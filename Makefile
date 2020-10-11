@@ -1,7 +1,7 @@
 default: checks
 
 checks:
-	env/bin/mypy *.py
+	env/bin/mypy *.py --ignore-missing-imports
 
 run:
 	env/bin/python3 dimsum.py
