@@ -9,12 +9,14 @@ async def test_run():
     bus = EventBus()
     world = World(bus)
 
-    jacob = Player(world, Details("Jacob", "Curly haired bastard."))
-    carla = Player(world, Details("Carla", "Chief salad officer."))
-    hammer = Item(jacob, Details("Hammer", "It's heavy."))
+    jacob = Player(owner=world, details=Details("Jacob", "Curly haired bastard."))
+    carla = Player(owner=world, details=Details("Carla", "Chief salad officer."))
+    hammer = Item(owner=jacob, details=Details("Hammer", "It's heavy."))
 
-    await world.add_area(Area(jacob, Details("Living room")).add_item(hammer))
-    await world.add_area(Area(jacob, Details("Kitchen")))
+    await world.add_area(
+        Area(owner=jacob, details=Details("Living room")).add_item(hammer)
+    )
+    await world.add_area(Area(owner=jacob, details=Details("Kitchen")))
     await world.join(jacob)
     await world.join(carla)
 
@@ -28,20 +30,20 @@ async def test_run():
 
     await world.give(jacob, "carla", "hammer")
 
-    trampoline = Item(jacob, Details("Trampoline", "It's bouncy."))
+    trampoline = Item(owner=jacob, details=Details("Trampoline", "It's bouncy."))
 
     await world.make(jacob, trampoline)
     await world.drop(jacob)
     await world.hold(jacob, "trampoline")
 
-    idea = Item(jacob, Details("Idea", "It's genius."))
+    idea = Item(owner=jacob, details=Details("Idea", "It's genius."))
 
     await world.make(jacob, idea)
     await world.drop(jacob)
 
     db = SqlitePersistence()
 
-    await db.open()
+    await db.open("test.sqlite3")
     await db.save(world)
 
     restored = World(bus)

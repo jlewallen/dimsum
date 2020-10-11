@@ -11,9 +11,12 @@ p = inflect.engine()
 class Entity:
     Counter = 0
 
-    def __init__(self):
-        Entity.Counter += 1
-        self.key = "e-%d" % (Entity.Counter)
+    def __init__(self, **kwargs):
+        if "key" in kwargs:
+            self.key = kwargs["key"]
+        else:
+            Entity.Counter += 1
+            self.key = "e-%d" % (Entity.Counter)
 
     def describes(self, q: str):
         return False
@@ -50,10 +53,10 @@ class Activity:
 
 
 class Item(Entity):
-    def __init__(self, owner: Entity, details: Details):
-        super().__init__()
-        self.owner = owner
-        self.details = details
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.owner = kwargs["owner"]
+        self.details = kwargs["details"]
 
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
@@ -103,10 +106,10 @@ class Holding(Activity):
 
 
 class Person(Entity):
-    def __init__(self, owner: Entity, details: Details):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.owner = owner
-        self.details = details
+        self.owner = kwargs["owner"]
+        self.details = kwargs["details"]
         self.holding: List[Entity] = []
 
     def observe(self):
@@ -162,13 +165,8 @@ class ObservedPerson:
 
 
 class Player(Person):
-    def __init__(self, owner: Entity, details: Details):
-        super().__init__(owner, details)
-
-
-class Route:
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Observation:
@@ -194,10 +192,10 @@ class Observation:
 
 
 class Area(Entity):
-    def __init__(self, owner: Entity, details: Details):
-        super().__init__()
-        self.owner = owner
-        self.details = details
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.owner = kwargs["owner"]
+        self.details = kwargs["details"]
         self.here: List[Entity] = []
 
     def entities(self):
@@ -269,6 +267,15 @@ class World(Entity):
         self.bus = bus
         self.entities = {}
 
+    def register(self, entity: Entity):
+        self.entities[entity.key] = entity
+
+    def unregister(self, entity: Entity):
+        del self.entities[entity.key]
+
+    def empty(self):
+        return len(self.entities.keys()) == 0
+
     def areas(self):
         return [e for e in self.entities.values() if isinstance(e, Area)]
 
@@ -291,14 +298,14 @@ class World(Entity):
     def find_player_area(self, player: Player):
         return self.find_entity_area(player)
 
+    def contains(self, key):
+        return key in self.entities
+
+    def find(self, key):
+        return self.entities[key]
+
     def resolve(self, keys):
         return [self.entities[key] for key in keys]
-
-    def register(self, entity: Entity):
-        self.entities[entity.key] = entity
-
-    def unregister(self, entity: Entity):
-        del self.entities[entity.key]
 
     async def join(self, player: Player):
         self.register(player)
@@ -324,11 +331,11 @@ class World(Entity):
         area = self.find_player_area(player)
         item = area.find(q)
         if not item:
-            return False
+            return []
         area.remove(item)
         player.hold(item)
         await self.bus.publish(ItemHeld(player, area, item))
-        return True
+        return [item]
 
     async def make(self, player: Player, item: Item):
         area = self.find_player_area(player)

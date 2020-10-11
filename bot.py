@@ -2,6 +2,7 @@ import discord
 import discord.ext.commands
 import logging
 import game
+import persistence
 
 bot = discord.ext.commands.Bot(".")
 
@@ -30,13 +31,25 @@ class BotPlayer:
 async def initialize_world():
     bus = DiscordEventBus(bot)
     world = game.World(bus)
-    hammer = game.Item(game.Details("Hammer", "It's heavy."))
-    await world.add_area(
-        game.Area(world, game.Details("Living room", "It's got walls.")).add_item(
-            hammer
+
+    db = persistence.SqlitePersistence()
+    await db.open("world.sqlite3")
+    await db.load(world)
+    if world.empty():
+        await world.add_area(
+            game.Area(
+                owner=world, details=game.Details("Living room", "It's got walls.")
+            ).add_item(
+                game.Item(owner=world, details=game.Details("Hammer", "It's heavy."))
+            )
         )
-    )
     return world
+
+
+async def save_world():
+    db = persistence.SqlitePersistence()
+    await db.open("world.sqlite3")
+    await db.save(world)
 
 
 async def get_player(message):
@@ -45,7 +58,15 @@ async def get_player(message):
     if author.id in players:
         players[author.id].channel = channel
         return players[author.id].player
-    player = game.Player(game.Details(author.name, "A discord user"))
+
+    if world.contains(author.id):
+        player = world.find(author.id)
+        players[author.id] = BotPlayer(player, channel)
+        return player
+
+    player = game.Player(
+        key=author.id, owner=world, details=game.Details(author.name, "A discord user")
+    )
     players[author.id] = BotPlayer(player, channel)
     await world.join(player)
     return player
@@ -80,6 +101,8 @@ async def hold(ctx, *, q: str = ""):
     held = await world.hold(player, q)
     if len(held) == 0:
         await ctx.message.channel.send("you can't hold that")
+    else:
+        await save_world()
 
 
 @bot.command(
@@ -93,6 +116,7 @@ async def drop(ctx):
     dropped = await world.drop(player)
     if len(dropped) == 0:
         await ctx.message.channel.send("nothing to drop")
+    await save_world()
 
 
 @bot.command(
@@ -127,8 +151,9 @@ async def look(ctx):
 )
 async def make(ctx, *, name: str):
     player = await get_player(ctx.message)
-    item = game.Item(game.Details(name, name))
+    item = game.Item(owner=player, details=game.Details(name, name))
     await world.make(player, item)
+    await save_world()
 
 
 @bot.command(
@@ -140,8 +165,9 @@ async def make(ctx, *, name: str):
 )
 async def build(ctx, *, name: str):
     player = await get_player(ctx.message)
-    item = game.Item(game.Details(name, name))
+    item = game.Item(owner=player, details=game.Details(name, name))
     await world.build(player, item)
+    await save_world()
 
 
 @bot.command(

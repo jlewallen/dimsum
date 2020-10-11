@@ -5,8 +5,8 @@ import game
 
 
 class SqlitePersistence:
-    async def open(self):
-        self.db = sqlite3.connect("dimsum.sqlite3")
+    async def open(self, path: str):
+        self.db = sqlite3.connect(path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
             "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
@@ -20,7 +20,6 @@ class SqlitePersistence:
             entity = world.entities[key]
             props = json.dumps(entity.saved())
             klass = entity.__class__.__name__
-            logging.info("%s %s" % (entity.key, props))
             self.dbc.execute(
                 "INSERT INTO entities (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, properties = EXCLUDED.properties",
                 [entity.key, klass, entity.owner.key, props],
@@ -54,7 +53,7 @@ class SqlitePersistence:
             row = rows[key]
             factory = factories[row[1]]
             owner = get_instance(row[2])
-            instance = factory(owner, game.Details())
+            instance = factory(key=row[0], owner=owner, details=game.Details())
             instance.key = key
             properties = json.loads(row[3])
             keyed[key] = [instance, properties]
