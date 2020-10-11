@@ -1,11 +1,60 @@
 import discord
 import discord.ext.commands
+import logging
+import game
 
 bot = discord.ext.commands.Bot(".")
 
 
+players = {}
+world = None
+
+
+class DiscordEventBus(game.EventBus):
+    def __init__(self, bot):
+        self.bot = bot
+
+    async def publish(self, event: game.Event):
+        logging.info("publish:%s", event)
+        for channel in self.bot.get_all_channels():
+            if channel.name == "test":
+                await channel.send(str(event))
+
+
+class BotPlayer:
+    def __init__(self, player, channel):
+        self.player = player
+        self.channel = channel
+
+
+async def initialize_world():
+    bus = DiscordEventBus(bot)
+    world = game.World(bus)
+    hammer = game.Item(game.Details("Hammer", "It's heavy."))
+    await world.add_area(
+        game.Area(world, game.Details("Living room", "It's got walls.")).add_item(
+            hammer
+        )
+    )
+    return world
+
+
+async def get_player(message):
+    author = message.author
+    channel = message.channel
+    if author.id in players:
+        players[author.id].channel = channel
+        return players[author.id].player
+    player = game.Player(game.Details(author.name, "A discord user"))
+    players[author.id] = BotPlayer(player, channel)
+    await world.join(player)
+    return player
+
+
 @bot.event
 async def on_ready():
+    global world
+    world = await initialize_world()
     print(f"{bot.user} has connected")
 
 
@@ -20,27 +69,17 @@ async def ping(ctx):
 
 
 @bot.command(
-    name="where",
-    description="where",
-    brief="where",
+    name="hold",
+    description="hold",
+    brief="hold",
     pass_context=True,
+    aliases=["take", "get"],
 )
-async def where(ctx):
-    user_id = ctx.message.author.id
-    name = ctx.message.author.display_name
-    await ctx.message.channel.send("indeed, %s (%d)!" % (name, user_id))
-
-
-@bot.command(
-    name="take",
-    description="take",
-    brief="take",
-    pass_context=True,
-)
-async def take(ctx):
-    user_id = ctx.message.author.id
-    name = ctx.message.author.display_name
-    await ctx.message.channel.send("indeed, %s (%d)!" % (name, user_id))
+async def hold(ctx, *, q: str = ""):
+    player = await get_player(ctx.message)
+    held = await world.hold(player, q)
+    if len(held) == 0:
+        await ctx.message.channel.send("you can't hold that")
 
 
 @bot.command(
@@ -50,9 +89,10 @@ async def take(ctx):
     pass_context=True,
 )
 async def drop(ctx):
-    user_id = ctx.message.author.id
-    name = ctx.message.author.display_name
-    await ctx.message.channel.send("indeed, %s (%d)!" % (name, user_id))
+    player = await get_player(ctx.message)
+    dropped = await world.drop(player)
+    if len(dropped) == 0:
+        await ctx.message.channel.send("nothing to drop")
 
 
 @bot.command(
@@ -62,9 +102,7 @@ async def drop(ctx):
     pass_context=True,
 )
 async def go(ctx):
-    user_id = ctx.message.author.id
-    name = ctx.message.author.display_name
-    await ctx.message.channel.send("indeed, %s (%d)!" % (name, user_id))
+    pass
 
 
 @bot.command(
@@ -72,11 +110,50 @@ async def go(ctx):
     description="look",
     brief="look",
     pass_context=True,
+    aliases=["where", "here"],
 )
 async def look(ctx):
-    user_id = ctx.message.author.id
-    name = ctx.message.author.display_name
-    await ctx.message.channel.send("indeed, %s (%d)!" % (name, user_id))
+    player = await get_player(ctx.message)
+    observation = world.look(player)
+    await ctx.message.channel.send(str(observation))
+
+
+@bot.command(
+    name="make",
+    description="make",
+    brief="make",
+    pass_context=True,
+    aliases=[],
+)
+async def make(ctx, *, name: str):
+    player = await get_player(ctx.message)
+    item = game.Item(game.Details(name, name))
+    await world.make(player, item)
+
+
+@bot.command(
+    name="build",
+    description="build",
+    brief="build",
+    pass_context=True,
+    aliases=[],
+)
+async def build(ctx, *, name: str):
+    player = await get_player(ctx.message)
+    item = game.Item(game.Details(name, name))
+    await world.build(player, item)
+
+
+@bot.command(
+    name="modify",
+    description="modify",
+    brief="modify",
+    pass_context=True,
+    aliases=[],
+)
+async def modify(ctx, *, q: str, how: str):
+    player = await get_player(ctx.message)
+    logging.info(q, how)
 
 
 class GameBot:

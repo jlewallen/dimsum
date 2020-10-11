@@ -1,7 +1,11 @@
 from typing import List, Tuple
 
+import asyncio
 import logging
 import sys
+import inflect
+
+p = inflect.engine()
 
 
 class Entity:
@@ -14,7 +18,7 @@ class Event:
 
 
 class EventBus:
-    def publish(self, event: Event):
+    async def publish(self, event: Event):
         logging.info("publish:%s", event)
 
 
@@ -43,7 +47,7 @@ class Item(Entity):
         return ObservedItem(self)
 
     def __str__(self):
-        return self.details.name
+        return p.a(self.details.name)
 
 
 class ObservedItem:
@@ -64,7 +68,7 @@ class Holding(Activity):
         self.item = item
 
     def __str__(self):
-        return "holding a %s" % (self.item,)
+        return "holding %s" % (self.item,)
 
     def __repr__(self):
         return str(self)
@@ -82,6 +86,11 @@ class Person(Entity):
     def hold(self, item: Item):
         self.holding.append(item)
         return True
+
+    def drop_all(self):
+        dropped = self.holding
+        self.holding = []
+        return dropped
 
     def drop(self, item: Item):
         if item in self.holding:
@@ -121,7 +130,7 @@ class Route:
 class Observation:
     def __init__(
         self,
-        who: Player,
+        who: ObservedPerson,
         details: Details,
         people: List[ObservedPerson],
         items: List[ObservedItem],
@@ -160,16 +169,22 @@ class Area:
             e.observe() for e in self.here if isinstance(e, Person) and e != player
         ]
         items = [e.observe() for e in self.here if isinstance(e, Item)]
-        return Observation(player, self.details, people, items)
+        return Observation(player.observe(), self.details, people, items)
 
-    def entered(self, bus: EventBus, player: Player):
+    async def entered(self, bus: EventBus, player: Player):
         self.here.append(player)
-        bus.publish(PlayerEnteredArea(player, self))
+        await bus.publish(PlayerEnteredArea(player, self))
         return self
 
-    def left(self, bus: EventBus, player: Player):
+    async def left(self, bus: EventBus, player: Player):
         self.here.remove(player)
-        bus.publish(PlayerLeftArea(player, self))
+        await bus.publish(PlayerLeftArea(player, self))
+        return self
+
+    async def drop(self, bus: EventBus, player: Player):
+        for item in player.drop_all():
+            self.here.append(item)
+            await bus.publish(ItemDropped(player, self, item))
         return self
 
     def add_item(self, item: Item):
@@ -199,24 +214,9 @@ class World(Entity):
     def welcome_area(self):
         return self.areas[0]
 
-    def join(self, player: Player):
-        self.players.append(player)
-        self.bus.publish(PlayerJoined(player))
-        self.welcome_area().entered(self.bus, player)
-
-    def go(self, player: Player, where: str):
-        pass
-
-    def quit(self, player: Player):
-        self.bus.publish(PlayerQuit(player))
-        self.players.remove(player)
-
     def look(self, player: Player):
         area = self.find_player_area(player)
         return area.look(player)
-
-    def add_area(self, area: Area):
-        self.areas.append(area)
 
     def find_entity_area(self, entity: Entity):
         for area in self.areas:
@@ -227,21 +227,46 @@ class World(Entity):
     def find_player_area(self, player: Player):
         return self.find_entity_area(player)
 
-    def give(self, player: Player, giving: str, receiving: str):
+    async def join(self, player: Player):
+        self.players.append(player)
+        await self.bus.publish(PlayerJoined(player))
+        await self.welcome_area().entered(self.bus, player)
+
+    async def quit(self, player: Player):
+        await self.bus.publish(PlayerQuit(player))
+        self.players.remove(player)
+
+    async def add_area(self, area: Area):
+        self.areas.append(area)
+
+    async def go(self, player: Player, where: str):
         pass
 
-    def hold(self, player: Player, q: str):
+    async def give(self, player: Player, giving: str, receiving: str):
+        pass
+
+    async def hold(self, player: Player, q: str):
         area = self.find_player_area(player)
         item = area.find(q)
         if not item:
             return False
         area.remove(item)
         player.hold(item)
-        self.bus.publish(ItemHeld(player, area, item))
+        await self.bus.publish(ItemHeld(player, area, item))
         return True
 
-    def drop(self, player: Player, q: str):
-        pass
+    async def make(self, player: Player, item: Item):
+        area = self.find_player_area(player)
+        player.hold(item)
+        await self.bus.publish(ItemMade(player, area, item))
+
+    async def build(self, player: Player, area: Area):
+        # add route
+        await self.bus.publish(AreaConstructed(player, area, item))
+
+    async def drop(self, player: Player):
+        area = self.find_player_area(player)
+        await area.drop(self.bus, player)
 
 
 class PlayerJoined(Event):
@@ -258,6 +283,15 @@ class PlayerQuit(Event):
 
     def __str__(self):
         return "%s quit" % (self.player)
+
+
+class AreaConstructed(Event):
+    def __init__(self, player: Player, area: Area):
+        self.player = player
+        self.area = area
+
+    def __str__(self):
+        return "%s constructed %s" % (self.player, self.area)
 
 
 class PlayerEnteredArea(Event):
@@ -288,6 +322,16 @@ class ItemHeld(Event):
         return "%s picked up %s" % (self.player, self.item)
 
 
+class ItemMade(Event):
+    def __init__(self, player: Player, area: Area, item: Item):
+        self.player = player
+        self.area = area
+        self.item = item
+
+    def __str__(self):
+        return "%s created %s out of thin air!" % (self.player, self.item)
+
+
 class ItemDropped(Event):
     def __init__(self, player: Player, area: Area, item: Item):
         self.player = player
@@ -298,26 +342,41 @@ class ItemDropped(Event):
         return "%s dropped %s" % (self.player, self.item)
 
 
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
+async def test_run():
     jacob = Player(Details("Jacob", "Curly haired bastard."))
     carla = Player(Details("Carla", "Chief salad officer."))
     hammer = Item(Details("Hammer", "It's heavy."))
 
     bus = EventBus()
     world = World(bus)
-    world.add_area(Area(jacob, Details("Living room")).add_item(hammer))
-    world.add_area(Area(jacob, Details("Kitchen")))
-    world.join(jacob)
-    world.join(carla)
+    await world.add_area(Area(jacob, Details("Living room")).add_item(hammer))
+    await world.add_area(Area(jacob, Details("Kitchen")))
+    await world.join(jacob)
+    await world.join(carla)
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
-    world.hold(jacob, "hammer")
+    await world.hold(jacob, "hammer")
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
-    world.give(jacob, "carla", "hammer")
+    await world.give(jacob, "carla", "hammer")
+
+    trampoline = Item(Details("Trampoline", "It's bouncy."))
+
+    await world.make(jacob, trampoline)
+    await world.drop(jacob)
+    await world.hold(jacob, "trampoline")
+
+    idea = Item(Details("Idea", "It's genius."))
+
+    await world.make(jacob, idea)
+    await world.drop(jacob)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+    asyncio.run(test_run())
