@@ -6,6 +6,9 @@ checks:
 run:
 	env/bin/python3 dimsum.py
 
+test:
+	env/bin/python3 test.py
+
 env:
 	echo
 

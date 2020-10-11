@@ -9,8 +9,22 @@ p = inflect.engine()
 
 
 class Entity:
+    Counter = 0
+
+    def __init__(self):
+        Entity.Counter += 1
+        self.key = "e-%d" % (Entity.Counter)
+
     def describes(self, q: str):
         return False
+
+    def saved(self):
+        return {
+            "key": self.key,
+        }
+
+    def load(self, world, properties):
+        self.key = properties["key"]
 
 
 class Event:
@@ -23,7 +37,7 @@ class EventBus:
 
 
 class Details:
-    def __init__(self, name: str, desc: str = ""):
+    def __init__(self, name: str = "", desc: str = ""):
         self.name = name
         self.desc = desc
 
@@ -36,8 +50,9 @@ class Activity:
 
 
 class Item(Entity):
-    def __init__(self, details: Details):
+    def __init__(self, owner: Entity, details: Details):
         super().__init__()
+        self.owner = owner
         self.details = details
 
     def describes(self, q: str):
@@ -48,6 +63,19 @@ class Item(Entity):
 
     def __str__(self):
         return p.a(self.details.name)
+
+    def saved(self):
+        p = super().saved()
+        p.update(
+            {
+                "details": self.details.__dict__,
+            }
+        )
+        return p
+
+    def load(self, world, properties):
+        super().load(world, properties)
+        self.details.__dict__ = properties["details"]
 
 
 class ObservedItem:
@@ -75,8 +103,10 @@ class Holding(Activity):
 
 
 class Person(Entity):
-    def __init__(self):
+    def __init__(self, owner: Entity, details: Details):
         super().__init__()
+        self.owner = owner
+        self.details = details
         self.holding: List[Entity] = []
 
     def observe(self):
@@ -98,6 +128,24 @@ class Person(Entity):
             return True
         return False
 
+    def __str__(self):
+        return self.details.name
+
+    def saved(self):
+        p = super().saved()
+        p.update(
+            {
+                "details": self.details.__dict__,
+                "holding": [e.key for e in self.holding],
+            }
+        )
+        return p
+
+    def load(self, world, properties):
+        super().load(world, properties)
+        self.details.__dict__ = properties["details"]
+        self.holding = world.resolve(properties["holding"])
+
 
 class ObservedPerson:
     def __init__(self, person: Person, activities: List[Activity]):
@@ -114,12 +162,8 @@ class ObservedPerson:
 
 
 class Player(Person):
-    def __init__(self, details: Details):
-        super().__init__()
-        self.details = details
-
-    def __str__(self):
-        return self.details.name
+    def __init__(self, owner: Entity, details: Details):
+        super().__init__(owner, details)
 
 
 class Route:
@@ -149,13 +193,15 @@ class Observation:
         )
 
 
-class Area:
-    def __init__(self, owner: Entity, details: Details, routes=[]):
+class Area(Entity):
+    def __init__(self, owner: Entity, details: Details):
+        super().__init__()
         self.owner = owner
         self.details = details
-        self.routes = routes
-        self.navigable = True
         self.here: List[Entity] = []
+
+    def entities(self):
+        return self.here
 
     def contains(self, e: Entity):
         return e in self.here
@@ -170,6 +216,35 @@ class Area:
         ]
         items = [e.observe() for e in self.here if isinstance(e, Item)]
         return Observation(player.observe(), self.details, people, items)
+
+    def add_item(self, item: Item):
+        self.here.append(item)
+        return self
+
+    def find(self, q: str):
+        for entity in self.here:
+            if entity.describes(q):
+                return entity
+        return None
+
+    def saved(self):
+        p = super().saved()
+        p.update(
+            {
+                "details": self.details.__dict__,
+                "owner": self.owner.key,
+                "here": [e.key for e in self.entities()],
+            }
+        )
+        return p
+
+    def load(self, world, properties):
+        super().load(world, properties)
+        self.details.__dict__ = properties["details"]
+        self.here = world.resolve(properties["here"])
+
+    def __str__(self):
+        return self.details.name
 
     async def entered(self, bus: EventBus, player: Player):
         self.here.append(player)
@@ -187,27 +262,12 @@ class Area:
             await bus.publish(ItemDropped(player, self, item))
         return self
 
-    def add_item(self, item: Item):
-        self.here.append(item)
-        return self
-
-    def add_route(self, route: Route):
-        self.routes.append(route)
-        return self
-
-    def find(self, q: str):
-        for entity in self.here:
-            if entity.describes(q):
-                return entity
-        return None
-
-    def __str__(self):
-        return self.details.name
-
 
 class World(Entity):
     def __init__(self, bus: EventBus):
+        self.key = "world"
         self.bus = bus
+        self.entities = {}
         self.areas = []
         self.players = []
 
@@ -227,17 +287,35 @@ class World(Entity):
     def find_player_area(self, player: Player):
         return self.find_entity_area(player)
 
+    def resolve(self, keys):
+        return [self.entities[key] for key in keys]
+
+    def register(self, entity: Entity):
+        if False:
+            logging.info("registering %s: %s" % (entity.key, entity))
+
+        self.entities[entity.key] = entity
+        if isinstance(entity, Player):
+            self.players.append(entity)
+
+    def unregister(self, entity: Entity):
+        if isinstance(entity, Player):
+            self.players.remove(entity)
+        del self.entities[entity.key]
+
     async def join(self, player: Player):
-        self.players.append(player)
+        self.register(player)
         await self.bus.publish(PlayerJoined(player))
         await self.welcome_area().entered(self.bus, player)
 
     async def quit(self, player: Player):
         await self.bus.publish(PlayerQuit(player))
-        self.players.remove(player)
+        self.unregister(player)
 
     async def add_area(self, area: Area):
         self.areas.append(area)
+        for entity in area.entities():
+            self.register(entity)
 
     async def go(self, player: Player, where: str):
         pass
@@ -258,10 +336,10 @@ class World(Entity):
     async def make(self, player: Player, item: Item):
         area = self.find_player_area(player)
         player.hold(item)
+        self.register(item)
         await self.bus.publish(ItemMade(player, area, item))
 
     async def build(self, player: Player, area: Area):
-        # add route
         await self.bus.publish(AreaConstructed(player, area, item))
 
     async def drop(self, player: Player):
@@ -340,43 +418,3 @@ class ItemDropped(Event):
 
     def __str__(self):
         return "%s dropped %s" % (self.player, self.item)
-
-
-async def test_run():
-    jacob = Player(Details("Jacob", "Curly haired bastard."))
-    carla = Player(Details("Carla", "Chief salad officer."))
-    hammer = Item(Details("Hammer", "It's heavy."))
-
-    bus = EventBus()
-    world = World(bus)
-    await world.add_area(Area(jacob, Details("Living room")).add_item(hammer))
-    await world.add_area(Area(jacob, Details("Kitchen")))
-    await world.join(jacob)
-    await world.join(carla)
-
-    logging.info(world.look(jacob))
-    logging.info(world.look(carla))
-
-    await world.hold(jacob, "hammer")
-
-    logging.info(world.look(jacob))
-    logging.info(world.look(carla))
-
-    await world.give(jacob, "carla", "hammer")
-
-    trampoline = Item(Details("Trampoline", "It's bouncy."))
-
-    await world.make(jacob, trampoline)
-    await world.drop(jacob)
-    await world.hold(jacob, "trampoline")
-
-    idea = Item(Details("Idea", "It's genius."))
-
-    await world.make(jacob, idea)
-    await world.drop(jacob)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
-    asyncio.run(test_run())
