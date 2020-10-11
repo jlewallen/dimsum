@@ -268,18 +268,22 @@ class World(Entity):
         self.key = "world"
         self.bus = bus
         self.entities = {}
-        self.areas = []
-        self.players = []
+
+    def areas(self):
+        return [e for e in self.entities.values() if isinstance(e, Area)]
+
+    def players(self):
+        return [e for e in self.entities.values() if isinstance(e, Player)]
 
     def welcome_area(self):
-        return self.areas[0]
+        return self.areas()[0]
 
     def look(self, player: Player):
         area = self.find_player_area(player)
         return area.look(player)
 
     def find_entity_area(self, entity: Entity):
-        for area in self.areas:
+        for area in self.areas():
             if area.contains(entity):
                 return area
         return None
@@ -291,16 +295,9 @@ class World(Entity):
         return [self.entities[key] for key in keys]
 
     def register(self, entity: Entity):
-        if False:
-            logging.info("registering %s: %s" % (entity.key, entity))
-
         self.entities[entity.key] = entity
-        if isinstance(entity, Player):
-            self.players.append(entity)
 
     def unregister(self, entity: Entity):
-        if isinstance(entity, Player):
-            self.players.remove(entity)
         del self.entities[entity.key]
 
     async def join(self, player: Player):
@@ -313,7 +310,7 @@ class World(Entity):
         self.unregister(player)
 
     async def add_area(self, area: Area):
-        self.areas.append(area)
+        self.register(area)
         for entity in area.entities():
             self.register(entity)
 

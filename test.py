@@ -46,7 +46,7 @@ async def test_run():
 
     restored = World(bus)
     await db.load(restored)
-    logging.info(restored.look(restored.players[0]))
+    logging.info(restored.look(restored.players()[0]))
 
 
 if __name__ == "__main__":

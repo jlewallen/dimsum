@@ -11,9 +11,6 @@ class SqlitePersistence:
         self.dbc.execute(
             "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
         )
-        self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS areas (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
-        )
         self.db.commit()
 
     async def save(self, world):
@@ -27,15 +24,6 @@ class SqlitePersistence:
             self.dbc.execute(
                 "INSERT INTO entities (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, properties = EXCLUDED.properties",
                 [entity.key, klass, entity.owner.key, props],
-            )
-
-        for area in world.areas:
-            props = json.dumps(area.saved())
-            klass = area.__class__.__name__
-            logging.info("%s %s" % (area.key, props))
-            self.dbc.execute(
-                "INSERT INTO areas (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, properties = EXCLUDED.properties",
-                [area.key, klass, area.owner.key, props],
             )
 
         self.db.commit()
@@ -78,13 +66,5 @@ class SqlitePersistence:
         for key in keyed.keys():
             instance, properties = keyed[key]
             instance.load(world, properties)
-
-        for row in self.dbc.execute("SELECT key, klass, owner, properties FROM areas"):
-            factory = factories[row[1]]
-            owner = get_instance(row[2])
-            instance = factory(owner, game.Details())
-            properties = json.loads(row[3])
-            instance.load(world, properties)
-            world.areas.append(instance)
 
         self.db.commit()
