@@ -32,6 +32,7 @@
                 <select v-model="form.owner">
                     <option disabled value="">Please select one</option>
                     <option v-for="person in people" v-bind:key="person.key" :value="person.key">{{ person.details.name }}</option>
+                    <option value="world">World</option>
                 </select>
             </div>
         </div>
