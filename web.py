@@ -118,6 +118,7 @@ def create(state):
             entity = world.find(key)
             entity.details.name = form["name"]
             entity.details.desc = form["desc"]
+            entity.details.presence = form["presence"]
             entity.owner = owner
 
             await state.save()

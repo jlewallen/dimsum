@@ -4,7 +4,6 @@ import {
     RootState,
     MutationTypes,
     ActionTypes,
-    UpdateEntityPayload,
     AreasResponse,
     Area,
     PeopleResponse,

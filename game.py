@@ -76,15 +76,16 @@ class EventBus:
 
 
 class Details:
-    def __init__(self, name: str = "", desc: str = ""):
+    def __init__(self, name: str = "", desc: str = "", presence: str = ""):
         self.name = name
         self.desc = desc
+        self.presence = presence
 
     def __str__(self):
         return self.name
 
     def clone(self):
-        return Details(self.name, self.desc)
+        return Details(self.name, self.desc, self.presence)
 
 
 class Activity:

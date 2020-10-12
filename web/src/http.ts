@@ -10,6 +10,7 @@ export interface UpdateEntityPayload {
     key: string;
     name: string;
     desc: string;
+    presence: string;
     owner: string;
 }
 
@@ -32,6 +33,7 @@ export async function http<T>(info: OurRequestInfo): Promise<T> {
 export interface Details {
     name: string;
     desc: string;
+    presence: string;
 }
 
 export type EntityKey = string;
