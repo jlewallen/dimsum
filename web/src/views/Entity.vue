@@ -10,50 +10,46 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import EntityEditor from "./EntityEditor.vue";
-import { http, EntityResponse, Entity } from "@/http";
+import { Entity } from "@/http";
+import store, { NeedEntityAction } from "@/store";
 
 export default defineComponent({
     name: "Entity",
     components: {
         EntityEditor,
     },
-    data(): { busy: boolean; entity: Entity | null } {
+    data(): { busy: boolean } {
         return {
             busy: false,
-            entity: null,
         };
     },
     computed: {
         key(): string | null {
             return this.$route.params.key?.toString() || null;
         },
+        entity(): Entity | null {
+            if (!this.key) return null;
+            return store.state.entities[this.key];
+        },
     },
     watch: {
-        key(): Promise<EntityResponse | null> {
+        key(): Promise<void> {
             return this.refresh();
         },
     },
-    mounted(): Promise<EntityResponse | null> {
+    mounted(): Promise<void> {
         return this.refresh();
     },
     methods: {
-        refresh(): Promise<EntityResponse | null> {
-            const key = this.$route.params.key?.toString() || null;
-            if (!key) {
+        refresh(): Promise<void> {
+            if (!this.key) {
                 console.log("no key", this.$route);
-                return Promise.resolve(null);
+                return Promise.resolve();
             }
             this.busy = true;
-            console.log("entity:change", key);
-            return http<EntityResponse>({ url: `/entities/${key}` })
-                .then((data: EntityResponse) => {
-                    console.log("entity:data", data);
-                    this.entity = data.entity;
-                    return data;
-                })
-                .finally(() => {
-                    this.busy = false;
-                });
+            return store.dispatch(new NeedEntityAction(this.key)).finally(() => {
+                this.busy = false;
+            });
         },
     },
 });

@@ -6,6 +6,13 @@ export interface OurRequestInfo {
     data?: any;
 }
 
+export interface UpdateEntityPayload {
+    key: string;
+    name: string;
+    desc: string;
+    owner: string;
+}
+
 export async function http<T>(info: OurRequestInfo): Promise<T> {
     let body: string | null = null;
     if (info.data) {
@@ -27,16 +34,20 @@ export interface Details {
     desc: string;
 }
 
+export type EntityKey = string;
+
 export interface EntityRef {
     key: string;
     kind: string;
     url: string;
+    name: string;
 }
 
 export interface Entity {
     key: string;
     kind: string;
     url: string;
+    owner: EntityRef;
     details: Details;
     holding?: Entity[];
     entities?: Entity[];

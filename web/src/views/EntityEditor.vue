@@ -42,7 +42,8 @@ import { defineComponent } from "vue";
 import AreaEditor from "./AreaEditor.vue";
 import ItemEditor from "./ItemEditor.vue";
 import PersonEditor from "./PersonEditor.vue";
-import { http, Person, PeopleResponse, EntityResponse } from "@/http";
+import { Person, Entity, UpdateEntityPayload } from "@/http";
+import store, { SaveEntityAction } from "@/store";
 
 export default defineComponent({
     name: "EntityEditor",
@@ -54,38 +55,32 @@ export default defineComponent({
     },
     props: {
         entity: {
-            type: Object,
+            type: Object as () => Entity,
             required: true,
         },
     },
-    data(): { form: { name: string; desc: string; owner: string }; people: Person[] } {
+    data(): { form: UpdateEntityPayload } {
         return {
             form: {
+                key: this.entity.key,
                 name: this.entity.details.name,
                 desc: this.entity.details.desc,
                 owner: this.entity.owner.key,
             },
-            people: [],
         };
     },
     computed: {
         kindSpecific(): string {
             return this.entity.kind + "Editor";
         },
-    },
-    mounted(): Promise<PeopleResponse> {
-        console.log("entity-editor:mounted", this.entity);
-        return http<PeopleResponse>({ url: `/people` }).then((data) => {
-            this.people = data.people;
-            return data;
-        });
+        people(): Person[] {
+            return Object.values(store.state.people);
+        },
     },
     methods: {
-        saveForm(): Promise<EntityResponse> {
+        saveForm(): Promise<any> {
             console.log("entity-editor:saving", this.entity);
-            return http<EntityResponse>({ url: `/entities/${this.entity.key}`, method: "POST", data: this.form }).then((data) => {
-                return data;
-            });
+            return store.dispatch(new SaveEntityAction(this.form));
         },
     },
 });

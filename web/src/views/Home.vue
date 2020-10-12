@@ -10,30 +10,23 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Entities from "./Entities.vue";
-import { http, AreasResponse, Entity, Area } from "@/http";
+import { Entity, Area } from "@/http";
+import store from "@/store";
 
 export default defineComponent({
     name: "Home",
     components: {
         Entities,
     },
-    data(): { busy: boolean; areas: Area[] } {
+    data(): { busy: boolean } {
         return {
             busy: false,
-            areas: [],
         };
     },
-    mounted() {
-        console.log("home:mounted");
-        this.busy = true;
-        return http<AreasResponse>({ url: `` })
-            .then((data) => {
-                this.areas = data.areas;
-                return;
-            })
-            .finally(() => {
-                this.busy = false;
-            });
+    computed: {
+        areas(): Area[] {
+            return Object.values(store.state.areas);
+        },
     },
     methods: {
         entitySelected(entity: Entity): Promise<any> {

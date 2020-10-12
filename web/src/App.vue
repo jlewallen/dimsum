@@ -5,6 +5,26 @@
     <router-view />
 </template>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+import store, { LoadingAction } from "@/store";
+
+export default defineComponent({
+    name: "App",
+    data() {
+        return {
+            busy: false,
+        };
+    },
+    mounted(): Promise<void> {
+        this.busy = true;
+        return store.dispatch(new LoadingAction()).finally(() => {
+            this.busy = false;
+        });
+    },
+});
+</script>
+
 <style>
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
