@@ -20,7 +20,7 @@ class DiscordEventBus(game.EventBus):
     async def publish(self, event: game.Event):
         logging.info("publish:%s", event)
         for channel in self.bot.get_all_channels():
-            if channel.name == "general":
+            if channel.name == "IGNORED":
                 await channel.send(str(event))
 
 
