@@ -14,5 +14,8 @@ export default defineComponent({
   components: {
     HelloWorld,
   },
+	mounted() {
+		console.log("home:mounted")
+	}
 });
 </script>
