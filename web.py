@@ -116,10 +116,12 @@ def create(state):
             owner = world
             if world.contains(form["owner"]):
                 owner = world.find(form["owner"])
+
+            del form["key"]
+            del form["owner"]
+
             entity = world.find(key)
-            entity.details.name = form["name"]
-            entity.details.desc = form["desc"]
-            entity.details.presence = form["presence"]
+            entity.details.__dict__.update(form)
             entity.owner = owner
 
             await state.save()

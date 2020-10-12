@@ -1,32 +1,25 @@
 <template>
     <form class="container form" @submit.prevent="saveForm">
-        <div class="row">
+        <div class="row" v-for="field in fields" v-bind:key="field.name">
             <div class="col-25">
-                <label>Name</label>
+                <label>{{ field.name }}</label>
             </div>
             <div class="col-75">
-                <input type="text" v-model="form.name" />
+                <div v-if="!field.readOnly">
+                    <select v-model="form[field.name]" v-if="field.bool">
+                        <option :value="true">yes</option>
+                        <option :value="false">no</option>
+                    </select>
+                    <input type="text" v-model="form[field.name]" v-else />
+                </div>
+                <div v-else>
+                    {{ form[field.name] }}
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-25">
-                <label>Description</label>
-            </div>
-            <div class="col-75">
-                <input type="text" v-model="form.desc" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-25">
-                <label>Presence</label>
-            </div>
-            <div class="col-75">
-                <input type="text" v-model="form.presence" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-25">
-                <label>Owner</label>
+                <label>owner</label>
             </div>
             <div class="col-75">
                 <select v-model="form.owner">
@@ -37,15 +30,29 @@
             </div>
         </div>
         <div class="row actions">
+            <!--
+            <label>Field Name</label>
+            <input type="text" v-model="field.name" />
+            <input type="button" class="button" value="Add Yes/No" v-on:click="addBoolField" />
+            <input type="button" class="button" value="Add Field" v-on:click="addDumbField" />
+			-->
             <input type="submit" value="Save" />
         </div>
     </form>
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { defineComponent } from "vue";
 import { Person, Entity, UpdateEntityPayload } from "@/http";
 import store, { SaveEntityAction } from "@/store";
+
+export interface Field {
+    name: string;
+    readOnly: boolean;
+    numeric: boolean;
+    bool: boolean;
+}
 
 export default defineComponent({
     name: "GeneralEntityForm",
@@ -56,14 +63,25 @@ export default defineComponent({
             required: true,
         },
     },
-    data(): { form: UpdateEntityPayload } {
+    data(): { fields: Field[]; field: { name: string }; form: any } {
+        const readOnly = ["created", "touched"];
+        const fields = _.map(this.entity.details, (value, key) => {
+            return {
+                name: key,
+                readOnly: readOnly.indexOf(key) >= 0,
+                numeric: _.isNumber(value),
+                bool: _.isBoolean(value),
+            };
+        });
         return {
+            fields: fields,
+            field: {
+                name: "",
+            },
             form: {
                 key: this.entity.key,
-                name: this.entity.details.name,
-                desc: this.entity.details.desc,
-                presence: this.entity.details.presence,
                 owner: this.entity.owner.key,
+                ...this.entity.details,
             },
         };
     },
@@ -73,6 +91,22 @@ export default defineComponent({
         },
     },
     methods: {
+        addDumbField(): void {
+            this.fields.push({
+                name: "field",
+                readOnly: false,
+                numeric: false,
+                bool: false,
+            });
+        },
+        addBoolField(): void {
+            this.fields.push({
+                name: "field",
+                readOnly: false,
+                numeric: false,
+                bool: true,
+            });
+        },
         saveForm(): Promise<any> {
             console.log("entity-editor:saving", this.entity);
             return store.dispatch(new SaveEntityAction(this.form));
@@ -140,6 +174,8 @@ input[type="submit"] {
 
 .row.actions {
     margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
@@ -150,5 +186,16 @@ input[type="submit"] {
         width: 100%;
         margin-top: 0;
     }
+}
+
+.button {
+    background-color: coral;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    margin-right: 1em;
 }
 </style>
