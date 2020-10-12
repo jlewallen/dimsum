@@ -28,6 +28,10 @@ class BotPlayer:
         self.channel = channel
 
 
+def get_world():
+    return world
+
+
 async def initialize_world():
     bus = DiscordEventBus(bot)
     world = game.World(bus)
@@ -35,6 +39,7 @@ async def initialize_world():
     db = persistence.SqlitePersistence()
     await db.open("world.sqlite3")
     await db.load(world)
+
     if world.empty():
         world.add_area(
             game.Area(
@@ -43,6 +48,7 @@ async def initialize_world():
                 game.Item(owner=world, details=game.Details("Hammer", "It's heavy."))
             )
         )
+
     return world
 
 

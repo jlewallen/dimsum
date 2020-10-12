@@ -8,6 +8,17 @@ import inflect
 p = inflect.engine()
 
 
+class Visitor:
+    def item(self, item):
+        pass
+
+    def person(self, person):
+        pass
+
+    def area(self, area):
+        pass
+
+
 class Entity:
     Counter = 0
 
@@ -28,6 +39,9 @@ class Entity:
 
     def load(self, world, properties):
         self.key = properties["key"]
+
+    def accept(self, visitor: Visitor):
+        raise Exception("unimplemented")
 
 
 class Event:
@@ -79,6 +93,9 @@ class Item(Entity):
         super().load(world, properties)
         self.details.__dict__ = properties["details"]
         self.area = world.find(properties["area"]) if properties["area"] else None
+
+    def accept(self, visitor: Visitor):
+        return visitor.item(self)
 
     def __str__(self):
         return p.a(self.details.name)
@@ -140,6 +157,9 @@ class Person(Entity):
             self.holding.remove(item)
             return [item]
         return []
+
+    def accept(self, visitor: Visitor):
+        return visitor.person(self)
 
     def __str__(self):
         return self.details.name
@@ -251,6 +271,9 @@ class Area(Entity):
         super().load(world, properties)
         self.details.__dict__ = properties["details"]
         self.here = world.resolve(properties["here"])
+
+    def accept(self, visitor: Visitor):
+        return visitor.area(self)
 
     def __str__(self):
         return self.details.name
