@@ -54,10 +54,12 @@ export interface Entity {
     holding?: Entity[];
     entities?: Entity[];
     area?: EntityRef;
+    memory?: EntityRef | null;
 }
 
 export interface Person extends Entity {
     holding: Entity[];
+    memory: EntityRef | null;
 }
 
 export interface Area extends Entity {

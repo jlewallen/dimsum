@@ -161,6 +161,7 @@ class Person(Entity):
         self.details = kwargs["details"]
         self.creator = kwargs["creator"] if "creator" in kwargs else True
         self.holding: List[Entity] = []
+        self.memory = None
 
     @property
     def holding(self):
@@ -169,6 +170,14 @@ class Person(Entity):
     @holding.setter
     def holding(self, value):
         self.__holding = value
+
+    @property
+    def memory(self):
+        return self.__memory
+
+    @memory.setter
+    def memory(self, value):
+        self.__memory = value
 
     def find(self, q: str):
         for entity in self.holding:
@@ -213,6 +222,7 @@ class Person(Entity):
                 "details": self.details.__dict__,
                 "holding": [e.key for e in self.holding],
                 "creator": self.creator,
+                "memory": self.memory.key if self.memory else None,
             }
         )
         return p
@@ -221,6 +231,8 @@ class Person(Entity):
         super().load(world, properties)
         self.details.__dict__ = properties["details"]
         self.holding = world.resolve(properties["holding"])
+        if "memory" in properties and properties["memory"]:
+            self.memory = world.find(properties["memory"])
 
 
 class ObservedPerson:
@@ -526,6 +538,16 @@ class Obliterate(Action):
         for item in items:
             world.unregister(item)
             await world.bus.publish(ItemObliterated(player, area, item))
+
+
+class Remember(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
+        player.memory = area
+        return area
 
 
 class Modify(Action):

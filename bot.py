@@ -148,6 +148,25 @@ class GameBot:
             await mutate(ctx.message.channel.send, op)
 
         @bot.command(
+            name="remember",
+            description="Remember a place, useful for finding your way back.",
+            brief="Remember a place, useful for finding your way back.",
+            pass_context=True,
+            aliases=[],
+        )
+        async def remember(ctx):
+            async def op():
+                player = await self.get_player(ctx.message)
+                await self.world.perform(player, game.Remember())
+
+                await ctx.message.channel.send(
+                    "you'll be able to remember this place, oh yeah"
+                )
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
             name="make",
             description="Make a new item.",
             brief="Make a new item.",

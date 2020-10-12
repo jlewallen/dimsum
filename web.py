@@ -53,6 +53,7 @@ class WebModelVisitor:
             "owner": self.ref(person.owner),
             "details": person.details.__dict__,
             "holding": [self.ref(e) for e in person.holding],
+            "memory": self.ref(person.memory) if person.memory else None,
         }
 
 

@@ -4,6 +4,11 @@
             <div></div>
         </div>
 
+        <div v-if="entity.memory">
+            <h3>Memory:</h3>
+            <DynamicSmallEntityPanel :entityKey="entity.memory.key" @selected="entitySelected" />
+        </div>
+
         <div v-if="entity.holding?.length > 0">
             <h4>Holding:</h4>
             <Entities :entityRefs="entity.holding" @selected="entitySelected" />
@@ -13,15 +18,16 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity } from "@/http";
+import { Entity, Person } from "@/http";
+import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 import Entities from "./Entities.vue";
 
 export default defineComponent({
     name: "PersonEditor",
-    components: { Entities },
+    components: { DynamicSmallEntityPanel, Entities },
     props: {
         entity: {
-            type: Object,
+            type: Object as () => Person,
             required: true,
         },
     },
