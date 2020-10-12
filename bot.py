@@ -71,9 +71,10 @@ class GameBot:
             pass_context=True,
             aliases=["l", "where", "here"],
         )
-        async def look(ctx):
+        async def look(ctx, *, q: str = ""):
             player = await self.get_player(ctx.message)
-            observation = self.world.look(player)
+            action = self.parse_as(evaluator.create(self.world, player), "look", q)
+            observation = await self.world.perform(player, action)
 
             emd = observation.details.desc
             emd += "\n\n"
@@ -91,27 +92,6 @@ class GameBot:
 
             em = discord.Embed(title=observation.details.name, description=emd)
 
-            await ctx.message.channel.send(embed=em)
-
-        @bot.command(
-            name="inspect",
-            description="Inspect things closer.",
-            brief="Inspect things closer.",
-            pass_context=True,
-            aliases=["insp", "i"],
-        )
-        async def inspect(ctx):
-            player = await self.get_player(ctx.message)
-            if len(player.holding) == 0:
-                await ctx.message.channel.send("try holding something")
-                return
-
-            em = discord.Embed(title="Inspection", colour=0x00FF00)
-            for item in player.holding:
-                em.add_field(
-                    name=str(item),
-                    value="[open](%s/entities/%s)" % (self.baseUrl, item.key),
-                )
             await ctx.message.channel.send(embed=em)
 
         @bot.command(

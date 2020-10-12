@@ -4,7 +4,7 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start: look | insp | obliterate | drop | hold | make | go | remember | modify
+        start: look | obliterate | drop | hold | make | go | remember | modify
 
         _WS:  WS
         TEXT:       (WS | WORD | "?" | "!" | "." | ",")+
@@ -13,7 +13,6 @@ def create_parser():
         somewhere:      TEXT
 
         look:       "look"
-        insp:       "insp"
         drop:       "drop"
         hold:       "hold" _WS something_here
         make:       "make" _WS something_new

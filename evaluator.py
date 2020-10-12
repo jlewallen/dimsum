@@ -44,6 +44,9 @@ class Evaluate(lark.Transformer):
     def go(self, args):
         return game.Go(item=args[0])
 
+    def look(self, args):
+        return game.Look()
+
     def modify_field(self, args):
         if len(self.player.holding) == 0:
             raise game.NotHoldingAnything()

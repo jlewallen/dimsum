@@ -484,6 +484,14 @@ class Join(Action):
         await world.welcome_area().entered(world.bus, player)
 
 
+class Look(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        return world.look(player)
+
+
 class Hold(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

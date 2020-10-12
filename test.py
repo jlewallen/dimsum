@@ -76,7 +76,6 @@ async def test_run():
     logging.info(l.parse("look"))
     logging.info(l.parse("hold my beer"))
     logging.info(l.parse("make My Beer"))
-    logging.info(l.parse("insp"))
     logging.info(l.parse("remember"))
     logging.info(l.parse("modify name Rusty Hammer"))
     logging.info(l.parse("modify desc How could anyone use this?"))
