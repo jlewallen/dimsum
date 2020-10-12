@@ -1,14 +1,4 @@
 * DimSum
 ** Example Session
 
-   #+BEGIN_SRC sh
-   .look
-   You can see stuff.
-   .make Door
-   .go Door
-   .modify name A lovely cove.
-   .modify desc The sun is setting towards the South and there's a gentle breeze that's rustling branches on nearby trees.
-   .look
-   .go Door
-
-   #+END_SRC
+	[[./docs/areas.png]]

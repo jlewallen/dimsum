@@ -251,6 +251,7 @@ async def go(ctx, *, where: str = ""):
         player = await get_player(ctx.message)
         await world.go(player, where)
         await save_world()
+        await look(ctx)
 
     await mutate(ctx.message.channel.send, op)
 
