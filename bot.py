@@ -104,19 +104,9 @@ async def on_ready():
 
 
 @bot.command(
-    name="ping",
-    description="ping",
-    brief="ping",
-    pass_context=True,
-)
-async def ping(ctx):
-    await ctx.message.channel.send("pong")
-
-
-@bot.command(
     name="look",
-    description="look",
-    brief="look",
+    description="Look around.",
+    brief="Look around.",
     pass_context=True,
     aliases=["where", "here"],
 )
@@ -128,8 +118,8 @@ async def look(ctx):
 
 @bot.command(
     name="hold",
-    description="hold",
-    brief="hold",
+    description="Pick something up off the ground, or from a place that's visible.",
+    brief="Pick something up off the ground, or from a place that's visible.",
     pass_context=True,
     aliases=["take", "get"],
 )
@@ -165,8 +155,8 @@ async def drop(ctx):
 
 @bot.command(
     name="make",
-    description="make",
-    brief="make",
+    description="Make a new item.",
+    brief="Make a new item.",
     pass_context=True,
     aliases=[],
 )
@@ -182,8 +172,8 @@ async def make(ctx, *, name: str):
 
 @bot.command(
     name="modify",
-    description="modify",
-    brief="modify",
+    description="Modify attributes/properties of items that are being held",
+    brief="Modify attributes/properties of items that are being held",
     pass_context=True,
     aliases=[],
 )
@@ -197,9 +187,25 @@ async def modify(ctx, *, changeQ: str):
 
 
 @bot.command(
+    name="obliterate",
+    description="Any items the player is holding are reduced to an uptick of warmth in the server room, never to be seen again",
+    brief="Destroy items being held forever",
+    pass_context=True,
+    aliases=[],
+)
+async def modify(ctx):
+    async def op():
+        player = await get_player(ctx.message)
+        await world.obliterate(player)
+        await save_world()
+
+    await mutate(ctx.message.channel.send, op)
+
+
+@bot.command(
     name="go",
-    description="go",
-    brief="go",
+    description="Move around the world, just say where.",
+    brief="Move around the world, just say where.",
     pass_context=True,
 )
 async def go(ctx, *, where: str = ""):

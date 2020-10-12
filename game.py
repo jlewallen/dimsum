@@ -401,6 +401,10 @@ class World(Entity):
     def search_hands(self, player: Player, whereQ: str):
         return player.find(whereQ)
 
+    def search_floor(self, player: Player, whereQ: str):
+        area = self.find_player_area(player)
+        return area.find(whereQ)
+
     def search(self, player: Player, whereQ: str, **kwargs):
         area = self.find_player_area(player)
         item = area.find(whereQ)
@@ -449,6 +453,13 @@ class World(Entity):
         player.hold(item)
         self.register(item)
         await self.bus.publish(ItemMade(player, area, item))
+
+    async def obliterate(self, player: Player):
+        area = self.find_player_area(player)
+        items = player.drop_all()
+        for item in items:
+            self.unregister(item)
+            await self.bus.publish(ItemObliterated(player, area, item))
 
     async def modify(self, player: Player, changeQ: str):
         def name(item, value):
@@ -550,3 +561,13 @@ class ItemDropped(Event):
 
     def __str__(self):
         return "%s dropped %s" % (self.player, self.item)
+
+
+class ItemObliterated(Event):
+    def __init__(self, player: Player, area: Area, item: Item):
+        self.player = player
+        self.area = area
+        self.item = item
+
+    def __str__(self):
+        return "%s obliterated %s" % (self.player, self.item)
