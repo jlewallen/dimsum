@@ -57,6 +57,7 @@ class Item(Entity):
         super().__init__(**kwargs)
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
+        self.area = kwargs["area"] if "area" in kwargs else None
 
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
@@ -64,14 +65,12 @@ class Item(Entity):
     def observe(self):
         return ObservedItem(self)
 
-    def __str__(self):
-        return p.a(self.details.name)
-
     def saved(self):
         p = super().saved()
         p.update(
             {
                 "details": self.details.__dict__,
+                "area": self.area.key if self.area else None,
             }
         )
         return p
@@ -79,6 +78,10 @@ class Item(Entity):
     def load(self, world, properties):
         super().load(world, properties)
         self.details.__dict__ = properties["details"]
+        self.area = world.find(properties["area"]) if properties["area"] else None
+
+    def __str__(self):
+        return p.a(self.details.name)
 
 
 class ObservedItem:
@@ -110,7 +113,14 @@ class Person(Entity):
         super().__init__()
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
+        self.creator = kwargs["creator"] if "creator" in kwargs else True
         self.holding: List[Entity] = []
+
+    def find(self, q: str):
+        for entity in self.holding:
+            if entity.describes(q):
+                return entity
+        return None
 
     def observe(self):
         activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
@@ -128,8 +138,8 @@ class Person(Entity):
     def drop(self, item: Item):
         if item in self.holding:
             self.holding.remove(item)
-            return True
-        return False
+            return [item]
+        return []
 
     def __str__(self):
         return self.details.name
@@ -140,6 +150,7 @@ class Person(Entity):
             {
                 "details": self.details.__dict__,
                 "holding": [e.key for e in self.holding],
+                "creator": self.creator,
             }
         )
         return p
@@ -247,18 +258,21 @@ class Area(Entity):
     async def entered(self, bus: EventBus, player: Player):
         self.here.append(player)
         await bus.publish(PlayerEnteredArea(player, self))
-        return self
 
     async def left(self, bus: EventBus, player: Player):
         self.here.remove(player)
         await bus.publish(PlayerLeftArea(player, self))
-        return self
 
     async def drop(self, bus: EventBus, player: Player):
-        for item in player.drop_all():
+        dropped = player.drop_all()
+        for item in dropped:
             self.here.append(item)
             await bus.publish(ItemDropped(player, self, item))
-        return self
+        return dropped
+
+
+class SorryError(Exception):
+    pass
 
 
 class World(Entity):
@@ -316,21 +330,59 @@ class World(Entity):
         await self.bus.publish(PlayerQuit(player))
         self.unregister(player)
 
-    async def add_area(self, area: Area):
+    def add_area(self, area: Area):
         self.register(area)
         for entity in area.entities():
             self.register(entity)
 
-    async def go(self, player: Player, where: str):
-        pass
+    def build_new_area(self, player: Player, fromArea: Area, entry: Item):
+        theWayBack = Item(owner=player, details=entry.details, area=fromArea)
+        area = Area(
+            owner=player,
+            details=Details(
+                "A pristine, new place.",
+                "Nothing seems to be here, maybe you should decorate?",
+            ),
+        )
+        area.add_item(theWayBack)
+        self.add_area(area)
+        return area
 
-    async def give(self, player: Player, giving: str, receiving: str):
-        pass
-
-    async def hold(self, player: Player, q: str):
+    def search(self, player: Player, whereQ: str):
         area = self.find_player_area(player)
-        item = area.find(q)
-        if not item:
+        item = area.find(whereQ)
+        if item:
+            return area, item
+
+        item = player.find(whereQ)
+        if item:
+            return area, item
+
+        return None, None
+
+    async def go(self, player: Player, whereQ: str):
+        area, item = self.search(player, whereQ)
+        if item is None:
+            return None
+
+        # If the person owns this item and they try to go the thing,
+        # this is how new areas area created, one of them.
+        if item.area is None:
+            if item.owner != player:
+                raise SorryError("you can only do that with things you own")
+            item.area = self.build_new_area(player, area, item)
+
+        await area.left(self.bus, player)
+        await item.area.entered(self.bus, player)
+
+        return item.area
+
+    async def give(self, player: Player, whatQ: str, whoQ: str):
+        pass
+
+    async def hold(self, player: Player, whatQ: str):
+        area, item = self.search(player, whatQ)
+        if item is None:
             return []
         area.remove(item)
         player.hold(item)
@@ -348,7 +400,7 @@ class World(Entity):
 
     async def drop(self, player: Player):
         area = self.find_player_area(player)
-        await area.drop(self.bus, player)
+        return await area.drop(self.bus, player)
 
 
 class PlayerJoined(Event):
@@ -391,7 +443,7 @@ class PlayerLeftArea(Event):
         self.area = area
 
     def __str__(self):
-        return "%s left" % (self.player, self.area)
+        return "%s left %s" % (self.player, self.area)
 
 
 class ItemHeld(Event):

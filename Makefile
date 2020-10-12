@@ -14,3 +14,6 @@ env:
 
 freeze:
 	pip3 freeze > requirements.txt
+
+dump:
+	sqlite3 test.sqlite3 "SELECT * FROM entities"

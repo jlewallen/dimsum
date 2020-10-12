@@ -36,7 +36,7 @@ async def initialize_world():
     await db.open("world.sqlite3")
     await db.load(world)
     if world.empty():
-        await world.add_area(
+        world.add_area(
             game.Area(
                 owner=world, details=game.Details("Living room", "It's got walls.")
             ).add_item(
@@ -116,7 +116,8 @@ async def drop(ctx):
     dropped = await world.drop(player)
     if len(dropped) == 0:
         await ctx.message.channel.send("nothing to drop")
-    await save_world()
+    else:
+        await save_world()
 
 
 @bot.command(
