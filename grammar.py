@@ -7,7 +7,7 @@ def create_parser():
         start: look | obliterate | drop | hold | make | go | remember | modify
 
         _WS:  WS
-        TEXT:       (WS | WORD | "?" | "!" | "." | ",")+
+        TEXT:       (WS | WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#")+
         something_here: TEXT
         something_new:  TEXT
         somewhere:      TEXT

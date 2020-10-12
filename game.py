@@ -567,14 +567,6 @@ class ModifyField(Action):
         self.item.details.__dict__[self.field] = self.value
 
 
-class ModifyNumeric(Action):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    async def perform(self, world: World, player: Player):
-        pass
-
-
 class Modify(Action):
     def __init__(self, changeQ: str, **kwargs):
         super().__init__(**kwargs)

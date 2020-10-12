@@ -48,9 +48,13 @@ class Evaluate(lark.Transformer):
         return game.Look()
 
     def modify_field(self, args):
+        area = self.world.find_player_area(self.player)
+        item = area
         if len(self.player.holding) == 0:
-            raise game.NotHoldingAnything()
-        item = self.player.holding[0]
+            if area.owner != self.player:
+                raise game.NotHoldingAnything()
+        else:
+            item = self.player.holding[0]
         field = str(args[0])
         value = args[1]
         return game.ModifyField(item=item, field=field, value=value)
