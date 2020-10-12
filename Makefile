@@ -21,3 +21,5 @@ web:
 dump:
 	sqlite3 test.sqlite3 "SELECT * FROM entities"
 	sqlite3 world.sqlite3 "SELECT * FROM entities"
+
+.PHONY: web
