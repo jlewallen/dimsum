@@ -3,6 +3,7 @@ from typing import List, Tuple
 import asyncio
 import logging
 import sys
+import time
 import inflect
 import uuid
 
@@ -80,9 +81,14 @@ class Details:
         self.name = name
         self.desc = desc
         self.presence = presence
+        self.created = time.time()
+        self.touched = time.time()
 
     def __str__(self):
         return self.name
+
+    def touch(self):
+        self.touched = time.time()
 
     def clone(self):
         return Details(self.name, self.desc, self.presence)
@@ -98,6 +104,9 @@ class Item(Entity):
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
         self.area = kwargs["area"] if "area" in kwargs else None
+
+    def touch(self):
+        self.details.touch()
 
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
@@ -194,18 +203,21 @@ class Person(Entity):
 
     def hold(self, item: Item):
         self.holding.append(item)
+        item.touch()
 
     def drop_all(self):
         dropped = []
         while len(self.holding) > 0:
             item = self.holding[0]
             self.drop(item)
+            item.touch()
             dropped.append(item)
         return dropped
 
     def drop(self, item: Item):
         if item in self.holding:
             self.holding.remove(item)
+            item.touch()
             return [item]
         return []
 
