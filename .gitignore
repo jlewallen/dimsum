@@ -1,6 +1,7 @@
 env
 __pycache__
 .env
+.log
 *.sqlite3
 web/dist
 web/node_modules
