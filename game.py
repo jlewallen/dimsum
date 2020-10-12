@@ -118,6 +118,9 @@ class Item(Entity):
     def __str__(self):
         return p.a(self.details.name)
 
+    def __repr__(self):
+        return str(self)
+
 
 class ObservedItem:
     def __init__(self, item: Item, where: str = ""):
@@ -125,10 +128,10 @@ class ObservedItem:
         self.where = where
 
     def __str__(self):
-        return self.item
+        return str(self.item)
 
     def __repr__(self):
-        return str(self.item)
+        return str(self)
 
 
 class Holding(Activity):
@@ -216,6 +219,10 @@ class ObservedPerson:
     def __init__(self, person: Person, activities: List[Activity]):
         self.person = person
         self.activities = activities
+
+    @property
+    def holding(self):
+        return self.person.holding
 
     def __str__(self):
         if len(self.activities) == 0:

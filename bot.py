@@ -3,6 +3,7 @@ import discord.ext.commands
 import logging
 import game
 import persistence
+import inflect
 
 bot = discord.ext.commands.Bot(".")
 
@@ -114,7 +115,24 @@ async def on_ready():
 async def look(ctx):
     player = await get_player(ctx.message)
     observation = world.look(player)
-    await ctx.message.channel.send(str(observation))
+
+    p = inflect.engine()
+
+    emd = observation.details.desc
+    emd += "\n\n"
+    if len(observation.people) > 0:
+        emd += "Also here: " + p.join([str(x) for x in observation.people])
+        emd += "\n"
+    if len(observation.items) > 0:
+        emd += "You can see " + p.join([str(x) for x in observation.items])
+        emd += "\n"
+    if len(observation.who.holding) > 0:
+        emd += "You're holding " + p.join([str(x) for x in observation.who.holding])
+        emd += "\n"
+
+    em = discord.Embed(title=observation.details.name, description=emd)
+
+    await ctx.message.channel.send(embed=em)
 
 
 @bot.command(
@@ -138,8 +156,8 @@ async def hold(ctx, *, q: str = ""):
 
 @bot.command(
     name="drop",
-    description="drop",
-    brief="drop",
+    description="Drop everything in your hands.",
+    brief="Drop everything in your hands.",
     pass_context=True,
 )
 async def drop(ctx):
