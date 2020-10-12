@@ -4,6 +4,7 @@ import asyncio
 import logging
 import sys
 import inflect
+import uuid
 
 p = inflect.engine()
 
@@ -28,14 +29,11 @@ class Visitor:
 
 
 class Entity:
-    Counter = 0
-
     def __init__(self, **kwargs):
         if "key" in kwargs:
             self.key = kwargs["key"]
         else:
-            Entity.Counter += 1
-            self.key = "e-%d" % (Entity.Counter)
+            self.key = str(uuid.uuid1())
 
     def describes(self, q: str):
         return False
