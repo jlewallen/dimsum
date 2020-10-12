@@ -15,9 +15,9 @@ if __name__ == "__main__":
 
     shutdown_event = asyncio.Event()
 
-    web.use_world_from(bot.get_world)
     gb = bot.GameBot(os.getenv("DISCORD_TOKEN"))
+    webApp = web.create(gb)
     gb.bot.loop.create_task(
-        web.app.run_task("0.0.0.0", 5000, shutdown_trigger=shutdown_event.wait)
+        webApp.run_task("0.0.0.0", 5000, shutdown_trigger=shutdown_event.wait)
     )
     gb.run()

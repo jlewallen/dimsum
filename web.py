@@ -1,6 +1,7 @@
 import quart
 import quart_cors
 import logging
+import game
 
 
 class WebModelVisitor:
@@ -55,81 +56,75 @@ class WebModelVisitor:
         }
 
 
-app = quart.Quart(__name__)
-app = quart_cors.cors(app)
-get_world = None
+def create(state):
+    app = quart.Quart(__name__)
+    app = quart_cors.cors(app)
 
+    @app.route("/api")
+    def main_index():
+        return areas_index()
 
-def use_world_from(get_world_fn):
-    global get_world
-    get_world = get_world_fn
-
-
-@app.route("/api")
-def main_index():
-    return areas_index()
-
-
-@app.route("/api/areas")
-def areas_index():
-    world = get_world()
-    if world is None:
-        return {"loading": True}
-
-    makeWeb = WebModelVisitor()
-
-    return {"areas": [a.accept(makeWeb) for a in world.areas()]}
-
-
-@app.route("/api/people")
-def people_index():
-    world = get_world()
-    if world is None:
-        return {"loading": True}
-
-    makeWeb = WebModelVisitor()
-
-    return {"people": [a.accept(makeWeb) for a in world.people()]}
-
-
-@app.route("/api/entities/<string:key>")
-def get_entity(key: str):
-    world = get_world()
-    if world is None:
-        return {"loading": True}
-
-    logging.info("key: %s" % (key,))
-
-    if world.contains(key):
-        entity = world.find(key)
-        makeWeb = WebModelVisitor()
-        return {"entity": entity.accept(makeWeb)}
-
-    return {"entity": None}
-
-
-@app.route("/api/entities/<string:key>", methods=["POST"])
-async def update_entity(key: str):
-    world = get_world()
-    if world is None:
-        return {"loading": True}
-
-    logging.info("key: %s" % (key,))
-
-    if world.contains(key):
-        form = await quart.request.get_json()
-        logging.info("form: %s" % (form,))
-
-        # Verify we can find the owner.
-        owner = world.find(form["owner"])
-        entity = world.find(key)
-        entity.details.name = form["name"]
-        entity.details.desc = form["desc"]
-        entity.owner = owner
-
-        # TODO Save
+    @app.route("/api/areas")
+    def areas_index():
+        world = state.world
+        if world is None:
+            return {"loading": True}
 
         makeWeb = WebModelVisitor()
-        return {"entity": entity.accept(makeWeb)}
 
-    return {"entity": None}
+        return {"areas": [a.accept(makeWeb) for a in world.areas()]}
+
+    @app.route("/api/people")
+    def people_index():
+        world = state.world
+        if world is None:
+            return {"loading": True}
+
+        makeWeb = WebModelVisitor()
+
+        return {"people": [a.accept(makeWeb) for a in world.people()]}
+
+    @app.route("/api/entities/<string:key>")
+    def get_entity(key: str):
+        world = state.world
+        if world is None:
+            return {"loading": True}
+
+        logging.info("key: %s" % (key,))
+
+        if world.contains(key):
+            entity = world.find(key)
+            makeWeb = WebModelVisitor()
+            return {"entity": entity.accept(makeWeb)}
+
+        return {"entity": None}
+
+    @app.route("/api/entities/<string:key>", methods=["POST"])
+    async def update_entity(key: str):
+        world = state.world
+        if world is None:
+            return {"loading": True}
+
+        logging.info("key: %s" % (key,))
+
+        if world.contains(key):
+            form = await quart.request.get_json()
+            logging.info("form: %s" % (form,))
+
+            # Verify we can find the owner.
+            owner = world
+            if world.contains(form["owner"]):
+                owner = world.find(form["owner"])
+            entity = world.find(key)
+            entity.details.name = form["name"]
+            entity.details.desc = form["desc"]
+            entity.owner = owner
+
+            await state.save()
+
+            makeWeb = WebModelVisitor()
+            return {"entity": entity.accept(makeWeb)}
+
+        return {"entity": None}
+
+    return app
