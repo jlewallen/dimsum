@@ -436,6 +436,7 @@ class World(Entity):
                 raise SorryError("you can only do that with things you own")
             item.area = self.build_new_area(player, area, item)
 
+        await self.drop(player)
         await area.left(self.bus, player)
         await item.area.entered(self.bus, player)
 
@@ -477,12 +478,19 @@ class World(Entity):
 
         modifications = {"name": name, "desc": desc}
 
+        item = None
         if len(player.holding) == 0:
-            raise NotHoldingAnything()
-        if len(player.holding) != 1:
-            raise HoldingTooMuch()
+            area = self.find_player_area(player)
+            # If the player owns the area, assume that they'd like to
+            # modify the area's properties.
+            if area.owner != player:
+                raise NotHoldingAnything()
+            item = area
+        else:
+            if len(player.holding) != 1:
+                raise HoldingTooMuch()
+            item = player.holding[0]
 
-        item = player.holding[0]
         field, value = changeQ.split(" ", 1)
         if field in modifications:
             modifications[field](item, value)

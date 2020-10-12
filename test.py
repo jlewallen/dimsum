@@ -46,6 +46,12 @@ async def test_run():
     await world.make(jacob, door)
     await world.go(jacob, "Door")
     logging.info(world.look(jacob))
+    await world.modify(jacob, "name An office.")
+    await world.modify(
+        jacob,
+        "desc This is a lovely room, more garden than room. The walls are barely visible through the potted plants and vines.",
+    )
+    logging.info(world.look(jacob))
     await world.go(jacob, "Door")
     logging.info(world.look(jacob))
 
