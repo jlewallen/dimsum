@@ -96,6 +96,8 @@ async def mutate(reply, mutation):
         await reply("you're holding too much")
     except game.UnknownField:
         await reply("i dunno how to change that")
+    except game.NotYours:
+        await reply("that's not yours, sorry")
 
 
 @bot.event

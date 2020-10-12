@@ -9,6 +9,10 @@ import uuid
 p = inflect.engine()
 
 
+class NotYours(Exception):
+    pass
+
+
 class SorryError(Exception):
     pass
 
@@ -414,11 +418,12 @@ class World(Entity):
 
     def search(self, player: Player, whereQ: str, **kwargs):
         area = self.find_player_area(player)
-        item = area.find(whereQ)
+
+        item = player.find(whereQ)
         if item:
             return area, item
 
-        item = player.find(whereQ)
+        item = area.find(whereQ)
         if item:
             return area, item
 
@@ -451,6 +456,9 @@ class World(Entity):
             return []
         if player.is_holding(item):
             raise AlreadyHolding("you're already holding that")
+        if item.area and item.owner != player:
+            raise NotYours("that's not yours")
+
         area.remove(item)
         player.hold(item)
         await self.bus.publish(ItemHeld(player, area, item))
