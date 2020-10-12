@@ -8,8 +8,9 @@ import inflect
 bot = discord.ext.commands.Bot(".")
 
 
-baseUrl = "http://192.168.0.100:5000/"
+baseUrl = "http://192.168.0.100:5000"
 players = {}
+p = inflect.engine()
 world = None
 
 
@@ -112,13 +113,11 @@ async def on_ready():
     description="Look around.",
     brief="Look around.",
     pass_context=True,
-    aliases=["where", "here"],
+    aliases=["l", "where", "here"],
 )
 async def look(ctx):
     player = await get_player(ctx.message)
     observation = world.look(player)
-
-    p = inflect.engine()
 
     emd = observation.details.desc
     emd += "\n\n"
@@ -142,7 +141,7 @@ async def look(ctx):
     description="Pick something up off the ground, or from a place that's visible.",
     brief="Pick something up off the ground, or from a place that's visible.",
     pass_context=True,
-    aliases=["take", "get"],
+    aliases=["h", "take", "get"],
 )
 async def hold(ctx, *, q: str = ""):
     async def op():
@@ -150,8 +149,10 @@ async def hold(ctx, *, q: str = ""):
         held = await world.hold(player, q)
         if len(held) == 0:
             await ctx.message.channel.send("you can't hold that")
-        else:
-            await save_world()
+            return
+
+        await ctx.message.channel.send("you picked up %s" % (p.join(held),))
+        await save_world()
 
     await mutate(ctx.message.channel.send, op)
 
@@ -161,6 +162,7 @@ async def hold(ctx, *, q: str = ""):
     description="Drop everything in your hands.",
     brief="Drop everything in your hands.",
     pass_context=True,
+    aliases=["d"],
 )
 async def drop(ctx):
     async def op():
@@ -168,8 +170,10 @@ async def drop(ctx):
         dropped = await world.drop(player)
         if len(dropped) == 0:
             await ctx.message.channel.send("nothing to drop")
-        else:
-            await save_world()
+            return
+
+        await ctx.message.channel.send("you dropped %s" % (p.join(dropped),))
+        await save_world()
 
     await mutate(ctx.message.channel.send, op)
 
@@ -179,7 +183,7 @@ async def drop(ctx):
     description="Inspect things closer.",
     brief="Inspect things closer.",
     pass_context=True,
-    aliases=[],
+    aliases=["insp", "i"],
 )
 async def inspect(ctx):
     player = await get_player(ctx.message)
@@ -189,7 +193,9 @@ async def inspect(ctx):
 
     em = discord.Embed(title="Inspection", colour=0x00FF00)
     for item in player.holding:
-        em.add_field(name=str(item), value="[open](%s%s)" % (baseUrl, item.key))
+        em.add_field(
+            name=str(item), value="[open](%s/entities/%s)" % (baseUrl, item.key)
+        )
     await ctx.message.channel.send(embed=em)
 
 
