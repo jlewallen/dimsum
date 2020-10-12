@@ -33,9 +33,13 @@ async def test_run():
     await world.make(jacob, trampoline)
     await world.drop(jacob)
     await world.hold(jacob, "trampoline")
+    await world.drop(jacob)
 
     idea = Item(owner=jacob, details=Details("Idea", "It's genius."))
     await world.make(jacob, idea)
+    await world.modify(jacob, "name Good Idea")
+    await world.modify(jacob, "desc These are very rare.")
+    logging.info(world.look(jacob))
     await world.drop(jacob)
 
     door = Item(owner=jacob, details=Details("Door", "It's wooden."))

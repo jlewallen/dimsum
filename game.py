@@ -17,6 +17,18 @@ class AlreadyHolding(Exception):
     pass
 
 
+class NotHoldingAnything(Exception):
+    pass
+
+
+class HoldingTooMuch(Exception):
+    pass
+
+
+class UnknownField(Exception):
+    pass
+
+
 class Visitor:
     def item(self, item):
         pass
@@ -139,6 +151,14 @@ class Person(Entity):
         self.creator = kwargs["creator"] if "creator" in kwargs else True
         self.holding: List[Entity] = []
 
+    @property
+    def holding(self):
+        return self.__holding
+
+    @holding.setter
+    def holding(self, value):
+        self.__holding = value
+
     def find(self, q: str):
         for entity in self.holding:
             if entity.describes(q):
@@ -154,11 +174,13 @@ class Person(Entity):
 
     def hold(self, item: Item):
         self.holding.append(item)
-        return True
 
     def drop_all(self):
-        dropped = self.holding
-        self.holding = []
+        dropped = []
+        while len(self.holding) > 0:
+            item = self.holding[0]
+            self.drop(item)
+            dropped.append(item)
         return dropped
 
     def drop(self, item: Item):
@@ -376,7 +398,10 @@ class World(Entity):
         self.add_area(area)
         return area
 
-    def search(self, player: Player, whereQ: str):
+    def search_hands(self, player: Player, whereQ: str):
+        return player.find(whereQ)
+
+    def search(self, player: Player, whereQ: str, **kwargs):
         area = self.find_player_area(player)
         item = area.find(whereQ)
         if item:
@@ -424,6 +449,27 @@ class World(Entity):
         player.hold(item)
         self.register(item)
         await self.bus.publish(ItemMade(player, area, item))
+
+    async def modify(self, player: Player, changeQ: str):
+        def name(item, value):
+            item.details.name = value
+
+        def desc(item, value):
+            item.details.desc = value
+
+        modifications = {"name": name, "desc": desc}
+
+        if len(player.holding) == 0:
+            raise NotHoldingAnything()
+        if len(player.holding) != 1:
+            raise HoldingTooMuch()
+
+        item = player.holding[0]
+        field, value = changeQ.split(" ", 1)
+        if field in modifications:
+            modifications[field](item, value)
+        else:
+            raise UnknownField()
 
     async def build(self, player: Player, area: Area):
         await self.bus.publish(AreaConstructed(player, area, item))

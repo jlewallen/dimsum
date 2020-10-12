@@ -84,8 +84,16 @@ async def get_player(message):
 async def mutate(reply, mutation):
     try:
         await mutation()
+    except game.SorryError:
+        await reply("sorry")
     except game.AlreadyHolding:
         await reply("you're already holding that")
+    except game.NotHoldingAnything:
+        await reply("you need to be holding something for that")
+    except game.HoldingTooMuch:
+        await reply("you're holding too much")
+    except game.UnknownField:
+        await reply("i dunno how to change that")
 
 
 @bot.event
@@ -179,9 +187,13 @@ async def make(ctx, *, name: str):
     pass_context=True,
     aliases=[],
 )
-async def modify(ctx, *, q: str, how: str):
-    player = await get_player(ctx.message)
-    logging.info(q, how)
+async def modify(ctx, *, changeQ: str):
+    async def op():
+        player = await get_player(ctx.message)
+        await world.modify(player, changeQ)
+        await save_world()
+
+    await mutate(ctx.message.channel.send, op)
 
 
 @bot.command(
