@@ -1,4 +1,8 @@
 * DimSum
-** Example Session
+** TODO Toggle eating and drinking of things.
+** TODO Allow naming of common things that get made.
+** TODO Timestamps.
+** TODO Lock/freeze items.
+**  Example Session
 
 	[[./docs/areas.png]]

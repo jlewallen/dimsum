@@ -83,6 +83,7 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("make My Beer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
     logging.info(await execute(world, jacob, l.parse("hold beer")))
+    logging.info(await execute(world, jacob, l.parse("eat beer")))
     logging.info(await execute(world, jacob, l.parse("modify name My IPA")))
     logging.info(await execute(world, jacob, l.parse("modify capacity 100")))
     logging.info(await execute(world, jacob, l.parse("go door")))

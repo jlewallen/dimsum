@@ -465,6 +465,32 @@ class Make(Action):
         return self.item
 
 
+class Eat(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
+        world.unregister(self.item)
+        player.drop(self.item)
+        await world.bus.publish(ItemEaten(player, area, self.item))
+        return self.item
+
+
+class Drink(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
+        world.unregister(self.item)
+        player.drop(self.item)
+        await world.bus.publish(ItemDrank(player, area, self.item))
+        return self.item
+
+
 class Drop(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -495,7 +521,7 @@ class Look(Action):
 class Hold(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"] if "item" in kwargs else None
+        self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
@@ -628,6 +654,26 @@ class ItemMade(Event):
 
     def __str__(self):
         return "%s created %s out of thin air!" % (self.player, self.item)
+
+
+class ItemEaten(Event):
+    def __init__(self, player: Player, area: Area, item: Item):
+        self.player = player
+        self.area = area
+        self.item = item
+
+    def __str__(self):
+        return "%s just ate %s!" % (self.player, self.item)
+
+
+class ItemDrank(Event):
+    def __init__(self, player: Player, area: Area, item: Item):
+        self.player = player
+        self.area = area
+        self.item = item
+
+    def __str__(self):
+        return "%s just drank %s!" % (self.player, self.item)
 
 
 class ItemDropped(Event):

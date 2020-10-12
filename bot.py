@@ -171,8 +171,10 @@ class GameBot:
             async def op():
                 player = await self.get_player(ctx.message)
                 action = self.parse_as(evaluator.create(self.world, player), "make", q)
-                await self.world.perform(player, action)
+                item = await self.world.perform(player, action)
                 await self.save()
+
+                await ctx.message.channel.send("you're now holding %s" % (item,))
 
             await mutate(ctx.message.channel.send, op)
 
@@ -199,6 +201,42 @@ modify when eaten
                 await self.world.perform(player, action)
                 await self.save()
                 await ctx.message.channel.send("done")
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="eat",
+            brief="Eat something.",
+            description="Eat something.",
+            pass_context=True,
+            aliases=[],
+        )
+        async def eat(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "eat", q)
+                item = await self.world.perform(player, action)
+                await self.save()
+
+                await ctx.message.channel.send("you ate %s" % (item,))
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="drink",
+            brief="Drink something.",
+            description="Drink something.",
+            pass_context=True,
+            aliases=[],
+        )
+        async def drink(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "drink", q)
+                item = await self.world.perform(player, action)
+                await self.save()
+
+                await ctx.message.channel.send("you drank %s" % (item,))
 
             await mutate(ctx.message.channel.send, op)
 

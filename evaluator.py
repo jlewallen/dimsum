@@ -7,16 +7,19 @@ class Evaluate(lark.Transformer):
         self.world = world
         self.player = player
 
-    def something_new(self, args):
+    def item_new(self, args):
         return game.Item(
             owner=self.player, details=game.Details(str(args[0]), str(args[0]))
         )
 
-    def something_here(self, args):
+    def item_here(self, args):
         area, item = self.world.search(self.player, str(args[0]))
         return item
 
-    def somewhere(self, args):
+    def item_held(self, args):
+        return self.world.search_hands(self.player, str(args[0]))
+
+    def item_goes(self, args):
         area, item = self.world.search(self.player, str(args[0]))
         return item
 
@@ -43,6 +46,12 @@ class Evaluate(lark.Transformer):
 
     def go(self, args):
         return game.Go(item=args[0])
+
+    def eat(self, args):
+        return game.Eat(item=args[0])
+
+    def drink(self, args):
+        return game.Drink(item=args[0])
 
     def look(self, args):
         return game.Look()
