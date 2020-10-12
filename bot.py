@@ -7,6 +7,7 @@ import persistence
 bot = discord.ext.commands.Bot(".")
 
 
+baseUrl = "http://192.168.0.100:5000/"
 players = {}
 world = None
 
@@ -151,6 +152,25 @@ async def drop(ctx):
             await save_world()
 
     await mutate(ctx.message.channel.send, op)
+
+
+@bot.command(
+    name="inspect",
+    description="Inspect things closer.",
+    brief="Inspect things closer.",
+    pass_context=True,
+    aliases=[],
+)
+async def inspect(ctx):
+    player = await get_player(ctx.message)
+    if len(player.holding) == 0:
+        await ctx.message.channel.send("try holding something")
+        return
+
+    em = discord.Embed(title="Inspection", colour=0x00FF00)
+    for item in player.holding:
+        em.add_field(name=str(item), value="[open](%s%s)" % (baseUrl, item.key))
+    await ctx.message.channel.send(embed=em)
 
 
 @bot.command(
