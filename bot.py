@@ -43,6 +43,8 @@ async def mutate(reply, mutation):
         await reply(str(err))
     except game.NotYours as err:
         await reply(str(err))
+    except game.YouCantDoThat as err:
+        await reply(str(err))
     except lark.exceptions.VisitError as err:
         await reply("oops, %s" % (err.__context__,))
     except Exception as err:

@@ -1,7 +1,7 @@
 * DimSum
-** TODO Toggle eating and drinking of things.
+** DONE Toggle eating and drinking of things.
 ** TODO Allow naming of common things that get made.
-** TODO Timestamps.
+** DONE Timestamps.
 ** TODO Lock/freeze items.
 **  Example Session
 

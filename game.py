@@ -34,6 +34,10 @@ class UnknownField(Exception):
     pass
 
 
+class YouCantDoThat(Exception):
+    pass
+
+
 class Visitor:
     def item(self, item):
         pass
@@ -84,14 +88,20 @@ class Details:
         self.created = time.time()
         self.touched = time.time()
 
-    def __str__(self):
-        return self.name
+    def when_eaten(self):
+        return self.__dict__["eaten"] if "eaten" in self.__dict__ else False
+
+    def when_drank(self):
+        return self.__dict__["drank"] if "drank" in self.__dict__ else False
 
     def touch(self):
         self.touched = time.time()
 
     def clone(self):
         return Details(self.name, self.desc, self.presence)
+
+    def __str__(self):
+        return self.name
 
 
 class Activity:
@@ -483,6 +493,8 @@ class Eat(Action):
         self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item.details.when_eaten():
+            raise YouCantDoThat("you can't eat that")
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
@@ -496,6 +508,8 @@ class Drink(Action):
         self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item.details.when_drank():
+            raise YouCantDoThat("you can't drink that")
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
