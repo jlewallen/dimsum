@@ -21,7 +21,7 @@ class SqlitePersistence:
             props = json.dumps(entity.saved())
             klass = entity.__class__.__name__
             self.dbc.execute(
-                "INSERT INTO entities (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, properties = EXCLUDED.properties",
+                "INSERT INTO entities (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, klass = EXCLUDED.klass, properties = EXCLUDED.properties",
                 [entity.key, klass, entity.owner.key, props],
             )
 
