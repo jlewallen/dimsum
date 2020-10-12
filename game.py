@@ -83,6 +83,9 @@ class Details:
     def __str__(self):
         return self.name
 
+    def clone(self):
+        return Details(self.name, self.desc)
+
 
 class Activity:
     pass
@@ -397,7 +400,7 @@ class World(Entity):
             self.register(entity)
 
     def build_new_area(self, player: Player, fromArea: Area, entry: Item):
-        theWayBack = Item(owner=player, details=entry.details, area=fromArea)
+        theWayBack = Item(owner=player, details=entry.details.clone(), area=fromArea)
         area = Area(
             owner=player,
             details=Details(
