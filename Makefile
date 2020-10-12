@@ -15,6 +15,9 @@ env:
 freeze:
 	pip3 freeze > requirements.txt
 
+web:
+	cd web && yarn serve
+
 dump:
 	sqlite3 test.sqlite3 "SELECT * FROM entities"
 	sqlite3 world.sqlite3 "SELECT * FROM entities"

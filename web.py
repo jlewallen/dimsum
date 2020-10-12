@@ -1,6 +1,8 @@
 import quart
+import quart_cors
 
 app = quart.Quart(__name__)
+app = quart_cors.cors(app)
 
 
 get_world = None
