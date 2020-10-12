@@ -234,7 +234,7 @@ class ObservedPerson:
     def __str__(self):
         if len(self.activities) == 0:
             return "%s" % (self.person,)
-        return "%s who is %s" % (self.person, self.activities)
+        return "%s who is %s" % (self.person, p.join(self.activities))
 
     def __repr__(self):
         return str(self)
