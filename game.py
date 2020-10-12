@@ -567,40 +567,6 @@ class ModifyField(Action):
         self.item.details.__dict__[self.field] = self.value
 
 
-class Modify(Action):
-    def __init__(self, changeQ: str, **kwargs):
-        super().__init__(**kwargs)
-        self.changeQ = changeQ
-
-    async def perform(self, world: World, player: Player):
-        def name(item, value):
-            item.details.name = value
-
-        def desc(item, value):
-            item.details.desc = value
-
-        modifications = {"name": name, "desc": desc}
-
-        item = None
-        if len(player.holding) == 0:
-            area = world.find_player_area(player)
-            # If the player owns the area, assume that they'd like to
-            # modify the area's properties.
-            if area.owner != player:
-                raise NotHoldingAnything()
-            item = area
-        else:
-            if len(player.holding) != 1:
-                raise HoldingTooMuch()
-            item = player.holding[0]
-
-        field, value = self.changeQ.split(" ", 1)
-        if field in modifications:
-            modifications[field](item, value)
-        else:
-            raise UnknownField()
-
-
 class PlayerJoined(Event):
     def __init__(self, player: Player):
         self.player = player

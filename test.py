@@ -39,22 +39,12 @@ async def test_run():
 
     idea = Item(owner=jacob, details=Details("Idea", "It's genius."))
     await world.perform(jacob, game.Make(idea))
-    await world.perform(jacob, game.Modify("name Good Idea"))
-    await world.perform(jacob, game.Modify("desc These are very rare."))
     logging.info(world.look(jacob))
     await world.perform(jacob, game.Drop())
 
     door = Item(owner=jacob, details=Details("Door", "It's wooden."))
     await world.perform(jacob, game.Make(door))
     await world.perform(jacob, game.Go(item=door))
-    logging.info(world.look(jacob))
-    await world.perform(jacob, game.Modify("name An office."))
-    await world.perform(
-        jacob,
-        game.Modify(
-            "desc This is a lovely room, more garden than room. The walls are barely visible through the potted plants and vines."
-        ),
-    )
     logging.info(world.look(jacob))
     await world.perform(jacob, game.Go(item=door))
     logging.info(world.look(jacob))
