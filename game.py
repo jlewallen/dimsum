@@ -8,6 +8,14 @@ import inflect
 p = inflect.engine()
 
 
+class SorryError(Exception):
+    pass
+
+
+class AlreadyHolding(Exception):
+    pass
+
+
 class Visitor:
     def item(self, item):
         pass
@@ -142,6 +150,9 @@ class Person(Entity):
     def observe(self):
         activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
         return ObservedPerson(self, activities)
+
+    def is_holding(self, item):
+        return item in self.holding
 
     def hold(self, item: Item):
         self.holding.append(item)
@@ -294,10 +305,6 @@ class Area(Entity):
         return dropped
 
 
-class SorryError(Exception):
-    pass
-
-
 class World(Entity):
     def __init__(self, bus: EventBus):
         self.key = "world"
@@ -407,6 +414,8 @@ class World(Entity):
         area, item = self.search(player, whatQ)
         if item is None:
             return []
+        if player.is_holding(item):
+            raise AlreadyHolding("you're already holding that")
         area.remove(item)
         player.hold(item)
         await self.bus.publish(ItemHeld(player, area, item))

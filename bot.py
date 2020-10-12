@@ -81,6 +81,13 @@ async def get_player(message):
     return player
 
 
+async def mutate(reply, mutation):
+    try:
+        await mutation()
+    except game.AlreadyHolding:
+        await reply("you're already holding that")
+
+
 @bot.event
 async def on_ready():
     global world
@@ -99,47 +106,6 @@ async def ping(ctx):
 
 
 @bot.command(
-    name="hold",
-    description="hold",
-    brief="hold",
-    pass_context=True,
-    aliases=["take", "get"],
-)
-async def hold(ctx, *, q: str = ""):
-    player = await get_player(ctx.message)
-    held = await world.hold(player, q)
-    if len(held) == 0:
-        await ctx.message.channel.send("you can't hold that")
-    else:
-        await save_world()
-
-
-@bot.command(
-    name="drop",
-    description="drop",
-    brief="drop",
-    pass_context=True,
-)
-async def drop(ctx):
-    player = await get_player(ctx.message)
-    dropped = await world.drop(player)
-    if len(dropped) == 0:
-        await ctx.message.channel.send("nothing to drop")
-    else:
-        await save_world()
-
-
-@bot.command(
-    name="go",
-    description="go",
-    brief="go",
-    pass_context=True,
-)
-async def go(ctx):
-    pass
-
-
-@bot.command(
     name="look",
     description="look",
     brief="look",
@@ -153,6 +119,43 @@ async def look(ctx):
 
 
 @bot.command(
+    name="hold",
+    description="hold",
+    brief="hold",
+    pass_context=True,
+    aliases=["take", "get"],
+)
+async def hold(ctx, *, q: str = ""):
+    async def op():
+        player = await get_player(ctx.message)
+        held = await world.hold(player, q)
+        if len(held) == 0:
+            await ctx.message.channel.send("you can't hold that")
+        else:
+            await save_world()
+
+    await mutate(ctx.message.channel.send, op)
+
+
+@bot.command(
+    name="drop",
+    description="drop",
+    brief="drop",
+    pass_context=True,
+)
+async def drop(ctx):
+    async def op():
+        player = await get_player(ctx.message)
+        dropped = await world.drop(player)
+        if len(dropped) == 0:
+            await ctx.message.channel.send("nothing to drop")
+        else:
+            await save_world()
+
+    await mutate(ctx.message.channel.send, op)
+
+
+@bot.command(
     name="make",
     description="make",
     brief="make",
@@ -160,24 +163,13 @@ async def look(ctx):
     aliases=[],
 )
 async def make(ctx, *, name: str):
-    player = await get_player(ctx.message)
-    item = game.Item(owner=player, details=game.Details(name, name))
-    await world.make(player, item)
-    await save_world()
+    async def op():
+        player = await get_player(ctx.message)
+        item = game.Item(owner=player, details=game.Details(name, name))
+        await world.make(player, item)
+        await save_world()
 
-
-@bot.command(
-    name="build",
-    description="build",
-    brief="build",
-    pass_context=True,
-    aliases=[],
-)
-async def build(ctx, *, name: str):
-    player = await get_player(ctx.message)
-    item = game.Item(owner=player, details=game.Details(name, name))
-    await world.build(player, item)
-    await save_world()
+    await mutate(ctx.message.channel.send, op)
 
 
 @bot.command(
@@ -190,6 +182,21 @@ async def build(ctx, *, name: str):
 async def modify(ctx, *, q: str, how: str):
     player = await get_player(ctx.message)
     logging.info(q, how)
+
+
+@bot.command(
+    name="go",
+    description="go",
+    brief="go",
+    pass_context=True,
+)
+async def go(ctx, *, where: str = ""):
+    async def op():
+        player = await get_player(ctx.message)
+        await world.go(player, where)
+        await save_world()
+
+    await mutate(ctx.message.channel.send, op)
 
 
 class GameBot:
