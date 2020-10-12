@@ -7,10 +7,17 @@ class Evaluate(lark.Transformer):
         self.world = world
         self.player = player
 
-    def item_new(self, args):
-        return game.Item(
-            owner=self.player, details=game.Details(str(args[0]), str(args[0]))
-        )
+    def start(self, args):
+        return args[0]
+
+    def make(self, args):
+        return game.Make(args[0])
+
+    def drop(self, args):
+        return game.Drop()
+
+    def hold(self, args):
+        return game.Hold(item=args[0])
 
     def item_here(self, args):
         area, item = self.world.search(self.player, str(args[0]))
@@ -23,26 +30,10 @@ class Evaluate(lark.Transformer):
         area, item = self.world.search(self.player, str(args[0]))
         return item
 
-    def make(self, args):
-        return game.Make(args[0])
-
-    def drop(self, args):
-        return game.Drop()
-
-    def hold(self, args):
-        return game.Hold(item=args[0])
-
-    def allow_opening(self, args):
-        pass
-
-    def allow_eating(self, args):
-        pass
-
-    def text(self, args):
-        return str(args[0])
-
-    def number(self, args):
-        return float(args[0])
+    def item_new(self, args):
+        return game.Item(
+            owner=self.player, details=game.Details(str(args[0]), str(args[0]))
+        )
 
     def go(self, args):
         return game.Go(item=args[0])
@@ -55,6 +46,11 @@ class Evaluate(lark.Transformer):
 
     def look(self, args):
         return game.Look()
+
+    def get_item_held(self):
+        if len(self.player.holding) == 0:
+            raise game.NotHoldingAnything("you're not holding anything")
+        return self.player.holding[0]
 
     def modify_field(self, args):
         area = self.world.find_player_area(self.player)
@@ -70,8 +66,26 @@ class Evaluate(lark.Transformer):
         value = args[1]
         return game.ModifyField(item=item, field=field, value=value)
 
-    def start(self, args):
-        return args[0]
+    def when_opened(self, args):
+        return game.ModifyActivity(
+            item=self.get_item_held(), activity="opened", value=True
+        )
+
+    def when_eaten(self, args):
+        return game.ModifyActivity(
+            item=self.get_item_held(), activity="eaten", value=True
+        )
+
+    def when_drank(self, args):
+        return game.ModifyActivity(
+            item=self.get_item_held(), activity="drank", value=True
+        )
+
+    def text(self, args):
+        return str(args[0])
+
+    def number(self, args):
+        return float(args[0])
 
 
 def create(world, player):

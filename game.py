@@ -605,6 +605,17 @@ class ModifyField(Action):
         self.item.details.__dict__[self.field] = self.value
 
 
+class ModifyActivity(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+        self.activity = kwargs["activity"]
+        self.value = kwargs["value"]
+
+    async def perform(self, world: World, player: Player):
+        self.item.details.__dict__[self.activity] = self.value
+
+
 class PlayerJoined(Event):
     def __init__(self, player: Player):
         self.player = player
