@@ -3,6 +3,7 @@ import discord.ext.commands
 import logging
 import inflect
 import game
+import lark
 import persistence
 import grammar
 import evaluator
@@ -30,18 +31,22 @@ class BotPlayer:
 async def mutate(reply, mutation):
     try:
         await mutation()
-    except game.SorryError:
-        await reply("sorry")
-    except game.AlreadyHolding:
-        await reply("you're already holding that")
-    except game.NotHoldingAnything:
-        await reply("you need to be holding something for that")
-    except game.HoldingTooMuch:
-        await reply("you're holding too much")
-    except game.UnknownField:
-        await reply("i dunno how to change that")
-    except game.NotYours:
-        await reply("that's not yours, sorry")
+    except game.SorryError as err:
+        await reply(str(err))
+    except game.AlreadyHolding as err:
+        await reply(str(err))
+    except game.NotHoldingAnything as err:
+        await reply(str(err))
+    except game.HoldingTooMuch as err:
+        await reply(str(err))
+    except game.UnknownField as err:
+        await reply(str(err))
+    except game.NotYours as err:
+        await reply(str(err))
+    except lark.exceptions.VisitError as err:
+        await reply("oops, %s" % (err.__context__,))
+    except Exception as err:
+        await reply("oops, %s" % (err,))
 
 
 class GameBot:
@@ -66,8 +71,8 @@ class GameBot:
 
         @bot.command(
             name="look",
-            description="Look around.",
             brief="Look around.",
+            description="Look around.",
             pass_context=True,
             aliases=["l", "where", "here"],
         )
@@ -96,8 +101,8 @@ class GameBot:
 
         @bot.command(
             name="hold",
-            description="Pick something up off the ground, or from a place that's visible.",
             brief="Pick something up off the ground, or from a place that's visible.",
+            description="Pick something up off the ground, or from a place that's visible.",
             pass_context=True,
             aliases=["h", "take", "get"],
         )
@@ -117,8 +122,8 @@ class GameBot:
 
         @bot.command(
             name="drop",
-            description="Drop everything in your hands.",
             brief="Drop everything in your hands.",
+            description="Drop everything in your hands.",
             pass_context=True,
             aliases=["d"],
         )
@@ -138,8 +143,8 @@ class GameBot:
 
         @bot.command(
             name="remember",
-            description="Remember a place, useful for finding your way back.",
             brief="Remember a place, useful for finding your way back.",
+            description="Remember a place, useful for finding your way back.",
             pass_context=True,
             aliases=[],
         )
@@ -157,8 +162,8 @@ class GameBot:
 
         @bot.command(
             name="make",
-            description="Make a new item.",
             brief="Make a new item.",
+            description="Make a new item.",
             pass_context=True,
             aliases=[],
         )
@@ -173,8 +178,15 @@ class GameBot:
 
         @bot.command(
             name="modify",
-            description="Modify attributes/properties of items that are being held",
-            brief="Modify attributes/properties of items that are being held",
+            brief="Modify attributes/properties of items that are being held.",
+            description="""
+Modify attributes/properties of items that are being held.
+
+modify [name|desc|presence] <TEXT>
+modify [capacity|size|weight|nutrition|toxicity] <NUMBER>
+modify when opened
+modify when eaten
+""",
             pass_context=True,
             aliases=[],
         )
@@ -186,13 +198,14 @@ class GameBot:
                 )
                 await self.world.perform(player, action)
                 await self.save()
+                await ctx.message.channel.send("done")
 
             await mutate(ctx.message.channel.send, op)
 
         @bot.command(
             name="obliterate",
-            description="Any items the player is holding are reduced to an uptick of warmth in the server room, never to be seen again",
             brief="Destroy items being held forever",
+            description="Any items the player is holding are reduced to an uptick of warmth in the server room, never to be seen again",
             pass_context=True,
             aliases=[],
         )
@@ -206,8 +219,8 @@ class GameBot:
 
         @bot.command(
             name="go",
-            description="Move around the world, just say where.",
             brief="Move around the world, just say where.",
+            description="Move around the world, just say where.",
             pass_context=True,
         )
         async def go(ctx, *, q: str):

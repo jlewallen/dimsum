@@ -52,7 +52,9 @@ class Evaluate(lark.Transformer):
         item = area
         if len(self.player.holding) == 0:
             if area.owner != self.player:
-                raise game.NotHoldingAnything()
+                raise game.NotHoldingAnything(
+                    "you're not holding anything and you don't own this area"
+                )
         else:
             item = self.player.holding[0]
         field = str(args[0])

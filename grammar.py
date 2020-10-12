@@ -21,15 +21,15 @@ def create_parser():
         remember:   "remember"
 
         TEXT_FIELD: "name" | "desc" | "presence"
-        NUMERIC_FIELD: "capacity" | "size" | "weight" | "nutrition" | "poison"
+        NUMERIC_FIELD: "capacity" | "size" | "weight" | "nutrition" | "toxicity"
 
         number: NUMBER
         text: TEXT
 
         modify:     "modify" _WS TEXT_FIELD _WS text               -> modify_field
                   | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field
-                  | "modify" _WS "when" _WS "opened"               -> allow_opening
-                  | "modify" _WS "when" _WS "eaten"                -> allow_eating
+                  | "modify" _WS "when" _WS "opened"               -> when_opened
+                  | "modify" _WS "when" _WS "eaten"                -> when_eaten
 
         %import common.WS
         %import common.WORD
