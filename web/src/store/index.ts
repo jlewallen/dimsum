@@ -66,5 +66,6 @@ export default createStore<RootState>({
             });
         },
     },
+    getters: {},
     modules: {},
 });

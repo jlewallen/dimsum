@@ -31,7 +31,7 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
+    data(): {} {
         return {};
     },
     computed: {

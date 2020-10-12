@@ -7,20 +7,35 @@
             </div>
         </div>
         <div class="desc">{{ entity.details.desc }}</div>
+        <div class="summary" v-if="summary">
+            {{ summary }}
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity } from "@/http";
+import { EntityRef, Entity } from "@/http";
 
 export default defineComponent({
     name: "SmallEntityPanel",
-    components: {},
     props: {
         entity: {
             type: Object,
             required: true,
+        },
+    },
+    computed: {
+        entities(): EntityRef[] {
+            const holding = this.entity.holding || [];
+            const entities = this.entity.entities || [];
+            return [...holding, ...entities];
+        },
+        summary(): string | null {
+            if (this.entities.length == 0) {
+                return null;
+            }
+            return this.entities.map((e) => e.kind).join(", ");
         },
     },
     methods: {
@@ -64,6 +79,9 @@ export default defineComponent({
     margin-bottom: 1em;
 }
 .entity .owner {
+    font-size: 10pt;
+}
+.entity .statistics {
     font-size: 10pt;
 }
 .entity .desc {
