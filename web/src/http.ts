@@ -27,6 +27,12 @@ export interface Details {
     desc: string;
 }
 
+export interface EntityRef {
+    key: string;
+    kind: string;
+    url: string;
+}
+
 export interface Entity {
     key: string;
     kind: string;
@@ -34,14 +40,20 @@ export interface Entity {
     details: Details;
     holding?: Entity[];
     entities?: Entity[];
-    area?: {
-        key: string;
-        kind: string;
-        url: string;
-    };
+    area?: EntityRef;
 }
 
-export type Area = Entity;
+export interface Person extends Entity {
+    holding: Entity[];
+}
+
+export interface Area extends Entity {
+    entities: Entity[];
+}
+
+export interface Item extends Entity {
+    area: EntityRef;
+}
 
 export interface EntityResponse {
     entity: Entity;

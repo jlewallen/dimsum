@@ -4,6 +4,13 @@
             <div></div>
         </div>
 
+        <div v-if="adjacent.length > 0" class="adjacent">
+            <h4>Adjacent Areas:</h4>
+            <div class="entities">
+                <DynamicSmallEntityPanel v-for="ref in adjacent" v-bind:key="ref.key" :entityKey="ref.key" @selected="entitySelected" />
+            </div>
+        </div>
+
         <div v-if="entity.entities?.length > 0">
             <h4>Also Here:</h4>
             <Entities :entities="entity.entities" @selected="entitySelected" />
@@ -13,20 +20,26 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity } from "@/http";
+import { Area, Entity, EntityRef } from "@/http";
+import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 import Entities from "./Entities.vue";
 
 export default defineComponent({
     name: "AreaEditor",
-    components: { Entities },
+    components: { DynamicSmallEntityPanel, Entities },
     props: {
         entity: {
-            type: Object,
+            type: Object as () => Area,
             required: true,
         },
     },
     data() {
         return {};
+    },
+    computed: {
+        adjacent(): EntityRef[] {
+            return this.entity.entities.filter((e) => e.area).map((e) => e.area!);
+        },
     },
     methods: {
         entitySelected(entity: Entity) {
@@ -39,5 +52,12 @@ export default defineComponent({
 
 <style scoped>
 .entity {
+}
+.entities {
+    display: flex;
+    flex-wrap: wrap;
+}
+.adjacent {
+    margin-top: 1em;
 }
 </style>

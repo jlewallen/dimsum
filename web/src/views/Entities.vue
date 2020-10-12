@@ -34,5 +34,6 @@ export default defineComponent({
 <style scoped>
 .entities {
     display: flex;
+    flex-wrap: wrap;
 }
 </style>
