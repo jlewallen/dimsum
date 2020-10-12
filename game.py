@@ -341,6 +341,7 @@ class Area(Entity):
 
 class World(Entity):
     def __init__(self, bus: EventBus):
+        self.details = Details("World", "Ya know, everything")
         self.key = "world"
         self.bus = bus
         self.entities = {}
@@ -356,6 +357,9 @@ class World(Entity):
 
     def areas(self):
         return [e for e in self.entities.values() if isinstance(e, Area)]
+
+    def people(self):
+        return [e for e in self.entities.values() if isinstance(e, Person)]
 
     def players(self):
         return [e for e in self.entities.values() if isinstance(e, Player)]

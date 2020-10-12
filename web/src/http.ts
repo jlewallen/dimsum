@@ -62,3 +62,7 @@ export interface EntityResponse {
 export interface AreasResponse {
     areas: Area[];
 }
+
+export interface PeopleResponse {
+    people: Person[];
+}

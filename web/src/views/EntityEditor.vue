@@ -7,7 +7,7 @@
                     <label>Name</label>
                 </div>
                 <div class="col-75">
-                    <input type="text" v-model="details.name" />
+                    <input type="text" v-model="form.name" />
                 </div>
             </div>
             <div class="row">
@@ -15,7 +15,18 @@
                     <label>Description</label>
                 </div>
                 <div class="col-75">
-                    <input type="text" v-model="details.desc" />
+                    <input type="text" v-model="form.desc" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Owner</label>
+                </div>
+                <div class="col-75">
+                    <select v-model="form.owner">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="person in people" v-bind:key="person.key" :value="person.key">{{ person.details.name }}</option>
+                    </select>
                 </div>
             </div>
             <div class="row actions">
@@ -31,7 +42,7 @@ import { defineComponent } from "vue";
 import AreaEditor from "./AreaEditor.vue";
 import ItemEditor from "./ItemEditor.vue";
 import PersonEditor from "./PersonEditor.vue";
-import { http, EntityResponse } from "@/http";
+import { http, Person, PeopleResponse, EntityResponse } from "@/http";
 
 export default defineComponent({
     name: "EntityEditor",
@@ -47,12 +58,14 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
+    data(): { form: { name: string; desc: string; owner: string }; people: Person[] } {
         return {
-            details: {
+            form: {
                 name: this.entity.details.name,
                 desc: this.entity.details.desc,
+                owner: this.entity.owner.key,
             },
+            people: [],
         };
     },
     computed: {
@@ -60,13 +73,17 @@ export default defineComponent({
             return this.entity.kind + "Editor";
         },
     },
-    mounted(): void {
+    mounted(): Promise<PeopleResponse> {
         console.log("entity-editor:mounted", this.entity);
+        return http<PeopleResponse>({ url: `/people` }).then((data) => {
+            this.people = data.people;
+            return data;
+        });
     },
     methods: {
         saveForm(): Promise<EntityResponse> {
             console.log("entity-editor:saving", this.entity);
-            return http<EntityResponse>({ url: `/entities/${this.entity.key}`, method: "POST", data: this.details }).then((data) => {
+            return http<EntityResponse>({ url: `/entities/${this.entity.key}`, method: "POST", data: this.form }).then((data) => {
                 return data;
             });
         },

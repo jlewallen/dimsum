@@ -1,6 +1,11 @@
 <template>
     <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
-        <div class="name">{{ entity.details.name }}</div>
+        <div class="one">
+            <div class="name">{{ entity.details.name }}</div>
+            <div class="owner">
+                {{ entity.owner.name }}
+            </div>
+        </div>
         <div class="desc">{{ entity.details.desc }}</div>
     </div>
 </template>
@@ -34,6 +39,8 @@ export default defineComponent({
     border-radius: 5px;
     border: 1px solid #f2f2f2;
     width: 50em;
+    display: flex;
+    flex-direction: column;
 }
 .entity.area {
     background-color: azure;
@@ -46,10 +53,20 @@ export default defineComponent({
 .entity.item {
     background-color: khaki;
 }
+
+.entity .one {
+    display: flex;
+    justify-content: space-between;
+}
+
 .entity .name {
     font-weight: bold;
     margin-bottom: 1em;
 }
+.entity .owner {
+    font-size: 10pt;
+}
 .entity .desc {
+    margin-bottom: 1em;
 }
 </style>

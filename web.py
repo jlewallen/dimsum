@@ -7,23 +7,30 @@ class WebModelVisitor:
     def entityUrl(self, e):
         return ("/api/entities/%s" % (e.key,),)
 
+    def ref(self, entity):
+        return {
+            "key": entity.key,
+            "url": self.entityUrl(entity),
+            "kind": entity.__class__.__name__,
+            "name": entity.details.name,
+        }
+
     def item(self, item):
         if item.area:
             return {
                 "key": item.key,
                 "url": self.entityUrl(item),
                 "kind": item.__class__.__name__,
+                "owner": self.ref(item.owner),
                 "details": item.details.__dict__,
-                "area": {
-                    "key": item.area.key,
-                    "url": self.entityUrl(item.area),
-                    "kind": item.area.__class__.__name__,
-                },
+                "area": self.ref(item.area),
             }
+
         return {
             "key": item.key,
             "url": self.entityUrl(item),
             "kind": item.__class__.__name__,
+            "owner": self.ref(item.owner),
             "details": item.details.__dict__,
         }
 
@@ -32,6 +39,7 @@ class WebModelVisitor:
             "key": area.key,
             "url": self.entityUrl(area),
             "kind": area.__class__.__name__,
+            "owner": self.ref(area.owner),
             "details": area.details.__dict__,
             "entities": [e.accept(self) for e in area.entities()],
         }
@@ -41,6 +49,7 @@ class WebModelVisitor:
             "key": person.key,
             "url": self.entityUrl(person),
             "kind": person.__class__.__name__,
+            "owner": self.ref(person.owner),
             "details": person.details.__dict__,
             "holding": [e.accept(self) for e in person.holding],
         }
@@ -72,6 +81,17 @@ def areas_index():
     return {"areas": [a.accept(makeWeb) for a in world.areas()]}
 
 
+@app.route("/api/people")
+def people_index():
+    world = get_world()
+    if world is None:
+        return {"loading": True}
+
+    makeWeb = WebModelVisitor()
+
+    return {"people": [a.accept(makeWeb) for a in world.people()]}
+
+
 @app.route("/api/entities/<string:key>")
 def get_entity(key: str):
     world = get_world()
@@ -100,9 +120,13 @@ async def update_entity(key: str):
         form = await quart.request.get_json()
         logging.info("form: %s" % (form,))
 
+        # Verify we can find the owner.
+        owner = world.find(form["owner"])
         entity = world.find(key)
         entity.details.name = form["name"]
         entity.details.desc = form["desc"]
+        entity.owner = owner
+
         # TODO Save
 
         makeWeb = WebModelVisitor()
