@@ -6,7 +6,7 @@
 
         <div v-if="entity.holding?.length > 0">
             <h4>Holding:</h4>
-            <Entities :entities="entity.holding" @selected="entitySelected" />
+            <Entities :entityRefs="entity.holding" @selected="entitySelected" />
         </div>
     </div>
 </template>

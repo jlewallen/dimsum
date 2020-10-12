@@ -7,7 +7,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { http, EntityResponse, Entity } from "@/http";
+import { Entity } from "@/http";
+import store, { NeedEntityAction } from "@/store";
 import SmallEntityPanel from "./SmallEntityPanel.vue";
 
 export default defineComponent({
@@ -19,16 +20,16 @@ export default defineComponent({
             required: true,
         },
     },
-    data(): { entity: Entity | null } {
-        return {
-            entity: null,
-        };
+    computed: {
+        entity(): Entity | null {
+            return store.state.entities[this.entityKey];
+        },
     },
-    mounted(): Promise<EntityResponse> {
-        return http<EntityResponse>({ url: `/entities/${this.entityKey}` }).then((data: EntityResponse) => {
-            this.entity = data.entity;
-            return data;
-        });
+    mounted(): Promise<void> {
+        if (this.entity == null) {
+            return store.dispatch(new NeedEntityAction(this.entityKey));
+        }
+        return Promise.resolve();
     },
     methods: {
         raiseSelected(entity: Entity): void {

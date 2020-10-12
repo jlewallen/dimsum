@@ -6,14 +6,12 @@
 
         <div v-if="adjacent.length > 0" class="adjacent">
             <h4>Adjacent Areas:</h4>
-            <div class="entities">
-                <DynamicSmallEntityPanel v-for="ref in adjacent" v-bind:key="ref.key" :entityKey="ref.key" @selected="entitySelected" />
-            </div>
+            <Entities :entityRefs="adjacent" @selected="entitySelected" />
         </div>
 
         <div v-if="entity.entities?.length > 0">
             <h4>Also Here:</h4>
-            <Entities :entities="entity.entities" @selected="entitySelected" />
+            <Entities :entityRefs="entity.entities" @selected="entitySelected" />
         </div>
     </div>
 </template>
@@ -21,12 +19,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Area, Entity, EntityRef } from "@/http";
-import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 import Entities from "./Entities.vue";
+import store from "@/store";
 
 export default defineComponent({
     name: "AreaEditor",
-    components: { DynamicSmallEntityPanel, Entities },
+    components: { Entities },
     props: {
         entity: {
             type: Object as () => Area,
@@ -38,7 +36,10 @@ export default defineComponent({
     },
     computed: {
         adjacent(): EntityRef[] {
-            return this.entity.entities.filter((e) => e.area).map((e) => e.area!);
+            return this.entity.entities
+                .map((ref) => store.state.entities[ref.key])
+                .filter((e) => e && e.area)
+                .map((e) => e.area!);
         },
     },
     methods: {

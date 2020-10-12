@@ -42,7 +42,7 @@ class WebModelVisitor:
             "kind": area.__class__.__name__,
             "owner": self.ref(area.owner),
             "details": area.details.__dict__,
-            "entities": [e.accept(self) for e in area.entities()],
+            "entities": [self.ref(e) for e in area.entities()],
         }
 
     def person(self, person):
@@ -52,7 +52,7 @@ class WebModelVisitor:
             "kind": person.__class__.__name__,
             "owner": self.ref(person.owner),
             "details": person.details.__dict__,
-            "holding": [e.accept(self) for e in person.holding],
+            "holding": [self.ref(e) for e in person.holding],
         }
 
 

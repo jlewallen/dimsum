@@ -2,7 +2,7 @@
     <div class="home">
         <div v-if="busy">Busy</div>
         <div v-if="areas">
-            <Entities :entities="areas" @selected="entitySelected" />
+            <Entities :entityRefs="areas" @selected="entitySelected" />
         </div>
     </div>
 </template>

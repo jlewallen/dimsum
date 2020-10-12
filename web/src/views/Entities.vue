@@ -1,27 +1,24 @@
 <template>
     <div class="entities">
-        <template v-for="entity in entities" v-bind:key="entity.key">
-            <SmallEntityPanel :entity="entity" @selected="raiseSelected" />
+        <template v-for="ref in entityRefs" v-bind:key="ref.key">
+            <DynamicSmallEntityPanel :entityKey="ref.key" @selected="raiseSelected" />
         </template>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity } from "@/http";
-import SmallEntityPanel from "./SmallEntityPanel.vue";
+import { EntityRef, Entity } from "@/http";
+import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 
 export default defineComponent({
     name: "Entities",
-    components: { SmallEntityPanel },
+    components: { DynamicSmallEntityPanel },
     props: {
-        entities: {
-            type: Array,
+        entityRefs: {
+            type: Array as () => EntityRef[],
             required: true,
         },
-    },
-    mounted(): void {
-        console.log("entities:mounted", this.entities);
     },
     methods: {
         raiseSelected(entity: Entity): void {
