@@ -1,22 +1,17 @@
 <template>
-    <div class="home">
-        <img alt="Vue logo" src="../assets/logo.png" />
-        <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
-    </div>
+    <div class="home"></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import { Config } from "@/config";
 
 export default defineComponent({
     name: "Home",
-    components: {
-        HelloWorld,
-    },
+    components: {},
     mounted() {
         console.log("home:mounted");
-        return fetch("http://192.168.0.100:5000");
+        Promise.all([fetch(Config.baseUrl)]);
     },
 });
 </script>
