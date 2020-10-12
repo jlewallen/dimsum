@@ -102,6 +102,23 @@ class GameBot:
             await ctx.message.channel.send(embed=em)
 
         @bot.command(
+            name="home",
+            brief="Home! Quick! Save me!",
+            description="Home! Quick! Save me!",
+            pass_context=True,
+            aliases=[],
+        )
+        async def home(ctx, *, q: str = ""):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "home", q)
+                await self.world.perform(player, action)
+                await self.save()
+                await ctx.message.channel.send("there ya go")
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
             name="hold",
             brief="Pick something up off the ground, or from a place that's visible.",
             description="Pick something up off the ground, or from a place that's visible.",

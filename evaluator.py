@@ -16,6 +16,9 @@ class Evaluate(lark.Transformer):
     def drop(self, args):
         return game.Drop()
 
+    def home(self, args):
+        return game.Home()
+
     def hold(self, args):
         return game.Hold(item=args[0])
 

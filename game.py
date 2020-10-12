@@ -474,6 +474,14 @@ class Action:
         raise Exception("unimplemented")
 
 
+class Home(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        return await Go(area=world.welcome_area()).perform(world, player)
+
+
 class Make(Action):
     def __init__(self, item, **kwargs):
         super().__init__(**kwargs)
@@ -567,23 +575,28 @@ class Hold(Action):
 class Go(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.area = kwargs["area"] if "area" in kwargs else None
+        self.item = kwargs["item"] if "item" in kwargs else None
 
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
 
+        destination = self.area
+
         # If the person owns this item and they try to go the thing,
         # this is how new areas area created, one of them.
-        if self.item.area is None:
-            if self.item.owner != player:
-                raise SorryError("you can only do that with things you own")
-            self.item.area = world.build_new_area(player, area, self.item)
+        if self.item:
+            if self.item.area is None:
+                if self.item.owner != player:
+                    raise SorryError("you can only do that with things you own")
+                self.item.area = world.build_new_area(player, area, self.item)
+            destination = self.item.area
 
         await world.perform(player, Drop())
         await area.left(world.bus, player)
-        await self.item.area.entered(world.bus, player)
+        await destination.entered(world.bus, player)
 
-        return self.item.area
+        return destination
 
 
 class Obliterate(Action):
