@@ -127,7 +127,7 @@ class Holding(Activity):
 
 class Person(Entity):
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
         self.creator = kwargs["creator"] if "creator" in kwargs else True

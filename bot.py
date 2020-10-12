@@ -61,20 +61,23 @@ async def save_world():
 async def get_player(message):
     author = message.author
     channel = message.channel
-    if author.id in players:
-        players[author.id].channel = channel
-        return players[author.id].player
+    key = str(author.id)
 
-    if world.contains(author.id):
-        player = world.find(author.id)
-        players[author.id] = BotPlayer(player, channel)
+    if key in players:
+        players[key].channel = channel
+        return players[key].player
+
+    if world.contains(key):
+        player = world.find(key)
+        players[key] = BotPlayer(player, channel)
         return player
 
     player = game.Player(
-        key=author.id, owner=world, details=game.Details(author.name, "A discord user")
+        key=key, owner=world, details=game.Details(author.name, "A discord user")
     )
-    players[author.id] = BotPlayer(player, channel)
+    players[key] = BotPlayer(player, channel)
     await world.join(player)
+    await save_world()
     return player
 
 
