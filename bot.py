@@ -20,7 +20,7 @@ class DiscordEventBus(game.EventBus):
     async def publish(self, event: game.Event):
         logging.info("publish:%s", event)
         for channel in self.bot.get_all_channels():
-            if channel.name == "test":
+            if channel.name == "general":
                 await channel.send(str(event))
 
 
