@@ -390,15 +390,6 @@ class World(Entity):
     def resolve(self, keys):
         return [self.entities[key] for key in keys]
 
-    async def join(self, player: Player):
-        self.register(player)
-        await self.bus.publish(PlayerJoined(player))
-        await self.welcome_area().entered(self.bus, player)
-
-    async def quit(self, player: Player):
-        await self.bus.publish(PlayerQuit(player))
-        self.unregister(player)
-
     def add_area(self, area: Area):
         self.register(area)
         for entity in area.entities():
@@ -437,29 +428,56 @@ class World(Entity):
 
         return None, None
 
-    async def go(self, player: Player, whereQ: str):
-        area, item = self.search(player, whereQ)
-        if item is None:
-            return None
+    async def perform(self, player: Player, action):
+        return await action.perform(self, player)
 
-        # If the person owns this item and they try to go the thing,
-        # this is how new areas area created, one of them.
-        if item.area is None:
-            if item.owner != player:
-                raise SorryError("you can only do that with things you own")
-            item.area = self.build_new_area(player, area, item)
 
-        await self.drop(player)
-        await area.left(self.bus, player)
-        await item.area.entered(self.bus, player)
-
-        return item.area
-
-    async def give(self, player: Player, whatQ: str, whoQ: str):
+class Action:
+    def __init__(self, **kwargs):
         pass
 
-    async def hold(self, player: Player, whatQ: str):
-        area, item = self.search(player, whatQ)
+    async def perform(self, world: World, player: Player):
+        raise Exception("unimplemented")
+
+
+class Make(Action):
+    def __init__(self, item, **kwargs):
+        super().__init__(**kwargs)
+        self.item = item
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
+        player.hold(self.item)
+        world.register(self.item)
+        await world.bus.publish(ItemMade(player, area, self.item))
+
+
+class Drop(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
+        return await area.drop(world.bus, player)
+
+
+class Join(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        world.register(player)
+        await world.bus.publish(PlayerJoined(player))
+        await world.welcome_area().entered(world.bus, player)
+
+
+class Hold(Action):
+    def __init__(self, whatQ: str, **kwargs):
+        super().__init__(**kwargs)
+        self.whatQ = whatQ
+
+    async def perform(self, world: World, player: Player):
+        area, item = world.search(player, self.whatQ)
         if item is None:
             return []
         if player.is_holding(item):
@@ -469,23 +487,53 @@ class World(Entity):
 
         area.remove(item)
         player.hold(item)
-        await self.bus.publish(ItemHeld(player, area, item))
+        await world.bus.publish(ItemHeld(player, area, item))
+
         return [item]
 
-    async def make(self, player: Player, item: Item):
-        area = self.find_player_area(player)
-        player.hold(item)
-        self.register(item)
-        await self.bus.publish(ItemMade(player, area, item))
 
-    async def obliterate(self, player: Player):
-        area = self.find_player_area(player)
+class Go(Action):
+    def __init__(self, whereQ: str, **kwargs):
+        super().__init__(**kwargs)
+        self.whereQ = whereQ
+
+    async def perform(self, world: World, player: Player):
+        area, item = world.search(player, self.whereQ)
+        if item is None:
+            return None
+
+        # If the person owns this item and they try to go the thing,
+        # this is how new areas area created, one of them.
+        if item.area is None:
+            if item.owner != player:
+                raise SorryError("you can only do that with things you own")
+            item.area = world.build_new_area(player, area, item)
+
+        await world.perform(player, Drop())
+        await area.left(world.bus, player)
+        await item.area.entered(world.bus, player)
+
+        return item.area
+
+
+class Obliterate(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        area = world.find_player_area(player)
         items = player.drop_all()
         for item in items:
-            self.unregister(item)
-            await self.bus.publish(ItemObliterated(player, area, item))
+            world.unregister(item)
+            await world.bus.publish(ItemObliterated(player, area, item))
 
-    async def modify(self, player: Player, changeQ: str):
+
+class Modify(Action):
+    def __init__(self, changeQ: str, **kwargs):
+        super().__init__(**kwargs)
+        self.changeQ = changeQ
+
+    async def perform(self, world: World, player: Player):
         def name(item, value):
             item.details.name = value
 
@@ -496,7 +544,7 @@ class World(Entity):
 
         item = None
         if len(player.holding) == 0:
-            area = self.find_player_area(player)
+            area = world.find_player_area(player)
             # If the player owns the area, assume that they'd like to
             # modify the area's properties.
             if area.owner != player:
@@ -507,18 +555,11 @@ class World(Entity):
                 raise HoldingTooMuch()
             item = player.holding[0]
 
-        field, value = changeQ.split(" ", 1)
+        field, value = self.changeQ.split(" ", 1)
         if field in modifications:
             modifications[field](item, value)
         else:
             raise UnknownField()
-
-    async def build(self, player: Player, area: Area):
-        await self.bus.publish(AreaConstructed(player, area, item))
-
-    async def drop(self, player: Player):
-        area = self.find_player_area(player)
-        return await area.drop(self.bus, player)
 
 
 class PlayerJoined(Event):

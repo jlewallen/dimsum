@@ -87,46 +87,6 @@ class GameBot:
             await ctx.message.channel.send(embed=em)
 
         @bot.command(
-            name="hold",
-            description="Pick something up off the ground, or from a place that's visible.",
-            brief="Pick something up off the ground, or from a place that's visible.",
-            pass_context=True,
-            aliases=["h", "take", "get"],
-        )
-        async def hold(ctx, *, q: str = ""):
-            async def op():
-                player = await self.get_player(ctx.message)
-                held = await self.world.hold(player, q)
-                if len(held) == 0:
-                    await ctx.message.channel.send("you can't hold that")
-                    return
-
-                await ctx.message.channel.send("you picked up %s" % (p.join(held),))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
-
-        @bot.command(
-            name="drop",
-            description="Drop everything in your hands.",
-            brief="Drop everything in your hands.",
-            pass_context=True,
-            aliases=["d"],
-        )
-        async def drop(ctx):
-            async def op():
-                player = await self.get_player(ctx.message)
-                dropped = await self.world.drop(player)
-                if len(dropped) == 0:
-                    await ctx.message.channel.send("nothing to drop")
-                    return
-
-                await ctx.message.channel.send("you dropped %s" % (p.join(dropped),))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
-
-        @bot.command(
             name="inspect",
             description="Inspect things closer.",
             brief="Inspect things closer.",
@@ -148,6 +108,46 @@ class GameBot:
             await ctx.message.channel.send(embed=em)
 
         @bot.command(
+            name="hold",
+            description="Pick something up off the ground, or from a place that's visible.",
+            brief="Pick something up off the ground, or from a place that's visible.",
+            pass_context=True,
+            aliases=["h", "take", "get"],
+        )
+        async def hold(ctx, *, q: str = ""):
+            async def op():
+                player = await self.get_player(ctx.message)
+                held = await self.world.perform(player, game.Hold(q))
+                if len(held) == 0:
+                    await ctx.message.channel.send("you can't hold that")
+                    return
+
+                await ctx.message.channel.send("you picked up %s" % (p.join(held),))
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="drop",
+            description="Drop everything in your hands.",
+            brief="Drop everything in your hands.",
+            pass_context=True,
+            aliases=["d"],
+        )
+        async def drop(ctx):
+            async def op():
+                player = await self.get_player(ctx.message)
+                dropped = await self.world.perform(player, game.Drop())
+                if len(dropped) == 0:
+                    await ctx.message.channel.send("nothing to drop")
+                    return
+
+                await ctx.message.channel.send("you dropped %s" % (p.join(dropped),))
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
             name="make",
             description="Make a new item.",
             brief="Make a new item.",
@@ -158,7 +158,7 @@ class GameBot:
             async def op():
                 player = await self.get_player(ctx.message)
                 item = game.Item(owner=player, details=game.Details(name, name))
-                await self.world.make(player, item)
+                await self.world.perform(player, game.Make(item))
                 await self.save()
 
             await mutate(ctx.message.channel.send, op)
@@ -173,7 +173,7 @@ class GameBot:
         async def modify(ctx, *, changeQ: str):
             async def op():
                 player = await self.get_player(ctx.message)
-                await self.world.modify(player, changeQ)
+                await self.world.perform(player, game.Modify(changeQ))
                 await self.save()
 
             await mutate(ctx.message.channel.send, op)
@@ -188,7 +188,7 @@ class GameBot:
         async def modify(ctx):
             async def op():
                 player = await self.get_player(ctx.message)
-                await self.world.obliterate(player)
+                await self.world.perform(player, game.Obliterate())
                 await self.save()
 
             await mutate(ctx.message.channel.send, op)
@@ -202,7 +202,7 @@ class GameBot:
         async def go(ctx, *, where: str = ""):
             async def op():
                 player = await self.get_player(ctx.message)
-                await self.world.go(player, where)
+                await self.world.perform(player, game.Go(where))
                 await self.save()
                 await look(ctx)
 
@@ -260,6 +260,6 @@ class GameBot:
             details=game.Details(author.name, "A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
-        await self.world.join(player)
+        await self.world.perform(player, game.Join())
         await self.save()
         return player

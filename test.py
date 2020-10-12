@@ -15,44 +15,44 @@ async def test_run():
 
     world.add_area(Area(owner=jacob, details=Details("Living room")).add_item(hammer))
     world.add_area(Area(owner=jacob, details=Details("Kitchen")))
-    await world.join(jacob)
-    await world.join(carla)
+    await world.perform(jacob, game.Join())
+    await world.perform(carla, game.Join())
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
-    await world.hold(jacob, "hammer")
+    await world.perform(jacob, game.Hold("hammer"))
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
-
-    await world.give(jacob, "carla", "hammer")
 
     trampoline = Item(owner=jacob, details=Details("Trampoline", "It's bouncy."))
 
-    await world.make(jacob, trampoline)
-    await world.drop(jacob)
-    await world.hold(jacob, "trampoline")
-    await world.drop(jacob)
+    await world.perform(jacob, game.Make(trampoline))
+    await world.perform(jacob, game.Drop())
+    await world.perform(jacob, game.Hold("trampoline"))
+    await world.perform(jacob, game.Drop())
 
     idea = Item(owner=jacob, details=Details("Idea", "It's genius."))
-    await world.make(jacob, idea)
-    await world.modify(jacob, "name Good Idea")
-    await world.modify(jacob, "desc These are very rare.")
+    await world.perform(jacob, game.Make(idea))
+    await world.perform(jacob, game.Modify("name Good Idea"))
+    await world.perform(jacob, game.Modify("desc These are very rare."))
     logging.info(world.look(jacob))
-    await world.drop(jacob)
+    await world.perform(jacob, game.Drop())
 
     door = Item(owner=jacob, details=Details("Door", "It's wooden."))
-    await world.make(jacob, door)
-    await world.go(jacob, "Door")
+    await world.perform(jacob, game.Make(door))
+    await world.perform(jacob, game.Go("door"))
     logging.info(world.look(jacob))
-    await world.modify(jacob, "name An office.")
-    await world.modify(
+    await world.perform(jacob, game.Modify("name An office."))
+    await world.perform(
         jacob,
-        "desc This is a lovely room, more garden than room. The walls are barely visible through the potted plants and vines.",
+        game.Modify(
+            "desc This is a lovely room, more garden than room. The walls are barely visible through the potted plants and vines."
+        ),
     )
     logging.info(world.look(jacob))
-    await world.go(jacob, "Door")
+    await world.perform(jacob, game.Go("Door"))
     logging.info(world.look(jacob))
 
     logging.info("saving and reloading")
