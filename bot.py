@@ -1,9 +1,11 @@
 import discord
 import discord.ext.commands
 import logging
+import inflect
 import game
 import persistence
-import inflect
+import grammar
+import evaluator
 
 p = inflect.engine()
 
@@ -43,6 +45,10 @@ async def mutate(reply, mutation):
 
 
 class GameBot:
+    def parse_as(self, evaluator, prefix, remaining):
+        tree = self.l.parse(prefix + " " + remaining)
+        return evaluator.transform(tree)
+
     def __init__(self, token):
         bot = discord.ext.commands.Bot(".")
 
@@ -51,6 +57,7 @@ class GameBot:
         self.bot = bot
         self.players = {}
         self.world = None
+        self.l = grammar.create_parser()
 
         @bot.event
         async def on_ready():
@@ -114,10 +121,11 @@ class GameBot:
             pass_context=True,
             aliases=["h", "take", "get"],
         )
-        async def hold(ctx, *, q: str = ""):
+        async def hold(ctx, *, q: str):
             async def op():
                 player = await self.get_player(ctx.message)
-                held = await self.world.perform(player, game.Hold(q))
+                action = self.parse_as(evaluator.create(self.world, player), "hold", q)
+                held = await self.world.perform(player, action)
                 if len(held) == 0:
                     await ctx.message.channel.send("you can't hold that")
                     return
@@ -134,10 +142,11 @@ class GameBot:
             pass_context=True,
             aliases=["d"],
         )
-        async def drop(ctx):
+        async def drop(ctx, *, q: str = ""):
             async def op():
                 player = await self.get_player(ctx.message)
-                dropped = await self.world.perform(player, game.Drop())
+                action = self.parse_as(evaluator.create(self.world, player), "drop", q)
+                dropped = await self.world.perform(player, action)
                 if len(dropped) == 0:
                     await ctx.message.channel.send("nothing to drop")
                     return
@@ -154,7 +163,7 @@ class GameBot:
             pass_context=True,
             aliases=[],
         )
-        async def remember(ctx):
+        async def remember(ctx, *, q: str = ""):
             async def op():
                 player = await self.get_player(ctx.message)
                 await self.world.perform(player, game.Remember())
@@ -173,11 +182,11 @@ class GameBot:
             pass_context=True,
             aliases=[],
         )
-        async def make(ctx, *, name: str):
+        async def make(ctx, *, q: str):
             async def op():
                 player = await self.get_player(ctx.message)
-                item = game.Item(owner=player, details=game.Details(name, name))
-                await self.world.perform(player, game.Make(item))
+                action = self.parse_as(evaluator.create(self.world, player), "make", q)
+                await self.world.perform(player, action)
                 await self.save()
 
             await mutate(ctx.message.channel.send, op)
@@ -189,10 +198,13 @@ class GameBot:
             pass_context=True,
             aliases=[],
         )
-        async def modify(ctx, *, changeQ: str):
+        async def modify(ctx, *, q: str):
             async def op():
                 player = await self.get_player(ctx.message)
-                await self.world.perform(player, game.Modify(changeQ))
+                action = self.parse_as(
+                    evaluator.create(self.world, player), "modify", q
+                )
+                await self.world.perform(player, action)
                 await self.save()
 
             await mutate(ctx.message.channel.send, op)
@@ -204,7 +216,7 @@ class GameBot:
             pass_context=True,
             aliases=[],
         )
-        async def modify(ctx):
+        async def obliterate(ctx):
             async def op():
                 player = await self.get_player(ctx.message)
                 await self.world.perform(player, game.Obliterate())
@@ -218,10 +230,11 @@ class GameBot:
             brief="Move around the world, just say where.",
             pass_context=True,
         )
-        async def go(ctx, *, where: str = ""):
+        async def go(ctx, *, q: str):
             async def op():
                 player = await self.get_player(ctx.message)
-                await self.world.perform(player, game.Go(where))
+                action = self.parse_as(evaluator.create(self.world, player), "go", q)
+                await self.world.perform(player, action)
                 await self.save()
                 await look(ctx)
 

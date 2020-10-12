@@ -462,6 +462,7 @@ class Make(Action):
         player.hold(self.item)
         world.register(self.item)
         await world.bus.publish(ItemMade(player, area, self.item))
+        return self.item
 
 
 class Drop(Action):
@@ -484,48 +485,45 @@ class Join(Action):
 
 
 class Hold(Action):
-    def __init__(self, whatQ: str, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.whatQ = whatQ
+        self.item = kwargs["item"] if "item" in kwargs else None
 
     async def perform(self, world: World, player: Player):
-        area, item = world.search(player, self.whatQ)
-        if item is None:
-            return []
-        if player.is_holding(item):
+        area = world.find_player_area(player)
+
+        if player.is_holding(self.item):
             raise AlreadyHolding("you're already holding that")
-        if item.area and item.owner != player:
+        if self.item.area and self.item.owner != player:
             raise NotYours("that's not yours")
 
-        area.remove(item)
-        player.hold(item)
-        await world.bus.publish(ItemHeld(player, area, item))
+        area.remove(self.item)
+        player.hold(self.item)
+        await world.bus.publish(ItemHeld(player, area, self.item))
 
-        return [item]
+        return [self.item]
 
 
 class Go(Action):
-    def __init__(self, whereQ: str, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.whereQ = whereQ
+        self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
-        area, item = world.search(player, self.whereQ)
-        if item is None:
-            return None
+        area = world.find_player_area(player)
 
         # If the person owns this item and they try to go the thing,
         # this is how new areas area created, one of them.
-        if item.area is None:
-            if item.owner != player:
+        if self.item.area is None:
+            if self.item.owner != player:
                 raise SorryError("you can only do that with things you own")
-            item.area = world.build_new_area(player, area, item)
+            self.item.area = world.build_new_area(player, area, self.item)
 
         await world.perform(player, Drop())
         await area.left(world.bus, player)
-        await item.area.entered(world.bus, player)
+        await self.item.area.entered(world.bus, player)
 
-        return item.area
+        return self.item.area
 
 
 class Obliterate(Action):
@@ -548,6 +546,25 @@ class Remember(Action):
         area = world.find_player_area(player)
         player.memory = area
         return area
+
+
+class ModifyField(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+        self.field = kwargs["field"]
+        self.value = kwargs["value"]
+
+    async def perform(self, world: World, player: Player):
+        self.item.details.__dict__[self.field] = self.value
+
+
+class ModifyNumeric(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        pass
 
 
 class Modify(Action):
