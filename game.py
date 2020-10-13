@@ -362,7 +362,7 @@ class ObservedPerson:
     def __str__(self):
         if len(self.activities) == 0:
             return "%s" % (self.person,)
-        return "%s who is %s" % (self.person, p.join(self.activities))
+        return "%s who is %s" % (self.person, p.join(list(map(str, self.activities))))
 
     def __repr__(self):
         return str(self)
@@ -402,7 +402,7 @@ class PersonalObservation(Observation):
         return visitor.personal(self)
 
     def __str__(self):
-        return "%s consideres themselves %s" % (
+        return "%s considers themselves %s" % (
             self.who,
             self.properties,
         )
@@ -435,18 +435,18 @@ class AreaObservation(Observation):
     def __init__(
         self,
         who: ObservedPerson,
-        what: Entity,
+        where: Entity,
         people: List[ObservedPerson],
         items: List[ObservedItem],
     ):
         self.who = who
-        self.what = what
+        self.where = where
         self.people = people
         self.items = items
 
     @property
     def details(self):
-        return self.what.details
+        return self.where.details
 
     def accept(self, visitor):
         return visitor.area(self)
@@ -871,7 +871,7 @@ class Obliterate(Action):
             world.unregister(item)
             await world.bus.publish(ItemObliterated(player, area, item))
 
-        return Success("you obliterated %s" % (p.join(items),))
+        return Success("you obliterated %s" % (p.join(list(map(str, items))),))
 
 
 class CallThis(Action):
