@@ -1,5 +1,6 @@
 import lark
 import game
+import actions
 
 
 class Evaluate(lark.Transformer):
@@ -11,19 +12,19 @@ class Evaluate(lark.Transformer):
         return args[0]
 
     def make(self, args):
-        return game.Make(args[0])
+        return actions.Make(args[0])
 
     def drop(self, args):
-        return game.Drop()
+        return actions.Drop()
 
     def home(self, args):
-        return game.Home()
+        return actions.Home()
 
     def hold(self, args):
-        return game.Hold(item=args[0])
+        return actions.Hold(item=args[0])
 
     def forget(self, args):
-        return game.Forget(name=args[0])
+        return actions.Forget(name=args[0])
 
     def memory(self, args):
         name, entity = self.player.find_memory(str(args[0]))
@@ -52,55 +53,55 @@ class Evaluate(lark.Transformer):
         return game.Item(owner=self.player, details=game.Details(name))
 
     def go(self, args):
-        return game.Go(item=args[0])
+        return actions.Go(item=args[0])
 
     def eat(self, args):
-        return game.Eat(item=args[0])
+        return actions.Eat(item=args[0])
 
     def drink(self, args):
-        return game.Drink(item=args[0])
+        return actions.Drink(item=args[0])
 
     def look(self, args):
-        return game.Look()
+        return actions.Look()
 
     def obliterate(self, args):
-        return game.Obliterate()
+        return actions.Obliterate()
 
     def this(self, args):
         return self.get_item_held()
 
     def call(self, args):
-        return game.CallThis(item=args[0], name=str(args[1]))
+        return actions.CallThis(item=args[0], name=str(args[1]))
 
     def stimulate(self, args):
         return args[0]
 
     def hug(self, args):
-        return game.Hug(who=args[0])
+        return actions.Hug(who=args[0])
 
     def heal(self, args):
-        return game.Heal(who=args[0])
+        return actions.Heal(who=args[0])
 
     def kick(self, args):
-        return game.Kick(who=args[0])
+        return actions.Kick(who=args[0])
 
     def kiss(self, args):
-        return game.Kiss(who=args[0])
+        return actions.Kiss(who=args[0])
 
     def tickle(self, args):
-        return game.Tickle(who=args[0])
+        return actions.Tickle(who=args[0])
 
     def poke(self, args):
-        return game.Poke(who=args[0])
+        return actions.Poke(who=args[0])
 
     def look_item(self, args):
-        return game.Look(item=args[0])
+        return actions.Look(item=args[0])
 
     def think(self, args):
-        return game.Myself()
+        return actions.Myself()
 
     def look_myself(self, args):
-        return game.Myself()
+        return actions.Myself()
 
     def get_item_held(self):
         if len(self.player.holding) == 0:
@@ -119,25 +120,25 @@ class Evaluate(lark.Transformer):
             item = self.player.holding[0]
         field = str(args[0])
         value = args[1]
-        return game.ModifyField(item=item, field=field, value=value)
+        return actions.ModifyField(item=item, field=field, value=value)
 
     def when_opened(self, args):
-        return game.ModifyActivity(
+        return actions.ModifyActivity(
             item=self.get_item_held(), activity="opened", value=True
         )
 
     def when_eaten(self, args):
-        return game.ModifyActivity(
+        return actions.ModifyActivity(
             item=self.get_item_held(), activity="eaten", value=True
         )
 
     def when_drank(self, args):
-        return game.ModifyActivity(
+        return actions.ModifyActivity(
             item=self.get_item_held(), activity="drank", value=True
         )
 
     def remember(self, args):
-        return game.Remember()
+        return actions.Remember()
 
     def text(self, args):
         return str(args[0])

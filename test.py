@@ -6,6 +6,8 @@ from persistence import *
 from game import *
 from grammar import *
 from evaluator import *
+from behavior import *
+from actions import *
 
 from lark import Tree, Transformer
 
@@ -20,34 +22,34 @@ async def test_run():
 
     world.add_area(Area(owner=jacob, details=Details("Living room")).add_item(hammer))
     world.add_area(Area(owner=jacob, details=Details("Kitchen")))
-    await world.perform(jacob, game.Join())
-    await world.perform(carla, game.Join())
+    await world.perform(jacob, actions.Join())
+    await world.perform(carla, actions.Join())
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
-    await world.perform(jacob, game.Hold(item=hammer))
+    await world.perform(jacob, actions.Hold(item=hammer))
 
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
     trampoline = Item(owner=jacob, details=Details("Trampoline", desc="It's bouncy."))
 
-    await world.perform(jacob, game.Make(trampoline))
-    await world.perform(jacob, game.Drop())
-    await world.perform(jacob, game.Hold(item=trampoline))
-    await world.perform(jacob, game.Drop())
+    await world.perform(jacob, actions.Make(trampoline))
+    await world.perform(jacob, actions.Drop())
+    await world.perform(jacob, actions.Hold(item=trampoline))
+    await world.perform(jacob, actions.Drop())
 
     idea = Item(owner=jacob, details=Details("Idea", desc="It's genius."))
-    await world.perform(jacob, game.Make(idea))
+    await world.perform(jacob, actions.Make(idea))
     logging.info(world.look(jacob))
-    await world.perform(jacob, game.Drop())
+    await world.perform(jacob, actions.Drop())
 
     door = Item(owner=jacob, details=Details("Door", desc="It's wooden."))
-    await world.perform(jacob, game.Make(door))
-    await world.perform(jacob, game.Go(item=door))
+    await world.perform(jacob, actions.Make(door))
+    await world.perform(jacob, actions.Go(item=door))
     logging.info(world.look(jacob))
-    await world.perform(jacob, game.Go(item=door))
+    await world.perform(jacob, actions.Go(item=door))
     logging.info(world.look(jacob))
 
     logging.info("saving and reloading")
@@ -107,15 +109,11 @@ async def test_run():
     logging.info(world.look(jacob))
 
 
-class Behavior(game.PropertyMap):
-    def execute(self, name):
-        pass
-
 async def test_lua():
     lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-    logging.info(lua.eval('1+1'))
+    logging.info(lua.eval("1+1"))
 
-    func = lua.eval('function(f, n) return f(n) end')
+    func = lua.eval("function(f, n) return f(n) end")
     logging.info(lupa.lua_type(func))
 
     bus = EventBus()
@@ -125,10 +123,11 @@ async def test_lua():
     lua.globals().world = world
     lua.globals().player = jacob
 
-    logging.info(lua.eval('player'))
-    logging.info(lua.eval('world'))
+    logging.info(lua.eval("player"))
+    logging.info(lua.eval("world"))
 
-    b = Behavior()
+    b = Behavior(world, jacob)
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
