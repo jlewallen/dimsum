@@ -82,28 +82,69 @@ class EventBus:
         logging.info("publish:%s", event)
 
 
-class Details:
-    def __init__(self, name: str = "", desc: str = "", presence: str = ""):
+class PropertyMap:
+    def __init__(self, **kwargs):
+        if "map" in kwargs:
+            self.__dict__ = kwargs["map"]
+
+    @property
+    def map(self):
+        return self.__dict__
+
+    def set(self, key, value):
+        self.map[key] = value
+
+    def update(self, changes):
+        self.map.update(changes)
+
+    def clone(self):
+        return PropertyMap(map=self.map)
+
+
+class Details(PropertyMap):
+    def __init__(self, name: str = "", desc: str = ""):
         self.name = name
         self.desc = desc
-        self.presence = presence
+        self.presence = ""
         self.created = time.time()
         self.touched = time.time()
 
+    @staticmethod
+    def from_base(base):
+        details = Details()
+        details.__dict__ = base
+        details.created = time.time()
+        details.touched = time.time()
+        return details
+
+    @staticmethod
+    def from_map(map):
+        details = Details()
+        details.__dict__ = map
+        return details
+
+    def to_base(self):
+        base = self.map.copy()
+        if "created" in base:
+            del base["created"]
+        if "touched" in base:
+            del base["touched"]
+        return base
+
     def when_eaten(self):
-        return self.__dict__["eaten"] if "eaten" in self.__dict__ else False
+        return self.map["eaten"] if "eaten" in self.map else False
 
     def when_drank(self):
-        return self.__dict__["drank"] if "drank" in self.__dict__ else False
+        return self.map["drank"] if "drank" in self.map else False
 
     def touch(self):
         self.touched = time.time()
 
     def clone(self):
-        return Details(self.name, self.desc, self.presence)
+        return Details(self.name, self.desc)
 
     def __str__(self):
-        return str(self.__dict__)
+        return str(self.map)
 
 
 class FieldMergeStrategy:
@@ -156,7 +197,7 @@ class Item(Entity):
         p = super().saved()
         p.update(
             {
-                "details": self.details.__dict__,
+                "details": self.details.map,
                 "area": self.area.key if self.area else None,
             }
         )
@@ -164,7 +205,7 @@ class Item(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details.__dict__ = properties["details"]
+        self.details = Details.from_map(properties["details"])
         self.area = world.find(properties["area"]) if properties["area"] else None
 
     def accept(self, visitor: Visitor):
@@ -202,9 +243,7 @@ class Recipe(Item):
         self.required = {k: world.find(v) for k, v in properties["required"].items()}
 
     def invoke(self, player):
-        details = Details()
-        details.__dict__.update(self.base)
-        return Item(owner=player, details=details)
+        return Item(owner=player, details=Details.from_base(self.base))
 
 
 class ObservedItem:
@@ -301,10 +340,10 @@ class Person(Entity):
             SumFields("vitamins"),
         ]
         changes = merge_dictionaries(
-            self.details.__dict__, item.details.__dict__, FoodFields
+            self.details.map, item.details.map, FoodFields
         )
         logging.info("merged %s" % (changes,))
-        self.details.__dict__.update(changes)
+        self.details.update(changes)
 
     def drop_all(self):
         dropped = []
@@ -332,7 +371,7 @@ class Person(Entity):
         p = super().saved()
         p.update(
             {
-                "details": self.details.__dict__,
+                "details": self.details.map,
                 "holding": [e.key for e in self.holding],
                 "memory": {k: e.key for k, e in self.memory.items()},
             }
@@ -341,7 +380,7 @@ class Person(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details.__dict__ = properties["details"]
+        self.details = Details.from_map(properties["details"])
         self.holding = world.resolve(properties["holding"])
         self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
@@ -392,7 +431,7 @@ class PersonalObservation(Observation):
 
     @property
     def properties(self):
-        return self.details.__dict__
+        return self.details.map
 
     @property
     def memory(self):
@@ -419,7 +458,7 @@ class DetailedObservation(Observation):
 
     @property
     def properties(self):
-        return self.details.__dict__
+        return self.details.map
 
     def accept(self, visitor):
         return visitor.detailed(self)
@@ -498,7 +537,7 @@ class Area(Entity):
         p = super().saved()
         p.update(
             {
-                "details": self.details.__dict__,
+                "details": self.details.map,
                 "owner": self.owner.key,
                 "here": [e.key for e in self.entities()],
             }
@@ -507,7 +546,7 @@ class Area(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details.__dict__ = properties["details"]
+        self.details = Details.from_map(properties["details"])
         self.here = world.resolve(properties["here"])
 
     def accept(self, visitor: Visitor):
@@ -881,7 +920,7 @@ class CallThis(Action):
         self.name = kwargs["name"]
 
     async def perform(self, world: World, player: Player):
-        base = self.item.details.__dict__.copy()
+        base = self.item.details.to_base()
 
         if "created" in base:
             del base["created"]
@@ -928,7 +967,7 @@ class ModifyField(Action):
         self.value = kwargs["value"]
 
     async def perform(self, world: World, player: Player):
-        self.item.details.__dict__[self.field] = self.value
+        self.item.details.set(self.field, self.value)
         return Success("done")
 
 
@@ -940,7 +979,7 @@ class ModifyActivity(Action):
         self.value = kwargs["value"]
 
     async def perform(self, world: World, player: Player):
-        self.item.details.__dict__[self.activity] = self.value
+        self.item.details.set(self.activity, self.value)
         return Success("done")
 
 

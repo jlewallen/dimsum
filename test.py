@@ -106,6 +106,11 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("forget ipa")))
     logging.info(world.look(jacob))
 
+
+class Behavior(game.PropertyMap):
+    def execute(self, name):
+        pass
+
 async def test_lua():
     lua = lupa.LuaRuntime(unpack_returned_tuples=True)
     logging.info(lua.eval('1+1'))
@@ -113,7 +118,21 @@ async def test_lua():
     func = lua.eval('function(f, n) return f(n) end')
     logging.info(lupa.lua_type(func))
 
+    bus = EventBus()
+    world = World(bus)
+    jacob = Player(owner=world, details=Details("Jacob", "Curly haired bastard."))
+
+    lua.globals().world = world
+    lua.globals().player = jacob
+
+    logging.info(lua.eval('player'))
+    logging.info(lua.eval('world'))
+
+    b = Behavior()
+
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    if False: asyncio.run(test_run())
+    logging.info("testing:basic")
+    asyncio.run(test_run())
+    logging.info("testing:lua")
     asyncio.run(test_lua())

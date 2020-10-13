@@ -22,7 +22,7 @@ class WebModelVisitor:
             "url": self.entityUrl(recipe),
             "kind": recipe.__class__.__name__,
             "owner": self.ref(recipe.owner),
-            "details": recipe.details.__dict__,
+            "details": recipe.details.map,
             "base": recipe.base,
             "required": {k: self.ref(e) for k, e in recipe.required.items()},
         }
@@ -34,7 +34,7 @@ class WebModelVisitor:
                 "url": self.entityUrl(item),
                 "kind": item.__class__.__name__,
                 "owner": self.ref(item.owner),
-                "details": item.details.__dict__,
+                "details": item.details.map,
                 "area": self.ref(item.area),
             }
 
@@ -43,7 +43,7 @@ class WebModelVisitor:
             "url": self.entityUrl(item),
             "kind": item.__class__.__name__,
             "owner": self.ref(item.owner),
-            "details": item.details.__dict__,
+            "details": item.details.map,
         }
 
     def area(self, area):
@@ -52,7 +52,7 @@ class WebModelVisitor:
             "url": self.entityUrl(area),
             "kind": area.__class__.__name__,
             "owner": self.ref(area.owner),
-            "details": area.details.__dict__,
+            "details": area.details.map,
             "entities": [self.ref(e) for e in area.entities()],
         }
 
@@ -62,7 +62,7 @@ class WebModelVisitor:
             "url": self.entityUrl(person),
             "kind": person.__class__.__name__,
             "owner": self.ref(person.owner),
-            "details": person.details.__dict__,
+            "details": person.details.map,
             "holding": [self.ref(e) for e in person.holding],
             "memory": {key: self.ref(value) for key, value in person.memory.items()},
         }
@@ -132,7 +132,7 @@ def create(state):
             del form["owner"]
 
             entity = world.find(key)
-            entity.details.__dict__.update(form)
+            entity.details.update(form)
             entity.owner = owner
 
             await state.save()
