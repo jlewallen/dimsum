@@ -22,9 +22,15 @@ class Evaluate(lark.Transformer):
     def hold(self, args):
         return game.Hold(item=args[0])
 
+    def forget(self, args):
+        return game.Forget(name=args[0])
+
+    def memory(self, args):
+        name, entity = self.player.find_memory(str(args[0]))
+        return name
+
     def somebody_here(self, args):
         area, item = self.world.search(self.player, str(args[0]))
-        print(args, item)
         return item
 
     def item_here(self, args):

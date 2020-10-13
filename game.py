@@ -268,6 +268,12 @@ class Person(Entity):
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
 
+    def find_memory(self, q: str):
+        for name, entity in self.memory.items():
+            if entity.describes(q):
+                return name, entity
+        return None, None
+
     def find_recipe(self, q: str):
         for name, entity in self.memory.items():
             if name.startswith("r:"):
@@ -892,6 +898,16 @@ class CallThis(Action):
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )
+
+
+class Forget(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name = kwargs["name"]
+
+    async def perform(self, world: World, player: Player):
+        del player.memory[self.name]
+        return Success("oh wait, was that important?")
 
 
 class Remember(Action):
