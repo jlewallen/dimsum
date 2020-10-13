@@ -1,6 +1,8 @@
+SHELL := /bin/bash
+
 default: checks
 
-checks:
+checks: env
 	env/bin/mypy *.py --ignore-missing-imports
 
 run:
@@ -11,7 +13,9 @@ test:
 	env/bin/python3 test.py
 
 env:
-	echo
+	python3 -m venv env
+	source env/bin/activate && pip3 install -r requirements.txt
+	echo remember to source env/bin/activate
 
 freeze:
 	pip3 freeze > requirements.txt
