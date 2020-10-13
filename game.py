@@ -349,6 +349,10 @@ class ObservedPerson:
     def holding(self):
         return self.person.holding
 
+    @property
+    def memory(self):
+        return self.person.memory
+
     def __str__(self):
         if len(self.activities) == 0:
             return "%s" % (self.person,)
@@ -383,6 +387,10 @@ class PersonalObservation(Observation):
     @property
     def properties(self):
         return self.details.__dict__
+
+    @property
+    def memory(self):
+        return self.who.memory
 
     def accept(self, visitor):
         return visitor.personal(self)

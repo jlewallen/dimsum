@@ -32,8 +32,17 @@ class EmbedObservationVisitor:
     def personal(self, obs):
         emd = obs.details.desc
         emd += "\n"
+
+        emd += "Properties:\n"
         for key, value in obs.properties.items():
-            emd += "\n" + key + "=" + str(value)
+            emd += key + "=" + str(value) + "\n"
+        emd += "\n"
+
+        emd += "Memory:\n"
+        for key, value in obs.memory.items():
+            emd += key + "=" + str(value) + "\n"
+        emd += "\n"
+
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
     def detailed(self, obs):
