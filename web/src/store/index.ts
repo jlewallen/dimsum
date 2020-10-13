@@ -10,6 +10,7 @@ import {
     Person,
     EntityResponse,
     Entity,
+    RefreshEntityAction,
     NeedEntityAction,
     SaveEntityAction,
 } from "./types";
@@ -49,6 +50,15 @@ export default createStore<RootState>({
                     commit(MutationTypes.PEOPLE, data.people);
                 }),
             ]);
+        },
+
+        [ActionTypes.REFRESH_ENTITY]: ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
+            if (state.entities[payload.key]) {
+                return Promise.resolve();
+            }
+            return http<EntityResponse>({ url: `/entities/${payload.key}` }).then((data) => {
+                commit(MutationTypes.ENTITY, data.entity);
+            });
         },
         [ActionTypes.NEED_ENTITY]: ({ commit }: ActionParameters, payload: NeedEntityAction) => {
             return http<EntityResponse>({ url: `/entities/${payload.key}` }).then((data) => {

@@ -11,7 +11,7 @@
 import { defineComponent } from "vue";
 import EntityEditor from "./EntityEditor.vue";
 import { Entity } from "@/http";
-import store, { NeedEntityAction } from "@/store";
+import store, { RefreshEntityAction } from "@/store";
 
 export default defineComponent({
     name: "Entity",
@@ -47,7 +47,7 @@ export default defineComponent({
                 return Promise.resolve();
             }
             this.busy = true;
-            return store.dispatch(new NeedEntityAction(this.key)).finally(() => {
+            return store.dispatch(new RefreshEntityAction(this.key)).finally(() => {
                 this.busy = false;
             });
         },

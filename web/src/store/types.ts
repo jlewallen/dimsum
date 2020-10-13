@@ -9,6 +9,7 @@ export class RootState {
 
 export enum ActionTypes {
     LOADING = "LOADING",
+    REFRESH_ENTITY = "REFRESH_ENTITY",
     NEED_ENTITY = "NEED_ENTITY",
     SAVE_ENTITY = "SAVE_ENTITY",
 }
@@ -21,6 +22,12 @@ export enum MutationTypes {
 
 export class LoadingAction {
     type = ActionTypes.LOADING;
+}
+
+export class RefreshEntityAction {
+    type = ActionTypes.REFRESH_ENTITY;
+
+    constructor(public readonly key: string) {}
 }
 
 export class NeedEntityAction {
