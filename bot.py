@@ -336,10 +336,10 @@ modify when eaten
         if self.world.empty():
             self.world.add_area(
                 game.Area(
-                    owner=world, details=game.Details("Living room", "It's got walls.")
+                    owner=self.world, details=game.Details("Living room", "It's got walls.")
                 ).add_item(
                     game.Item(
-                        owner=world, details=game.Details("Hammer", "It's heavy.")
+                        owner=self.world, details=game.Details("Hammer", "It's heavy.")
                     )
                 )
             )

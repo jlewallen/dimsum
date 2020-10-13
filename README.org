@@ -1,9 +1,14 @@
 * DimSum
+** TODO Planting
+** TODO Water/Pour
 ** DONE Toggle eating and drinking of things.
 ** TODO Allow naming of common things that get made.
 ** TODO Make maze.
-** TODO Bombs.
-** TODO Planting.
+** TODO Rain/weather. Explosions.
+
+   Set logical zip code for an area.
+
+** TODO Optimize persistence: delete and only update modified.
 ** TODO Animal Crossing mode.
 
    .do recipe Super Cool Thing
