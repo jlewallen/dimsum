@@ -4,15 +4,16 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home
+        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | stimulate
 
         _WS:        WS
         TEXT:       (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
 
-        item_here:  TEXT
-        item_new:   TEXT
-        item_held:  TEXT
-        item_goes:  TEXT
+        somebody_here: TEXT
+        item_here:     TEXT
+        item_new:      TEXT
+        item_held:     TEXT
+        item_goes:     TEXT
 
         home:       "home"
         look:       "look"
@@ -26,6 +27,14 @@ def create_parser():
         drink:      "drink" _WS item_held
         obliterate: "obliterate"
         remember:   "remember"
+
+        stimulate:  hug | kiss | kick | tickle | poke | heal
+        heal:       "heal" _WS somebody_here
+        hug:         "hug" _WS somebody_here
+        kiss:       "kiss" _WS somebody_here
+        kick:       "kick" _WS somebody_here
+        tickle:   "tickle" _WS somebody_here
+        poke:       "poke" _WS somebody_here
 
         TEXT_FIELD: "name" | "desc" | "presence"
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"

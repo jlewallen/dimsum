@@ -234,6 +234,9 @@ class Person(Entity):
         activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
         return ObservedPerson(self, activities)
 
+    def describes(self, q: str):
+        return q.lower() in self.details.name.lower()
+
     def is_holding(self, item):
         return item in self.holding
 
@@ -593,6 +596,60 @@ class Make(Action):
         world.register(self.item)
         await world.bus.publish(ItemMade(player, area, self.item))
         return self.item
+
+
+class Hug(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
+
+
+class Heal(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
+
+
+class Kick(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
+
+
+class Kiss(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
+
+
+class Tickle(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
+
+
+class Poke(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.who = kwargs["who"]
+
+    async def perform(self, world: World, player: Player):
+        return self.who
 
 
 class Eat(Action):

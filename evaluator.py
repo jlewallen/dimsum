@@ -22,6 +22,11 @@ class Evaluate(lark.Transformer):
     def hold(self, args):
         return game.Hold(item=args[0])
 
+    def somebody_here(self, args):
+        area, item = self.world.search(self.player, str(args[0]))
+        print(args, item)
+        return item
+
     def item_here(self, args):
         area, item = self.world.search(self.player, str(args[0]))
         return item
@@ -49,6 +54,27 @@ class Evaluate(lark.Transformer):
 
     def look(self, args):
         return game.Look()
+
+    def stimulate(self, args):
+        return args[0]
+
+    def hug(self, args):
+        return game.Hug(who=args[0])
+
+    def heal(self, args):
+        return game.Heal(who=args[0])
+
+    def kick(self, args):
+        return game.Kick(who=args[0])
+
+    def kiss(self, args):
+        return game.Kiss(who=args[0])
+
+    def tickle(self, args):
+        return game.Tickle(who=args[0])
+
+    def poke(self, args):
+        return game.Poke(who=args[0])
 
     def look_item(self, args):
         return game.Look(item=args[0])

@@ -79,6 +79,7 @@ async def mutate(reply, mutation):
         await reply("oops, %s" % (err.__context__,))
     except Exception as err:
         await reply("oops, %s" % (err,))
+        raise err
 
 
 class GameBot:
@@ -303,6 +304,124 @@ modify when eaten
                 await self.world.perform(player, action)
                 await self.save()
                 await look(ctx)
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="hug",
+            brief="Hug",
+            description="Hug",
+            pass_context=True,
+        )
+        async def hug(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "hug", q)
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't hug that")
+                    return
+
+                await ctx.message.channel.send("you hugged %s" % (who,))
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="heal",
+            brief="Heal",
+            description="Heal",
+            pass_context=True,
+        )
+        async def heal(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "heal", q)
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't heal that")
+                    return
+
+                await ctx.message.channel.send("you healed %s" % (who,))
+                await self.save()
+
+        @bot.command(
+            name="kick",
+            brief="Kick",
+            description="Kick",
+            pass_context=True,
+        )
+        async def kick(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "kick", q)
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't kick that")
+                    return
+
+                await ctx.message.channel.send("you kicked %s" % (who,))
+                await self.save()
+
+        @bot.command(
+            name="kiss",
+            brief="Kiss",
+            description="Kiss",
+            pass_context=True,
+        )
+        async def kiss(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "kiss", q)
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't kiss that")
+                    return
+
+                await ctx.message.channel.send("you kissed %s" % (who,))
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="tickle",
+            brief="Tickle",
+            description="Tickle",
+            pass_context=True,
+        )
+        async def tickle(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(
+                    evaluator.create(self.world, player), "tickle", q
+                )
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't tickle that")
+                    return
+
+                await ctx.message.channel.send("you tickled %s" % (who,))
+                await self.save()
+
+            await mutate(ctx.message.channel.send, op)
+
+        @bot.command(
+            name="poke",
+            brief="Poke",
+            description="Poke",
+            pass_context=True,
+        )
+        async def poke(ctx, *, q: str):
+            async def op():
+                player = await self.get_player(ctx.message)
+                action = self.parse_as(evaluator.create(self.world, player), "poke", q)
+                who = await self.world.perform(player, action)
+                if not who:
+                    await ctx.message.channel.send("you can't poke that")
+                    return
+
+                await ctx.message.channel.send("you poked %s" % (who,))
+                await self.save()
 
             await mutate(ctx.message.channel.send, op)
 
