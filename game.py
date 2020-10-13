@@ -101,7 +101,33 @@ class Details:
         return Details(self.name, self.desc, self.presence)
 
     def __str__(self):
-        return self.name
+        return str(self.__dict__)
+
+
+class FieldMergeStrategy:
+    def __init__(self, name: str):
+        self.name = name
+
+    def merge(self, old_value, new_value):
+        return old_value
+
+
+class SumFields(FieldMergeStrategy):
+    def merge(self, old_value, new_value):
+        if not old_value:
+            return new_value
+        if not new_value:
+            return old_value
+        return float(old_value) + float(new_value)
+
+
+def merge_dictionaries(left, right, fields):
+    merged = {}
+    for field in fields:
+        old_value = left[field.name] if field.name in left else None
+        new_value = right[field.name] if field.name in right else None
+        merged[field.name] = field.merge(old_value, new_value)
+    return merged
 
 
 class Activity:
@@ -214,6 +240,23 @@ class Person(Entity):
     def hold(self, item: Item):
         self.holding.append(item)
         item.touch()
+
+    def consume(self, item):
+        FoodFields = [
+            SumFields("sugar"),
+            SumFields("fat"),
+            SumFields("protein"),
+            SumFields("toxicity"),
+            SumFields("caffeine"),
+            SumFields("alcohol"),
+            SumFields("nutrition"),
+            SumFields("vitamins"),
+        ]
+        changes = merge_dictionaries(
+            self.details.__dict__, item.details.__dict__, FoodFields
+        )
+        logging.info("merged %s" % (changes,))
+        self.details.__dict__.update(changes)
 
     def drop_all(self):
         dropped = []
@@ -563,6 +606,7 @@ class Eat(Action):
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
+        player.consume(self.item)
         await world.bus.publish(ItemEaten(player, area, self.item))
         return self.item
 
@@ -580,6 +624,7 @@ class Drink(Action):
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
+        player.consume(self.item)
         await world.bus.publish(ItemDrank(player, area, self.item))
         return self.item
 

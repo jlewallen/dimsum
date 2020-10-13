@@ -28,7 +28,7 @@ def create_parser():
         remember:   "remember"
 
         TEXT_FIELD: "name" | "desc" | "presence"
-        CONSUMABLE_FIELDS: "nutrition" | "toxicity" | "caffeine" | "alcohol" | "weed"
+        CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD: "capacity" | "size" | "weight" | CONSUMABLE_FIELDS
 
         number: NUMBER

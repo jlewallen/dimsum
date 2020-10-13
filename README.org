@@ -1,6 +1,10 @@
 * DimSum
 ** DONE Toggle eating and drinking of things.
 ** TODO Allow naming of common things that get made.
+** TODO Make maze.
+** TODO Bombs.
+** TODO Planting.
+** TODO Animal Crossing mode.
 ** DONE Timestamps.
 ** TODO Lock/freeze items.
 ** TODO Things being able to produce and contain. Think pour water into a cup.
