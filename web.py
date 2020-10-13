@@ -16,6 +16,17 @@ class WebModelVisitor:
             "name": entity.details.name,
         }
 
+    def recipe(self, recipe):
+        return {
+            "key": recipe.key,
+            "url": self.entityUrl(recipe),
+            "kind": recipe.__class__.__name__,
+            "owner": self.ref(recipe.owner),
+            "details": recipe.details.__dict__,
+            "base": recipe.base,
+            "required": {k: self.ref(e) for k, e in recipe.required.items()},
+        }
+
     def item(self, item):
         if item.area:
             return {

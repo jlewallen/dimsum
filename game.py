@@ -180,10 +180,26 @@ class Item(Entity):
 class Recipe(Item):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.required = kwargs["required"]
+        self.required = kwargs["required"] if "required" in kwargs else {}
+        self.base = kwargs["base"] if "base" in kwargs else {}
 
     def accept(self, visitor: Visitor):
         return visitor.recipe(self)
+
+    def saved(self):
+        p = super().saved()
+        p.update(
+            {
+                "base": self.base,
+                "required": {k: e.key for k, e in self.required.items()},
+            }
+        )
+        return p
+
+    def load(self, world, properties):
+        super().load(world, properties)
+        self.base = properties["base"] if "base" in properties else {}
+        self.memory = {k: world.find(v) for k, v in properties["required"].items()}
 
 
 class ObservedItem:
@@ -293,18 +309,13 @@ class Person(Entity):
     def __str__(self):
         return self.details.name
 
-    def memory_refs(self):
-        if self.memory:
-            return {k: e.key for k, e in self.memory.items()}
-        return {}
-
     def saved(self):
         p = super().saved()
         p.update(
             {
                 "details": self.details.__dict__,
                 "holding": [e.key for e in self.holding],
-                "memory": self.memory_refs(),
+                "memory": {k: e.key for k, e in self.memory.items()},
             }
         )
         return p
@@ -843,6 +854,20 @@ class CallThis(Action):
         self.name = kwargs["name"]
 
     async def perform(self, world: World, player: Player):
+        base = self.item.details.__dict__.copy()
+
+        if "created" in base:
+            del base["created"]
+        if "touched" in base:
+            del base["touched"]
+
+        recipe = Recipe(
+            owner=player,
+            details=Details(self.name, self.name),
+            base=base,
+        )
+        world.register(recipe)
+        player.memory["r:" + self.name] = recipe
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )

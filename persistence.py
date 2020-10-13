@@ -34,6 +34,7 @@ class SqlitePersistence:
             "Player": game.Player,
             "Item": game.Item,
             "Area": game.Area,
+            "Recipe": game.Recipe,
         }
 
         rows = {}

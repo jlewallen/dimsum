@@ -68,6 +68,9 @@ export default defineComponent({
 .entity.item {
     background-color: khaki;
 }
+.entity.recipe {
+    background-color: thistle;
+}
 
 .entity .one {
     display: flex;
