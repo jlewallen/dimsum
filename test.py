@@ -72,6 +72,7 @@ async def test_run():
     logging.info(l.parse("modify when opened"))
     logging.info(l.parse("modify when eaten"))
     logging.info(l.parse("modify capacity 100"))
+    logging.info(l.parse("look at ipa"))
     logging.info(l.parse("go window"))
 
     async def execute(world, player, tree):
@@ -84,9 +85,10 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("drop")))
     logging.info(await execute(world, jacob, l.parse("hold beer")))
     logging.info(await execute(world, jacob, l.parse("modify when drank")))
-    logging.info(await execute(world, jacob, l.parse("drink beer")))
-    logging.info(await execute(world, jacob, l.parse("modify name My IPA")))
-    logging.info(await execute(world, jacob, l.parse("modify capacity 100")))
+    logging.info(await execute(world, jacob, l.parse("modify name IPA")))
+    logging.info(await execute(world, jacob, l.parse("modify alcohol 100")))
+    logging.info(await execute(world, jacob, l.parse("look at ipa")))
+    logging.info(await execute(world, jacob, l.parse("drink ipa")))
     logging.info(await execute(world, jacob, l.parse("go door")))
     logging.info(await execute(world, jacob, l.parse("home")))
     logging.info(world.look(jacob))

@@ -3,6 +3,7 @@
 ** TODO Allow naming of common things that get made.
 ** DONE Timestamps.
 ** TODO Lock/freeze items.
+** TODO Things being able to produce and contain. Think pour water into a cup.
 **  Example Session
 
 	[[./docs/areas.png]]

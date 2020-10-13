@@ -28,6 +28,29 @@ class BotPlayer:
         self.channel = channel
 
 
+class EmbedObservation:
+    def detailed(self, obs):
+        emd = obs.details.desc
+        emd += "\n"
+        for key, value in obs.properties.items():
+            emd += "\n" + key + "=" + str(value)
+        return emd
+
+    def area(self, obs):
+        emd = obs.details.desc
+        emd += "\n\n"
+        if len(obs.people) > 0:
+            emd += "Also here: " + p.join([str(x) for x in obs.people])
+            emd += "\n"
+        if len(obs.items) > 0:
+            emd += "You can see " + p.join([str(x) for x in obs.items])
+            emd += "\n"
+        if len(obs.who.holding) > 0:
+            emd += "You're holding " + p.join([str(x) for x in obs.who.holding])
+            emd += "\n"
+        return emd
+
+
 async def mutate(reply, mutation):
     try:
         await mutation()
@@ -82,23 +105,9 @@ class GameBot:
             player = await self.get_player(ctx.message)
             action = self.parse_as(evaluator.create(self.world, player), "look", q)
             observation = await self.world.perform(player, action)
-
-            emd = observation.details.desc
-            emd += "\n\n"
-            if len(observation.people) > 0:
-                emd += "Also here: " + p.join([str(x) for x in observation.people])
-                emd += "\n"
-            if len(observation.items) > 0:
-                emd += "You can see " + p.join([str(x) for x in observation.items])
-                emd += "\n"
-            if len(observation.who.holding) > 0:
-                emd += "You're holding " + p.join(
-                    [str(x) for x in observation.who.holding]
-                )
-                emd += "\n"
-
+            visitor = EmbedObservation()
+            emd = observation.accept(visitor)
             em = discord.Embed(title=observation.details.name, description=emd)
-
             await ctx.message.channel.send(embed=em)
 
         @bot.command(

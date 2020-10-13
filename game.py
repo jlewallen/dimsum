@@ -281,17 +281,56 @@ class Player(Person):
 
 
 class Observation:
+    def accept(self, visitor):
+        raise Error("unimplemented")
+
+
+class DetailedObservation(Observation):
     def __init__(
         self,
         who: ObservedPerson,
-        details: Details,
+        what: Entity,
+    ):
+        self.who = who
+        self.what = what
+
+    @property
+    def details(self):
+        return self.what.details
+
+    @property
+    def properties(self):
+        return self.details.__dict__
+
+    def accept(self, visitor):
+        return visitor.detailed(self)
+
+    def __str__(self):
+        return "%s observes %s" % (
+            self.who,
+            self.properties,
+        )
+
+
+class AreaObservation(Observation):
+    def __init__(
+        self,
+        who: ObservedPerson,
+        what: Entity,
         people: List[ObservedPerson],
         items: List[ObservedItem],
     ):
         self.who = who
-        self.details = details
+        self.what = what
         self.people = people
         self.items = items
+
+    @property
+    def details(self):
+        return self.what.details
+
+    def accept(self, visitor):
+        return visitor.area(self)
 
     def __str__(self):
         return "%s observes %s, also here %s and visible is %s" % (
@@ -324,7 +363,7 @@ class Area(Entity):
             e.observe() for e in self.here if isinstance(e, Person) and e != player
         ]
         items = [e.observe() for e in self.here if isinstance(e, Item)]
-        return Observation(player.observe(), self.details, people, items)
+        return AreaObservation(player.observe(), self, people, items)
 
     def add_item(self, item: Item):
         self.here.append(item)
@@ -516,6 +555,8 @@ class Drink(Action):
         self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item:
+            raise NotHoldingAnything("dunno where that is")
         if not self.item.details.when_drank():
             raise YouCantDoThat("you can't drink that")
         area = world.find_player_area(player)
@@ -547,8 +588,11 @@ class Join(Action):
 class Look(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.item = kwargs["item"] if "item" in kwargs else None
 
     async def perform(self, world: World, player: Player):
+        if self.item:
+            return DetailedObservation(player.observe(), self.item)
         return world.look(player)
 
 
