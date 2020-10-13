@@ -10,11 +10,11 @@ def create_parser():
         TEXT:       (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
         NAME:       TEXT
 
-        somebody_here: TEXT
-        item_here:     TEXT
-        item_new:      TEXT
-        item_held:     TEXT
-        item_goes:     TEXT
+        somebody_here:  TEXT
+        item_here:      TEXT
+        item_recipe:    TEXT
+        item_held:      TEXT
+        item_goes:      TEXT
 
         home:       "home"
         this:       "this"
@@ -25,7 +25,7 @@ def create_parser():
         drop:       "drop"
         call:       "call" _WS this _WS NAME
         hold:       "hold" _WS item_here
-        make:       "make" _WS item_new
+        make:       "make" _WS item_recipe
         go:         "go" _WS item_goes
         eat:        "eat" _WS item_held
         drink:      "drink" _WS item_held

@@ -199,7 +199,12 @@ class Recipe(Item):
     def load(self, world, properties):
         super().load(world, properties)
         self.base = properties["base"] if "base" in properties else {}
-        self.memory = {k: world.find(v) for k, v in properties["required"].items()}
+        self.required = {k: world.find(v) for k, v in properties["required"].items()}
+
+    def invoke(self, player):
+        details = Details()
+        details.__dict__.update(self.base)
+        return Item(owner=player, details=details)
 
 
 class ObservedItem:
@@ -262,6 +267,14 @@ class Person(Entity):
 
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
+
+    def find_recipe(self, q: str):
+        for name, entity in self.memory.items():
+            if name.startswith("r:"):
+                name = name.replace("r:", "")
+                if q.lower() in name.lower():
+                    return entity
+        return None
 
     def is_holding(self, item):
         return item in self.holding

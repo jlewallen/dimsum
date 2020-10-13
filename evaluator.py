@@ -38,10 +38,12 @@ class Evaluate(lark.Transformer):
         area, item = self.world.search(self.player, str(args[0]))
         return item
 
-    def item_new(self, args):
-        return game.Item(
-            owner=self.player, details=game.Details(str(args[0]), str(args[0]))
-        )
+    def item_recipe(self, args):
+        name = str(args[0])
+        recipe = self.player.find_recipe(name)
+        if recipe:
+            return recipe.invoke(self.player)
+        return game.Item(owner=self.player, details=game.Details(name, name))
 
     def go(self, args):
         return game.Go(item=args[0])
