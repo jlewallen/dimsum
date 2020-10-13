@@ -11,6 +11,7 @@
    .call this NAME
 
 ** DONE Timestamps.
+** TODO Modify credentials in game.
 ** TODO Lock/freeze items.
 ** TODO Things being able to produce and contain. Think pour water into a cup.
 ** TODO Escape Room Mode

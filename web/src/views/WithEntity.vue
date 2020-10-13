@@ -1,6 +1,8 @@
 <template>
     <div>
-        <SmallEntityPanel :entity="entity" v-if="entity" @selected="raiseSelected" />
+        <div v-if="entity">
+            <slot :entity="entity"></slot>
+        </div>
         <div v-else>Loading</div>
     </div>
 </template>
@@ -9,11 +11,10 @@
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
 import store, { NeedEntityAction } from "@/store";
-import SmallEntityPanel from "./SmallEntityPanel.vue";
 
 export default defineComponent({
-    name: "DynamicSmallEntityPanel",
-    components: { SmallEntityPanel },
+    name: "WithEntity",
+    components: {},
     props: {
         entityKey: {
             type: String,
@@ -30,11 +31,6 @@ export default defineComponent({
             return store.dispatch(new NeedEntityAction(this.entityKey));
         }
         return Promise.resolve();
-    },
-    methods: {
-        raiseSelected(entity: Entity): void {
-            this.$emit("selected", entity);
-        },
     },
 });
 </script>

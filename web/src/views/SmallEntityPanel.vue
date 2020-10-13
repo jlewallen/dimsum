@@ -10,6 +10,7 @@
         <div class="summary" v-if="summary">
             {{ summary }}
         </div>
+        <slot></slot>
     </div>
 </template>
 

@@ -1,7 +1,11 @@
 <template>
     <div class="entities">
         <template v-for="ref in entityRefs" v-bind:key="ref.key">
-            <DynamicSmallEntityPanel :entityKey="ref.key" @selected="raiseSelected" />
+            <WithEntity :entityKey="ref.key" v-slot="withEntity">
+                <slot :entity="withEntity.entity">
+                    <component v-bind:is="panel" :entity="withEntity.entity" @selected="raiseSelected" />
+                </slot>
+            </WithEntity>
         </template>
     </div>
 </template>
@@ -9,15 +13,20 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { EntityRef, Entity } from "@/http";
-import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
+import SmallEntityPanel from "./SmallEntityPanel.vue";
+import WithEntity from "./WithEntity.vue";
 
 export default defineComponent({
     name: "Entities",
-    components: { DynamicSmallEntityPanel },
+    components: { WithEntity, SmallEntityPanel },
     props: {
         entityRefs: {
             type: Array as () => EntityRef[],
             required: true,
+        },
+        panel: {
+            type: Object,
+            default: SmallEntityPanel,
         },
     },
     methods: {

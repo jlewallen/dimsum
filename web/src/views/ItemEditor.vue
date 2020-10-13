@@ -6,19 +6,25 @@
 
         <div v-if="entity.area">
             <h3>This leads to:</h3>
-            <DynamicSmallEntityPanel :entityKey="entity.area.key" @selected="destinationSelected" />
+            <WithEntity :entityKey="entity.area.key" v-slot="withEntity">
+                <SmallEntityPanel :entity="withEntity.entity" @selected="raiseSelected" />
+            </WithEntity>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 import { Entity } from "@/http";
+import WithEntity from "./WithEntity.vue";
+import SmallEntityPanel from "./SmallEntityPanel.vue";
 
 export default defineComponent({
     name: "ItemEditor",
-    components: { DynamicSmallEntityPanel },
+    components: {
+        WithEntity,
+        SmallEntityPanel,
+    },
     props: {
         entity: {
             type: Object,
@@ -28,11 +34,8 @@ export default defineComponent({
     data() {
         return {};
     },
-    mounted(): void {
-        console.log("item-editor:mounted", this.entity);
-    },
     methods: {
-        destinationSelected(entity: Entity) {
+        raiseSelected(entity: Entity) {
             return this.$router.push({ path: `/entities/${entity.key}` });
         },
     },
