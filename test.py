@@ -76,6 +76,7 @@ async def test_run():
     logging.info(l.parse("look at myself"))
     logging.info(l.parse("go window"))
     logging.info(l.parse("kiss carla"))
+    logging.info(l.parse("call this IPA"))
 
     async def execute(world, player, tree):
         action = create(world, player).transform(tree)
@@ -90,6 +91,7 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("modify name IPA")))
     logging.info(await execute(world, jacob, l.parse("modify alcohol 100")))
     logging.info(await execute(world, jacob, l.parse("look at ipa")))
+    logging.info(await execute(world, jacob, l.parse("call this IPA")))
     logging.info(await execute(world, jacob, l.parse("drink ipa")))
     logging.info(await execute(world, jacob, l.parse("go door")))
     logging.info(await execute(world, jacob, l.parse("home")))

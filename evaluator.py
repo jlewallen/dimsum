@@ -58,6 +58,12 @@ class Evaluate(lark.Transformer):
     def obliterate(self, args):
         return game.Obliterate()
 
+    def this(self, args):
+        return self.get_item_held()
+
+    def call(self, args):
+        return game.CallThis(item=args[0], name=str(args[1]))
+
     def stimulate(self, args):
         return args[0]
 
@@ -118,6 +124,9 @@ class Evaluate(lark.Transformer):
         return game.ModifyActivity(
             item=self.get_item_held(), activity="drank", value=True
         )
+
+    def remember(self, args):
+        return game.Remember()
 
     def text(self, args):
         return str(args[0])

@@ -4,9 +4,9 @@
             <div></div>
         </div>
 
-        <div v-if="entity.memory">
+        <div v-if="Object.keys(entity.memory || {}).length > 0">
             <h3>Memory:</h3>
-            <DynamicSmallEntityPanel :entityKey="entity.memory.key" @selected="entitySelected" />
+            <KeyedEntities :entityRefs="entity.memory" @selected="entitySelected" />
         </div>
 
         <div v-if="entity.holding?.length > 0">
@@ -19,12 +19,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Entity, Person } from "@/http";
-import DynamicSmallEntityPanel from "./DynamicSmallEntityPanel.vue";
 import Entities from "./Entities.vue";
+import KeyedEntities from "./KeyedEntities.vue";
 
 export default defineComponent({
     name: "PersonEditor",
-    components: { DynamicSmallEntityPanel, Entities },
+    components: { KeyedEntities, Entities },
     props: {
         entity: {
             type: Object as () => Person,

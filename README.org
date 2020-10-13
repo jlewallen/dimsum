@@ -8,6 +8,7 @@
 
    .do recipe Super Cool Thing
    You're holding a recipe.
+   .call this NAME
 
 ** DONE Timestamps.
 ** TODO Lock/freeze items.

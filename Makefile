@@ -7,6 +7,7 @@ run:
 	env/bin/python3 dimsum.py
 
 test:
+	rm -f fieldkit.sqlite3
 	env/bin/python3 test.py
 
 env:

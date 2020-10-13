@@ -4,10 +4,11 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | stimulate
+        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | stimulate | call
 
         _WS:        WS
         TEXT:       (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
+        NAME:       TEXT
 
         somebody_here: TEXT
         item_here:     TEXT
@@ -16,10 +17,13 @@ def create_parser():
         item_goes:     TEXT
 
         home:       "home"
+        this:       "this"
+
         look:       "look"
                   | "look" ("at" _WS "myself")   -> look_myself
                   | "look" ("at" _WS item_held)  -> look_item
         drop:       "drop"
+        call:       "call" _WS this _WS NAME
         hold:       "hold" _WS item_here
         make:       "make" _WS item_new
         go:         "go" _WS item_goes

@@ -9,6 +9,8 @@ import uuid
 
 p = inflect.engine()
 
+MemoryAreaKey = "m:area"
+
 
 class NotYours(Exception):
     pass
@@ -175,6 +177,15 @@ class Item(Entity):
         return str(self)
 
 
+class Recipe(Item):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.required = kwargs["required"]
+
+    def accept(self, visitor: Visitor):
+        return visitor.recipe(self)
+
+
 class ObservedItem:
     def __init__(self, item: Item, where: str = ""):
         self.item = item
@@ -206,7 +217,7 @@ class Person(Entity):
         self.details = kwargs["details"]
         self.creator = kwargs["creator"] if "creator" in kwargs else True
         self.holding: List[Entity] = []
-        self.memory = None
+        self.memory = {}
 
     @property
     def holding(self):
@@ -283,6 +294,11 @@ class Person(Entity):
     def __str__(self):
         return self.details.name
 
+    def memory_refs(self):
+        if self.memory:
+            return {k: e.key for k, e in self.memory.items()}
+        return {}
+
     def saved(self):
         p = super().saved()
         p.update(
@@ -290,7 +306,7 @@ class Person(Entity):
                 "details": self.details.__dict__,
                 "holding": [e.key for e in self.holding],
                 "creator": self.creator,
-                "memory": self.memory.key if self.memory else None,
+                "memory": self.memory_refs(),
             }
         )
         return p
@@ -299,8 +315,7 @@ class Person(Entity):
         super().load(world, properties)
         self.details.__dict__ = properties["details"]
         self.holding = world.resolve(properties["holding"])
-        if "memory" in properties and properties["memory"]:
-            self.memory = world.find(properties["memory"])
+        self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
 
 class ObservedPerson:
@@ -823,13 +838,25 @@ class Obliterate(Action):
         return Success("you obliterated %s" % (p.join(items),))
 
 
+class CallThis(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+        self.name = kwargs["name"]
+
+    async def perform(self, world: World, player: Player):
+        return Success(
+            "cool, you'll be able to make another %s easier now" % (self.name,)
+        )
+
+
 class Remember(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
-        player.memory = area
+        player.memory[MemoryAreaKey] = area
         return Success("you'll be able to remember this place, oh yeah")
 
 
