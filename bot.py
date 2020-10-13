@@ -29,6 +29,13 @@ class BotPlayer:
 
 
 class EmbedObservation:
+    def personal(self, obs):
+        emd = obs.details.desc
+        emd += "\n"
+        for key, value in obs.properties.items():
+            emd += "\n" + key + "=" + str(value)
+        return emd
+
     def detailed(self, obs):
         emd = obs.details.desc
         emd += "\n"

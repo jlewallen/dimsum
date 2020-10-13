@@ -285,12 +285,30 @@ class Observation:
         raise Error("unimplemented")
 
 
+class PersonalObservation(Observation):
+    def __init__(self, who: ObservedPerson):
+        self.who = who
+
+    @property
+    def details(self):
+        return self.who.person.details
+
+    @property
+    def properties(self):
+        return self.details.__dict__
+
+    def accept(self, visitor):
+        return visitor.personal(self)
+
+    def __str__(self):
+        return "%s consideres themselves %s" % (
+            self.who,
+            self.properties,
+        )
+
+
 class DetailedObservation(Observation):
-    def __init__(
-        self,
-        who: ObservedPerson,
-        what: Entity,
-    ):
+    def __init__(self, who: ObservedPerson, what: Entity):
         self.who = who
         self.what = what
 
@@ -583,6 +601,14 @@ class Join(Action):
         world.register(player)
         await world.bus.publish(PlayerJoined(player))
         await world.welcome_area().entered(world.bus, player)
+
+
+class Myself(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        return PersonalObservation(player.observe())
 
 
 class Look(Action):

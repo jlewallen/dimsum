@@ -16,6 +16,7 @@ def create_parser():
 
         home:       "home"
         look:       "look"
+                  | "look" ("at" _WS "myself")   -> look_myself
                   | "look" ("at" _WS item_held)  -> look_item
         drop:       "drop"
         hold:       "hold" _WS item_here

@@ -53,6 +53,9 @@ class Evaluate(lark.Transformer):
     def look_item(self, args):
         return game.Look(item=args[0])
 
+    def look_myself(self, args):
+        return game.Myself()
+
     def get_item_held(self):
         if len(self.player.holding) == 0:
             raise game.NotHoldingAnything("you're not holding anything")
