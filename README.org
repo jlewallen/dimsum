@@ -5,6 +5,10 @@
 ** TODO Bombs.
 ** TODO Planting.
 ** TODO Animal Crossing mode.
+
+   .do recipe Super Cool Thing
+   You're holding a recipe.
+
 ** DONE Timestamps.
 ** TODO Lock/freeze items.
 ** TODO Things being able to produce and contain. Think pour water into a cup.

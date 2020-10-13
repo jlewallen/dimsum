@@ -55,6 +55,9 @@ class Evaluate(lark.Transformer):
     def look(self, args):
         return game.Look()
 
+    def obliterate(self, args):
+        return game.Obliterate()
+
     def stimulate(self, args):
         return args[0]
 

@@ -28,20 +28,20 @@ class BotPlayer:
         self.channel = channel
 
 
-class EmbedObservation:
+class EmbedObservationVisitor:
     def personal(self, obs):
         emd = obs.details.desc
         emd += "\n"
         for key, value in obs.properties.items():
             emd += "\n" + key + "=" + str(value)
-        return emd
+        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
     def detailed(self, obs):
         emd = obs.details.desc
         emd += "\n"
         for key, value in obs.properties.items():
             emd += "\n" + key + "=" + str(value)
-        return emd
+        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
     def area(self, obs):
         emd = obs.details.desc
@@ -55,38 +55,18 @@ class EmbedObservation:
         if len(obs.who.holding) > 0:
             emd += "You're holding " + p.join([str(x) for x in obs.who.holding])
             emd += "\n"
-        return emd
+        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
 
-async def mutate(reply, mutation):
-    try:
-        await mutation()
-    except game.SorryError as err:
-        await reply(str(err))
-    except game.AlreadyHolding as err:
-        await reply(str(err))
-    except game.NotHoldingAnything as err:
-        await reply(str(err))
-    except game.HoldingTooMuch as err:
-        await reply(str(err))
-    except game.UnknownField as err:
-        await reply(str(err))
-    except game.NotYours as err:
-        await reply(str(err))
-    except game.YouCantDoThat as err:
-        await reply(str(err))
-    except lark.exceptions.VisitError as err:
-        await reply("oops, %s" % (err.__context__,))
-    except Exception as err:
-        await reply("oops, %s" % (err,))
-        raise err
+class ReplyVisitor(EmbedObservationVisitor):
+    def failure(self, reply):
+        return {"content": reply.message}
+
+    def success(self, reply):
+        return {"content": reply.message}
 
 
 class GameBot:
-    def parse_as(self, evaluator, prefix, remaining):
-        tree = self.l.parse(prefix + " " + remaining)
-        return evaluator.transform(tree)
-
     def __init__(self, token):
         bot = discord.ext.commands.Bot(".")
 
@@ -110,13 +90,7 @@ class GameBot:
             aliases=["l", "where", "here"],
         )
         async def look(ctx, *, q: str = ""):
-            player = await self.get_player(ctx.message)
-            action = self.parse_as(evaluator.create(self.world, player), "look", q)
-            observation = await self.world.perform(player, action)
-            visitor = EmbedObservation()
-            emd = observation.accept(visitor)
-            em = discord.Embed(title=observation.details.name, description=emd)
-            await ctx.message.channel.send(embed=em)
+            return await self.repl(ctx, "look", q)
 
         @bot.command(
             name="home",
@@ -126,14 +100,16 @@ class GameBot:
             aliases=[],
         )
         async def home(ctx, *, q: str = ""):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "home", q)
-                await self.world.perform(player, action)
-                await self.save()
-                await ctx.message.channel.send("there ya go")
+            return await self.repl(ctx, "home", q)
 
-            await mutate(ctx.message.channel.send, op)
+        @bot.command(
+            name="m",
+            brief="Command!",
+            description="Command!",
+            pass_context=True,
+        )
+        async def generic(ctx, *, q: str):
+            return await self.repl(ctx, q)
 
         @bot.command(
             name="hold",
@@ -143,18 +119,7 @@ class GameBot:
             aliases=["h", "take", "get"],
         )
         async def hold(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "hold", q)
-                held = await self.world.perform(player, action)
-                if len(held) == 0:
-                    await ctx.message.channel.send("you can't hold that")
-                    return
-
-                await ctx.message.channel.send("you picked up %s" % (p.join(held),))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "hold", q)
 
         @bot.command(
             name="drop",
@@ -164,18 +129,7 @@ class GameBot:
             aliases=["d"],
         )
         async def drop(ctx, *, q: str = ""):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "drop", q)
-                dropped = await self.world.perform(player, action)
-                if len(dropped) == 0:
-                    await ctx.message.channel.send("nothing to drop")
-                    return
-
-                await ctx.message.channel.send("you dropped %s" % (p.join(dropped),))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "drop", q)
 
         @bot.command(
             name="remember",
@@ -185,16 +139,7 @@ class GameBot:
             aliases=[],
         )
         async def remember(ctx, *, q: str = ""):
-            async def op():
-                player = await self.get_player(ctx.message)
-                await self.world.perform(player, game.Remember())
-
-                await ctx.message.channel.send(
-                    "you'll be able to remember this place, oh yeah"
-                )
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "remember", q)
 
         @bot.command(
             name="make",
@@ -204,15 +149,7 @@ class GameBot:
             aliases=[],
         )
         async def make(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "make", q)
-                item = await self.world.perform(player, action)
-                await self.save()
-
-                await ctx.message.channel.send("you're now holding %s" % (item,))
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "make", q)
 
         @bot.command(
             name="modify",
@@ -229,16 +166,7 @@ modify when eaten
             aliases=[],
         )
         async def modify(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(
-                    evaluator.create(self.world, player), "modify", q
-                )
-                await self.world.perform(player, action)
-                await self.save()
-                await ctx.message.channel.send("done")
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "modify", q)
 
         @bot.command(
             name="eat",
@@ -248,15 +176,7 @@ modify when eaten
             aliases=[],
         )
         async def eat(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "eat", q)
-                item = await self.world.perform(player, action)
-                await self.save()
-
-                await ctx.message.channel.send("you ate %s" % (item,))
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "eat", q)
 
         @bot.command(
             name="drink",
@@ -266,15 +186,7 @@ modify when eaten
             aliases=[],
         )
         async def drink(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "drink", q)
-                item = await self.world.perform(player, action)
-                await self.save()
-
-                await ctx.message.channel.send("you drank %s" % (item,))
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "drink", q)
 
         @bot.command(
             name="obliterate",
@@ -283,13 +195,8 @@ modify when eaten
             pass_context=True,
             aliases=[],
         )
-        async def obliterate(ctx):
-            async def op():
-                player = await self.get_player(ctx.message)
-                await self.world.perform(player, game.Obliterate())
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+        async def obliterate(ctx, *, q: str = ""):
+            return await self.repl(ctx, "obliterate", q)
 
         @bot.command(
             name="go",
@@ -298,14 +205,7 @@ modify when eaten
             pass_context=True,
         )
         async def go(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "go", q)
-                await self.world.perform(player, action)
-                await self.save()
-                await look(ctx)
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "go", q)
 
         @bot.command(
             name="hug",
@@ -314,18 +214,7 @@ modify when eaten
             pass_context=True,
         )
         async def hug(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "hug", q)
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't hug that")
-                    return
-
-                await ctx.message.channel.send("you hugged %s" % (who,))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "hug", q)
 
         @bot.command(
             name="heal",
@@ -334,16 +223,7 @@ modify when eaten
             pass_context=True,
         )
         async def heal(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "heal", q)
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't heal that")
-                    return
-
-                await ctx.message.channel.send("you healed %s" % (who,))
-                await self.save()
+            return await self.repl(ctx, "heal", q)
 
         @bot.command(
             name="kick",
@@ -352,16 +232,7 @@ modify when eaten
             pass_context=True,
         )
         async def kick(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "kick", q)
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't kick that")
-                    return
-
-                await ctx.message.channel.send("you kicked %s" % (who,))
-                await self.save()
+            return await self.repl(ctx, "kick", q)
 
         @bot.command(
             name="kiss",
@@ -370,18 +241,7 @@ modify when eaten
             pass_context=True,
         )
         async def kiss(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "kiss", q)
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't kiss that")
-                    return
-
-                await ctx.message.channel.send("you kissed %s" % (who,))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "kiss", q)
 
         @bot.command(
             name="tickle",
@@ -390,20 +250,7 @@ modify when eaten
             pass_context=True,
         )
         async def tickle(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(
-                    evaluator.create(self.world, player), "tickle", q
-                )
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't tickle that")
-                    return
-
-                await ctx.message.channel.send("you tickled %s" % (who,))
-                await self.save()
-
-            await mutate(ctx.message.channel.send, op)
+            return await self.repl(ctx, "tickle", q)
 
         @bot.command(
             name="poke",
@@ -412,18 +259,56 @@ modify when eaten
             pass_context=True,
         )
         async def poke(ctx, *, q: str):
-            async def op():
-                player = await self.get_player(ctx.message)
-                action = self.parse_as(evaluator.create(self.world, player), "poke", q)
-                who = await self.world.perform(player, action)
-                if not who:
-                    await ctx.message.channel.send("you can't poke that")
-                    return
+            return await self.repl(ctx, "poke", q)
 
-                await ctx.message.channel.send("you poked %s" % (who,))
-                await self.save()
+    def parse_as(self, evaluator, prefix, remaining=""):
+        full = prefix + " " + remaining
+        tree = self.l.parse(full.strip())
+        logging.info(str(tree))
+        return evaluator.transform(tree)
 
-            await mutate(ctx.message.channel.send, op)
+    async def send(self, ctx, reply):
+        visitor = ReplyVisitor()
+        visual = reply.accept(visitor)
+        print(reply, visual)
+        if visual:
+            await ctx.message.channel.send(**visual)
+
+    async def repl(self, ctx, full_command: str, q: str = ""):
+        async def op():
+            player = await self.get_player(ctx.message)
+            action = self.parse_as(
+                evaluator.create(self.world, player), full_command, q
+            )
+            reply = await self.world.perform(player, action)
+            await self.save()
+            return reply
+
+        reply = await self.translate(op)
+        await self.send(ctx, reply)
+
+    async def translate(self, mutation):
+        try:
+            return await mutation()
+        except game.SorryError as err:
+            return game.Failure(str(err))
+        except game.AlreadyHolding as err:
+            return game.Failure(str(err))
+        except game.NotHoldingAnything as err:
+            return game.Failure(str(err))
+        except game.HoldingTooMuch as err:
+            return game.Failure(str(err))
+        except game.UnknownField as err:
+            return game.Failure(str(err))
+        except game.NotYours as err:
+            return game.Failure(str(err))
+        except game.YouCantDoThat as err:
+            return game.Failure(str(err))
+        except lark.exceptions.VisitError as err:
+            return game.Failure("oops, %s" % (err.__context__,))
+        except Exception as err:
+            return game.Failure("oops, %s" % (err,))
+            raise err
 
     def run(self):
         self.bot.run(self.token)

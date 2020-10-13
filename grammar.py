@@ -38,7 +38,7 @@ def create_parser():
 
         TEXT_FIELD: "name" | "desc" | "presence"
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
-        NUMERIC_FIELD: "capacity" | "size" | "weight" | CONSUMABLE_FIELDS
+        NUMERIC_FIELD: "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
 
         number: NUMBER
         text: TEXT
@@ -48,6 +48,9 @@ def create_parser():
                   | "modify" _WS "when" _WS "opened"               -> when_opened
                   | "modify" _WS "when" _WS "eaten"                -> when_eaten
                   | "modify" _WS "when" _WS "drank"                -> when_drank
+                  | "modify" _WS "when" _WS "activated"            -> when_activated
+                  | "modify" _WS "when" _WS "triggered"            -> when_triggered
+                  | "modify" _WS "when" _WS "closed"               -> when_closed
 
         %import common.WS
         %import common.WORD

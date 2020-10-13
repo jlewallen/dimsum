@@ -326,9 +326,13 @@ class Player(Person):
         super().__init__(**kwargs)
 
 
-class Observation:
+class Reply:
     def accept(self, visitor):
         raise Error("unimplemented")
+
+
+class Observation(Reply):
+    pass
 
 
 class PersonalObservation(Observation):
@@ -569,6 +573,21 @@ class World(Entity):
         return await action.perform(self, player)
 
 
+class SimpleReply(Reply):
+    def __init__(self, message: str):
+        self.message = message
+
+
+class Success(SimpleReply):
+    def accept(self, visitor):
+        return visitor.success(self)
+
+
+class Failure(SimpleReply):
+    def accept(self, visitor):
+        return visitor.failure(self)
+
+
 class Action:
     def __init__(self, **kwargs):
         pass
@@ -595,7 +614,7 @@ class Make(Action):
         player.hold(self.item)
         world.register(self.item)
         await world.bus.publish(ItemMade(player, area, self.item))
-        return self.item
+        return Success("you're now holding a %s" % (self.item,))
 
 
 class Hug(Action):
@@ -604,7 +623,9 @@ class Hug(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you hugged %s" % (self.who))
+        return Failure("who?")
 
 
 class Heal(Action):
@@ -613,7 +634,9 @@ class Heal(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you healed %s" % (self.who))
+        return Failure("who?")
 
 
 class Kick(Action):
@@ -622,7 +645,9 @@ class Kick(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you kicked %s" % (self.who))
+        return Failure("who?")
 
 
 class Kiss(Action):
@@ -631,7 +656,9 @@ class Kiss(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you kissed %s" % (self.who))
+        return Failure("who?")
 
 
 class Tickle(Action):
@@ -640,7 +667,9 @@ class Tickle(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you tickled %s" % (self.who))
+        return Failure("who?")
 
 
 class Poke(Action):
@@ -649,7 +678,9 @@ class Poke(Action):
         self.who = kwargs["who"]
 
     async def perform(self, world: World, player: Player):
-        return self.who
+        if self.who:
+            return Success("you poked %s" % (self.who))
+        return Failure("who?")
 
 
 class Eat(Action):
@@ -665,7 +696,7 @@ class Eat(Action):
         player.drop(self.item)
         player.consume(self.item)
         await world.bus.publish(ItemEaten(player, area, self.item))
-        return self.item
+        return Failure("you ate %s" % (self.item))
 
 
 class Drink(Action):
@@ -683,7 +714,7 @@ class Drink(Action):
         player.drop(self.item)
         player.consume(self.item)
         await world.bus.publish(ItemDrank(player, area, self.item))
-        return self.item
+        return Success("you drank %s" % (self.item))
 
 
 class Drop(Action):
@@ -692,7 +723,10 @@ class Drop(Action):
 
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
-        return await area.drop(world.bus, player)
+        dropped = await area.drop(world.bus, player)
+        if len(dropped) == 0:
+            return Failure("nothing to drop")
+        return Success("you dropped %s" % (p.join(dropped),))
 
 
 class Join(Action):
@@ -703,6 +737,7 @@ class Join(Action):
         world.register(player)
         await world.bus.publish(PlayerJoined(player))
         await world.welcome_area().entered(world.bus, player)
+        return Success("welcome!")
 
 
 class Myself(Action):
@@ -741,7 +776,7 @@ class Hold(Action):
         player.hold(self.item)
         await world.bus.publish(ItemHeld(player, area, self.item))
 
-        return [self.item]
+        return Success("you picked up %s" % (self.item,))
 
 
 class Go(Action):
@@ -768,7 +803,7 @@ class Go(Action):
         await area.left(world.bus, player)
         await destination.entered(world.bus, player)
 
-        return destination
+        return await Look().perform(world, player)
 
 
 class Obliterate(Action):
@@ -778,9 +813,14 @@ class Obliterate(Action):
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
         items = player.drop_all()
+        if len(items) == 0:
+            raise NotHoldingAnything("you're not holding anything")
+
         for item in items:
             world.unregister(item)
             await world.bus.publish(ItemObliterated(player, area, item))
+
+        return Success("you obliterated %s" % (p.join(items),))
 
 
 class Remember(Action):
@@ -790,7 +830,7 @@ class Remember(Action):
     async def perform(self, world: World, player: Player):
         area = world.find_player_area(player)
         player.memory = area
-        return area
+        return Success("you'll be able to remember this place, oh yeah")
 
 
 class ModifyField(Action):
@@ -802,6 +842,7 @@ class ModifyField(Action):
 
     async def perform(self, world: World, player: Player):
         self.item.details.__dict__[self.field] = self.value
+        return Success("done")
 
 
 class ModifyActivity(Action):
@@ -813,6 +854,7 @@ class ModifyActivity(Action):
 
     async def perform(self, world: World, player: Player):
         self.item.details.__dict__[self.activity] = self.value
+        return Success("done")
 
 
 class PlayerJoined(Event):
