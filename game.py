@@ -215,7 +215,6 @@ class Person(Entity):
         super().__init__(**kwargs)
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
-        self.creator = kwargs["creator"] if "creator" in kwargs else True
         self.holding: List[Entity] = []
         self.memory = {}
 
@@ -305,7 +304,6 @@ class Person(Entity):
             {
                 "details": self.details.__dict__,
                 "holding": [e.key for e in self.holding],
-                "creator": self.creator,
                 "memory": self.memory_refs(),
             }
         )

@@ -13,6 +13,11 @@
 ** DONE Timestamps.
 ** TODO Lock/freeze items.
 ** TODO Things being able to produce and contain. Think pour water into a cup.
+** TODO Escape Room Mode
+
+   Everybody is thrown into a randomly generated world and has to
+   capture a flag or do something?
+
 **  Example Session
 
 	[[./docs/areas.png]]
