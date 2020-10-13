@@ -1,5 +1,6 @@
 import logging
 import sys
+import lupa
 
 from persistence import *
 from game import *
@@ -105,7 +106,14 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("forget ipa")))
     logging.info(world.look(jacob))
 
+async def test_lua():
+    lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+    logging.info(lua.eval('1+1'))
+
+    func = lua.eval('function(f, n) return f(n) end')
+    logging.info(lupa.lua_type(func))
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    asyncio.run(test_run())
+    if False: asyncio.run(test_run())
+    asyncio.run(test_lua())
