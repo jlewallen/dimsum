@@ -49,7 +49,7 @@ class Evaluate(lark.Transformer):
         recipe = self.player.find_recipe(name)
         if recipe:
             return recipe.invoke(self.player)
-        return game.Item(owner=self.player, details=game.Details(name, name))
+        return game.Item(owner=self.player, details=game.Details(name))
 
     def go(self, args):
         return game.Go(item=args[0])

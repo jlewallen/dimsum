@@ -14,9 +14,9 @@ async def test_run():
     bus = EventBus()
     world = World(bus)
 
-    jacob = Player(owner=world, details=Details("Jacob", "Curly haired bastard."))
-    carla = Player(owner=world, details=Details("Carla", "Chief salad officer."))
-    hammer = Item(owner=jacob, details=Details("Hammer", "It's heavy."))
+    jacob = Player(owner=world, details=Details("Jacob", desc="Curly haired bastard."))
+    carla = Player(owner=world, details=Details("Carla", desc="Chief salad officer."))
+    hammer = Item(owner=jacob, details=Details("Hammer", desc="It's heavy."))
 
     world.add_area(Area(owner=jacob, details=Details("Living room")).add_item(hammer))
     world.add_area(Area(owner=jacob, details=Details("Kitchen")))
@@ -31,19 +31,19 @@ async def test_run():
     logging.info(world.look(jacob))
     logging.info(world.look(carla))
 
-    trampoline = Item(owner=jacob, details=Details("Trampoline", "It's bouncy."))
+    trampoline = Item(owner=jacob, details=Details("Trampoline", desc="It's bouncy."))
 
     await world.perform(jacob, game.Make(trampoline))
     await world.perform(jacob, game.Drop())
     await world.perform(jacob, game.Hold(item=trampoline))
     await world.perform(jacob, game.Drop())
 
-    idea = Item(owner=jacob, details=Details("Idea", "It's genius."))
+    idea = Item(owner=jacob, details=Details("Idea", desc="It's genius."))
     await world.perform(jacob, game.Make(idea))
     logging.info(world.look(jacob))
     await world.perform(jacob, game.Drop())
 
-    door = Item(owner=jacob, details=Details("Door", "It's wooden."))
+    door = Item(owner=jacob, details=Details("Door", desc="It's wooden."))
     await world.perform(jacob, game.Make(door))
     await world.perform(jacob, game.Go(item=door))
     logging.info(world.look(jacob))
@@ -120,7 +120,7 @@ async def test_lua():
 
     bus = EventBus()
     world = World(bus)
-    jacob = Player(owner=world, details=Details("Jacob", "Curly haired bastard."))
+    jacob = Player(owner=world, details=Details("Jacob", desc="Curly haired bastard."))
 
     lua.globals().world = world
     lua.globals().player = jacob

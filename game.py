@@ -86,6 +86,8 @@ class PropertyMap:
     def __init__(self, **kwargs):
         if "map" in kwargs:
             self.__dict__ = kwargs["map"]
+        else:
+            self.__dict__ = kwargs
 
     @property
     def map(self):
@@ -98,13 +100,14 @@ class PropertyMap:
         self.map.update(changes)
 
     def clone(self):
-        return PropertyMap(map=self.map)
+        return PropertyMap(self.map)
 
 
 class Details(PropertyMap):
-    def __init__(self, name: str = "", desc: str = ""):
+    def __init__(self, name: str = "", **kwargs):
+        super().__init__(**kwargs)
         self.name = name
-        self.desc = desc
+        self.desc = kwargs["desc"] if "desc" in kwargs else name
         self.presence = ""
         self.created = time.time()
         self.touched = time.time()
@@ -131,6 +134,9 @@ class Details(PropertyMap):
             del base["touched"]
         return base
 
+    def clone(self):
+        return Details(self.name, desc=self.desc)
+
     def when_eaten(self):
         return self.map["eaten"] if "eaten" in self.map else False
 
@@ -139,9 +145,6 @@ class Details(PropertyMap):
 
     def touch(self):
         self.touched = time.time()
-
-    def clone(self):
-        return Details(self.name, self.desc)
 
     def __str__(self):
         return str(self.map)
@@ -573,7 +576,7 @@ class Area(Entity):
 
 class World(Entity):
     def __init__(self, bus: EventBus):
-        self.details = Details("World", "Ya know, everything")
+        self.details = Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
         self.entities = {}
@@ -632,7 +635,7 @@ class World(Entity):
             owner=player,
             details=Details(
                 "A pristine, new place.",
-                "Nothing seems to be here, maybe you should decorate?",
+                desc="Nothing seems to be here, maybe you should decorate?",
             ),
         )
         area.add_item(theWayBack)
@@ -929,7 +932,7 @@ class CallThis(Action):
 
         recipe = Recipe(
             owner=player,
-            details=Details(self.name, self.name),
+            details=Details(self.name),
             base=base,
         )
         world.register(recipe)
