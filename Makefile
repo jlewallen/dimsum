@@ -27,4 +27,10 @@ dump:
 	sqlite3 test.sqlite3 "SELECT * FROM entities"
 	sqlite3 world.sqlite3 "SELECT * FROM entities"
 
+image:
+	docker build -t jlewallen/dimsum .
+
+image-test:
+	docker run --name mud --env-file .env --rm -p 5000:5000 jlewallen/dimsum
+
 .PHONY: web

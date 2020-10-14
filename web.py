@@ -86,6 +86,16 @@ def create(state):
         decoded = jwt.decode(base64.b64decode(encoded), session_key, algorithms="HS256")
         return state.world
 
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    async def index(path):
+        if path == "":
+            return await app.send_static_file("index.html")
+        file_path = "static/" + path
+        if os.path.isfile(file_path):
+            return await app.send_static_file(path)
+        return await app.send_static_file("index.html")
+
     @app.route("/api")
     def main_index():
         authenticate()
