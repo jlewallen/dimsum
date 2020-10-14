@@ -19,6 +19,8 @@ def create_parser():
         home:              "home"
         think:             "think"
         drop:              "drop"
+        obliterate:        "obliterate"
+        remember:          "remember"
         make:              "make" _WS noun
         hold:              "hold" _WS noun
         go:                "go" _WS noun
@@ -31,8 +33,6 @@ def create_parser():
         kick:              "kick" _WS noun
         tickle:            "tickle" _WS noun
         poke:              "poke" _WS noun
-        obliterate:        "obliterate"
-        remember:          "remember"
 
         modify:            "modify" _WS TEXT_FIELD _WS text               -> modify_field
                          | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field

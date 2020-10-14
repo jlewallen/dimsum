@@ -12,34 +12,6 @@ p = inflect.engine()
 MemoryAreaKey = "m:area"
 
 
-class NotYours(Exception):
-    pass
-
-
-class SorryError(Exception):
-    pass
-
-
-class AlreadyHolding(Exception):
-    pass
-
-
-class NotHoldingAnything(Exception):
-    pass
-
-
-class HoldingTooMuch(Exception):
-    pass
-
-
-class UnknownField(Exception):
-    pass
-
-
-class YouCantDoThat(Exception):
-    pass
-
-
 class Visitor:
     def item(self, item):
         pass
@@ -342,9 +314,7 @@ class Person(Entity):
             SumFields("nutrition"),
             SumFields("vitamins"),
         ]
-        changes = merge_dictionaries(
-            self.details.map, item.details.map, FoodFields
-        )
+        changes = merge_dictionaries(self.details.map, item.details.map, FoodFields)
         logging.info("merged %s" % (changes,))
         self.details.update(changes)
 
@@ -679,8 +649,6 @@ class Success(SimpleReply):
 class Failure(SimpleReply):
     def accept(self, visitor):
         return visitor.failure(self)
-
-
 
 
 class PlayerJoined(Event):

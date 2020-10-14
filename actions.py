@@ -40,6 +40,8 @@ class Make(Action):
         self.item = item
 
     async def perform(self, world: World, player: Player):
+        if not self.item:
+            return Failure("todo: fix")
         area = world.find_player_area(player)
         player.hold(self.item)
         world.register(self.item)
@@ -120,7 +122,8 @@ class Eat(Action):
 
     async def perform(self, world: World, player: Player):
         if not self.item.details.when_eaten():
-            raise YouCantDoThat("you can't eat that")
+            return Failure("you can't eat that")
+
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
@@ -136,9 +139,10 @@ class Drink(Action):
 
     async def perform(self, world: World, player: Player):
         if not self.item:
-            raise NotHoldingAnything("dunno where that is")
+            return Failure("dunno where that is")
         if not self.item.details.when_drank():
-            raise YouCantDoThat("you can't drink that")
+            return Failure("you can't drink that")
+
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
@@ -195,12 +199,16 @@ class Hold(Action):
         self.item = kwargs["item"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item:
+            return Failure("sorry, hold what?")
+
         area = world.find_player_area(player)
 
         if player.is_holding(self.item):
-            raise AlreadyHolding("you're already holding that")
+            raise Failure("you're already holding that")
+
         if self.item.area and self.item.owner != player:
-            raise NotYours("that's not yours")
+            raise Failure("that's not yours")
 
         area.remove(self.item)
         player.hold(self.item)
@@ -260,6 +268,9 @@ class CallThis(Action):
         self.name = kwargs["name"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item:
+            return Failure("you don't have anything")
+
         base = self.item.details.to_base()
 
         if "created" in base:
@@ -321,5 +332,7 @@ class ModifyActivity(Action):
         self.value = kwargs["value"]
 
     async def perform(self, world: World, player: Player):
+        if not self.item:
+            return Failure("nothing to modify")
         self.item.details.set(self.activity, self.value)
         return Success("done")
