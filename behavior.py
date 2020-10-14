@@ -23,7 +23,7 @@ class Hook:
     def prepare(self):
         pass
 
-    def prepare(self):
+    def execute(self):
         pass
 
 

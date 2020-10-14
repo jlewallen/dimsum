@@ -1,4 +1,5 @@
 from game import *
+from props import *
 
 
 class Action:
@@ -205,10 +206,10 @@ class Hold(Action):
         area = world.find_player_area(player)
 
         if player.is_holding(self.item):
-            raise Failure("you're already holding that")
+            return Failure("you're already holding that")
 
         if self.item.area and self.item.owner != player:
-            raise Failure("that's not yours")
+            return Failure("that's not yours")
 
         area.remove(self.item)
         player.hold(self.item)
@@ -233,7 +234,7 @@ class Go(Action):
         if self.item:
             if self.item.area is None:
                 if self.item.owner != player:
-                    raise SorryError("you can only do that with things you own")
+                    return Failure("you can only do that with things you own")
                 self.item.area = world.build_new_area(player, area, self.item)
             destination = self.item.area
 
@@ -252,7 +253,7 @@ class Obliterate(Action):
         area = world.find_player_area(player)
         items = player.drop_all()
         if len(items) == 0:
-            raise NotHoldingAnything("you're not holding anything")
+            return Failure("you're not holding anything")
 
         for item in items:
             world.unregister(item)
@@ -280,7 +281,7 @@ class CallThis(Action):
 
         recipe = Recipe(
             owner=player,
-            details=Details(self.name),
+            details=props.Details(self.name),
             base=base,
         )
         world.register(recipe)

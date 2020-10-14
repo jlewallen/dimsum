@@ -25,6 +25,9 @@ class EntityVisitor:
     def item(self, item):
         pass
 
+    def recipe(self, recipe):
+        pass
+
     def person(self, person):
         pass
 

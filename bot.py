@@ -299,22 +299,6 @@ modify when eaten
     async def translate(self, mutation):
         try:
             return await mutation()
-        except game.SorryError as err:
-            return game.Failure(str(err))
-        except game.AlreadyHolding as err:
-            return game.Failure(str(err))
-        except game.NotHoldingAnything as err:
-            return game.Failure(str(err))
-        except game.HoldingTooMuch as err:
-            return game.Failure(str(err))
-        except game.UnknownField as err:
-            return game.Failure(str(err))
-        except game.NotYours as err:
-            return game.Failure(str(err))
-        except game.YouCantDoThat as err:
-            return game.Failure(str(err))
-        except lark.exceptions.VisitError as err:
-            return game.Failure("oops, %s" % (err.__context__,))
         except Exception as err:
             return game.Failure("oops, %s" % (err,))
             raise err
@@ -336,7 +320,8 @@ modify when eaten
         if self.world.empty():
             self.world.add_area(
                 game.Area(
-                    owner=self.world, details=game.Details("Living room", "It's got walls.")
+                    owner=self.world,
+                    details=game.Details("Living room", "It's got walls."),
                 ).add_item(
                     game.Item(
                         owner=self.world, details=game.Details("Hammer", "It's heavy.")
