@@ -42,6 +42,7 @@ export default createStore<RootState>({
             } else {
                 state.headers = {};
                 state.authenticated = false;
+                delete window.localStorage["dimsum:headers"];
             }
         },
         [MutationTypes.PEOPLE]: (state: RootState, people: Person[]) => {
