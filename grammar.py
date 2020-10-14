@@ -4,7 +4,10 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | call | forget | think | hug | kiss | kick | tickle | poke | heal | verb
+        start:       look | obliterate | drop | hold | make | go | remember | modify
+                   | eat | drink | home
+                   | call | forget | think
+                   | hug | kiss | kick | tickle | poke | heal | auth | verb
 
         noun:              TEXT
         this:              "this"
@@ -33,6 +36,8 @@ def create_parser():
         kick:              "kick" _WS noun
         tickle:            "tickle" _WS noun
         poke:              "poke" _WS noun
+
+        auth:              "auth" _WS TEXT
 
         modify:            "modify" _WS TEXT_FIELD _WS text               -> modify_field
                          | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field

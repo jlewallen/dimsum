@@ -76,6 +76,9 @@ class Evaluate(lark.Transformer):
     def look_myself(self, args):
         return actions.Myself()
 
+    def auth(self, args):
+        return actions.Auth(password=str(args[0]))
+
     # Item lookup
 
     def noun(self, args):

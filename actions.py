@@ -1,3 +1,7 @@
+import os
+import hashlib
+import base64
+
 from game import *
 from props import *
 
@@ -16,6 +20,29 @@ class Unknown(Action):
 
     async def perform(self, world: World, player: Player):
         return Failure("sorry, i don't understand")
+
+
+class Auth(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.password = kwargs["password"]
+
+    async def perform(self, world: World, player: Player):
+        if "s:password" in player.details.map:
+            saltEncoded, keyEncoded = player.details.map["s:password"]
+            salt = base64.b64decode(saltEncoded)
+            key = base64.b64decode(keyEncoded)
+            actual_key = hashlib.pbkdf2_hmac(
+                "sha256", self.password.encode("utf-8"), salt, 100000
+            )
+
+        salt = os.urandom(32)
+        key = hashlib.pbkdf2_hmac("sha256", self.password.encode("utf-8"), salt, 100000)
+        player.details.map["s:password"] = [
+            base64.b64encode(salt).decode("utf-8"),
+            base64.b64encode(key).decode("utf-8"),
+        ]
+        return Success("done, https://url")
 
 
 class Plant(Action):

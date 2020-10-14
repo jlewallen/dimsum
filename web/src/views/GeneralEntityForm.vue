@@ -71,8 +71,9 @@ export default defineComponent({
                 readOnly: readOnly.indexOf(key) >= 0,
                 numeric: _.isNumber(value),
                 bool: _.isBoolean(value),
+                complex: _.isObject(value) || _.isArray(value),
             };
-        });
+        }).filter((field) => !field.complex);
         return {
             fields: fields,
             field: {

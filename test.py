@@ -111,6 +111,8 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("hug carla")))
     logging.info(await execute(world, jacob, l.parse("make ipa")))
     logging.info(await execute(world, jacob, l.parse("forget ipa")))
+    logging.info(await execute(world, jacob, l.parse("auth asdfasdf")))
+
     logging.info(world.look(jacob))
 
 
