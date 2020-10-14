@@ -5,7 +5,10 @@ import sys
 import time
 import inflect
 import uuid
+
 import props
+import entity
+import behavior
 
 p = inflect.engine()
 
@@ -21,51 +24,13 @@ class EventBus:
         logging.info("publish:%s", event)
 
 
-class EntityVisitor:
-    def item(self, item):
-        pass
-
-    def recipe(self, recipe):
-        pass
-
-    def person(self, person):
-        pass
-
-    def area(self, area):
-        pass
-
-
-class Entity:
-    def __init__(self, **kwargs):
-        if "key" in kwargs:
-            self.key = kwargs["key"]
-        else:
-            self.key = str(uuid.uuid1())
-
-    def describes(self, q: str):
-        return False
-
-    def saved(self):
-        return {
-            "key": self.key,
-        }
-
-    def load(self, world, properties):
-        self.key = properties["key"]
-
-    def accept(self, visitor: EntityVisitor):
-        raise Exception("unimplemented")
-
-
 class Activity:
     pass
 
 
-class Item(Entity):
+class Item(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.owner = kwargs["owner"]
-        self.details = kwargs["details"]
         self.area = kwargs["area"] if "area" in kwargs else None
 
     def touch(self):
@@ -81,7 +46,6 @@ class Item(Entity):
         p = super().saved()
         p.update(
             {
-                "details": self.details.map,
                 "area": self.area.key if self.area else None,
             }
         )
@@ -89,10 +53,9 @@ class Item(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details = props.Details.from_map(properties["details"])
         self.area = world.find(properties["area"]) if properties["area"] else None
 
-    def accept(self, visitor: EntityVisitor):
+    def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)
 
     def __str__(self):
@@ -108,7 +71,7 @@ class Recipe(Item):
         self.required = kwargs["required"] if "required" in kwargs else {}
         self.base = kwargs["base"] if "base" in kwargs else {}
 
-    def accept(self, visitor: EntityVisitor):
+    def accept(self, visitor: entity.EntityVisitor):
         return visitor.recipe(self)
 
     def saved(self):
@@ -154,12 +117,10 @@ class Holding(Activity):
         return str(self)
 
 
-class Person(Entity):
+class Person(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.owner = kwargs["owner"]
-        self.details = kwargs["details"]
-        self.holding: List[Entity] = []
+        self.holding: List[entity.Entity] = []
         self.memory = {}
 
     @property
@@ -243,7 +204,7 @@ class Person(Entity):
             return [item]
         return []
 
-    def accept(self, visitor: EntityVisitor):
+    def accept(self, visitor: entity.EntityVisitor):
         return visitor.person(self)
 
     def __str__(self):
@@ -253,7 +214,6 @@ class Person(Entity):
         p = super().saved()
         p.update(
             {
-                "details": self.details.map,
                 "holding": [e.key for e in self.holding],
                 "memory": {k: e.key for k, e in self.memory.items()},
             }
@@ -262,7 +222,6 @@ class Person(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details = props.Details.from_map(properties["details"])
         self.holding = world.resolve(properties["holding"])
         self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
@@ -351,7 +310,7 @@ class PersonalObservation(Observation):
 
 
 class DetailedObservation(Observation):
-    def __init__(self, who: ObservedPerson, what: Entity):
+    def __init__(self, who: ObservedPerson, what: entity.Entity):
         self.who = who
         self.what = what
 
@@ -377,7 +336,7 @@ class AreaObservation(Observation):
     def __init__(
         self,
         who: ObservedPerson,
-        where: Entity,
+        where: entity.Entity,
         people: List[ObservedPerson],
         items: List[ObservedItem],
     ):
@@ -402,20 +361,20 @@ class AreaObservation(Observation):
         )
 
 
-class Area(Entity):
+class Area(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.owner = kwargs["owner"]
         self.details = kwargs["details"]
-        self.here: List[Entity] = []
+        self.here: List[entity.Entity] = []
 
     def entities(self):
         return self.here
 
-    def contains(self, e: Entity):
+    def contains(self, e: entity.Entity):
         return e in self.here
 
-    def remove(self, e: Entity):
+    def remove(self, e: entity.Entity):
         self.here.remove(e)
         return self
 
@@ -452,7 +411,7 @@ class Area(Entity):
         self.details = props.Details.from_map(properties["details"])
         self.here = world.resolve(properties["here"])
 
-    def accept(self, visitor: EntityVisitor):
+    def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
     def __str__(self):
@@ -474,17 +433,17 @@ class Area(Entity):
         return dropped
 
 
-class World(Entity):
+class World(entity.Entity):
     def __init__(self, bus: EventBus):
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
-        self.entities: Dict[str, Entity] = {}
+        self.entities: Dict[str, entity.Entity] = {}
 
-    def register(self, entity: Entity):
+    def register(self, entity: entity.Entity):
         self.entities[entity.key] = entity
 
-    def unregister(self, entity: Entity):
+    def unregister(self, entity: entity.Entity):
         del self.entities[entity.key]
 
     def empty(self):
@@ -512,7 +471,7 @@ class World(Entity):
         area = self.find_player_area(player)
         return area.look(player)
 
-    def find_entity_area(self, entity: Entity):
+    def find_entity_area(self, entity: entity.Entity):
         for area in self.areas():
             if area.contains(entity):
                 return area

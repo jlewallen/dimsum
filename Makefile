@@ -10,6 +10,8 @@ run:
 
 test:
 	rm -f fieldkit.sqlite3
+	env/bin/python3 behavior.py
+	env/bin/python3 game.py
 	env/bin/python3 test.py
 
 env:

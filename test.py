@@ -136,9 +136,45 @@ async def test_lua():
     b = Behavior(world, jacob)
 
 
+async def test_behavior():
+    bus = game.EventBus()
+    world = game.World(bus)
+    carla = game.Player(owner=world, details=props.Details("Carla"))
+    jacob = game.Player(owner=world, details=props.Details("Jacob"))
+    hammer = game.Item(owner=jacob, details=props.Details("Hammer"))
+    world.add_area(
+        game.Area(owner=jacob, details=props.Details("Living room")).add_item(hammer)
+    )
+    world.add_area(game.Area(owner=jacob, details=props.Details("Kitchen")))
+    await world.perform(jacob, actions.Join())
+    await world.perform(carla, actions.Join())
+
+    bmap = BehaviorMap()
+    bmap.map["b:jacob:drop"] = "ok"
+    print(bmap.get_all("drop"))
+
+    thunk = behavior.ThunkWorldPersonScope
+    source = """
+function(s, world, player)
+    s.changes.msg("Hello, world!")
+    return nil
+end
+"""
+
+    se = behavior.ScriptEngine()
+    changes = behavior.Changes()
+    scope = behavior.Scope(world=world, person=jacob, changes=changes)
+    value = se.execute(thunk, scope, source)
+
+    print(changes)
+    print(value)
+
+
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logging.info("testing:basic")
     asyncio.run(test_run())
     logging.info("testing:lua")
     asyncio.run(test_lua())
+    logging.info("testing:behavior")
+    asyncio.run(test_behavior())

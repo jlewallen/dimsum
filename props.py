@@ -1,4 +1,5 @@
 import time
+import re
 
 
 class FieldMergeStrategy:
@@ -37,6 +38,13 @@ class PropertyMap:
     @property
     def map(self):
         return self.__dict__
+
+    @property
+    def keys(self):
+        return self.__dict__.keys()
+
+    def keys_matching(self, pattern: str):
+        return [k for k in self.__dict__.keys() if re.match(pattern, k)]
 
     def set(self, key, value):
         self.map[key] = value
