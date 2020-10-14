@@ -1,18 +1,27 @@
 from typing import List, Tuple
 
-import asyncio
 import logging
 import sys
 import time
 import inflect
 import uuid
+import props
 
 p = inflect.engine()
 
 MemoryAreaKey = "m:area"
 
 
-class Visitor:
+class Event:
+    pass
+
+
+class EventBus:
+    async def publish(self, event: Event):
+        logging.info("publish:%s", event)
+
+
+class EntityVisitor:
     def item(self, item):
         pass
 
@@ -41,111 +50,8 @@ class Entity:
     def load(self, world, properties):
         self.key = properties["key"]
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor: EntityVisitor):
         raise Exception("unimplemented")
-
-
-class Event:
-    pass
-
-
-class EventBus:
-    async def publish(self, event: Event):
-        logging.info("publish:%s", event)
-
-
-class PropertyMap:
-    def __init__(self, **kwargs):
-        if "map" in kwargs:
-            self.__dict__ = kwargs["map"]
-        else:
-            self.__dict__ = kwargs
-
-    @property
-    def map(self):
-        return self.__dict__
-
-    def set(self, key, value):
-        self.map[key] = value
-
-    def update(self, changes):
-        self.map.update(changes)
-
-    def clone(self):
-        return PropertyMap(self.map)
-
-
-class Details(PropertyMap):
-    def __init__(self, name: str = "", **kwargs):
-        super().__init__(**kwargs)
-        self.name = name
-        self.desc = kwargs["desc"] if "desc" in kwargs else name
-        self.presence = ""
-        self.created = time.time()
-        self.touched = time.time()
-
-    @staticmethod
-    def from_base(base):
-        details = Details()
-        details.__dict__ = base
-        details.created = time.time()
-        details.touched = time.time()
-        return details
-
-    @staticmethod
-    def from_map(map):
-        details = Details()
-        details.__dict__ = map
-        return details
-
-    def to_base(self):
-        base = self.map.copy()
-        if "created" in base:
-            del base["created"]
-        if "touched" in base:
-            del base["touched"]
-        return base
-
-    def clone(self):
-        return Details(self.name, desc=self.desc)
-
-    def when_eaten(self):
-        return self.map["eaten"] if "eaten" in self.map else False
-
-    def when_drank(self):
-        return self.map["drank"] if "drank" in self.map else False
-
-    def touch(self):
-        self.touched = time.time()
-
-    def __str__(self):
-        return str(self.map)
-
-
-class FieldMergeStrategy:
-    def __init__(self, name: str):
-        self.name = name
-
-    def merge(self, old_value, new_value):
-        return old_value
-
-
-class SumFields(FieldMergeStrategy):
-    def merge(self, old_value, new_value):
-        if not old_value:
-            return new_value
-        if not new_value:
-            return old_value
-        return float(old_value) + float(new_value)
-
-
-def merge_dictionaries(left, right, fields):
-    merged = {}
-    for field in fields:
-        old_value = left[field.name] if field.name in left else None
-        new_value = right[field.name] if field.name in right else None
-        merged[field.name] = field.merge(old_value, new_value)
-    return merged
 
 
 class Activity:
@@ -180,10 +86,10 @@ class Item(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details = Details.from_map(properties["details"])
+        self.details = props.Details.from_map(properties["details"])
         self.area = world.find(properties["area"]) if properties["area"] else None
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor: EntityVisitor):
         return visitor.item(self)
 
     def __str__(self):
@@ -199,7 +105,7 @@ class Recipe(Item):
         self.required = kwargs["required"] if "required" in kwargs else {}
         self.base = kwargs["base"] if "base" in kwargs else {}
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor: EntityVisitor):
         return visitor.recipe(self)
 
     def saved(self):
@@ -218,7 +124,7 @@ class Recipe(Item):
         self.required = {k: world.find(v) for k, v in properties["required"].items()}
 
     def invoke(self, player):
-        return Item(owner=player, details=Details.from_base(self.base))
+        return Item(owner=player, details=props.Details.from_base(self.base))
 
 
 class ObservedItem:
@@ -334,7 +240,7 @@ class Person(Entity):
             return [item]
         return []
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor: EntityVisitor):
         return visitor.person(self)
 
     def __str__(self):
@@ -353,7 +259,7 @@ class Person(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details = Details.from_map(properties["details"])
+        self.details = props.Details.from_map(properties["details"])
         self.holding = world.resolve(properties["holding"])
         self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
@@ -388,6 +294,21 @@ class Player(Person):
 class Reply:
     def accept(self, visitor):
         raise Error("unimplemented")
+
+
+class SimpleReply(Reply):
+    def __init__(self, message: str):
+        self.message = message
+
+
+class Success(SimpleReply):
+    def accept(self, visitor):
+        return visitor.success(self)
+
+
+class Failure(SimpleReply):
+    def accept(self, visitor):
+        return visitor.failure(self)
 
 
 class Observation(Reply):
@@ -519,10 +440,10 @@ class Area(Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.details = Details.from_map(properties["details"])
+        self.details = props.Details.from_map(properties["details"])
         self.here = world.resolve(properties["here"])
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor: EntityVisitor):
         return visitor.area(self)
 
     def __str__(self):
@@ -546,7 +467,7 @@ class Area(Entity):
 
 class World(Entity):
     def __init__(self, bus: EventBus):
-        self.details = Details("World", desc="Ya know, everything")
+        self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
         self.entities = {}
@@ -603,7 +524,7 @@ class World(Entity):
         theWayBack = Item(owner=player, details=entry.details.clone(), area=fromArea)
         area = Area(
             owner=player,
-            details=Details(
+            details=props.Details(
                 "A pristine, new place.",
                 desc="Nothing seems to be here, maybe you should decorate?",
             ),
@@ -634,21 +555,6 @@ class World(Entity):
 
     async def perform(self, player: Player, action):
         return await action.perform(self, player)
-
-
-class SimpleReply(Reply):
-    def __init__(self, message: str):
-        self.message = message
-
-
-class Success(SimpleReply):
-    def accept(self, visitor):
-        return visitor.success(self)
-
-
-class Failure(SimpleReply):
-    def accept(self, visitor):
-        return visitor.failure(self)
 
 
 class PlayerJoined(Event):

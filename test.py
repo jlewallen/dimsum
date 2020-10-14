@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import sys
 import lupa
 
+from props import *
 from persistence import *
 from game import *
 from grammar import *

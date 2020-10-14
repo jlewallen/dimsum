@@ -1,6 +1,7 @@
 import logging
 import sqlite3
 import json
+import props
 import game
 
 
@@ -54,7 +55,7 @@ class SqlitePersistence:
             row = rows[key]
             factory = factories[row[1]]
             owner = get_instance(row[2])
-            instance = factory(key=row[0], owner=owner, details=game.Details())
+            instance = factory(key=row[0], owner=owner, details=props.Details())
             instance.key = key
             properties = json.loads(row[3])
             keyed[key] = [instance, properties]
