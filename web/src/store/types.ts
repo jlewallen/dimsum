@@ -20,6 +20,8 @@ export enum ActionTypes {
 }
 
 export enum MutationTypes {
+    INIT = "INIT",
+    AUTH = "AUTH",
     PEOPLE = "PEOPLE",
     AREAS = "AREAS",
     ENTITY = "ENTITY",

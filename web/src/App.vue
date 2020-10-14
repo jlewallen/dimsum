@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import store, { LoadingAction } from "@/store";
+import store, { MutationTypes, LoadingAction } from "@/store";
 
 export default defineComponent({
     name: "App",
@@ -27,7 +27,7 @@ export default defineComponent({
     mounted(): Promise<void> {
         this.busy = true;
 
-        store.commit("INIT");
+        store.commit(MutationTypes.INIT);
 
         if (store.state.authenticated) {
             return store.dispatch(new LoadingAction()).finally(() => {

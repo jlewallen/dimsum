@@ -27,14 +27,14 @@ export default createStore<RootState>({
     plugins: [createLogger()],
     state: new RootState(),
     mutations: {
-        ["INIT"]: (state: RootState) => {
+        [MutationTypes.INIT]: (state: RootState) => {
             const stored = window.localStorage["dimsum:headers"];
             if (stored) {
                 state.authenticated = true;
                 state.headers = JSON.parse(stored);
             }
         },
-        ["AUTH"]: (state: RootState, auth: Auth | null) => {
+        [MutationTypes.AUTH]: (state: RootState, auth: Auth | null) => {
             if (auth) {
                 state.headers["Authorization"] = `Bearer ${auth.token}`;
                 state.authenticated = true;
@@ -64,7 +64,7 @@ export default createStore<RootState>({
     actions: {
         [ActionTypes.LOGIN]: ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
             return http<any>({ url: "/login", method: "POST", data: payload }).then((data: Auth) => {
-                commit("AUTH", data);
+                commit(MutationTypes.AUTH, data);
                 return dispatch(new AuthenticatedAction(data));
             });
         },
@@ -72,7 +72,7 @@ export default createStore<RootState>({
             return Promise.resolve();
         },
         [ActionTypes.LOGOUT]: ({ dispatch, commit }: ActionParameters) => {
-            commit("AUTH", null);
+            commit(MutationTypes.AUTH, null);
         },
         [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
             return Promise.all([
