@@ -1,6 +1,9 @@
 <template>
     <div id="nav">
         <router-link to="/">Home</router-link>
+        |
+        <router-link to="/login" v-if="!authenticated">Login</router-link>
+        <router-link to="/logout" v-if="authenticated">Logout</router-link>
     </div>
     <router-view />
 </template>
@@ -16,11 +19,25 @@ export default defineComponent({
             busy: false,
         };
     },
+    computed: {
+        authenticated() {
+            return store.state.authenticated;
+        },
+    },
     mounted(): Promise<void> {
         this.busy = true;
-        return store.dispatch(new LoadingAction()).finally(() => {
-            this.busy = false;
-        });
+
+        store.commit("INIT");
+
+        if (store.state.authenticated) {
+            return store.dispatch(new LoadingAction()).finally(() => {
+                this.busy = false;
+            });
+        }
+
+        this.$router.push("/login");
+
+        return Promise.resolve();
     },
 });
 </script>

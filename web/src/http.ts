@@ -4,6 +4,7 @@ export interface OurRequestInfo {
     url: string;
     method?: string;
     data?: any;
+    headers?: { [index: string]: string };
 }
 
 export interface UpdateEntityPayload {
@@ -22,9 +23,12 @@ export async function http<T>(info: OurRequestInfo): Promise<T> {
     const response = await fetch(Config.baseUrl + info.url, {
         method: info.method || "GET",
         mode: "cors",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: Object.assign(
+            {
+                "Content-Type": "application/json",
+            },
+            info.headers
+        ),
         body: body,
     });
     return await response.json();

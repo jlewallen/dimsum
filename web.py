@@ -1,6 +1,10 @@
+import os
+import logging
 import quart
 import quart_cors
-import logging
+import jwt
+import base64
+import hashlib
 import game
 
 
@@ -72,13 +76,24 @@ def create(state):
     app = quart.Quart(__name__)
     app = quart_cors.cors(app)
 
+    session_key_string = os.getenv("SESSION_KEY")
+    session_key = base64.b64decode(session_key_string)
+
+    def authenticate():
+        # TODO HACK We just 500 in here for now.
+        header = quart.request.headers["authorization"]
+        bearer, encoded = header.split(" ")
+        decoded = jwt.decode(base64.b64decode(encoded), session_key, algorithms="HS256")
+        return state.world
+
     @app.route("/api")
     def main_index():
+        authenticate()
         return areas_index()
 
     @app.route("/api/areas")
     def areas_index():
-        world = state.world
+        world = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -88,7 +103,7 @@ def create(state):
 
     @app.route("/api/people")
     def people_index():
-        world = state.world
+        world = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -98,7 +113,7 @@ def create(state):
 
     @app.route("/api/entities/<string:key>")
     def get_entity(key: str):
-        world = state.world
+        world = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -113,7 +128,7 @@ def create(state):
 
     @app.route("/api/entities/<string:key>", methods=["POST"])
     async def update_entity(key: str):
-        world = state.world
+        world = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -141,5 +156,40 @@ def create(state):
             return {"entity": entity.accept(makeWeb)}
 
         return {"entity": None}
+
+    @app.route("/api/login", methods=["POST"])
+    async def login():
+        world = state.world
+        if world is None:
+            return {"loading": True}
+
+        form = await quart.request.get_json()
+
+        name = form["name"]
+        password = form["password"]
+
+        person = world.find_person_by_name(name)
+        if not person:
+            raise Exception("no way")
+
+        if not "s:password" in person.details.map:
+            raise Exception("no way")
+
+        saltEncoded, keyEncoded = person.details.map["s:password"]
+        salt = base64.b64decode(saltEncoded)
+        key = base64.b64decode(keyEncoded)
+        actual_key = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt, 100000
+        )
+
+        token = {
+            "key": person.key,
+        }
+
+        encoded = base64.b64encode(
+            jwt.encode({"key": person.key}, session_key, algorithm="HS256")
+        )
+
+        return {"token": encoded.decode("utf-8"), "person": None}
 
     return app

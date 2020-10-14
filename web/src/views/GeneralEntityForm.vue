@@ -117,6 +117,7 @@ export default defineComponent({
 </script>
 <style>
 /* Style inputs, select elements and textareas */
+input[type="password"],
 input[type="text"],
 select,
 textarea {

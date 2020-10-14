@@ -13,6 +13,9 @@ import {
     RefreshEntityAction,
     NeedEntityAction,
     SaveEntityAction,
+    LoginAction,
+    Auth,
+    AuthenticatedAction,
 } from "./types";
 import { http } from "@/http";
 
@@ -24,6 +27,23 @@ export default createStore<RootState>({
     plugins: [createLogger()],
     state: new RootState(),
     mutations: {
+        ["INIT"]: (state: RootState) => {
+            const stored = window.localStorage["dimsum:headers"];
+            if (stored) {
+                state.authenticated = true;
+                state.headers = JSON.parse(stored);
+            }
+        },
+        ["AUTH"]: (state: RootState, auth: Auth | null) => {
+            if (auth) {
+                state.headers["Authorization"] = `Bearer ${auth.token}`;
+                state.authenticated = true;
+                window.localStorage["dimsum:headers"] = JSON.stringify(state.headers);
+            } else {
+                state.headers = {};
+                state.authenticated = false;
+            }
+        },
         [MutationTypes.PEOPLE]: (state: RootState, people: Person[]) => {
             state.people = _.keyBy(people, (p: Person) => p.key);
             for (const e of people) {
@@ -41,12 +61,24 @@ export default createStore<RootState>({
         },
     },
     actions: {
-        [ActionTypes.LOADING]: ({ commit }: ActionParameters) => {
+        [ActionTypes.LOGIN]: ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
+            return http<any>({ url: "/login", method: "POST", data: payload }).then((data: Auth) => {
+                commit("AUTH", data);
+                return dispatch(new AuthenticatedAction(data));
+            });
+        },
+        [ActionTypes.AUTHENTICATED]: ({ commit }: ActionParameters, payload: AuthenticatedAction) => {
+            return Promise.resolve();
+        },
+        [ActionTypes.LOGOUT]: ({ dispatch, commit }: ActionParameters) => {
+            commit("AUTH", null);
+        },
+        [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
             return Promise.all([
-                http<AreasResponse>({ url: "" }).then((data) => {
+                http<AreasResponse>({ url: "", headers: state.headers }).then((data) => {
                     commit(MutationTypes.AREAS, data.areas);
                 }),
-                http<PeopleResponse>({ url: "/people" }).then((data) => {
+                http<PeopleResponse>({ url: "/people", headers: state.headers }).then((data) => {
                     commit(MutationTypes.PEOPLE, data.people);
                 }),
             ]);
@@ -56,20 +88,21 @@ export default createStore<RootState>({
             if (state.entities[payload.key]) {
                 return Promise.resolve();
             }
-            return http<EntityResponse>({ url: `/entities/${payload.key}` }).then((data) => {
+            return http<EntityResponse>({ url: `/entities/${payload.key}`, headers: state.headers }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
-        [ActionTypes.NEED_ENTITY]: ({ commit }: ActionParameters, payload: NeedEntityAction) => {
-            return http<EntityResponse>({ url: `/entities/${payload.key}` }).then((data) => {
+        [ActionTypes.NEED_ENTITY]: ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
+            return http<EntityResponse>({ url: `/entities/${payload.key}`, headers: state.headers }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
-        [ActionTypes.SAVE_ENTITY]: ({ commit }: ActionParameters, payload: SaveEntityAction) => {
+        [ActionTypes.SAVE_ENTITY]: ({ state, commit }: ActionParameters, payload: SaveEntityAction) => {
             return http<EntityResponse>({
                 url: `/entities/${payload.form.key}`,
                 method: "POST",
                 data: payload.form,
+                headers: state.headers,
             }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
                 return data;

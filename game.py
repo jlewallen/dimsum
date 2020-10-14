@@ -493,6 +493,12 @@ class World(Entity):
     def players(self):
         return [e for e in self.entities.values() if isinstance(e, Player)]
 
+    def find_person_by_name(self, name):
+        for person in self.people():
+            if person.details.name == name:
+                return person
+        return None
+
     def welcome_area(self):
         return self.areas()[0]
 
