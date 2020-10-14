@@ -2,6 +2,7 @@ import discord
 import discord.ext.commands
 import logging
 import inflect
+import props
 import game
 import lark
 import persistence
@@ -321,10 +322,10 @@ modify when eaten
             self.world.add_area(
                 game.Area(
                     owner=self.world,
-                    details=game.Details("Living room", "It's got walls."),
+                    details=props.Details("Living room", "It's got walls."),
                 ).add_item(
                     game.Item(
-                        owner=self.world, details=game.Details("Hammer", "It's heavy.")
+                        owner=self.world, details=props.Details("Hammer", "It's heavy.")
                     )
                 )
             )
@@ -353,7 +354,7 @@ modify when eaten
         player = game.Player(
             key=key,
             owner=self.world,
-            details=game.Details(author.name, "A discord user"),
+            details=props.Details(author.name, "A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
         await self.world.perform(player, game.Join())
