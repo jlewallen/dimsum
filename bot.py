@@ -301,8 +301,8 @@ modify when eaten
         try:
             return await mutation()
         except Exception as err:
+            logging.error("error", exc_info=True)
             return game.Failure("oops, %s" % (err,))
-            raise err
 
     def run(self):
         self.bot.run(self.token)
@@ -322,10 +322,11 @@ modify when eaten
             self.world.add_area(
                 game.Area(
                     owner=self.world,
-                    details=props.Details("Living room", "It's got walls."),
+                    details=props.Details("Living room", desc="It's got walls."),
                 ).add_item(
                     game.Item(
-                        owner=self.world, details=props.Details("Hammer", "It's heavy.")
+                        owner=self.world,
+                        details=props.Details("Hammer", desc="It's heavy."),
                     )
                 )
             )
@@ -342,6 +343,9 @@ modify when eaten
         channel = message.channel
         key = str(author.id)
 
+        if not self.world:
+            raise ExceptioException("initializing")
+
         if key in self.players:
             self.players[key].channel = channel
             return self.players[key].player
@@ -354,9 +358,9 @@ modify when eaten
         player = game.Player(
             key=key,
             owner=self.world,
-            details=props.Details(author.name, "A discord user"),
+            details=props.Details(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
-        await self.world.perform(player, game.Join())
+        await self.world.perform(player, actions.Join())
         await self.save()
         return player
