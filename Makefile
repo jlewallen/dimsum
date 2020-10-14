@@ -31,6 +31,9 @@ image:
 	docker build -t jlewallen/dimsum .
 
 image-test:
-	docker run --name mud --env-file .env --rm -p 5000:5000 jlewallen/dimsum
+	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 jlewallen/dimsum
+
+prod-server:
+	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
 
 .PHONY: web
