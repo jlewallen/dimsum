@@ -5,4 +5,5 @@ __pycache__
 *.sqlite3
 web/dist
 web/node_modules
+web/src/config.ts
 static

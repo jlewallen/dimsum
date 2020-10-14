@@ -20,7 +20,10 @@ env:
 freeze:
 	pip3 freeze > requirements.txt
 
-web:
+web/src/config:
+	cp web/src/config.ts.dev web/src/config.ts
+
+web: web/src/config
 	cd web && yarn serve
 
 dump:
@@ -32,6 +35,10 @@ image:
 
 image-test:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 jlewallen/dimsum
+
+prod-image:
+	cp web/src/config.ts.prod web/src/config.ts
+	docker build -t jlewallen/dimsum .
 
 prod-server:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
