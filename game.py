@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import logging
 import sys
@@ -473,7 +473,7 @@ class World(Entity):
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
-        self.entities = {}
+        self.entities: Dict[str, Entity] = {}
 
     def register(self, entity: Entity):
         self.entities[entity.key] = entity

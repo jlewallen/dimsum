@@ -23,12 +23,11 @@ freeze:
 web/src/config:
 	cp web/src/config.ts.dev web/src/config.ts
 
-web: web/src/config
-	cd web && yarn serve
+web/node_modules:
+	cd web && yarn install
 
-dump:
-	sqlite3 test.sqlite3 "SELECT * FROM entities"
-	sqlite3 world.sqlite3 "SELECT * FROM entities"
+web: web/node_modules web/src/config
+	cd web && yarn serve
 
 image:
 	docker build -t jlewallen/dimsum .

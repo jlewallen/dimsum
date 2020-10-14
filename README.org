@@ -1,29 +1,69 @@
 * DimSum
+** TODO Lua Customization
+
+   Per-Behavior Hooks
+
+   These can be on entities, for example if they're on an Item and
+   that the user "shakes" that item, then we run the "b:shake" for
+   that item. If the behavior is on a room then we also call the
+   b:shake hook for the room.
+
+   Verb Entities
+
+   This would be of the form "v:shake" and define the behavior of that
+   verb. In many cases these just invoke the behavior.
+
+
 ** TODO Planting
+** TODO Climbing
 ** TODO Water/Pour
-** DONE Toggle eating and drinking of things.
-** TODO Allow naming of common things that get made.
 ** TODO Make maze.
-** TODO Rain/weather. Explosions.
 
-   Set logical zip code for an area.
+   Just randomly generates a maze that gets populated with stuff.
 
-** TODO Optimize persistence: delete and only update modified.
+** TODO Rain/weather.
+
+   Set logical zip code for an area, weather changes to reflect that.
+
 ** TODO Animal Crossing mode.
+
+   I think that eventually this will become a thing, but the idea is
+   that we can forage for supplies/resources and then use those to
+   build other items, using recipes.
 
    .do recipe Super Cool Thing
    You're holding a recipe.
    .call this NAME
 
-** DONE Timestamps.
-** TODO Modify credentials in game.
-** TODO Lock/freeze items.
-** TODO Things being able to produce and contain. Think pour water into a cup.
+** TODO Entities that have to be carried.
+
+   Water, for example.
+
+** TODO Entities that produce others.
+
+   I'm thinking of a water fountain that can produce water. Rock face
+   that produces rocks/boulders.
+
 ** TODO Escape Room Mode
 
    Everybody is thrown into a randomly generated world and has to
-   capture a flag or do something?
+   capture a flag or do something? See who can gather the most X in
+   whatever time? People can also create their own scenarios, in a
+   DnD-esque way and see if their friends can find their way out.
 
+** TODO Lock/freeze items.
+
+   In order to create scarcity and value for items, maybe locking them
+   so they can't be cloned or modified.
+
+** TODO Optimize persistence: delete and only update modified.
+
+   Remember which entities are modified in which Actions, only save those.
+
+** DONE Allow naming of common things that get made.
+** DONE Modify credentials in game.
+** DONE Toggle eating and drinking of things.
+** DONE Timestamps.
 **  Example Session
 
 	[[./docs/areas.png]]
