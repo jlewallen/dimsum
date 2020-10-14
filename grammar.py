@@ -4,62 +4,54 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | stimulate | call | forget | think
+        start: look | obliterate | drop | hold | make | go | remember | modify | eat | drink | home | call | forget | think | hug | kiss | kick | tickle | poke | heal | verb
 
-        _WS:        WS
-        TEXT:       (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
-        NAME:       TEXT
+        noun:              TEXT
+        this:              "this"
+        that:              "that"
 
-        somebody_here:  TEXT
-        item_here:      TEXT
-        item_recipe:    TEXT
-        item_held:      TEXT
-        item_goes:      TEXT
-        memory:         TEXT
+        look:              "look"
+                         | "look" ("at" _WS "myself") -> look_myself
+                         | "look" ("at" _WS noun)     -> look_item
+        call:              "call" _WS this _WS NAME
 
-        home:       "home"
-        this:       "this"
+        verb:              WORD (this | that | noun)?
+        home:              "home"
+        think:             "think"
+        drop:              "drop"
+        make:              "make" _WS noun
+        hold:              "hold" _WS noun
+        go:                "go" _WS noun
+        eat:               "eat" _WS noun
+        drink:             "drink" _WS noun
+        forget:            "forget" _WS noun
+        heal:              "heal" _WS noun
+        hug:               "hug" _WS noun
+        kiss:              "kiss" _WS noun
+        kick:              "kick" _WS noun
+        tickle:            "tickle" _WS noun
+        poke:              "poke" _WS noun
+        obliterate:        "obliterate"
+        remember:          "remember"
 
-        think:      "think"
-        look:       "look"
-                  | "look" ("at" _WS "myself")   -> look_myself
-                  | "look" ("at" _WS item_held)  -> look_item
-        drop:       "drop"
-        call:       "call" _WS this _WS NAME
-        hold:       "hold" _WS item_here
-        make:       "make" _WS item_recipe
-        go:         "go" _WS item_goes
-        eat:        "eat" _WS item_held
-        drink:      "drink" _WS item_held
-        obliterate: "obliterate"
-        remember:   "remember"
+        modify:            "modify" _WS TEXT_FIELD _WS text               -> modify_field
+                         | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field
+                         | "modify" _WS "when" _WS "opened"               -> when_opened
+                         | "modify" _WS "when" _WS "eaten"                -> when_eaten
+                         | "modify" _WS "when" _WS "drank"                -> when_drank
+                         | "modify" _WS "when" _WS "activated"            -> when_activated
+                         | "modify" _WS "when" _WS "triggered"            -> when_triggered
+                         | "modify" _WS "when" _WS "closed"               -> when_closed
 
-
-        forget:     "forget" _WS memory
-
-        stimulate:  hug | kiss | kick | tickle | poke | heal
-        heal:       "heal" _WS somebody_here
-        hug:         "hug" _WS somebody_here
-        kiss:       "kiss" _WS somebody_here
-        kick:       "kick" _WS somebody_here
-        tickle:   "tickle" _WS somebody_here
-        poke:       "poke" _WS somebody_here
-
-        TEXT_FIELD: "name" | "desc" | "presence"
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
-        NUMERIC_FIELD: "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
+        NUMERIC_FIELD:     "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
+        TEXT_FIELD:        "name" | "desc" | "presence"
 
-        number: NUMBER
-        text: TEXT
-
-        modify:     "modify" _WS TEXT_FIELD _WS text               -> modify_field
-                  | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field
-                  | "modify" _WS "when" _WS "opened"               -> when_opened
-                  | "modify" _WS "when" _WS "eaten"                -> when_eaten
-                  | "modify" _WS "when" _WS "drank"                -> when_drank
-                  | "modify" _WS "when" _WS "activated"            -> when_activated
-                  | "modify" _WS "when" _WS "triggered"            -> when_triggered
-                  | "modify" _WS "when" _WS "closed"               -> when_closed
+        TEXT:         (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
+        NAME:         TEXT
+        number:       NUMBER
+        text:         TEXT
+        _WS:          WS
 
         %import common.WS
         %import common.WORD

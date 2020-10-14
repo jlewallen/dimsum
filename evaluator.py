@@ -11,8 +11,13 @@ class Evaluate(lark.Transformer):
     def start(self, args):
         return args[0]
 
-    def make(self, args):
-        return actions.Make(args[0])
+    def stimulate(self, args):
+        return args[0]
+
+    # Actions
+
+    def look(self, args):
+        return actions.Look()
 
     def drop(self, args):
         return actions.Drop()
@@ -23,34 +28,11 @@ class Evaluate(lark.Transformer):
     def hold(self, args):
         return actions.Hold(item=args[0])
 
+    def make(self, args):
+        return actions.Make(args[0])
+
     def forget(self, args):
         return actions.Forget(name=args[0])
-
-    def memory(self, args):
-        name, entity = self.player.find_memory(str(args[0]))
-        return name
-
-    def somebody_here(self, args):
-        area, item = self.world.search(self.player, str(args[0]))
-        return item
-
-    def item_here(self, args):
-        area, item = self.world.search(self.player, str(args[0]))
-        return item
-
-    def item_held(self, args):
-        return self.world.search_hands(self.player, str(args[0]))
-
-    def item_goes(self, args):
-        area, item = self.world.search(self.player, str(args[0]))
-        return item
-
-    def item_recipe(self, args):
-        name = str(args[0])
-        recipe = self.player.find_recipe(name)
-        if recipe:
-            return recipe.invoke(self.player)
-        return game.Item(owner=self.player, details=game.Details(name))
 
     def go(self, args):
         return actions.Go(item=args[0])
@@ -61,20 +43,11 @@ class Evaluate(lark.Transformer):
     def drink(self, args):
         return actions.Drink(item=args[0])
 
-    def look(self, args):
-        return actions.Look()
-
     def obliterate(self, args):
         return actions.Obliterate()
 
-    def this(self, args):
-        return self.get_item_held()
-
     def call(self, args):
         return actions.CallThis(item=args[0], name=str(args[1]))
-
-    def stimulate(self, args):
-        return args[0]
 
     def hug(self, args):
         return actions.Hug(who=args[0])
@@ -103,10 +76,21 @@ class Evaluate(lark.Transformer):
     def look_myself(self, args):
         return actions.Myself()
 
-    def get_item_held(self):
-        if len(self.player.holding) == 0:
-            raise game.NotHoldingAnything("you're not holding anything")
-        return self.player.holding[0]
+    # Item lookup
+
+    def noun(self, args):
+        area, item = self.world.search(self.player, str(args[0]))
+        return item
+
+    def this(self, args):
+        return self.get_item_held()
+
+    def item_recipe(self, args):
+        name = str(args[0])
+        recipe = self.player.find_recipe(name)
+        if recipe:
+            return recipe.invoke(self.player)
+        return game.Item(owner=self.player, details=game.Details(name))
 
     def modify_field(self, args):
         area = self.world.find_player_area(self.player)
@@ -140,11 +124,21 @@ class Evaluate(lark.Transformer):
     def remember(self, args):
         return actions.Remember()
 
+    def verb(self, args):
+        return actions.Unknown()
+
     def text(self, args):
         return str(args[0])
 
     def number(self, args):
         return float(args[0])
+
+    # Tools
+
+    def get_item_held(self):
+        if len(self.player.holding) == 0:
+            raise game.NotHoldingAnything("you're not holding anything")
+        return self.player.holding[0]
 
 
 def create(world, player):

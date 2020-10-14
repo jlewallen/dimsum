@@ -9,6 +9,14 @@ class Action:
         raise Exception("unimplemented")
 
 
+class Unknown(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, world: World, player: Player):
+        return Failure("sorry, i don't understand")
+
+
 class Plant(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -277,8 +285,10 @@ class Forget(Action):
         self.name = kwargs["name"]
 
     async def perform(self, world: World, player: Player):
-        del player.memory[self.name]
-        return Success("oh wait, was that important?")
+        if self.name in player.memory:
+            del player.memory[self.name]
+            return Success("oh wait, was that important?")
+        return Failure("huh, seems i already have forgotten that!")
 
 
 class Remember(Action):

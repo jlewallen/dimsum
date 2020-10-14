@@ -81,6 +81,9 @@ async def test_run():
     logging.info(l.parse("kiss carla"))
     logging.info(l.parse("call this IPA"))
     logging.info(l.parse("forget ipa"))
+    logging.info(l.parse("plant"))
+    logging.info(l.parse("plant this"))
+    logging.info(l.parse("plant seeds"))
 
     async def execute(world, player, tree):
         action = create(world, player).transform(tree)
