@@ -223,7 +223,9 @@ class Person(entity.Entity):
     def load(self, world, properties):
         super().load(world, properties)
         self.holding = world.resolve(properties["holding"])
-        self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
+        self.memory = {}
+        if "memory" in properties:
+            self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
 
 class ObservedPerson:
