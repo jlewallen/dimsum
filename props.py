@@ -30,10 +30,7 @@ def merge_dictionaries(left, right, fields):
 
 class PropertyMap:
     def __init__(self, **kwargs):
-        if "map" in kwargs:
-            self.__dict__ = kwargs["map"]
-        else:
-            self.__dict__ = kwargs
+        self.__dict__ = kwargs
 
     @property
     def map(self):
