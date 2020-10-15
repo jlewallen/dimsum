@@ -47,7 +47,8 @@ class Entity:
 
     def load(self, world, properties):
         self.key = properties["key"]
-        self.details = props.Details.from_map(properties["details"])
+        if "details" in properties:
+            self.details = props.Details.from_map(properties["details"])
         if "behavior" in properties:
             self.behaviors = behavior.BehaviorMap(**properties["behavior"])
 
