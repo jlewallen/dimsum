@@ -1,5 +1,6 @@
 import uuid
 import props
+import behavior
 
 
 class EntityVisitor:
@@ -26,6 +27,13 @@ class Entity:
         self.details = (
             kwargs["details"] if "details" in kwargs else props.Details("Unknown")
         )
+        self.behaviors = behavior.BehaviorMap()
+
+    def get_behaviors(self, name):
+        return self.behaviors.get_all(name)
+
+    def add_behavior(self, name, **kwargs):
+        return self.behaviors.add(name, **kwargs)
 
     def describes(self, q: str):
         return False

@@ -13,8 +13,19 @@ class Scope:
     def map(self):
         return self.__dict__
 
+    def keys(self):
+        return self.map.keys()
+
+    def values(self):
+        return self.map.values()
+
     def items(self):
         return self.map.items()
+
+    def extend(self, **kwargs):
+        copy = self.__dict__.copy()
+        copy.update(**kwargs)
+        return Scope(**copy)
 
 
 class Changes:
@@ -28,15 +39,15 @@ class Changes:
         return str(self.messages)
 
 
-ThunkWorldPersonScope = """
+GenericThunk = """
 function(scope, g)
-   return g(scope, scope.world, scope.person)
+    return g(scope, scope.world, scope.person)
 end
 """
 
 
 class ScriptEngine:
-    def execute(self, thunk, scope, main):
+    def execute(self, thunk: str, scope: Scope, main: str):
         lua = lupa.LuaRuntime(unpack_returned_tuples=True)
         g = lua.globals()
         for key, value in scope.items():
@@ -51,44 +62,16 @@ class ScriptEngine:
 # The <key> allows multiple customizations, and will be run in order sorted by key.
 class BehaviorMap(props.PropertyMap):
     def get_all(self, behavior: str):
-        for key in self.keys_matching("b:(.+):%s" % (behavior,)):
-            print(key)
+        pattern = "b:(.+):%s" % (behavior,)
+        return [self.map[key] for key in self.keys_matching(pattern)]
+
+    def add(self, name, **kwargs):
+        self.map[name] = Behavior(**kwargs)
 
 
 class Behavior:
-    def __init__(self, world, person):
-        self.world = world
-        self.person = person
-
-    def execute(self, hook):
-        lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-        g = lua.globals()
-        g.world = self.world
-        g.player = self.jacob
-        g.item = None
-
-
-class Hook:
     def __init__(self, **kwargs):
-        self.item = kwargs["item"] if "item" in kwargs else None
-
-    def prepare(self):
-        pass
-
-    def execute(self):
-        pass
-
-
-class CreatedHook(Hook):
-    pass
-
-
-class HeldHook(Hook):
-    pass
-
-
-class DropHook(Hook):
-    pass
+        self.lua = kwargs["lua"] if "lua" in kwargs else None
 
 
 async def tests():

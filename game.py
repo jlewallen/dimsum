@@ -435,6 +435,7 @@ class Area(entity.Entity):
 
 class World(entity.Entity):
     def __init__(self, bus: EventBus):
+        super().__init__()
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
@@ -528,7 +529,59 @@ class World(entity.Entity):
         return None, None
 
     async def perform(self, player: Player, action):
-        return await action.perform(self, player)
+        area = self.find_player_area(player)
+        ctx = Ctx(world=self, person=player, area=area)
+        return await action.perform(ctx, self, player)
+
+
+class Ctx:
+    def __init__(self, **kwargs):
+        self.se = behavior.ScriptEngine()
+        self.scope = behavior.Scope(**kwargs)
+
+    def extend(self, **kwargs):
+        self.scope = self.scope.extend(**kwargs)
+        return self
+
+    def entities(self):
+        def flatten(l):
+            return [item for sl in l for item in sl]
+
+        def get_entities_inside(array):
+            return flatten([get_entities(e) for e in array])
+
+        def get_entities(thing):
+            if isinstance(thing, entity.Entity):
+                return [thing]
+            if isinstance(thing, list):
+                return get_entities_inside(thing)
+            return []
+
+        return get_entities_inside(self.scope.values())
+
+    async def hook(self, name, **kwargs):
+        found = []
+        for entity in self.entities():
+            behaviors = entity.get_behaviors(name)
+            if len(behaviors) > 0:
+                logging.info(
+                    "entity:behaviors invoke '%s' %d behavior"
+                    % (entity, len(behaviors))
+                )
+            found.extend(behaviors)
+
+        scope = self.scope.extend(**kwargs)
+
+        for b in found:
+            self.se.execute(behavior.GenericThunk, scope, b.lua)
+
+
+class Action:
+    def __init__(self, **kwargs):
+        pass
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        raise Exception("unimplemented")
 
 
 class PlayerJoined(Event):

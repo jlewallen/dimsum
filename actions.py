@@ -6,19 +6,11 @@ from game import *
 from props import *
 
 
-class Action:
-    def __init__(self, **kwargs):
-        pass
-
-    async def perform(self, world: World, player: Player):
-        raise Exception("unimplemented")
-
-
 class Unknown(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         return Failure("sorry, i don't understand")
 
 
@@ -27,7 +19,7 @@ class Auth(Action):
         super().__init__(**kwargs)
         self.password = kwargs["password"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if "s:password" in player.details.map:
             saltEncoded, keyEncoded = player.details.map["s:password"]
             salt = base64.b64decode(saltEncoded)
@@ -50,7 +42,7 @@ class Plant(Action):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         pass
 
 
@@ -58,8 +50,8 @@ class Home(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
-        return await Go(area=world.welcome_area()).perform(world, player)
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
 
 class Make(Action):
@@ -67,7 +59,7 @@ class Make(Action):
         super().__init__(**kwargs)
         self.item = item
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("todo: fix")
         area = world.find_player_area(player)
@@ -82,7 +74,7 @@ class Hug(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you hugged %s" % (self.who))
         return Failure("who?")
@@ -93,7 +85,7 @@ class Heal(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you healed %s" % (self.who))
         return Failure("who?")
@@ -104,7 +96,7 @@ class Kick(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you kicked %s" % (self.who))
         return Failure("who?")
@@ -115,7 +107,7 @@ class Kiss(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you kissed %s" % (self.who))
         return Failure("who?")
@@ -126,7 +118,7 @@ class Tickle(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you tickled %s" % (self.who))
         return Failure("who?")
@@ -137,7 +129,7 @@ class Poke(Action):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you poked %s" % (self.who))
         return Failure("who?")
@@ -148,7 +140,7 @@ class Eat(Action):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item.details.when_eaten():
             return Failure("you can't eat that")
 
@@ -165,7 +157,7 @@ class Drink(Action):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("dunno where that is")
         if not self.item.details.when_drank():
@@ -183,11 +175,12 @@ class Drop(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         dropped = await area.drop(world.bus, player)
         if len(dropped) == 0:
             return Failure("nothing to drop")
+        await ctx.extend(dropped=dropped).hook("drop:after")
         return Success("you dropped %s" % (p.join(dropped),))
 
 
@@ -195,7 +188,7 @@ class Join(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         world.register(player)
         await world.bus.publish(PlayerJoined(player))
         await world.welcome_area().entered(world.bus, player)
@@ -206,7 +199,7 @@ class Myself(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         return PersonalObservation(player.observe())
 
 
@@ -215,7 +208,7 @@ class Look(Action):
         super().__init__(**kwargs)
         self.item = kwargs["item"] if "item" in kwargs else None
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
             return DetailedObservation(player.observe(), self.item)
         return world.look(player)
@@ -226,7 +219,7 @@ class Hold(Action):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("sorry, hold what?")
 
@@ -251,7 +244,7 @@ class Go(Action):
         self.area = kwargs["area"] if "area" in kwargs else None
         self.item = kwargs["item"] if "item" in kwargs else None
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
 
         destination = self.area
@@ -269,14 +262,12 @@ class Go(Action):
         await area.left(world.bus, player)
         await destination.entered(world.bus, player)
 
-        return await Look().perform(world, player)
-
 
 class Obliterate(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         items = player.drop_all()
         if len(items) == 0:
@@ -295,7 +286,7 @@ class CallThis(Action):
         self.item = kwargs["item"]
         self.name = kwargs["name"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("you don't have anything")
 
@@ -323,7 +314,7 @@ class Forget(Action):
         super().__init__(**kwargs)
         self.name = kwargs["name"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.name in player.memory:
             del player.memory[self.name]
             return Success("oh wait, was that important?")
@@ -334,7 +325,7 @@ class Remember(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         player.memory[MemoryAreaKey] = area
         return Success("you'll be able to remember this place, oh yeah")
@@ -347,7 +338,7 @@ class ModifyField(Action):
         self.field = kwargs["field"]
         self.value = kwargs["value"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         self.item.details.set(self.field, self.value)
         return Success("done")
 
@@ -359,7 +350,7 @@ class ModifyActivity(Action):
         self.activity = kwargs["activity"]
         self.value = kwargs["value"]
 
-    async def perform(self, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("nothing to modify")
         self.item.details.set(self.activity, self.value)

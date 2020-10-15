@@ -14,6 +14,16 @@ from actions import *
 from lark import Tree, Transformer
 
 
+l = create_parser()
+
+
+async def execute(world, player, tree):
+    action = create(world, player).transform(tree)
+    if action:
+        return await world.perform(player, action)
+    return None
+
+
 async def test_run():
     bus = EventBus()
     world = World(bus)
@@ -87,12 +97,6 @@ async def test_run():
     logging.info(l.parse("plant this"))
     logging.info(l.parse("plant seeds"))
 
-    async def execute(world, player, tree):
-        action = create(world, player).transform(tree)
-        if action:
-            return await world.perform(player, action)
-        return None
-
     logging.info(await execute(world, jacob, l.parse("make My Beer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
     logging.info(await execute(world, jacob, l.parse("hold beer")))
@@ -116,26 +120,6 @@ async def test_run():
     logging.info(world.look(jacob))
 
 
-async def test_lua():
-    lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-    logging.info(lua.eval("1+1"))
-
-    func = lua.eval("function(f, n) return f(n) end")
-    logging.info(lupa.lua_type(func))
-
-    bus = EventBus()
-    world = World(bus)
-    jacob = Player(owner=world, details=Details("Jacob", desc="Curly haired bastard."))
-
-    lua.globals().world = world
-    lua.globals().player = jacob
-
-    logging.info(lua.eval("player"))
-    logging.info(lua.eval("world"))
-
-    b = Behavior(world, jacob)
-
-
 async def test_behavior():
     bus = game.EventBus()
     world = game.World(bus)
@@ -149,11 +133,25 @@ async def test_behavior():
     await world.perform(jacob, actions.Join())
     await world.perform(carla, actions.Join())
 
+    hammer.add_behavior(
+        "b:test:drop:after",
+        lua="""
+function(s, world, player)
+    return nil
+end
+""",
+    )
+
+    logging.info(await execute(world, jacob, l.parse("hold hammer")))
+    logging.info(await execute(world, jacob, l.parse("drop")))
+
+    if True:
+        return
     bmap = BehaviorMap()
     bmap.map["b:jacob:drop"] = "ok"
     print(bmap.get_all("drop"))
 
-    thunk = behavior.ThunkWorldPersonScope
+    thunk = behavior.GenericThunk
     source = """
 function(s, world, player)
     s.changes.msg("Hello, world!")
@@ -174,7 +172,5 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logging.info("testing:basic")
     asyncio.run(test_run())
-    logging.info("testing:lua")
-    asyncio.run(test_lua())
     logging.info("testing:behavior")
     asyncio.run(test_behavior())
