@@ -3,7 +3,7 @@
         <div v-if="entity.area">
             <h3>This leads to:</h3>
             <WithEntity :entityKey="entity.area.key" v-slot="withEntity">
-                <SmallEntityPanel :entity="withEntity.entity" @selected="raiseSelected" />
+                <EntityPanel :entity="withEntity.entity" @selected="raiseSelected" />
             </WithEntity>
         </div>
     </div>
@@ -13,13 +13,13 @@
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
 import WithEntity from "./WithEntity.vue";
-import SmallEntityPanel from "./SmallEntityPanel.vue";
+import EntityPanel from "./EntityPanel.vue";
 
 export default defineComponent({
     name: "ItemEditor",
     components: {
         WithEntity,
-        SmallEntityPanel,
+        EntityPanel,
     },
     props: {
         entity: {

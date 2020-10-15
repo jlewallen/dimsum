@@ -1,13 +1,13 @@
 <template>
     <div class="person-editor">
-        <div v-if="Object.keys(entity.memory || {}).length > 0">
-            <h3>Memory:</h3>
-            <KeyedEntities :entityRefs="entity.memory" @selected="entitySelected" />
-        </div>
-
         <div v-if="entity.holding?.length > 0">
             <h4>Holding:</h4>
             <Entities :entityRefs="entity.holding" @selected="entitySelected" />
+        </div>
+
+        <div v-if="Object.keys(entity.memory || {}).length > 0">
+            <h3>Memory:</h3>
+            <KeyedEntities :entityRefs="entity.memory" @selected="entitySelected" />
         </div>
     </div>
 </template>

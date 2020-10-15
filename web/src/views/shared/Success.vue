@@ -1,5 +1,7 @@
 <template>
-    <div class="response success">{{ response.reply.success }}</div>
+    <div class="alert alert-dismissible alert-success">
+        <div class="response success">{{ response.reply.success }}</div>
+    </div>
 </template>
 
 <script lang="ts">

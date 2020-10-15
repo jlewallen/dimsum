@@ -2,7 +2,7 @@
     <div class="explore container-fluid">
         <Repl @response="onResponse" />
 
-        <div v-for="response in responses" v-bind:key="response.key">
+        <div v-for="response in responses" v-bind:key="response.key" class="response">
             <component v-bind:is="viewFor(response)" :response="response" />
         </div>
     </div>
@@ -39,4 +39,8 @@ export default defineComponent({
     },
 });
 </script>
-<style scoped></style>
+<style scoped>
+.response {
+    margin-bottom: 1em;
+}
+</style>

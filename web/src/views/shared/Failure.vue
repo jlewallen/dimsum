@@ -1,5 +1,7 @@
 <template>
-    <div class="response failure">{{ response.reply.failure }}</div>
+    <div class="alert alert-dismissible alert-danger">
+        <div class="response failure">{{ response.reply.failure }}</div>
+    </div>
 </template>
 
 <script lang="ts">

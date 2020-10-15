@@ -19,7 +19,7 @@ import { defineComponent } from "vue";
 import { EntityRef, Entity } from "@/http";
 
 export default defineComponent({
-    name: "SmallEntityPanel",
+    name: "EntityPanel",
     props: {
         entity: {
             type: Object,

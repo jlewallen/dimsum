@@ -56,6 +56,10 @@
    In order to create scarcity and value for items, maybe locking them
    so they can't be cloned or modified.
 
+** TODO Allow some items to only be held/interacted with after being seen.
+
+   We can use a property for this.
+
 ** TODO Optimize persistence: delete and only update modified.
 
    Remember which entities are modified in which Actions, only save those.

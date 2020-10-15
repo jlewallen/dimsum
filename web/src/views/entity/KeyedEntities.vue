@@ -14,12 +14,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { EntityRef, Entity } from "@/http";
-import SmallEntityPanel from "./SmallEntityPanel.vue";
+import EntityPanel from "./EntityPanel.vue";
 import WithEntity from "./WithEntity.vue";
 
 export default defineComponent({
     name: "KeyedEntities",
-    components: { WithEntity, SmallEntityPanel },
+    components: { WithEntity, EntityPanel },
     props: {
         entityRefs: {
             type: Object as () => { [index: string]: EntityRef },
@@ -27,7 +27,7 @@ export default defineComponent({
         },
         panel: {
             type: Object,
-            default: SmallEntityPanel,
+            default: EntityPanel,
         },
     },
     methods: {

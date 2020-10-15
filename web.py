@@ -262,7 +262,6 @@ def create(state):
         player = world.find(person_key)
         action = parse_as(evaluator.create(world, player), command)
         reply = await world.perform(player, action)
-
         await state.save()
 
         makeWeb = WebModelVisitor()
