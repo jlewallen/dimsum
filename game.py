@@ -563,7 +563,9 @@ class Ctx:
 
     async def hook(self, name, **kwargs):
         found = []
-        for entity in self.entities():
+        entities = self.entities()
+        logging.info("hook:%s %s" % (name, entities))
+        for entity in entities:
             behaviors = entity.get_behaviors(name)
             if len(behaviors) > 0:
                 logging.info(
