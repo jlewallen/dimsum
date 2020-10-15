@@ -273,6 +273,8 @@ class Go(Action):
         await area.left(world.bus, player)
         await destination.entered(world.bus, player)
 
+        return world.look(player)
+
 
 class Obliterate(Action):
     def __init__(self, **kwargs):

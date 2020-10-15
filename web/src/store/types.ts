@@ -1,4 +1,4 @@
-import { Entity, Area, Person, UpdateEntityDetailsPayload, UpdateEntityBehaviorPayload } from "@/http";
+import { Entity, Area, Person, UpdateEntityDetailsPayload, UpdateEntityBehaviorPayload, ReplResponse } from "@/http";
 export * from "@/http";
 
 export class RootState {
@@ -7,6 +7,7 @@ export class RootState {
     entities: { [index: string]: Entity } = {};
     areas: { [index: string]: Area } = {};
     people: { [index: string]: Person } = {};
+    responses: ReplResponse[] = [];
 }
 
 export enum ActionTypes {

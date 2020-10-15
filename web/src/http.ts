@@ -12,7 +12,9 @@ export interface ReplPayload {
 }
 
 export interface ReplResponse {
-    reply: any;
+    reply: {
+        kind: string;
+    };
 }
 
 export type PropertyMap = { [index: string]: any };

@@ -1,26 +1,40 @@
 <template>
     <div class="explore container-fluid">
-        <Repl @response="response" />
+        <Repl @response="onResponse" />
+
+        <div v-for="response in responses" v-bind:key="response.key">
+            <component v-bind:is="viewFor(response)" :response="response" />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Repl from "../shared/Repl.vue";
-import { ReplResponse } from "@/store";
+import Replies from "../shared/replies";
+import store, { ReplResponse } from "@/store";
 
 export default defineComponent({
     name: "ExploreView",
     components: {
+        ...Replies,
         Repl,
     },
     props: {},
-    data(): { command: string } {
-        return { command: "" };
+    computed: {
+        responses(): ReplResponse[] {
+            return store.state.responses;
+        },
+    },
+    data(): { command: string; response: ReplResponse | null } {
+        return { command: "", response: null };
     },
     methods: {
-        response(response: ReplResponse): void {
-            console.log(response);
+        onResponse(response: ReplResponse): void {
+            this.response = response;
+        },
+        viewFor(response: ReplResponse): string | null {
+            return response?.reply.kind || null;
         },
     },
 });

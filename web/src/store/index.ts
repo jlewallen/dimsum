@@ -78,8 +78,9 @@ export default createStore<RootState>({
             commit(MutationTypes.AUTH, null);
         },
         [ActionTypes.REPL]: ({ state, commit }: ActionParameters, payload: ReplAction) => {
-            return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((data) => {
-                return data;
+            return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((response) => {
+                state.responses.unshift(response);
+                return response;
             });
         },
         [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
