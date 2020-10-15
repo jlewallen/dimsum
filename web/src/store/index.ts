@@ -12,7 +12,8 @@ import {
     Entity,
     RefreshEntityAction,
     NeedEntityAction,
-    SaveEntityAction,
+    SaveEntityDetailsAction,
+    SaveEntityBehaviorAction,
     LoginAction,
     Auth,
     AuthenticatedAction,
@@ -98,9 +99,20 @@ export default createStore<RootState>({
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
-        [ActionTypes.SAVE_ENTITY]: ({ state, commit }: ActionParameters, payload: SaveEntityAction) => {
+        [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
             return http<EntityResponse>({
-                url: `/entities/${payload.form.key}`,
+                url: `/entities/${payload.form.key}/details`,
+                method: "POST",
+                data: payload.form,
+                headers: state.headers,
+            }).then((data) => {
+                commit(MutationTypes.ENTITY, data.entity);
+                return data;
+            });
+        },
+        [ActionTypes.SAVE_ENTITY_BEHAVIOR]: ({ state, commit }: ActionParameters, payload: SaveEntityBehaviorAction) => {
+            return http<EntityResponse>({
+                url: `/entities/${payload.key}/behavior`,
                 method: "POST",
                 data: payload.form,
                 headers: state.headers,

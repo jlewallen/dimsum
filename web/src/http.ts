@@ -7,6 +7,8 @@ export interface OurRequestInfo {
     headers?: { [index: string]: string };
 }
 
+export type PropertyMap = { [index: string]: any };
+
 export interface UpdateEntityPayload {
     key: string;
     name: string;
@@ -49,6 +51,12 @@ export interface EntityRef {
     name: string;
 }
 
+export interface Behavior {
+    lua: string;
+}
+
+export type Behaviors = { [index: string]: Behavior };
+
 export interface Entity {
     key: string;
     kind: string;
@@ -59,6 +67,7 @@ export interface Entity {
     entities?: Entity[];
     area?: EntityRef;
     memory?: EntityRef | null;
+    behaviors: Behaviors;
 }
 
 export interface Person extends Entity {

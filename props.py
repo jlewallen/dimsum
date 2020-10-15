@@ -47,10 +47,13 @@ class PropertyMap:
         return [k for k in self.__dict__.keys() if re.match(pattern, k)]
 
     def set(self, key, value):
-        self.map[key] = value
+        self.__dict__[key] = value
 
     def update(self, changes):
-        self.map.update(changes)
+        self.__dict__.update(changes)
+
+    def replace(self, replacing):
+        self.__dict__ = replacing
 
     def clone(self):
         return PropertyMap(self.map)

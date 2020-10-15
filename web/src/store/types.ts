@@ -1,4 +1,4 @@
-import { Entity, Area, Person, UpdateEntityPayload } from "@/http";
+import { Entity, Area, Person, PropertyMap, UpdateEntityPayload } from "@/http";
 export * from "@/http";
 
 export class RootState {
@@ -16,7 +16,8 @@ export enum ActionTypes {
     LOADING = "LOADING",
     REFRESH_ENTITY = "REFRESH_ENTITY",
     NEED_ENTITY = "NEED_ENTITY",
-    SAVE_ENTITY = "SAVE_ENTITY",
+    SAVE_ENTITY_DETAILS = "SAVE_ENTITY_DETAILS",
+    SAVE_ENTITY_BEHAVIOR = "SAVE_ENTITY_BEHAVIOR",
 }
 
 export enum MutationTypes {
@@ -43,10 +44,16 @@ export class NeedEntityAction {
     constructor(public readonly key: string) {}
 }
 
-export class SaveEntityAction {
-    type = ActionTypes.SAVE_ENTITY;
+export class SaveEntityDetailsAction {
+    type = ActionTypes.SAVE_ENTITY_DETAILS;
 
     constructor(public readonly form: UpdateEntityPayload) {}
+}
+
+export class SaveEntityBehaviorAction {
+    type = ActionTypes.SAVE_ENTITY_BEHAVIOR;
+
+    constructor(public readonly key: string, public readonly form: PropertyMap) {}
 }
 
 export class LoginAction {

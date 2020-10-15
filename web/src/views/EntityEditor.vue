@@ -2,6 +2,7 @@
     <div class="entity-editor" v-if="entity">
         <h3>{{ entity.kind }}: {{ entity.details.name }}</h3>
         <GeneralEntityForm :entity="entity" />
+        <BehaviorEditor :entity="entity" />
         <component v-bind:is="kindSpecific" :entity="entity" />
     </div>
 </template>
@@ -12,6 +13,7 @@ import GeneralEntityForm from "./GeneralEntityForm.vue";
 import AreaEditor from "./AreaEditor.vue";
 import ItemEditor from "./ItemEditor.vue";
 import PersonEditor from "./PersonEditor.vue";
+import BehaviorEditor from "./BehaviorEditor.vue";
 import { Entity } from "@/http";
 
 export default defineComponent({
@@ -22,6 +24,7 @@ export default defineComponent({
         ItemEditor,
         PersonEditor,
         PlayerEditor: PersonEditor,
+        BehaviorEditor,
     },
     props: {
         entity: {

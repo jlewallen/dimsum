@@ -141,8 +141,8 @@ def create(state):
 
         return {"entity": None}
 
-    @app.route("/api/entities/<string:key>", methods=["POST"])
-    async def update_entity(key: str):
+    @app.route("/api/entities/<string:key>/details", methods=["POST"])
+    async def update_entity_details(key: str):
         world = authenticate()
         if world is None:
             return {"loading": True}
@@ -164,6 +164,28 @@ def create(state):
             entity = world.find(key)
             entity.details.update(form)
             entity.owner = owner
+
+            await state.save()
+
+            makeWeb = WebModelVisitor()
+            return {"entity": entity.accept(makeWeb)}
+
+        return {"entity": None}
+
+    @app.route("/api/entities/<string:key>/behavior", methods=["POST"])
+    async def update_entity_behavior(key: str):
+        world = authenticate()
+        if world is None:
+            return {"loading": True}
+
+        logging.info("key: %s" % (key,))
+
+        if world.contains(key):
+            form = await quart.request.get_json()
+            logging.info("form: %s" % (form,))
+
+            entity = world.find(key)
+            entity.behaviors.replace(form)
 
             await state.save()
 

@@ -60,6 +60,10 @@
 
    Remember which entities are modified in which Actions, only save those.
 
+** TODO Behavior Name Picker
+
+   Present good options for b:key:verb:when
+
 ** DONE Allow naming of common things that get made.
 ** DONE Modify credentials in game.
 ** DONE Toggle eating and drinking of things.
