@@ -8,14 +8,8 @@ export interface OurRequestInfo {
 }
 
 export type PropertyMap = { [index: string]: any };
-
-export interface UpdateEntityPayload {
-    key: string;
-    name: string;
-    desc: string;
-    presence: string;
-    owner: string;
-}
+export type UpdateEntityDetailsPayload = PropertyMap;
+export type UpdateEntityBehaviorPayload = PropertyMap;
 
 export async function http<T>(info: OurRequestInfo): Promise<T> {
     let body: string | null = null;

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
-import Login from "../views/Login.vue";
-import Logout from "../views/Logout.vue";
-import Entity from "../views/Entity.vue";
+import Login from "../views/auth/Login.vue";
+import Logout from "../views/auth/Logout.vue";
+import GeneralView from "../views/entity/GeneralView.vue";
+import BehaviorView from "../views/entity/BehaviorView.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -22,16 +23,14 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/entities/:key",
-        name: "Entity",
-        component: Entity,
+        name: "entity-general",
+        component: GeneralView,
     },
-    // {
-    // path: "/about",
-    // name: "About",
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    // component: () => import(/* webpackChunkName: "about" */ "../views/About.vue"),
-    // },
+    {
+        path: "/entities/:key/behavior",
+        name: "entity-behavior",
+        component: BehaviorView,
+    },
 ];
 
 const router = createRouter({

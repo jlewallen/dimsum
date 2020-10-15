@@ -1,5 +1,5 @@
 <template>
-    <div class="behavior-editor container-fluid">
+    <div class="behavior-editor">
         <div class="row">
             <div class="col">
                 <h4>Behaviors</h4>
@@ -39,7 +39,7 @@ import { defineComponent } from "vue";
 import { Entity } from "@/http";
 import store, { SaveEntityBehaviorAction } from "@/store";
 
-import CodeEditor from "./CodeEditor.vue";
+import CodeEditor from "../shared/CodeEditor.vue";
 
 export class Behavior {
     constructor(public key: string, public lua: string) {}
@@ -92,9 +92,6 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.behavior-editor {
-    margin-top: 1em;
-}
 .behavior {
     width: 40em;
     margin-right: 1em;

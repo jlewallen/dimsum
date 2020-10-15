@@ -1,52 +1,64 @@
 <template>
-    <div class="general-editor col-md-6">
-        <form class="" @submit.prevent="saveForm">
-            <div class="form-group" v-for="field in fields" v-bind:key="field.name">
-                <div class="">
-                    <label>{{ field.name }}</label>
-                </div>
-                <div class="">
-                    <div v-if="!field.readOnly">
-                        <select class="form-control" v-model="form[field.name]" v-if="field.bool">
-                            <option :value="true">yes</option>
-                            <option :value="false">no</option>
-                        </select>
-                        <input class="form-control" type="text" v-model="form[field.name]" v-else />
-                    </div>
-                    <div v-else>
-                        {{ form[field.name] }}
-                    </div>
-                </div>
+    <div class="general-editor">
+        <div class="row">
+            <div class="col">
+                <h4>General</h4>
             </div>
-            <div class="form-group">
-                <div class="">
-                    <label>owner</label>
-                </div>
-                <div class="">
-                    <select class="form-control" v-model="form.owner">
-                        <option disabled value="">Please select one</option>
-                        <option v-for="person in people" v-bind:key="person.key" :value="person.key">{{ person.details.name }}</option>
-                        <option value="world">World</option>
-                    </select>
-                </div>
-            </div>
-            <div class="">
-                <!--
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <form class="" @submit.prevent="saveForm">
+                    <div class="form-group" v-for="field in fields" v-bind:key="field.name">
+                        <div class="">
+                            <label>{{ field.name }}</label>
+                        </div>
+                        <div class="">
+                            <div v-if="!field.readOnly">
+                                <select class="form-control" v-model="form[field.name]" v-if="field.bool">
+                                    <option :value="true">yes</option>
+                                    <option :value="false">no</option>
+                                </select>
+                                <input class="form-control" type="text" v-model="form[field.name]" v-else />
+                            </div>
+                            <div v-else>
+                                {{ form[field.name] }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="">
+                            <label>owner</label>
+                        </div>
+                        <div class="">
+                            <select class="form-control" v-model="form.owner">
+                                <option disabled value="">Please select one</option>
+                                <option v-for="person in people" v-bind:key="person.key" :value="person.key">
+                                    {{ person.details.name }}
+                                </option>
+                                <option value="world">World</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="">
+                        <!--
 				<label>Field Name</label>
 				<input type="text" v-model="field.name" />
 				<input type="button" class="button" value="Add Yes/No" v-on:click="addBoolField" />
 				<input type="button" class="button" value="Add Field" v-on:click="addDumbField" />
 				-->
-                <input type="submit" value="Save" class="btn btn-primary" />
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Person, Entity, UpdateEntityPayload } from "@/http";
+import { Person, Entity, PropertyMap } from "@/http";
 import store, { SaveEntityDetailsAction } from "@/store";
 
 export interface Field {
@@ -65,7 +77,7 @@ export default defineComponent({
             required: true,
         },
     },
-    data(): { fields: Field[]; field: { name: string }; form: any } {
+    data(): { fields: Field[]; field: { name: string }; form: PropertyMap } {
         const readOnly = ["created", "touched"];
         const fields = _.map(this.entity.details, (value, key) => {
             return {
@@ -117,4 +129,5 @@ export default defineComponent({
     },
 });
 </script>
-<style></style>
+
+<style scoped></style>

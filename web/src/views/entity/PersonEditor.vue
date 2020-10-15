@@ -1,5 +1,5 @@
 <template>
-    <div class="person-editor container-fluid">
+    <div class="person-editor">
         <div v-if="Object.keys(entity.memory || {}).length > 0">
             <h3>Memory:</h3>
             <KeyedEntities :entityRefs="entity.memory" @selected="entitySelected" />

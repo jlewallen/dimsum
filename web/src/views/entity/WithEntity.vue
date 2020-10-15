@@ -35,7 +35,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.entity {
-}
-</style>
+<style scoped></style>

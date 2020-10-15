@@ -1,4 +1,4 @@
-import { Entity, Area, Person, PropertyMap, UpdateEntityPayload } from "@/http";
+import { Entity, Area, Person, UpdateEntityDetailsPayload, UpdateEntityBehaviorPayload } from "@/http";
 export * from "@/http";
 
 export class RootState {
@@ -47,13 +47,13 @@ export class NeedEntityAction {
 export class SaveEntityDetailsAction {
     type = ActionTypes.SAVE_ENTITY_DETAILS;
 
-    constructor(public readonly form: UpdateEntityPayload) {}
+    constructor(public readonly form: UpdateEntityDetailsPayload) {}
 }
 
 export class SaveEntityBehaviorAction {
     type = ActionTypes.SAVE_ENTITY_BEHAVIOR;
 
-    constructor(public readonly key: string, public readonly form: PropertyMap) {}
+    constructor(public readonly key: string, public readonly form: UpdateEntityBehaviorPayload) {}
 }
 
 export class LoginAction {

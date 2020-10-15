@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Entities from "./Entities.vue";
+import Entities from "./entity/Entities.vue";
 import { Entity, Area } from "@/http";
 import store from "@/store";
 

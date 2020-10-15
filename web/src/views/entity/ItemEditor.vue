@@ -1,5 +1,5 @@
 <template>
-    <div class="item-editor container-fluid">
+    <div class="item-editor">
         <div v-if="entity.area">
             <h3>This leads to:</h3>
             <WithEntity :entityKey="entity.area.key" v-slot="withEntity">

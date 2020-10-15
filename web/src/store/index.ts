@@ -64,7 +64,7 @@ export default createStore<RootState>({
     },
     actions: {
         [ActionTypes.LOGIN]: ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
-            return http<any>({ url: "/login", method: "POST", data: payload }).then((data: Auth) => {
+            return http<Auth>({ url: "/login", method: "POST", data: payload }).then((data: Auth) => {
                 commit(MutationTypes.AUTH, data);
                 return Promise.all([dispatch(new AuthenticatedAction(data)), dispatch(ActionTypes.LOADING)]);
             });
