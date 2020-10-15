@@ -5,7 +5,10 @@ import quart_cors
 import jwt
 import base64
 import hashlib
+
 import game
+import grammar
+import evaluator
 
 
 class WebModelVisitor:
@@ -18,6 +21,46 @@ class WebModelVisitor:
             "url": self.entityUrl(entity),
             "kind": entity.__class__.__name__,
             "name": entity.details.name,
+        }
+
+    def failure(self, reply):
+        return {"kind": reply.__class__.__name__, "failure": reply.message}
+
+    def success(self, reply):
+        return {"kind": reply.__class__.__name__, "success": reply.message}
+
+    def observed_person(self, observed):
+        return observed.person.accept(self)
+
+    def observed_item(self, observed):
+        return observed.item.accept(self)
+
+    def personal_observation(self, obs):
+        return {
+            "kind": obs.__class__.__name__,
+            "personal": {
+                "who": obs.who.accept(self),
+            },
+        }
+
+    def detailed_observation(self, obs):
+        return {
+            "kind": obs.__class__.__name__,
+            "detailed": {
+                "who": obs.who.accept(self),
+                "what": obs.what.accept(self),
+            },
+        }
+
+    def area_observation(self, obs):
+        return {
+            "kind": obs.__class__.__name__,
+            "area": {
+                "who": obs.who.accept(self),
+                "where": obs.where.accept(self),
+                "people": [e.accept(self) for e in obs.people],
+                "items": [e.accept(self) for e in obs.items],
+            },
         }
 
     def behavior(self, b):
@@ -95,7 +138,7 @@ def create(state):
         header = quart.request.headers["authorization"]
         bearer, encoded = header.split(" ")
         decoded = jwt.decode(base64.b64decode(encoded), session_key, algorithms="HS256")
-        return state.world
+        return state.world, decoded
 
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
@@ -114,7 +157,7 @@ def create(state):
 
     @app.route("/api/areas")
     def areas_index():
-        world = authenticate()
+        world, token = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -124,7 +167,7 @@ def create(state):
 
     @app.route("/api/people")
     def people_index():
-        world = authenticate()
+        world, token = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -134,7 +177,7 @@ def create(state):
 
     @app.route("/api/entities/<string:key>")
     def get_entity(key: str):
-        world = authenticate()
+        world, token = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -149,7 +192,7 @@ def create(state):
 
     @app.route("/api/entities/<string:key>/details", methods=["POST"])
     async def update_entity_details(key: str):
-        world = authenticate()
+        world, token = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -180,7 +223,7 @@ def create(state):
 
     @app.route("/api/entities/<string:key>/behavior", methods=["POST"])
     async def update_entity_behavior(key: str):
-        world = authenticate()
+        world, token = authenticate()
         if world is None:
             return {"loading": True}
 
@@ -198,6 +241,32 @@ def create(state):
             return {"entity": entity.accept(makeWeb)}
 
         return {"entity": None}
+
+    @app.route("/api/repl", methods=["POST"])
+    async def repl():
+        world, token = authenticate()
+        if world is None:
+            return {"loading": True}
+
+        form = await quart.request.get_json()
+        command = form["command"]
+
+        l = grammar.create_parser()
+
+        def parse_as(evaluator, full):
+            tree = l.parse(full.strip())
+            logging.info(str(tree))
+            return evaluator.transform(tree)
+
+        person_key = token["key"]
+        player = world.find(person_key)
+        action = parse_as(evaluator.create(world, player), command)
+        reply = await world.perform(player, action)
+
+        await state.save()
+
+        makeWeb = WebModelVisitor()
+        return {"reply": reply.accept(makeWeb)}
 
     @app.route("/api/login", methods=["POST"])
     async def login():

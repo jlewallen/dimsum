@@ -4,19 +4,24 @@
 
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
+                <li class="nav-item" v-if="authenticated">
                     <span class="nav-link">
                         <router-link to="/">Home</router-link>
                     </span>
                 </li>
-                <li class="nav-item" v-if="!authenticated">
+                <li class="nav-item" v-if="authenticated">
                     <span class="nav-link">
-                        <router-link to="/login">Login</router-link>
+                        <router-link to="/explore">Explore</router-link>
                     </span>
                 </li>
                 <li class="nav-item" v-if="authenticated">
                     <span class="nav-link">
                         <router-link to="/logout">Logout</router-link>
+                    </span>
+                </li>
+                <li class="nav-item" v-if="!authenticated">
+                    <span class="nav-link">
+                        <router-link to="/login">Login</router-link>
                     </span>
                 </li>
             </ul>

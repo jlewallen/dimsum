@@ -17,6 +17,8 @@ import {
     LoginAction,
     Auth,
     AuthenticatedAction,
+    ReplResponse,
+    ReplAction,
 } from "./types";
 import { http } from "@/http";
 
@@ -69,11 +71,16 @@ export default createStore<RootState>({
                 return Promise.all([dispatch(new AuthenticatedAction(data)), dispatch(ActionTypes.LOADING)]);
             });
         },
-        [ActionTypes.AUTHENTICATED]: ({ commit }: ActionParameters, payload: AuthenticatedAction) => {
+        [ActionTypes.AUTHENTICATED]: ({ state }: ActionParameters, payload: AuthenticatedAction) => {
             return Promise.resolve();
         },
-        [ActionTypes.LOGOUT]: ({ dispatch, commit }: ActionParameters) => {
+        [ActionTypes.LOGOUT]: ({ commit }: ActionParameters) => {
             commit(MutationTypes.AUTH, null);
+        },
+        [ActionTypes.REPL]: ({ state, commit }: ActionParameters, payload: ReplAction) => {
+            return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((data) => {
+                return data;
+            });
         },
         [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
             return Promise.all([

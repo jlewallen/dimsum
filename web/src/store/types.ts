@@ -18,6 +18,7 @@ export enum ActionTypes {
     NEED_ENTITY = "NEED_ENTITY",
     SAVE_ENTITY_DETAILS = "SAVE_ENTITY_DETAILS",
     SAVE_ENTITY_BEHAVIOR = "SAVE_ENTITY_BEHAVIOR",
+    REPL = "REPL",
 }
 
 export enum MutationTypes {
@@ -30,6 +31,12 @@ export enum MutationTypes {
 
 export class LoadingAction {
     type = ActionTypes.LOADING;
+}
+
+export class ReplAction {
+    type = ActionTypes.REPL;
+
+    constructor(public readonly command: string) {}
 }
 
 export class RefreshEntityAction {

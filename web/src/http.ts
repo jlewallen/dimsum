@@ -7,6 +7,14 @@ export interface OurRequestInfo {
     headers?: { [index: string]: string };
 }
 
+export interface ReplPayload {
+    command: string;
+}
+
+export interface ReplResponse {
+    reply: any;
+}
+
 export type PropertyMap = { [index: string]: any };
 export type UpdateEntityDetailsPayload = PropertyMap;
 export type UpdateEntityBehaviorPayload = PropertyMap;

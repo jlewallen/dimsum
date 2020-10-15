@@ -98,6 +98,9 @@ class ObservedItem:
         self.item = item
         self.where = where
 
+    def accept(self, visitor):
+        return visitor.observed_item(self)
+
     def __str__(self):
         return str(self.item)
 
@@ -241,6 +244,9 @@ class ObservedPerson:
     def memory(self):
         return self.person.memory
 
+    def accept(self, visitor):
+        return visitor.observed_person(self)
+
     def __str__(self):
         if len(self.activities) == 0:
             return "%s" % (self.person,)
@@ -302,7 +308,7 @@ class PersonalObservation(Observation):
         return self.who.memory
 
     def accept(self, visitor):
-        return visitor.personal(self)
+        return visitor.personal_observation(self)
 
     def __str__(self):
         return "%s considers themselves %s" % (
@@ -325,7 +331,7 @@ class DetailedObservation(Observation):
         return self.details.map
 
     def accept(self, visitor):
-        return visitor.detailed(self)
+        return visitor.detailed_observation(self)
 
     def __str__(self):
         return "%s observes %s" % (
@@ -352,7 +358,7 @@ class AreaObservation(Observation):
         return self.where.details
 
     def accept(self, visitor):
-        return visitor.area(self)
+        return visitor.area_observation(self)
 
     def __str__(self):
         return "%s observes %s, also here %s and visible is %s" % (

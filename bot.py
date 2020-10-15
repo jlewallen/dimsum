@@ -30,7 +30,7 @@ class BotPlayer:
 
 
 class EmbedObservationVisitor:
-    def personal(self, obs):
+    def personal_observation(self, obs):
         emd = obs.details.desc
         emd += "\n"
 
@@ -46,7 +46,7 @@ class EmbedObservationVisitor:
 
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
-    def detailed(self, obs):
+    def detailed_observation(self, obs):
         emd = obs.details.desc
         emd += "\n"
         for key, value in obs.properties.items():
@@ -55,7 +55,7 @@ class EmbedObservationVisitor:
             emd += "\n" + key + "=" + value.lua
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
-    def area(self, obs):
+    def area_observation(self, obs):
         emd = obs.details.desc
         emd += "\n\n"
         if len(obs.people) > 0:
