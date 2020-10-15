@@ -51,6 +51,8 @@ class EmbedObservationVisitor:
         emd += "\n"
         for key, value in obs.properties.items():
             emd += "\n" + key + "=" + str(value)
+        for key, value in obs.what.behaviors.items():
+            emd += "\n" + key + "=" + value.lua
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
     def area(self, obs):

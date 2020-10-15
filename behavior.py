@@ -68,6 +68,13 @@ class BehaviorMap(props.PropertyMap):
     def add(self, name, **kwargs):
         self.map[name] = Behavior(**kwargs)
 
+    def items(self):
+        return self.map.items()
+
+    def replace(self, map):
+        typed = {key: Behavior(**value) for key, value in map.items()}
+        return super().replace(**typed)
+
 
 class Behavior:
     def __init__(self, **kwargs):

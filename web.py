@@ -20,6 +20,12 @@ class WebModelVisitor:
             "name": entity.details.name,
         }
 
+    def behavior(self, b):
+        return {"lua": b.lua}
+
+    def behaviors(self, bs):
+        return {key: self.behavior(value) for key, value in bs.items()}
+
     def recipe(self, recipe):
         return {
             "key": recipe.key,
@@ -27,7 +33,7 @@ class WebModelVisitor:
             "kind": recipe.__class__.__name__,
             "owner": self.ref(recipe.owner),
             "details": recipe.details.map,
-            "behaviors": recipe.behaviors.map,
+            "behaviors": self.behaviors(recipe.behaviors),
             "base": recipe.base,
             "required": {k: self.ref(e) for k, e in recipe.required.items()},
         }
@@ -40,7 +46,7 @@ class WebModelVisitor:
                 "kind": item.__class__.__name__,
                 "owner": self.ref(item.owner),
                 "details": item.details.map,
-                "behaviors": item.behaviors.map,
+                "behaviors": self.behaviors(item.behaviors),
                 "area": self.ref(item.area),
             }
 
@@ -50,7 +56,7 @@ class WebModelVisitor:
             "kind": item.__class__.__name__,
             "owner": self.ref(item.owner),
             "details": item.details.map,
-            "behaviors": item.behaviors.map,
+            "behaviors": self.behaviors(item.behaviors),
         }
 
     def area(self, area):
@@ -60,7 +66,7 @@ class WebModelVisitor:
             "kind": area.__class__.__name__,
             "owner": self.ref(area.owner),
             "details": area.details.map,
-            "behaviors": area.behaviors.map,
+            "behaviors": self.behaviors(area.behaviors),
             "entities": [self.ref(e) for e in area.entities()],
         }
 
@@ -71,7 +77,7 @@ class WebModelVisitor:
             "kind": person.__class__.__name__,
             "owner": self.ref(person.owner),
             "details": person.details.map,
-            "behaviors": person.behaviors.map,
+            "behaviors": self.behaviors(person.behaviors),
             "holding": [self.ref(e) for e in person.holding],
             "memory": {key: self.ref(value) for key, value in person.memory.items()},
         }
@@ -186,7 +192,6 @@ def create(state):
 
             entity = world.find(key)
             entity.behaviors.replace(form)
-
             await state.save()
 
             makeWeb = WebModelVisitor()

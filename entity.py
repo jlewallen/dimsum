@@ -42,15 +42,21 @@ class Entity:
         return {
             "key": self.key,
             "details": self.details.map,
-            "behaviors": self.behaviors.map,
+            # Unwraps the Behavior instances.
+            "behaviors": {k: v.__dict__ for k, v in self.behaviors.map.items()},
         }
 
     def load(self, world, properties):
         self.key = properties["key"]
         if "details" in properties:
             self.details = props.Details.from_map(properties["details"])
-        if "behavior" in properties:
-            self.behaviors = behavior.BehaviorMap(**properties["behavior"])
+        if "behaviors" in properties:
+            self.behaviors = behavior.BehaviorMap(
+                **{
+                    key: behavior.BehaviorMap(**value)
+                    for key, value in properties["behaviors"].items()
+                }
+            )
 
     def accept(self, visitor: EntityVisitor):
         raise Exception("unimplemented")

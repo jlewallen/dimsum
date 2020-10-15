@@ -49,7 +49,7 @@ class PropertyMap:
     def update(self, changes):
         self.__dict__.update(changes)
 
-    def replace(self, replacing):
+    def replace(self, **replacing):
         self.__dict__ = replacing
 
     def clone(self):
