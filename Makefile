@@ -5,10 +5,14 @@ default: checks
 checks: env
 	env/bin/mypy *.py --ignore-missing-imports
 
+clean:
+	rm -rf env
+	rm -rf web/node_modules
+
 run:
 	env/bin/python3 dimsum.py
 
-test:
+test: env
 	rm -f fieldkit.sqlite3
 	env/bin/python3 behavior.py
 	env/bin/python3 game.py
