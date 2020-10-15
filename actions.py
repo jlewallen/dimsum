@@ -76,10 +76,10 @@ class Hug(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you hugged %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(hug=self.who).hook("hug:after")
-        return Failure("who?")
+        return Success("you hugged %s" % (self.who))
 
 
 class Heal(Action):
@@ -88,10 +88,10 @@ class Heal(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you healed %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(heal=self.who).hook("heal:after")
-        return Failure("who?")
+        return Success("you healed %s" % (self.who))
 
 
 class Kick(Action):
@@ -100,10 +100,10 @@ class Kick(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you kicked %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(kick=self.who).hook("kick:after")
-        return Failure("who?")
+        return Success("you kicked %s" % (self.who))
 
 
 class Kiss(Action):
@@ -112,10 +112,10 @@ class Kiss(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you kissed %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(kiss=self.who).hook("kiss:after")
-        return Failure("who?")
+        return Success("you kissed %s" % (self.who))
 
 
 class Tickle(Action):
@@ -124,10 +124,10 @@ class Tickle(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you tickled %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(tickle=self.who).hook("tickle:after")
-        return Failure("who?")
+        return Success("you tickled %s" % (self.who))
 
 
 class Poke(Action):
@@ -136,10 +136,10 @@ class Poke(Action):
         self.who = kwargs["who"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.who:
-            return Success("you poked %s" % (self.who))
+        if not self.who:
+            return Failure("who?")
         await ctx.extend(poke=self.who).hook("poke:after")
-        return Failure("who?")
+        return Success("you poked %s" % (self.who))
 
 
 class Eat(Action):
