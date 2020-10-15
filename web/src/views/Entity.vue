@@ -1,6 +1,5 @@
 <template>
-    <div class="entity">
-        <div v-if="busy">Busy</div>
+    <div class="container-fluid entity">
         <div v-if="entity">
             <EntityEditor :entity="entity" v-bind:key="entity.key" />
         </div>
@@ -18,10 +17,8 @@ export default defineComponent({
     components: {
         EntityEditor,
     },
-    data(): { busy: boolean } {
-        return {
-            busy: false,
-        };
+    data(): {} {
+        return {};
     },
     computed: {
         key(): string | null {
@@ -46,10 +43,7 @@ export default defineComponent({
                 console.log("no key", this.$route);
                 return Promise.resolve();
             }
-            this.busy = true;
-            return store.dispatch(new RefreshEntityAction(this.key)).finally(() => {
-                this.busy = false;
-            });
+            return store.dispatch(new RefreshEntityAction(this.key));
         },
     },
 });

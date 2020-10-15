@@ -1,25 +1,31 @@
 <template>
-    <div class="behavior-editor">
-        <h4>Behaviors</h4>
+    <div class="behavior-editor container-fluid">
+        <div class="row">
+            <div class="col">
+                <h4>Behaviors</h4>
+            </div>
+        </div>
 
-        <div class="row actions">
-            <button v-on:click="add" class="button">Add Behavior</button>
-            <button v-on:click="save" class="button">Save</button>
+        <div class="row">
+            <div class="col">
+                <button v-on:click="add" class="btn btn-secondary">Add Behavior</button>
+                <button v-on:click="save" class="btn btn-primary">Save</button>
+            </div>
         </div>
 
         <div class="behavior-container">
             <div v-for="behavior in behaviors" v-bind:key="behavior.key" class="behavior">
-                <div class="inner">
-                    <div class="row">
+                <div>
+                    <div class="form-group">
                         <label>Key</label>
-                        <input type="text" v-model="behavior.key" />
+                        <input class="form-control" type="text" v-model="behavior.key" />
                     </div>
-                    <div class="row">
+                    <div class="form-group">
                         <label>Lua</label>
                         <CodeEditor v-model="behavior.lua" />
                     </div>
-                    <div class="row">
-                        <button v-on:click="(ev) => remove(behavior)">Remove</button>
+                    <div class="form-group">
+                        <button class="btn btn-secondary" v-on:click="(ev) => remove(behavior)">Remove</button>
                     </div>
                 </div>
             </div>
@@ -86,9 +92,13 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+.behavior-editor {
+    margin-top: 1em;
+}
 .behavior {
-    width: 50em;
-    padding: 1em;
+    width: 40em;
+    margin-right: 1em;
+    margin-bottom: 1em;
 }
 .behavior-container {
     display: flex;

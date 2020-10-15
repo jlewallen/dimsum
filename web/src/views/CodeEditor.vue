@@ -1,6 +1,6 @@
 <template>
     <div class="code-editor">
-        <textarea :value="modelValue" @input="updated" rows="8" />
+        <textarea class="form-control" :value="modelValue" @input="updated" rows="8" />
     </div>
 </template>
 

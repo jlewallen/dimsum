@@ -1,44 +1,46 @@
 <template>
-    <form class="container form" @submit.prevent="saveForm">
-        <div class="row" v-for="field in fields" v-bind:key="field.name">
-            <div class="col-25">
-                <label>{{ field.name }}</label>
+    <div class="general-editor col-md-6">
+        <form class="" @submit.prevent="saveForm">
+            <div class="form-group" v-for="field in fields" v-bind:key="field.name">
+                <div class="">
+                    <label>{{ field.name }}</label>
+                </div>
+                <div class="">
+                    <div v-if="!field.readOnly">
+                        <select class="form-control" v-model="form[field.name]" v-if="field.bool">
+                            <option :value="true">yes</option>
+                            <option :value="false">no</option>
+                        </select>
+                        <input class="form-control" type="text" v-model="form[field.name]" v-else />
+                    </div>
+                    <div v-else>
+                        {{ form[field.name] }}
+                    </div>
+                </div>
             </div>
-            <div class="col-75">
-                <div v-if="!field.readOnly">
-                    <select v-model="form[field.name]" v-if="field.bool">
-                        <option :value="true">yes</option>
-                        <option :value="false">no</option>
+            <div class="form-group">
+                <div class="">
+                    <label>owner</label>
+                </div>
+                <div class="">
+                    <select class="form-control" v-model="form.owner">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="person in people" v-bind:key="person.key" :value="person.key">{{ person.details.name }}</option>
+                        <option value="world">World</option>
                     </select>
-                    <input type="text" v-model="form[field.name]" v-else />
-                </div>
-                <div v-else>
-                    {{ form[field.name] }}
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-25">
-                <label>owner</label>
+            <div class="">
+                <!--
+				<label>Field Name</label>
+				<input type="text" v-model="field.name" />
+				<input type="button" class="button" value="Add Yes/No" v-on:click="addBoolField" />
+				<input type="button" class="button" value="Add Field" v-on:click="addDumbField" />
+				-->
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
-            <div class="col-75">
-                <select v-model="form.owner">
-                    <option disabled value="">Please select one</option>
-                    <option v-for="person in people" v-bind:key="person.key" :value="person.key">{{ person.details.name }}</option>
-                    <option value="world">World</option>
-                </select>
-            </div>
-        </div>
-        <div class="row actions">
-            <!--
-            <label>Field Name</label>
-            <input type="text" v-model="field.name" />
-            <input type="button" class="button" value="Add Yes/No" v-on:click="addBoolField" />
-            <input type="button" class="button" value="Add Field" v-on:click="addDumbField" />
-			-->
-            <input type="submit" value="Save" />
-        </div>
-    </form>
+        </form>
+    </div>
 </template>
 
 <script lang="ts">

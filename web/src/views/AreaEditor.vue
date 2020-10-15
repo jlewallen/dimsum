@@ -1,9 +1,5 @@
 <template>
-    <div>
-        <div class="entity area">
-            <div></div>
-        </div>
-
+    <div class="area-editor container-fluid">
         <div v-if="adjacent.length > 0" class="adjacent">
             <h4>Adjacent Areas:</h4>
             <Entities :entityRefs="adjacent" @selected="entitySelected" />

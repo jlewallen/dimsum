@@ -1,5 +1,5 @@
 <template>
-    <div class="home">
+    <div class="container-fluid home">
         <div v-if="busy">Busy</div>
         <div v-if="areas">
             <Entities :entityRefs="areas" @selected="entitySelected" />

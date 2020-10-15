@@ -1,9 +1,16 @@
 <template>
     <div class="entity-editor" v-if="entity">
         <h3>{{ entity.kind }}: {{ entity.details.name }}</h3>
-        <GeneralEntityForm :entity="entity" />
-        <BehaviorEditor :entity="entity" />
-        <component v-bind:is="kindSpecific" :entity="entity" />
+
+        <div class="row">
+            <GeneralEntityForm :entity="entity" />
+        </div>
+        <div class="row">
+            <BehaviorEditor :entity="entity" />
+        </div>
+        <div class="row">
+            <component v-bind:is="kindSpecific" :entity="entity" />
+        </div>
     </div>
 </template>
 

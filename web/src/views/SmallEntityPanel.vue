@@ -53,10 +53,10 @@ export default defineComponent({
     margin-bottom: 1em;
     margin-right: 1em;
     border-radius: 5px;
-    border: 1px solid #f2f2f2;
-    width: 50em;
+    width: 28em;
     display: flex;
     flex-direction: column;
+    color: black;
 }
 .entity.area {
     background-color: azure;

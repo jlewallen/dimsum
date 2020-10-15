@@ -1,26 +1,24 @@
 <template>
-    <div class="login">
-        <form class="container form" @submit.prevent="login">
-            <div class="row">
-                <div class="col-25">
-                    <label>Name</label>
+    <div class="container login">
+        <div class="row justify-content-center">
+            <form class="form col-8" @submit.prevent="login">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Name</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" type="text" v-model="form.name" />
+                    </div>
                 </div>
-                <div class="col-75">
-                    <input type="text" v-model="form.name" />
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Password</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" type="password" v-model="form.password" />
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-25">
-                    <label>Password</label>
+                <div class="form-group row">
+                    <input class="btn btn-primary" type="submit" value="Login" />
                 </div>
-                <div class="col-75">
-                    <input type="password" v-model="form.password" />
-                </div>
-            </div>
-            <div class="row actions">
-                <input type="submit" value="Login" />
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </template>
 
