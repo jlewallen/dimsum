@@ -42,11 +42,14 @@ class Entity:
         return {
             "key": self.key,
             "details": self.details.map,
+            "behaviors": self.behaviors.map,
         }
 
     def load(self, world, properties):
         self.key = properties["key"]
         self.details = props.Details.from_map(properties["details"])
+        if "behavior" in properties:
+            self.behaviors = behavior.BehaviorMap(**properties["behavior"])
 
     def accept(self, visitor: EntityVisitor):
         raise Exception("unimplemented")
