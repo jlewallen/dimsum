@@ -51,6 +51,7 @@ class Home(Action):
         super().__init__(**kwargs)
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.extend().hook("home:before")
         return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
 
@@ -77,6 +78,7 @@ class Hug(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you hugged %s" % (self.who))
+        await ctx.extend(hug=self.who).hook("hug:after")
         return Failure("who?")
 
 
@@ -88,6 +90,7 @@ class Heal(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you healed %s" % (self.who))
+        await ctx.extend(heal=self.who).hook("heal:after")
         return Failure("who?")
 
 
@@ -99,6 +102,7 @@ class Kick(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you kicked %s" % (self.who))
+        await ctx.extend(kick=self.who).hook("kick:after")
         return Failure("who?")
 
 
@@ -110,6 +114,7 @@ class Kiss(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you kissed %s" % (self.who))
+        await ctx.extend(kiss=self.who).hook("kiss:after")
         return Failure("who?")
 
 
@@ -121,6 +126,7 @@ class Tickle(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you tickled %s" % (self.who))
+        await ctx.extend(tickle=self.who).hook("tickle:after")
         return Failure("who?")
 
 
@@ -132,6 +138,7 @@ class Poke(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.who:
             return Success("you poked %s" % (self.who))
+        await ctx.extend(poke=self.who).hook("poke:after")
         return Failure("who?")
 
 
@@ -149,6 +156,7 @@ class Eat(Action):
         player.drop(self.item)
         player.consume(self.item)
         await world.bus.publish(ItemEaten(player, area, self.item))
+        await ctx.extend(eat=self.item).hook("eat:after")
         return Failure("you ate %s" % (self.item))
 
 
@@ -168,6 +176,7 @@ class Drink(Action):
         player.drop(self.item)
         player.consume(self.item)
         await world.bus.publish(ItemDrank(player, area, self.item))
+        await ctx.extend(drink=self.item).hook("drink:after")
         return Success("you drank %s" % (self.item))
 
 
@@ -235,6 +244,8 @@ class Hold(Action):
         player.hold(self.item)
         await world.bus.publish(ItemHeld(player, area, self.item))
 
+        await ctx.extend(hold=[self.item]).hook("hold:after")
+
         return Success("you picked up %s" % (self.item,))
 
 
@@ -276,6 +287,8 @@ class Obliterate(Action):
         for item in items:
             world.unregister(item)
             await world.bus.publish(ItemObliterated(player, area, item))
+
+        await ctx.extend(obliterate=items).hook("obliterate:after")
 
         return Success("you obliterated %s" % (p.join(list(map(str, items))),))
 
