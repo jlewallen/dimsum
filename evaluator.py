@@ -70,11 +70,23 @@ class Evaluate(lark.Transformer):
     def look_item(self, args):
         return actions.Look(item=args[0])
 
+    def look_for(self, args):
+        return actions.LookFor(name=str(args[0]))
+
+    def say(self, args):
+        return actions.Unknown()
+
+    def tell(self, args):
+        return actions.Unknown()
+
     def think(self, args):
         return actions.Myself()
 
     def look_myself(self, args):
-        return actions.Myself()
+        return actions.LookMyself()
+
+    def look_down(self, args):
+        return actions.LookDown()
 
     def auth(self, args):
         return actions.Auth(password=str(args[0]))

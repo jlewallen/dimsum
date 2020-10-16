@@ -7,16 +7,21 @@ def create_parser():
         start:       look | obliterate | drop | hold | make | go | remember | modify
                    | eat | drink | home
                    | call | forget | think
-                   | hug | kiss | kick | tickle | poke | heal | auth | verb
+                   | hug | kiss | kick | tickle | poke | heal | auth | verb | say | tell
 
         noun:              TEXT
         this:              "this"
         that:              "that"
 
         look:              "look"
+                         | "look" ("down")            -> look_down
                          | "look" ("at" _WS "myself") -> look_myself
                          | "look" ("at" _WS noun)     -> look_item
+                         | "look" ("for" _WS noun)    -> look_for
         call:              "call" _WS this _WS NAME
+
+        say:               TEXT
+        tell:              noun TEXT
 
         verb:              WORD (this | that | noun)?
         home:              "home"

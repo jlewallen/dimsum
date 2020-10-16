@@ -40,7 +40,7 @@ class Item(entity.Entity):
         return q.lower() in self.details.name.lower()
 
     def observe(self):
-        return ObservedItem(self)
+        return ObservedEntity(self)
 
     def saved(self):
         p = super().saved()
@@ -93,16 +93,29 @@ class Recipe(Item):
         return Item(owner=player, details=props.Details.from_base(self.base))
 
 
-class ObservedItem:
-    def __init__(self, item: Item, where: str = ""):
-        self.item = item
-        self.where = where
+class ObservedEntity:
+    def __init__(self, entity: entity.Entity):
+        self.entity = entity
 
     def accept(self, visitor):
-        return visitor.observed_item(self)
+        return visitor.observed_entity(self)
 
     def __str__(self):
-        return str(self.item)
+        return str(self.entity)
+
+    def __repr__(self):
+        return str(self)
+
+
+class ObservedEntities:
+    def __init__(self, entities: List[entity.Entity]):
+        self.entities = entities
+
+    def accept(self, visitor):
+        return visitor.observed_entities(self)
+
+    def __str__(self):
+        return str(p.join(self.entities))
 
     def __repr__(self):
         return str(self)
@@ -340,13 +353,21 @@ class DetailedObservation(Observation):
         )
 
 
+class EntitiesObservation(Observation):
+    def __init__(self, entities: List[entity.Entity]):
+        self.entities = entities
+
+    def accept(self, visitor):
+        return visitor.entities_observation(self)
+
+
 class AreaObservation(Observation):
     def __init__(
         self,
         who: ObservedPerson,
         where: entity.Entity,
         people: List[ObservedPerson],
-        items: List[ObservedItem],
+        items: List[ObservedEntity],
     ):
         self.who = who
         self.where = where
@@ -540,6 +561,14 @@ class World(entity.Entity):
         area = self.find_player_area(player)
         ctx = Ctx(world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
+
+
+class HooksAround:
+    def __enter__(self):
+        return None
+
+    def __exit__(self, type, value, traceback):
+        pass
 
 
 class Ctx:

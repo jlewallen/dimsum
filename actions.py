@@ -204,12 +204,32 @@ class Join(Action):
         return Success("welcome!")
 
 
-class Myself(Action):
+class LookFor(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name = kwargs["name"] if "name" in kwargs else None
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.extend(name=self.name).hook("look-for")
+        return PersonalObservation(player.observe())
+
+
+class LookMyself(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.hook("look-myself")
         return PersonalObservation(player.observe())
+
+
+class LookDown(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.hook("look-down")
+        return EntitiesObservation(player.holding)
 
 
 class Look(Action):

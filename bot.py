@@ -69,6 +69,21 @@ class EmbedObservationVisitor:
             emd += "\n"
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
+    def item(self, item):
+        return str(item)
+
+    def observed_person(self, observed):
+        return observed.person.accept(self)
+
+    def observed_entity(self, observed):
+        return observed.entity.accept(self)
+
+    def observed_entities(self, observed):
+        return [e.accept(self) for e in observed.entities]
+
+    def entities_observation(self, obs):
+        return {"content": p.join([str(x) for x in obs.entities])}
+
 
 class ReplyVisitor(EmbedObservationVisitor):
     def failure(self, reply):
@@ -297,6 +312,7 @@ modify when eaten
             return reply
 
         reply = await self.translate(op)
+        logging.info("reply: %s", (reply,))
         await self.send(ctx, reply)
 
     async def translate(self, mutation):

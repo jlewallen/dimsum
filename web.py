@@ -32,8 +32,11 @@ class WebModelVisitor:
     def observed_person(self, observed):
         return observed.person.accept(self)
 
-    def observed_item(self, observed):
-        return observed.item.accept(self)
+    def observed_entity(self, observed):
+        return observed.entity.accept(self)
+
+    def observed_entities(self, observed):
+        return [e.accept(self) for e in observed.entities]
 
     def personal_observation(self, obs):
         return {
@@ -41,6 +44,12 @@ class WebModelVisitor:
             "personal": {
                 "who": obs.who.accept(self),
             },
+        }
+
+    def entities_observation(self, obs):
+        return {
+            "kind": obs.__class__.__name__,
+            "entities": [e.accept(self) for e in obs.entities],
         }
 
     def detailed_observation(self, obs):
