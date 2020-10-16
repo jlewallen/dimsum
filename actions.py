@@ -34,7 +34,7 @@ class Auth(Action):
             base64.b64encode(salt).decode("utf-8"),
             base64.b64encode(key).decode("utf-8"),
         ]
-        return Success("done, https://url")
+        return Success("done, https://mud.espial.me")
 
 
 class Plant(Action):

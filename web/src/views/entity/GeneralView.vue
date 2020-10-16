@@ -4,7 +4,7 @@
             <Header :entity="withEntity.entity" />
         </div>
         <div class="container-fluid">
-            <GeneralEntityForm :entity="withEntity.entity" />
+            <GeneralEntityForm :entity="withEntity.entity" v-bind:key="withEntity.entity.key" />
         </div>
         <div class="container-fluid specific">
             <component v-bind:is="kindSpecific(withEntity.entity)" :entity="withEntity.entity" />
