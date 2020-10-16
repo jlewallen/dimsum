@@ -21,6 +21,10 @@
 ** DONE Climbing
 ** DONE Water/Pour
 ** DONE Saving behaviors should compile or error.
+** TODO Time passing.
+
+   Maybe a tick hook that fires once a minutes for everything, staggered.
+
 ** TODO Countable things.
 
    give NUMBER noun to noun

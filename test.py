@@ -149,16 +149,18 @@ function(s, world, player)
     else
         debug("yes!")
     end
+    debug("ok")
 end
 """,
     )
 
+    print(hammer.behaviors)
+
     logging.info(await execute(world, jacob, l.parse("hold hammer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
     logging.info(await execute(world, jacob, l.parse("hold hammer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
 
-    logging.info(jacob.__dict__)
     logging.info(jacob.details)
 
     db = SqlitePersistence()

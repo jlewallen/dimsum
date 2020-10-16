@@ -31,6 +31,12 @@ class Scope:
         copy.update(**kwargs)
         return Scope(**copy)
 
+    def prepare(self, wrap):
+        prepared = {}
+        for key, value in self.map.items():
+            prepared[key] = wrap(value)
+        return prepared
+
 
 class Changes:
     def __init__(self):
@@ -70,6 +76,9 @@ end
 class ScriptEngine:
     def __init__(self):
         self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+
+    def prepare(self, scope: Scope, wrap):
+        return scope.prepare(wrap)
 
     def execute(self, thunk: str, scope: Scope, main: Behavior):
         messages: List[str] = []

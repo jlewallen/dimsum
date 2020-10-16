@@ -682,7 +682,7 @@ class World(entity.Entity):
 
     async def perform(self, player: Player, action):
         area = self.find_player_area(player)
-        ctx = Ctx(world=lupa_for(self), person=lupa_for(player), area=lupa_for(area))
+        ctx = Ctx(world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
 
     def __str__(self):
@@ -709,8 +709,7 @@ class Ctx:
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):
-        wrapped = lupa_for(kwargs)
-        self.scope = self.scope.extend(**wrapped)
+        self.scope = self.scope.extend(**kwargs)
         return self
 
     def entities(self):
@@ -743,9 +742,9 @@ class Ctx:
             found.extend(behaviors)
 
         scope = self.scope.extend(**kwargs)
-
+        prepared = self.se.prepare(scope, lupa_for)
         for b in found:
-            self.se.execute(behavior.GenericThunk, scope, b)
+            self.se.execute(behavior.GenericThunk, prepared, b)
 
 
 class Action:
