@@ -49,6 +49,9 @@ class Identity:
         else:
             self.signature = None
 
+    def saved(self):
+        return {"private": self.private, "signature": self.signature}
+
     def private_key(self):
         return get_private_key(self.private)
 

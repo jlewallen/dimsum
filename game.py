@@ -7,6 +7,7 @@ import inflect
 import uuid
 import lupa
 
+import crypto
 import props
 import entity
 import behavior
@@ -27,10 +28,25 @@ class Activity:
     pass
 
 
+class Kind:
+    def __init__(self, **kwargs):
+        if "identity" in kwargs:
+            self.identity = crypto.Identity(**kwargs["identity"])
+        else:
+            self.identity = crypto.generate_identity()
+
+    def saved(self):
+        return {"identity": self.identity.saved()}
+
+
 class Item(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.areas = kwargs["areas"] if "areas" in kwargs else {}
+        if "kind" in kwargs:
+            self.kind = kwargs["kind"]
+        else:
+            self.kind = Kind()
         self.validate()
 
     def touch(self):
@@ -46,6 +62,7 @@ class Item(entity.Entity):
         p = super().saved()
         p.update(
             {
+                "kind": self.kind.saved(),
                 "areas": {k: v.key for k, v in self.areas.items()},
             }
         )
@@ -58,6 +75,8 @@ class Item(entity.Entity):
             self.areas = {
                 key: world.find(value) for key, value in properties["areas"].items()
             }
+        if "kind" in properties:
+            self.areas = Kind(**properties["kind"])
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)

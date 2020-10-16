@@ -29,6 +29,8 @@
 
    give NUMBER noun to noun
 
+   Recipes have a kind identity. This same kind identity is used for QuantifiedItems to group them.
+
 ** TODO Make maze.
 
    Just randomly generates a maze that gets populated with stuff.

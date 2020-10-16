@@ -69,10 +69,7 @@ class Entity:
             "details": self.details.map,
             # Unwraps the Behavior instances.
             "behaviors": {k: v.__dict__ for k, v in self.behaviors.map.items()},
-            "identity": {
-                "private": self.identity.private,
-                "signature": self.identity.signature,
-            },
+            "identity": self.identity.saved(),
         }
 
     def load(self, world, properties):
