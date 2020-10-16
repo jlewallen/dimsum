@@ -11,6 +11,9 @@ class Evaluate(lark.Transformer):
     def start(self, args):
         return args[0]
 
+    def verbs(self, args):
+        return args[0]
+
     def stimulate(self, args):
         return args[0]
 
@@ -107,6 +110,12 @@ class Evaluate(lark.Transformer):
         return actions.Auth(password=str(args[0]))
 
     # Item lookup
+
+    def makeable_noun(self, args):
+        area, item = self.world.search(self.player, str(args[0]))
+        if item:
+            return item
+        return game.MaybeItem(str(args[0]))
 
     def noun(self, args):
         area, item = self.world.search(self.player, str(args[0]))

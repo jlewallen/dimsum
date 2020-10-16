@@ -4,12 +4,17 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start:       look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing
-                   | eat | drink | home
-                   | call | forget | think
-                   | hug | kiss | kick | tickle | poke | heal | auth | verb | say | tell
+        start: verbs | verb
 
-        noun:              TEXT
+        verbs.2: look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
+                      | eat | drink | home | hit
+                      | call | forget | think
+                      | hug | kiss | kick | tickle | poke | heal | auth | say | tell
+
+        USEFUL_WORD:      /(?!(on|with|over)\b)[\w][\w]*/i
+
+        makeable_noun:     TEXT
+        noun:              USEFUL_WORD+
         this:              "this"
         that:              "that"
 
@@ -20,21 +25,21 @@ def create_parser():
                          | "look" ("for" _WS noun)    -> look_for
         call:              "call" _WS this _WS NAME
 
-        say:               TEXT
-        tell:              noun TEXT
+        say:               "say" TEXT
+        tell:              "tell" TEXT
 
-        verb:              WORD (this | that | noun)?
+        verb.1:            WORD (this | that | noun)?
         home:              "home"
         think:             "think"
         drop:              "drop"
         obliterate:        "obliterate"
         remember:          "remember"
-        make:              "make" _WS noun
+        make:              "make" _WS makeable_noun
         hold:              "hold" _WS noun
         go:                "go" _WS noun
         eat:               "eat" _WS noun
         drink:             "drink" _WS noun
-        plant:             "plant" _WS noun
+        plant:             "plant" (_WS noun)?
         wear:              "wear" _WS noun
         remove:            "remove" _WS noun
         swing:             "swing" _WS noun
@@ -46,9 +51,10 @@ def create_parser():
         kick:              "kick" _WS noun
         tickle:            "tickle" _WS noun (_WS "with" _WS noun)?
         poke:              "poke" _WS noun (_WS "with" _WS noun)?
+        hit:               "hit" noun ("with" noun)?
 
         water:             "water" _WS noun (_WS "with" _WS noun)?
-        pour:              "pour" _WS noun (_WS "on" _WS noun)?
+        pour:              "pour" _WS noun (_WS ("on"|"over") _WS noun)?
 
         auth:              "auth" _WS TEXT
 

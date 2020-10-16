@@ -96,6 +96,9 @@ async def test_run():
     logging.info(l.parse("plant"))
     logging.info(l.parse("plant this"))
     logging.info(l.parse("plant seeds"))
+    logging.info(l.parse("water seeds"))
+    logging.info(l.parse("pour water over seeds"))
+    logging.info(l.parse("hit myself with hammer"))
 
     logging.info(await execute(world, jacob, l.parse("make My Beer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
