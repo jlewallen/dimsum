@@ -70,7 +70,7 @@ export interface Entity {
     details: Details;
     holding?: Entity[];
     entities?: Entity[];
-    area?: EntityRef;
+    areas?: { [index: string]: EntityRef };
     memory?: EntityRef | null;
     behaviors: Behaviors;
 }

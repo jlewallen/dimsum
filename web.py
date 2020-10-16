@@ -91,17 +91,6 @@ class WebModelVisitor:
         }
 
     def item(self, item):
-        if item.area:
-            return {
-                "key": item.key,
-                "url": self.entityUrl(item),
-                "kind": item.__class__.__name__,
-                "owner": self.ref(item.owner),
-                "details": item.details.map,
-                "behaviors": self.behaviors(item.behaviors),
-                "area": self.ref(item.area),
-            }
-
         return {
             "key": item.key,
             "url": self.entityUrl(item),
@@ -109,6 +98,7 @@ class WebModelVisitor:
             "owner": self.ref(item.owner),
             "details": item.details.map,
             "behaviors": self.behaviors(item.behaviors),
+            "areas": {k: self.ref(e) for k, e in item.areas.items()},
         }
 
     def area(self, area):

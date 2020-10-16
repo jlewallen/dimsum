@@ -13,6 +13,7 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { defineComponent } from "vue";
 import { Area, Entity, EntityRef } from "@/http";
 import Entities from "./Entities.vue";
@@ -32,10 +33,10 @@ export default defineComponent({
     },
     computed: {
         adjacent(): EntityRef[] {
-            return this.entity.entities
+            return _.flatten(this.entity.entities
                 .map((ref) => store.state.entities[ref.key])
-                .filter((e) => e && e.area)
-                .map((e) => e.area!);
+                .filter((e) => e && e.areas)
+                .map((e) => Object.values(e.areas!)));
         },
     },
     methods: {

@@ -1,8 +1,9 @@
 <template>
-    <div class="item-editor">
-        <div v-if="entity.area">
-            <h3>This leads to:</h3>
-            <WithEntity :entityKey="entity.area.key" v-slot="withEntity">
+<div class="item-editor">
+	Item
+        <div v-for="(value, key) in entity.areas" v-bind:key="key">
+            <h3>{{key}} -></h3>
+            <WithEntity :entityKey="value.key" v-slot="withEntity">
                 <EntityPanel :entity="withEntity.entity" @selected="raiseSelected" />
             </WithEntity>
         </div>
