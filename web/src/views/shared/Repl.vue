@@ -10,7 +10,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import store, { ReplAction, ReplResponse } from "@/store";
 
 export default defineComponent({
     name: "Repl",
@@ -19,11 +18,9 @@ export default defineComponent({
         return { command: "" };
     },
     methods: {
-        send(): Promise<any> {
-            return store.dispatch(new ReplAction(this.command)).then((response: ReplResponse) => {
-                this.command = "";
-                this.$emit("response", response);
-            });
+        send(): void {
+            this.$emit("send", this.command);
+            this.command = "";
         },
     },
 });

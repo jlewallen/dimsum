@@ -1,9 +1,9 @@
 <template>
     <div class="explore container-fluid">
-        <Repl @response="onResponse" />
+        <Repl @send="send" />
 
         <div v-for="response in responses" v-bind:key="response.key" class="response">
-            <component v-bind:is="viewFor(response)" :response="response" />
+            <component v-bind:is="viewFor(response)" :response="response" @selected="onSelected" />
         </div>
     </div>
 </template>
@@ -12,7 +12,7 @@
 import { defineComponent } from "vue";
 import Repl from "../shared/Repl.vue";
 import Replies from "../shared/replies";
-import store, { ReplResponse } from "@/store";
+import store, { Entity, ReplAction, ReplResponse } from "@/store";
 
 export default defineComponent({
     name: "ExploreView",
@@ -29,12 +29,19 @@ export default defineComponent({
     data(): { command: string; response: ReplResponse | null } {
         return { command: "", response: null };
     },
+    mounted(): Promise<any> {
+        return store.dispatch(new ReplAction("look"));
+    },
     methods: {
-        onResponse(response: ReplResponse): void {
-            this.response = response;
+        send(command: string): Promise<any> {
+            return store.dispatch(new ReplAction(command));
         },
         viewFor(response: ReplResponse): string | null {
             return response?.reply.kind || null;
+        },
+        onSelected(entity: Entity): void {
+            console.log("explore:selected", entity);
+            return this.$router.push({ path: `/entities/${entity.key}` });
         },
     },
 });

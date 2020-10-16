@@ -5,12 +5,12 @@
             <h6 class="card-subtitle">{{ response.reply.area.where.details.desc }}</h6>
             <div class="people">
                 <div v-for="person in response.reply.area.people" v-bind:key="person.key">
-                    <TinyEntityPanel :entity="person" />
+                    <TinyEntityPanel :entity="person" @selected="(e) => onSelected(e)" />
                 </div>
             </div>
             <div class="entities">
                 <div v-for="entity in response.reply.area.items" v-bind:key="entity.key">
-                    <TinyEntityPanel :entity="entity" />
+                    <TinyEntityPanel :entity="entity" @selected="(e) => onSelected(e)" />
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ReplResponse } from "@/store";
+import { Entity, ReplResponse } from "@/store";
 import TinyEntityPanel from "../entity/TinyEntityPanel.vue";
 
 export default defineComponent({
@@ -37,7 +37,11 @@ export default defineComponent({
         return {};
     },
     computed: {},
-    methods: {},
+    methods: {
+        onSelected(entity: Entity): void {
+            this.$emit("selected", entity);
+        },
+    },
 });
 </script>
 

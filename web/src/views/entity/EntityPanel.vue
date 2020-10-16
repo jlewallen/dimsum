@@ -57,6 +57,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     color: black;
+    cursor: pointer;
 }
 .entity.area {
     background-color: azure;

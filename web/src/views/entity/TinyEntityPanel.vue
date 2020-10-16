@@ -1,5 +1,5 @@
 <template>
-    <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
+    <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
         {{ entity.details.name }}
     </div>
 </template>
@@ -18,7 +18,7 @@ export default defineComponent({
     },
     computed: {},
     methods: {
-        raiseSelected(entity: Entity): void {
+        onSelected(entity: Entity): void {
             this.$emit("selected", entity);
         },
     },
@@ -33,6 +33,7 @@ export default defineComponent({
     color: black;
     margin: 0.1em 0.1em 0.1em 0.1em;
     padding: 0.2em 0.5em 0.2em 0.5em;
+    cursor: pointer;
 }
 .entity.area {
     background-color: azure;
