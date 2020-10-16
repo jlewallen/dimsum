@@ -117,6 +117,10 @@ class Evaluate(lark.Transformer):
 
     # Item lookup
 
+    def make_quantified(self, args):
+        quantity = args[0]
+        return actions.Make(item=game.MaybeQuantifiedItem(args[1], quantity))
+
     def makeable_noun(self, args):
         area, item = self.world.search(self.player, str(args[0]))
         if item:

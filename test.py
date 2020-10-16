@@ -100,6 +100,7 @@ async def test_run():
     logging.info(l.parse("water seeds"))
     logging.info(l.parse("pour water over seeds"))
     logging.info(l.parse("hit myself with hammer"))
+    logging.info(l.parse("make 20 Dollars"))
 
     logging.info(await execute(world, jacob, l.parse("make My Beer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
@@ -120,6 +121,7 @@ async def test_run():
     logging.info(await execute(world, jacob, l.parse("make ipa")))
     logging.info(await execute(world, jacob, l.parse("forget ipa")))
     logging.info(await execute(world, jacob, l.parse("auth asdfasdf")))
+    logging.info(await execute(world, jacob, l.parse("make 20 Dollars")))
 
     logging.info(world.look(jacob))
 

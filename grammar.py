@@ -8,7 +8,7 @@ def create_parser():
 
         verbs.2: look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour | climb
                       | eat | drink | home | hit
-                      | call | forget | think
+                      | call | forget | think | give | take
                       | hug | kiss | kick | tickle | poke | heal | auth | say | tell
 
         USEFUL_WORD:      /(?!(on|with|over)\b)[\w][\w]*/i
@@ -20,59 +20,63 @@ def create_parser():
 
         look:              "look"
                          | "look" ("down")            -> look_down
-                         | "look" ("at" _WS "myself") -> look_myself
-                         | "look" ("at" _WS noun)     -> look_item
-                         | "look" ("for" _WS noun)    -> look_for
-        call:              "call" _WS this _WS NAME
+                         | "look" ("at" "myself")     -> look_myself
+                         | "look" ("at" noun)         -> look_item
+                         | "look" ("for" noun)        -> look_for
+        call:              "call" this NAME
 
         say:               "say" TEXT
         tell:              "tell" TEXT
 
         verb.1:            WORD (this | that | noun)?
+        give:              "give"
+        take:              "take"
         home:              "home"
         think:             "think"
         drop:              "drop"
         obliterate:        "obliterate"
         remember:          "remember"
-        make:              "make" _WS makeable_noun
-        hold:              "hold" _WS noun
-        go:                "go" _WS noun
-        eat:               "eat" _WS noun
-        drink:             "drink" _WS noun
-        plant:             "plant" (_WS noun)?
-        wear:              "wear" _WS noun
-        remove:            "remove" _WS noun
-        swing:             "swing" _WS noun
-        shake:             "shake" _WS noun
-        forget:            "forget" _WS noun
-        heal:              "heal" _WS noun
-        climb:             "climb" _WS noun
-        hug:               "hug" _WS noun
-        kiss:              "kiss" _WS noun
-        kick:              "kick" _WS noun
-        tickle:            "tickle" _WS noun (_WS "with" _WS noun)?
-        poke:              "poke" _WS noun (_WS "with" _WS noun)?
+        make:              "make" makeable_noun        -> make
+                         | "make" number makeable_noun -> make_quantified
+        hold:              "hold" noun
+        go:                "go" noun
+        eat:               "eat" noun
+        drink:             "drink" noun
+        plant:             "plant" (noun)?
+        wear:              "wear" noun
+        remove:            "remove" noun
+        swing:             "swing" noun
+        shake:             "shake" noun
+        forget:            "forget" noun
+        heal:              "heal" noun
+        climb:             "climb" noun
+        hug:               "hug" noun
+        kiss:              "kiss" noun
+        kick:              "kick" noun
+        tickle:            "tickle" noun ("with" noun)?
+        poke:              "poke" noun ("with" noun)?
         hit:               "hit" noun ("with" noun)?
 
-        water:             "water" _WS noun (_WS "with" _WS noun)?
-        pour:              "pour" _WS noun (_WS ("on"|"over") _WS noun)?
+        water:             "water" noun ("with" noun)?
+        pour:              "pour" noun (("on"|"over") noun)?
 
-        auth:              "auth" _WS TEXT
+        auth:              "auth" TEXT
 
-        modify:            "modify" _WS TEXT_FIELD _WS text               -> modify_field
-                         | "modify" _WS NUMERIC_FIELD _WS number          -> modify_field
-                         | "modify" _WS "when" _WS "opened"               -> when_opened
-                         | "modify" _WS "when" _WS "eaten"                -> when_eaten
-                         | "modify" _WS "when" _WS "drank"                -> when_drank
-                         | "modify" _WS "when" _WS "activated"            -> when_activated
-                         | "modify" _WS "when" _WS "triggered"            -> when_triggered
-                         | "modify" _WS "when" _WS "closed"               -> when_closed
+        modify:            "modify" TEXT_FIELD text               -> modify_field
+                         | "modify" NUMERIC_FIELD number          -> modify_field
+                         | "modify" "when" "opened"               -> when_opened
+                         | "modify" "when" "eaten"                -> when_eaten
+                         | "modify" "when" "drank"                -> when_drank
+                         | "modify" "when" "activated"            -> when_activated
+                         | "modify" "when" "triggered"            -> when_triggered
+                         | "modify" "when" "closed"               -> when_closed
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD:     "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
         TEXT_FIELD:        "name" | "desc" | "presence"
 
-        TEXT:         (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#" | WS)+
+        TEXT_INNER:   (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#")
+        TEXT:         TEXT_INNER (WS | TEXT_INNER)*
         NAME:         TEXT
         number:       NUMBER
         text:         TEXT

@@ -13,8 +13,6 @@ import behavior
 
 p = inflect.engine()
 
-MemoryAreaKey = "m:area"
-
 
 class Event:
     pass
@@ -71,12 +69,44 @@ class Item(entity.Entity):
         return str(self)
 
 
+class QuantifiedItem(Item):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.quantity = kwargs["quantity"] if "quantity" else 0
+
+    def saved(self):
+        p = super().saved()
+        p.update(
+            {
+                "quantity": self.quantity,
+            }
+        )
+        return p
+
+    def load(self, world, properties):
+        super().load(world, properties)
+        self.quantity = properties["quantity"] if "quantity" else 0
+
+
 class MaybeItem:
     def __init__(self, name: str):
         self.name = name
 
     def make(self, player):
         return Item(details=props.Details(self.name), owner=player)
+
+
+class MaybeQuantifiedItem(MaybeItem):
+    def __init__(self, template: MaybeItem, quantity: float):
+        self.template = template
+        self.quantity = quantity
+
+    def make(self, player):
+        return QuantifiedItem(
+            details=props.Details(self.template.name),
+            owner=player,
+            quantity=self.quantity,
+        )
 
 
 class Recipe(Item):
