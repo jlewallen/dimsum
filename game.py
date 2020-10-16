@@ -5,6 +5,7 @@ import sys
 import time
 import inflect
 import uuid
+import lupa
 
 import props
 import entity
@@ -517,31 +518,48 @@ class Area(entity.Entity):
             await bus.publish(ItemDropped(player, self, item))
         return dropped
 
+
 class LupaEntity:
     def __init__(self, entity):
         self.entity = entity
 
+    def unlua(self, value):
+        if lupa.lua_type(value) == "table":
+            v = {}
+            for key, val in value.items():
+                v[key] = val
+            return v
+        return value
+
     def __setitem__(self, key, value):
-        logging.info("entity:entity s: %s %s=%s" % (str(self), str(key), str(value)))
-        self.entity.details.map[key] = value
+        logging.info(
+            "entity:entity s: %s %s=%s (%s)"
+            % (str(self), str(key), str(value), lupa.lua_type(value))
+        )
+        self.entity.details.map[key] = self.unlua(value)
 
     def __getitem__(self, key):
         logging.info("entity:entity g: %s %s" % (str(self), str(key)))
         if key in self.entity.details.map:
             return self.entity.details.map[key]
         return None
-    
+
+
 class LupaWorld(LupaEntity):
     pass
+
 
 class LupaArea(LupaEntity):
     pass
 
+
 class LupaItem(LupaEntity):
     pass
 
+
 class LupaPerson(LupaEntity):
     pass
+
 
 def lupa_for(entity: entity.Entity):
     if entity is None:
@@ -555,6 +573,7 @@ def lupa_for(entity: entity.Entity):
     if isinstance(entity, Item):
         return LupaItem(entity)
     raise Exception("no wrapper for entity: %s" % (entity,))
+
 
 class World(entity.Entity):
     def __init__(self, bus: EventBus):
@@ -673,13 +692,14 @@ class HooksAround:
 
 scriptEngine = behavior.ScriptEngine()
 
+
 class Ctx:
     def __init__(self, **kwargs):
         self.se = scriptEngine
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):
-        logging.info("EXTEND-NO-WRAPPERS", kwargs)
+        logging.info("EXTEND-NO-WRAPPERS %s" % (kwargs,))
         self.scope = self.scope.extend(**kwargs)
         return self
 

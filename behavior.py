@@ -66,7 +66,7 @@ end
 class ScriptEngine:
     def __init__(self):
         self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-    
+
     def execute(self, thunk: str, scope: Scope, main: Behavior):
         messages: List[str] = []
 
@@ -96,7 +96,7 @@ class ScriptEngine:
             main.done(messages)
             return rv
         except Exception as err:
-            logging.error("error", err)
+            logging.error("error: %s" % (err,), exc_info=True)
             main.error(messages, err)
         return None
 
