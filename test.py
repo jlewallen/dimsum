@@ -149,7 +149,6 @@ function(s, world, player)
     else
         debug("yes!")
     end
-    debug("gold")
 end
 """,
     )

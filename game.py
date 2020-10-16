@@ -561,18 +561,28 @@ class LupaPerson(LupaEntity):
     pass
 
 
-def lupa_for(entity: entity.Entity):
-    if entity is None:
+def lupa_for(thing):
+    if thing is None:
         return None
-    if isinstance(entity, World):
-        return LupaWorld(entity)
-    if isinstance(entity, Person):
-        return LupaPerson(entity)
-    if isinstance(entity, Area):
-        return LupaArea(entity)
-    if isinstance(entity, Item):
-        return LupaItem(entity)
-    raise Exception("no wrapper for entity: %s" % (entity,))
+    if isinstance(thing, list):
+        return [lupa_for(e) for e in thing]
+    if isinstance(thing, dict):
+        return {key: lupa_for(value) for key, value in thing.items()}
+    if isinstance(thing, World):
+        return LupaWorld(thing)
+    if isinstance(thing, Person):
+        return LupaPerson(thing)
+    if isinstance(thing, Area):
+        return LupaArea(thing)
+    if isinstance(thing, Item):
+        return LupaItem(thing)
+    raise Exception(
+        "no wrapper for entity: %s (%s)"
+        % (
+            thing,
+            type(thing),
+        )
+    )
 
 
 class World(entity.Entity):
@@ -699,8 +709,8 @@ class Ctx:
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):
-        logging.info("EXTEND-NO-WRAPPERS %s" % (kwargs,))
-        self.scope = self.scope.extend(**kwargs)
+        wrapped = lupa_for(kwargs)
+        self.scope = self.scope.extend(**wrapped)
         return self
 
     def entities(self):
