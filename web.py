@@ -81,56 +81,57 @@ class WebModelVisitor:
     def identity(self, identity):
         return {"public": identity.public, "signature": identity.signature}
 
-    def recipe(self, recipe):
+    def entity(self, entity):
         return {
-            "key": recipe.key,
-            "url": self.entityUrl(recipe),
-            "kind": recipe.__class__.__name__,
-            "identity": self.identity(recipe.identity),
-            "owner": self.ref(recipe.owner),
-            "details": recipe.details.map,
-            "behaviors": self.behaviors(recipe.behaviors),
-            "base": recipe.base,
-            "required": {k: self.ref(e) for k, e in recipe.required.items()},
+            "key": entity.key,
+            "url": self.entityUrl(entity),
+            "kind": entity.__class__.__name__,
+            "identity": self.identity(entity.identity),
+            "owner": self.ref(entity.owner),
+            "details": entity.details.map,
+            "behaviors": self.behaviors(entity.behaviors),
         }
+
+    def recipe(self, recipe):
+        e = self.entity(recipe)
+        e.update(
+            {
+                "base": recipe.base,
+                "required": {k: self.ref(e) for k, e in recipe.required.items()},
+            }
+        )
+        return e
 
     def item(self, item):
-        return {
-            "key": item.key,
-            "url": self.entityUrl(item),
-            "kind": item.__class__.__name__,
-            "identity": self.identity(item.identity),
-            "owner": self.ref(item.owner),
-            "details": item.details.map,
-            "behaviors": self.behaviors(item.behaviors),
-            "areas": {k: self.ref(e) for k, e in item.areas.items()},
-        }
+        e = self.entity(item)
+        e.update(
+            {
+                "areas": {k: self.ref(e) for k, e in item.areas.items()},
+            }
+        )
+        return e
 
     def area(self, area):
-        return {
-            "key": area.key,
-            "url": self.entityUrl(area),
-            "kind": area.__class__.__name__,
-            "identity": self.identity(area.identity),
-            "owner": self.ref(area.owner),
-            "details": area.details.map,
-            "behaviors": self.behaviors(area.behaviors),
-            "entities": [self.ref(e) for e in area.entities()],
-        }
+        e = self.entity(area)
+        e.update(
+            {
+                "entities": [self.ref(e) for e in area.entities()],
+            }
+        )
+        return e
 
     def person(self, person):
-        return {
-            "key": person.key,
-            "url": self.entityUrl(person),
-            "kind": person.__class__.__name__,
-            "identity": self.identity(person.identity),
-            "owner": self.ref(person.owner),
-            "details": person.details.map,
-            "behaviors": self.behaviors(person.behaviors),
-            "holding": [self.ref(e) for e in person.holding],
-            "wearing": [self.ref(e) for e in person.wearing],
-            "memory": {key: self.ref(value) for key, value in person.memory.items()},
-        }
+        e = self.entity(person)
+        e.update(
+            {
+                "holding": [self.ref(e) for e in person.holding],
+                "wearing": [self.ref(e) for e in person.wearing],
+                "memory": {
+                    key: self.ref(value) for key, value in person.memory.items()
+                },
+            }
+        )
+        return e
 
 
 def create(state):
