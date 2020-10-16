@@ -29,6 +29,12 @@ class Entity:
         )
         self.behaviors = behavior.BehaviorMap()
 
+    def validate(self):
+        if not self.owner:
+            raise Exception("entity owner required")
+        if not self.details:
+            raise Exception("entity owner required")
+
     def get_behaviors(self, name):
         return self.behaviors.get_all(name)
 

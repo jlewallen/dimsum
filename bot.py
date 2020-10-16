@@ -8,6 +8,7 @@ import lark
 import persistence
 import grammar
 import evaluator
+import actions
 
 p = inflect.engine()
 
@@ -82,6 +83,8 @@ class EmbedObservationVisitor:
         return [e.accept(self) for e in observed.entities]
 
     def entities_observation(self, obs):
+        if len(obs.entities) == 0:
+            return {"content": "nothing"}
         return {"content": p.join([str(x) for x in obs.entities])}
 
 

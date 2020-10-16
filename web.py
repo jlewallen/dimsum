@@ -131,6 +131,7 @@ class WebModelVisitor:
             "details": person.details.map,
             "behaviors": self.behaviors(person.behaviors),
             "holding": [self.ref(e) for e in person.holding],
+            "wearing": [self.ref(e) for e in person.wearing],
             "memory": {key: self.ref(value) for key, value in person.memory.items()},
         }
 

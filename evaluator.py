@@ -64,6 +64,18 @@ class Evaluate(lark.Transformer):
     def tickle(self, args):
         return actions.Tickle(who=args[0])
 
+    def plant(self, args):
+        return actions.Plant(item=args[0])
+
+    def shake(self, args):
+        return actions.Shake(item=args[0])
+
+    def wear(self, args):
+        return actions.Wear(item=args[0])
+
+    def remove(self, args):
+        return actions.Remove(item=args[0])
+
     def poke(self, args):
         return actions.Poke(who=args[0])
 
@@ -95,7 +107,9 @@ class Evaluate(lark.Transformer):
 
     def noun(self, args):
         area, item = self.world.search(self.player, str(args[0]))
-        return item
+        if item:
+            return item
+        return game.MaybeItem(str(args[0]))
 
     def this(self, args):
         return self.get_item_held()

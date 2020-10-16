@@ -61,11 +61,15 @@ class Make(Action):
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
-            return Failure("todo: fix")
-        area = world.find_player_area(player)
-        player.hold(self.item)
+        if isinstance(self.item, MaybeItem):
+            self.item = self.item.make(player)
+
+        if not isinstance(self.item, Item):
+            return Failure("call jacob")
+
         world.register(self.item)
+        player.hold(self.item)
+        area = world.find_player_area(player)
         await world.bus.publish(ItemMade(player, area, self.item))
         return Success("you're now holding a %s" % (self.item,))
 
@@ -140,6 +144,56 @@ class Poke(Action):
             return Failure("who?")
         await ctx.extend(poke=self.who).hook("poke:after")
         return Success("you poked %s" % (self.who))
+
+
+class Plant(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("plant what?")
+        await ctx.extend(plant=self.item).hook("plant")
+        return Success("you poked %s" % (self.who))
+
+
+class Shake(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("shake what?")
+        await ctx.extend(shake=self.item).hook("shake")
+        return Success("you shook %s" % (self.item))
+
+
+class Wear(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("wear what?")
+        player.wear(self.item)
+        await ctx.extend(wear=self.item).hook("wear:after")
+        return Success("you wore %s" % (self.item))
+
+
+class Remove(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("remove what?")
+        player.remove(self.item)
+        await ctx.extend(remove=self.item).hook("remove:after")
+        return Success("you removed %s" % (self.item))
 
 
 class Eat(Action):

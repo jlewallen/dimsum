@@ -32,6 +32,7 @@ class Item(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.area = kwargs["area"] if "area" in kwargs else None
+        self.validate()
 
     def touch(self):
         self.details.touch()
@@ -65,11 +66,20 @@ class Item(entity.Entity):
         return str(self)
 
 
+class MaybeItem:
+    def __init__(self, name: str):
+        self.name = name
+
+    def make(self, player):
+        return Item(details=props.Details(self.name), owner=player)
+
+
 class Recipe(Item):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.required = kwargs["required"] if "required" in kwargs else {}
         self.base = kwargs["base"] if "base" in kwargs else {}
+        self.validate()
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.recipe(self)
@@ -137,6 +147,7 @@ class Person(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.holding: List[entity.Entity] = []
+        self.wearing: List[entity.Entity] = []
         self.memory = {}
 
     @property
@@ -146,6 +157,14 @@ class Person(entity.Entity):
     @holding.setter
     def holding(self, value):
         self.__holding = value
+
+    @property
+    def wearing(self):
+        return self.__wearing
+
+    @holding.setter
+    def wearing(self, value):
+        self.__wearing = value
 
     @property
     def memory(self):
@@ -182,11 +201,32 @@ class Person(entity.Entity):
                     return entity
         return None
 
+    def is_wearing(self, item):
+        return item in self.wearing
+
+    def wear(self, item: Item):
+        if not self.is_holding(item):
+            raise Exception("wear before hold")
+        self.drop(item)
+        if self.is_holding(item):
+            raise Exception("wear before hold")
+        self.wearing.append(item)
+        item.touch()
+        print("wearing", self.wearing)
+
     def is_holding(self, item):
         return item in self.holding
 
     def hold(self, item: Item):
         self.holding.append(item)
+        item.touch()
+
+    def remove(self, item: Item):
+        if not self.is_wearing(item):
+            raise Exception("remove before wear")
+        self.hold(item)
+        self.wearing.remove(item)
+        print("wearing", self.wearing)
         item.touch()
 
     def consume(self, item):
@@ -231,6 +271,7 @@ class Person(entity.Entity):
         p.update(
             {
                 "holding": [e.key for e in self.holding],
+                "wearing": [e.key for e in self.wearing],
                 "memory": {k: e.key for k, e in self.memory.items()},
             }
         )
@@ -238,7 +279,12 @@ class Person(entity.Entity):
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.holding = world.resolve(properties["holding"])
+        self.holding = (
+            world.resolve(properties["holding"]) if "holding" in properties else []
+        )
+        self.wearing = (
+            world.resolve(properties["wearing"]) if "wearing" in properties else []
+        )
         self.memory = {}
         if "memory" in properties:
             self.memory = {k: world.find(v) for k, v in properties["memory"].items()}

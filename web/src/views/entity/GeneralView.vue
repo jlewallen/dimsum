@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <GeneralEntityForm :entity="withEntity.entity" />
         </div>
-        <div class="container-fluid">
+        <div class="container-fluid specific">
             <component v-bind:is="kindSpecific(withEntity.entity)" :entity="withEntity.entity" />
         </div>
     </WithRoutedEntity>
@@ -47,4 +47,9 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.specific {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+</style>
