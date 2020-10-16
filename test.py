@@ -123,6 +123,10 @@ async def test_run():
     logging.info(world.look(jacob))
 
 
+class Example:
+    def __getitem__(self, key):
+        pass
+
 async def test_behavior():
     bus = game.EventBus()
     world = game.World(bus)
@@ -140,7 +144,8 @@ async def test_behavior():
         "b:test:drop:after",
         lua="""
 function(s, world, player)
-    return nil
+    player.gold = 0
+    debug("gold")
 end
 """,
     )
@@ -148,10 +153,14 @@ end
     logging.info(await execute(world, jacob, l.parse("hold hammer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
 
+    logging.info(jacob.__dict__)
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    print()
     logging.info("testing:basic")
     asyncio.run(test_run())
+    print()
     logging.info("testing:behavior")
     asyncio.run(test_behavior())

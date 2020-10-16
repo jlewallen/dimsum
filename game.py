@@ -517,6 +517,58 @@ class Area(entity.Entity):
             await bus.publish(ItemDropped(player, self, item))
         return dropped
 
+class LupaWorld:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def __setitem__(self, key, value):
+        print("worldworld s", self, key, value)
+
+    def __getitem__(self, key):
+        print("worldworld g", self, key)
+
+class LupaArea:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def __setitem__(self, key, value):
+        print("arearea s", self, key, value)
+
+    def __getitem__(self, key):
+        print("arearea g", self, key)
+
+class LupaItem:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def __setitem__(self, key, value):
+        print("itemitem s", self, key, value)
+
+    def __getitem__(self, key):
+        print("itemitem g", self, key)
+
+class LupaPerson:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def __setitem__(self, key, value):
+        print("personperson s", self, key, value)
+
+    def __getitem__(self, key):
+        print("personperson g", self, key)
+
+def lupa_for(entity: entity.Entity):
+    if entity is None:
+        return None
+    if isinstance(entity, World):
+        return LupaWorld(entity)
+    if isinstance(entity, Person):
+        return LupaPerson(entity)
+    if isinstance(entity, Area):
+        return LupaArea(entity)
+    if isinstance(entity, Item):
+        return LupaItem(entity)
+    raise Exception("no wrapper for entity: %s" % (entity,))
 
 class World(entity.Entity):
     def __init__(self, bus: EventBus):
@@ -615,7 +667,7 @@ class World(entity.Entity):
 
     async def perform(self, player: Player, action):
         area = self.find_player_area(player)
-        ctx = Ctx(world=self, person=player, area=area)
+        ctx = Ctx(world=lupa_for(self), person=lupa_for(player), area=lupa_for(area))
         return await action.perform(ctx, self, player)
 
     def __str__(self):
@@ -639,6 +691,7 @@ class Ctx:
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):
+        logging.info("EXTEND-NO-WRAPPERS", kwargs)
         self.scope = self.scope.extend(**kwargs)
         return self
 
