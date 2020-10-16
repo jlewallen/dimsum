@@ -4,7 +4,7 @@ from lark import Lark
 def create_parser():
     l = Lark(
         """
-        start:       look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove
+        start:       look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing
                    | eat | drink | home
                    | call | forget | think
                    | hug | kiss | kick | tickle | poke | heal | auth | verb | say | tell
@@ -37,6 +37,7 @@ def create_parser():
         plant:             "plant" _WS noun
         wear:              "wear" _WS noun
         remove:            "remove" _WS noun
+        swing:             "swing" _WS noun
         shake:             "shake" _WS noun
         forget:            "forget" _WS noun
         heal:              "heal" _WS noun

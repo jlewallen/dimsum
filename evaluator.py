@@ -70,6 +70,9 @@ class Evaluate(lark.Transformer):
     def shake(self, args):
         return actions.Shake(item=args[0])
 
+    def swing(self, args):
+        return actions.Swing(item=args[0])
+
     def wear(self, args):
         return actions.Wear(item=args[0])
 

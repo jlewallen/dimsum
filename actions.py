@@ -170,6 +170,18 @@ class Shake(Action):
         return Success("you shook %s" % (self.item))
 
 
+class Swing(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("swing what?")
+        await ctx.extend(swing=self.item).hook("swing")
+        return Success("you swung %s" % (self.item))
+
+
 class Wear(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
