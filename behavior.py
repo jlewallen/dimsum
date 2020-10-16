@@ -48,8 +48,19 @@ end
 
 class ScriptEngine:
     def execute(self, thunk: str, scope: Scope, main: str):
+        def debug(*args):
+            message = " ".join(args)
+            logging.info(
+                "lua:debug:%s: %s"
+                % (
+                    "",
+                    message,
+                )
+            )
+
         lua = lupa.LuaRuntime(unpack_returned_tuples=True)
         g = lua.globals()
+        g.debug = debug
         for key, value in scope.items():
             g[key] = value
         thunker = lua.eval(thunk)
@@ -63,6 +74,7 @@ class ScriptEngine:
 class BehaviorMap(props.PropertyMap):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
+        logging.info(pattern)
         return [self.map[key] for key in self.keys_matching(pattern)]
 
     def add(self, name, **kwargs):

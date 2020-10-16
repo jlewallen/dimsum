@@ -212,7 +212,7 @@ class LookFor(Action):
         self.name = kwargs["name"] if "name" in kwargs else None
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        await ctx.extend(name=self.name).hook("look-for")
+        await ctx.extend(holding=player.holding).extend(name=self.name).hook("look-for")
         return PersonalObservation(player.observe())
 
 
