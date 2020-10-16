@@ -671,9 +671,11 @@ class HooksAround:
         pass
 
 
+scriptEngine = behavior.ScriptEngine()
+
 class Ctx:
     def __init__(self, **kwargs):
-        self.se = behavior.ScriptEngine()
+        self.se = scriptEngine
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):

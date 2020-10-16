@@ -64,6 +64,9 @@ end
 
 
 class ScriptEngine:
+    def __init__(self):
+        self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+    
     def execute(self, thunk: str, scope: Scope, main: Behavior):
         messages: List[str] = []
 
@@ -82,13 +85,12 @@ class ScriptEngine:
 
         debug("invoked")
 
-        lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-        g = lua.globals()
+        g = self.lua.globals()
         g.debug = debug
         for key, value in scope.items():
             g[key] = value
-        thunker = lua.eval(thunk)
-        fn = lua.eval(main.lua)
+        thunker = self.lua.eval(thunk)
+        fn = self.lua.eval(main.lua)
         try:
             rv = thunker(scope, fn)
             main.done(messages)

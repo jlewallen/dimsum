@@ -141,10 +141,14 @@ async def test_behavior():
         lua="""
 function(s, world, player)
     if not player.gold then
-        player.gold = 0
+        player.gold = {
+total = 0
+}
     end
-    if player.gold < 10 then
-        player.gold = player.gold + 1
+    if player.gold.total < 1 then
+        player.gold.total = player.gold.total + 1
+    else
+        debug("yes!")
     end
     debug("gold")
 end
@@ -153,8 +157,14 @@ end
 
     logging.info(await execute(world, jacob, l.parse("hold hammer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
+    logging.info(await execute(world, jacob, l.parse("hold hammer")))
+    logging.info(await execute(world, jacob, l.parse("drop")))
 
     logging.info(jacob.__dict__)
+
+    db = SqlitePersistence()
+    await db.open("test.sqlite3")
+    await db.save(world)
 
 
 if __name__ == "__main__":
