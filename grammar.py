@@ -6,7 +6,7 @@ def create_parser():
         """
         start: verbs | verb
 
-        verbs.2: look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
+        verbs.2: look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour | climb
                       | eat | drink | home | hit
                       | call | forget | think
                       | hug | kiss | kick | tickle | poke | heal | auth | say | tell
@@ -46,6 +46,7 @@ def create_parser():
         shake:             "shake" _WS noun
         forget:            "forget" _WS noun
         heal:              "heal" _WS noun
+        climb:             "climb" _WS noun
         hug:               "hug" _WS noun
         kiss:              "kiss" _WS noun
         kick:              "kick" _WS noun

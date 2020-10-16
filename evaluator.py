@@ -82,6 +82,9 @@ class Evaluate(lark.Transformer):
     def wear(self, args):
         return actions.Wear(item=args[0])
 
+    def climb(self, args):
+        return actions.Climb(item=args[0])
+
     def remove(self, args):
         return actions.Remove(item=args[0])
 

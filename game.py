@@ -31,7 +31,7 @@ class Activity:
 class Item(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.area = kwargs["area"] if "area" in kwargs else None
+        self.areas = kwargs["areas"] if "areas" in kwargs else {}
         self.validate()
 
     def touch(self):
@@ -47,14 +47,18 @@ class Item(entity.Entity):
         p = super().saved()
         p.update(
             {
-                "area": self.area.key if self.area else None,
+                "areas": {k: v.key for k, v in self.areas.items()},
             }
         )
         return p
 
     def load(self, world, properties):
         super().load(world, properties)
-        self.area = world.find(properties["area"]) if properties["area"] else None
+        self.areas = {}
+        if "areas" in properties:
+            self.areas = {
+                key: world.find(value) for key, value in properties["areas"].items()
+            }
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)
@@ -212,7 +216,6 @@ class Person(entity.Entity):
             raise Exception("wear before hold")
         self.wearing.append(item)
         item.touch()
-        print("wearing", self.wearing)
 
     def is_holding(self, item):
         return item in self.holding
@@ -226,7 +229,6 @@ class Person(entity.Entity):
             raise Exception("remove before wear")
         self.hold(item)
         self.wearing.remove(item)
-        print("wearing", self.wearing)
         item.touch()
 
     def consume(self, item):

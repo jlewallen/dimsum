@@ -337,9 +337,6 @@ class Hold(Action):
         if player.is_holding(self.item):
             return Failure("you're already holding that")
 
-        if self.item.area and self.item.owner != player:
-            return Failure("that's not yours")
-
         area.remove(self.item)
         player.hold(self.item)
         await world.bus.publish(ItemHeld(player, area, self.item))
@@ -349,13 +346,13 @@ class Hold(Action):
         return Success("you picked up %s" % (self.item,))
 
 
-class Go(Action):
+class MovingAction(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.area = kwargs["area"] if "area" in kwargs else None
         self.item = kwargs["item"] if "item" in kwargs else None
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def move(self, verb: str, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
 
         destination = self.area
@@ -363,23 +360,37 @@ class Go(Action):
         # If the person owns this item and they try to go the thing,
         # this is how new areas area created, one of them.
         if self.item:
-            if self.item.area is None:
+            print("CREATING AREA")
+            if verb not in self.item.areas:
                 if self.item.owner != player:
                     return Failure("you can only do that with things you own")
-                self.item.area = world.build_new_area(player, area, self.item)
-            destination = self.item.area
+                new_area = world.build_new_area(player, area, self.item)
+                self.item.areas[verb] = new_area
+            destination = self.item.areas[verb]
 
         await world.perform(player, Drop())
 
-        await ctx.hook("left:before")
+        await ctx.extend(area=area).hook("left:before")
         await area.left(world.bus, player)
-        await ctx.hook("left:after")
+        await ctx.extend(area=area).hook("left:after")
 
-        await ctx.hook("entered:before")
+        await ctx.extend(area=destination).hook("entered:before")
         await destination.entered(world.bus, player)
-        await ctx.hook("entered:after")
+        await ctx.extend(area=destination).hook("entered:after")
 
         return world.look(player)
+
+
+class Climb(MovingAction):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.extend().hook("climb:before")
+        return await self.move("climb", ctx, world, player)
+
+
+class Go(MovingAction):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        await ctx.extend().hook("walk:before")
+        return await self.move("walk", ctx, world, player)
 
 
 class Obliterate(Action):

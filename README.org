@@ -14,9 +14,9 @@
    verb. In many cases these just invoke the behavior.
 
 
-** TODO Planting
-** TODO Climbing
-** TODO Water/Pour
+** DONE Planting
+** DONE Climbing
+** DONE Water/Pour
 ** TODO Make maze.
 
    Just randomly generates a maze that gets populated with stuff.
@@ -56,6 +56,9 @@
    In order to create scarcity and value for items, maybe locking them
    so they can't be cloned or modified.
 
+   Part of this should be making something immobile, to solve moving
+   entrances problem.
+
 ** TODO Allow some items to only be held/interacted with after being seen.
 
    We can use a property for this.
@@ -64,6 +67,7 @@
 
    Remember which entities are modified in which Actions, only save those.
 
+** TODO Web tool for drawing connected areas.
 ** TODO Behavior Name Picker
 
    Present good options for b:key:verb:when
