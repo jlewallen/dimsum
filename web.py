@@ -143,11 +143,14 @@ def create(state):
     session_key = base64.b64decode(session_key_string)
 
     def authenticate():
-        # TODO HACK We just 500 in here for now.
-        header = quart.request.headers["authorization"]
-        bearer, encoded = header.split(" ")
-        decoded = jwt.decode(base64.b64decode(encoded), session_key, algorithms="HS256")
-        return state.world, decoded
+        if "authorization" in quart.request.headers:
+            header = quart.request.headers["authorization"]
+            bearer, encoded = header.split(" ")
+            decoded = jwt.decode(
+                base64.b64decode(encoded), session_key, algorithms="HS256"
+            )
+            return state.world, decoded
+        raise Exception("unauthorized")
 
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
