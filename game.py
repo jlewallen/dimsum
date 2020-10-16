@@ -408,7 +408,7 @@ class Failure(SimpleReply):
         return visitor.failure(self)
 
     def __str__(self):
-        return "Success<%s>" % (self.message,)
+        return "Failure<%s>" % (self.message,)
 
 
 class Observation(Reply):
