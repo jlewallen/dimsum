@@ -13,7 +13,7 @@ run:
 	env/bin/python3 dimsum.py
 
 test: env
-	rm -f fieldkit.sqlite3
+	rm -f test*.sqlite3
 	env/bin/python3 behavior.py
 	env/bin/python3 game.py
 	env/bin/python3 test.py

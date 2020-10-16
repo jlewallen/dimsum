@@ -2,6 +2,9 @@ import asyncio
 import logging
 import sys
 import lupa
+import lark
+
+import crypto
 
 from props import *
 from persistence import *
@@ -10,8 +13,6 @@ from grammar import *
 from evaluator import *
 from behavior import *
 from actions import *
-
-from lark import Tree, Transformer
 
 
 l = create_parser()
@@ -159,12 +160,13 @@ end
     logging.info(await execute(world, jacob, l.parse("drop")))
 
     logging.info(jacob.__dict__)
+    logging.info(jacob.details)
 
     db = SqlitePersistence()
     await db.open("test.sqlite3")
     await db.save(world)
 
-    logging.info(jacob.details)
+    crypto.test()
 
 
 if __name__ == "__main__":

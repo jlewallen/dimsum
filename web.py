@@ -78,11 +78,15 @@ class WebModelVisitor:
     def behaviors(self, bs):
         return {key: self.behavior(value) for key, value in bs.items()}
 
+    def identity(self, identity):
+        return {"public": identity.public, "signature": identity.signature}
+
     def recipe(self, recipe):
         return {
             "key": recipe.key,
             "url": self.entityUrl(recipe),
             "kind": recipe.__class__.__name__,
+            "identity": self.identity(recipe.identity),
             "owner": self.ref(recipe.owner),
             "details": recipe.details.map,
             "behaviors": self.behaviors(recipe.behaviors),
@@ -95,6 +99,7 @@ class WebModelVisitor:
             "key": item.key,
             "url": self.entityUrl(item),
             "kind": item.__class__.__name__,
+            "identity": self.identity(item.identity),
             "owner": self.ref(item.owner),
             "details": item.details.map,
             "behaviors": self.behaviors(item.behaviors),
@@ -106,6 +111,7 @@ class WebModelVisitor:
             "key": area.key,
             "url": self.entityUrl(area),
             "kind": area.__class__.__name__,
+            "identity": self.identity(area.identity),
             "owner": self.ref(area.owner),
             "details": area.details.map,
             "behaviors": self.behaviors(area.behaviors),
@@ -117,6 +123,7 @@ class WebModelVisitor:
             "key": person.key,
             "url": self.entityUrl(person),
             "kind": person.__class__.__name__,
+            "identity": self.identity(person.identity),
             "owner": self.ref(person.owner),
             "details": person.details.map,
             "behaviors": self.behaviors(person.behaviors),

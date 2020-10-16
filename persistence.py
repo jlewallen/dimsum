@@ -2,6 +2,7 @@ import logging
 import sqlite3
 import json
 import props
+import crypto
 import game
 
 
@@ -10,7 +11,7 @@ class SqlitePersistence:
         self.db = sqlite3.connect(path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, identity TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
         )
         self.db.commit()
 
@@ -21,10 +22,20 @@ class SqlitePersistence:
             entity = world.entities[key]
             props = json.dumps(entity.saved())
             klass = entity.__class__.__name__
+            identity_field = {
+                "private": entity.identity.private,
+                "signature": entity.identity.signature,
+            }
             try:
                 self.dbc.execute(
-                    "INSERT INTO entities (key, klass, owner, properties) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, klass = EXCLUDED.klass, properties = EXCLUDED.properties",
-                    [entity.key, klass, entity.owner.key, props],
+                    "INSERT INTO entities (key, klass, identity, owner, properties) VALUES (?, ?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, klass = EXCLUDED.klass, properties = EXCLUDED.properties",
+                    [
+                        entity.key,
+                        klass,
+                        json.dumps(identity_field),
+                        entity.owner.key,
+                        props,
+                    ],
                 )
             except:
                 logging.error(
@@ -48,7 +59,7 @@ class SqlitePersistence:
         rows = {}
 
         for row in self.dbc.execute(
-            "SELECT key, klass, owner, properties FROM entities"
+            "SELECT key, klass, identity, owner, properties FROM entities"
         ):
             rows[row[0]] = row
 
@@ -61,10 +72,16 @@ class SqlitePersistence:
                 return keyed[key][0]
             row = rows[key]
             factory = factories[row[1]]
-            owner = get_instance(row[2])
-            instance = factory(key=row[0], owner=owner, details=props.Details())
+            identity = json.loads(row[2])
+            owner = get_instance(row[3])
+            instance = factory(
+                key=row[0],
+                owner=owner,
+                identity=crypto.Identity(**identity),
+                details=props.Details(),
+            )
             instance.key = key
-            properties = json.loads(row[3])
+            properties = json.loads(row[4])
             keyed[key] = [instance, properties]
             return instance
 
