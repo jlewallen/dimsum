@@ -48,6 +48,10 @@ class Behavior:
         self.lua = kwargs["lua"] if "lua" in kwargs else None
         self.logs = kwargs["logs"] if "logs" in kwargs else []
 
+    def check(self):
+        eng = lupa.LuaRuntime(unpack_returned_tuples=True)
+        eng.eval(self.lua)
+
     def error(self, messages: List[str], error):
         self.logs.extend(messages)
 
@@ -110,13 +114,17 @@ class BehaviorMap(props.PropertyMap):
         return [self.map[key] for key in self.keys_matching(pattern)]
 
     def add(self, name, **kwargs):
-        self.map[name] = Behavior(**kwargs)
+        b = self.map[name] = Behavior(**kwargs)
+        b.check()
+        return b
 
     def items(self):
         return self.map.items()
 
     def replace(self, map):
         typed = {key: Behavior(**value) for key, value in map.items()}
+        for key, value in typed.items():
+            value.check()
         return super().replace(**typed)
 
 
