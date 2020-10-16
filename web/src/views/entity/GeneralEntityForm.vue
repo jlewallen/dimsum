@@ -9,11 +9,9 @@
         <div class="row">
             <div class="col">
                 <form class="" @submit.prevent="saveForm">
-                    <div class="form-group" v-for="field in fields" v-bind:key="field.name">
-                        <div class="">
-                            <label>{{ field.name }}</label>
-                        </div>
-                        <div class="">
+                    <div class="form-group row" v-for="field in fields" v-bind:key="field.name">
+                        <label class="col-sm-2">{{ field.name }}</label>
+                        <div class="col-sm-5">
                             <div v-if="!field.readOnly">
                                 <select class="form-control" v-model="form[field.name]" v-if="field.bool">
                                     <option :value="true">yes</option>
@@ -26,11 +24,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="">
-                            <label>owner</label>
-                        </div>
-                        <div class="">
+                    <div class="form-group row">
+                        <label class="col-sm-2">owner</label>
+                        <div class="col-sm-5">
                             <select class="form-control" v-model="form.owner">
                                 <option disabled value="">Please select one</option>
                                 <option v-for="person in people" v-bind:key="person.key" :value="person.key">
@@ -41,12 +37,6 @@
                         </div>
                     </div>
                     <div class="">
-                        <!--
-				<label>Field Name</label>
-				<input type="text" v-model="field.name" />
-				<input type="button" class="button" value="Add Yes/No" v-on:click="addBoolField" />
-				<input type="button" class="button" value="Add Field" v-on:click="addDumbField" />
-				-->
                         <input type="submit" value="Save" class="btn btn-primary" />
                     </div>
                 </form>
