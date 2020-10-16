@@ -53,7 +53,7 @@ class Entity:
         if "behaviors" in properties:
             self.behaviors = behavior.BehaviorMap(
                 **{
-                    key: behavior.BehaviorMap(**value)
+                    key: behavior.Behavior(**value)
                     for key, value in properties["behaviors"].items()
                 }
             )

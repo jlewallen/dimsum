@@ -1,5 +1,9 @@
+from typing import List
+
 import sys
 import logging
+import datetime
+import time
 import asyncio
 import lupa
 import props
@@ -39,6 +43,19 @@ class Changes:
         return str(self.messages)
 
 
+class Behavior:
+    def __init__(self, **kwargs):
+        self.lua = kwargs["lua"] if "lua" in kwargs else None
+        self.logs = kwargs["logs"] if "logs" in kwargs else []
+
+    def error(self, messages: List[str], error):
+        self.logs.extend(messages)
+
+    def done(self, messages: List[str]):
+        self.logs.extend(messages)
+        self.logs = self.logs[-20:]
+
+
 GenericThunk = """
 function(scope, g)
     return g(scope, scope.world, scope.person)
@@ -47,7 +64,9 @@ end
 
 
 class ScriptEngine:
-    def execute(self, thunk: str, scope: Scope, main: str):
+    def execute(self, thunk: str, scope: Scope, main: Behavior):
+        messages: List[str] = []
+
         def debug(*args):
             message = " ".join(args)
             logging.info(
@@ -57,6 +76,11 @@ class ScriptEngine:
                     message,
                 )
             )
+            now = datetime.datetime.now()
+            stamped = now.strftime("%Y/%m/%d %H:%M:%S") + " " + message
+            messages.append(stamped)
+
+        debug("invoked")
 
         lua = lupa.LuaRuntime(unpack_returned_tuples=True)
         g = lua.globals()
@@ -64,8 +88,15 @@ class ScriptEngine:
         for key, value in scope.items():
             g[key] = value
         thunker = lua.eval(thunk)
-        fn = lua.eval(main)
-        return thunker(scope, fn)
+        fn = lua.eval(main.lua)
+        try:
+            rv = thunker(scope, fn)
+            main.done(messages)
+            return rv
+        except Exception as err:
+            logging.error("error", err)
+            main.error(messages, err)
+        return None
 
 
 # Behavior keys are of the form:
@@ -74,7 +105,6 @@ class ScriptEngine:
 class BehaviorMap(props.PropertyMap):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
-        logging.info(pattern)
         return [self.map[key] for key in self.keys_matching(pattern)]
 
     def add(self, name, **kwargs):
@@ -86,11 +116,6 @@ class BehaviorMap(props.PropertyMap):
     def replace(self, map):
         typed = {key: Behavior(**value) for key, value in map.items()}
         return super().replace(**typed)
-
-
-class Behavior:
-    def __init__(self, **kwargs):
-        self.lua = kwargs["lua"] if "lua" in kwargs else None
 
 
 async def tests():

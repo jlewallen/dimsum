@@ -57,6 +57,7 @@ export interface EntityRef {
 
 export interface Behavior {
     lua: string;
+    logs: string[];
 }
 
 export type Behaviors = { [index: string]: Behavior };

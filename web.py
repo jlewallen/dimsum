@@ -73,7 +73,7 @@ class WebModelVisitor:
         }
 
     def behavior(self, b):
-        return {"lua": b.lua}
+        return {"lua": b.lua, "logs": b.logs}
 
     def behaviors(self, bs):
         return {key: self.behavior(value) for key, value in bs.items()}

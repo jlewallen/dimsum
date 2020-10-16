@@ -13,9 +13,9 @@
             </div>
         </div>
 
-        <div class="behavior-container">
-            <div v-for="behavior in behaviors" v-bind:key="behavior.id" class="behavior">
-                <div>
+        <div class="behavior-container container-fluid">
+            <div v-for="behavior in behaviors" v-bind:key="behavior.id" class="behavior row">
+                <div class="col-6">
                     <div class="form-group">
                         <label>Key</label>
                         <input class="form-control" type="text" v-model="behavior.key" />
@@ -26,6 +26,11 @@
                     </div>
                     <div class="form-group">
                         <button class="btn btn-secondary" v-on:click="(ev) => remove(behavior)">Remove</button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div v-for="(log, index) in behavior.logs" v-bind:key="index">
+                        {{ log }}
                     </div>
                 </div>
             </div>
@@ -42,17 +47,19 @@ import { getTimeStamp } from "@/datetime";
 
 import CodeEditor from "../shared/CodeEditor.vue";
 
-export class Behavior {
-    constructor(public id: string, public key: string, public lua: string) {}
-
-    public static makeDefault() {
-        const template = `function(s, world, person)
+const HookTemplate = `
+function(s, world, person)
     return nil
 end
 `;
+
+export class Behavior {
+    constructor(public id: string, public key: string, public lua: string, public logs: string[]) {}
+
+    public static makeDefault() {
         const uniq = getTimeStamp();
         const key = `b:${uniq}:hold:after`;
-        return new Behavior(key, key, template);
+        return new Behavior(key, key, HookTemplate, []);
     }
 }
 
@@ -72,7 +79,7 @@ export default defineComponent({
     } {
         return {
             behaviors: _.map(this.entity.behaviors, (value, key) => {
-                return new Behavior(key, key, value!.lua);
+                return new Behavior(key, key, value!.lua, value!.logs);
             }),
         };
     },
@@ -94,12 +101,12 @@ export default defineComponent({
 </script>
 <style scoped>
 .behavior {
-    width: 40em;
-    margin-right: 1em;
-    margin-bottom: 1em;
+    background-color: #efefef;
+    border: 1px solid #afafaf;
+    border-radius: 5px;
+    padding: 1em;
+    margin-top: 1em;
 }
 .behavior-container {
-    display: flex;
-    flex-wrap: wrap;
 }
 </style>
