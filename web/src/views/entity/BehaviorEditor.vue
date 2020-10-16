@@ -14,7 +14,7 @@
         </div>
 
         <div class="behavior-container">
-            <div v-for="behavior in behaviors" v-bind:key="behavior.key" class="behavior">
+            <div v-for="behavior in behaviors" v-bind:key="behavior.id" class="behavior">
                 <div>
                     <div class="form-group">
                         <label>Key</label>
@@ -43,7 +43,7 @@ import { getTimeStamp } from "@/datetime";
 import CodeEditor from "../shared/CodeEditor.vue";
 
 export class Behavior {
-    constructor(public key: string, public lua: string) {}
+    constructor(public id: string, public key: string, public lua: string) {}
 
     public static makeDefault() {
         const template = `function(s, world, person)
@@ -51,7 +51,8 @@ export class Behavior {
 end
 `;
         const uniq = getTimeStamp();
-        return new Behavior(`b:${uniq}:hold:after`, template);
+        const key = `b:${uniq}:hold:after`;
+        return new Behavior(key, key, template);
     }
 }
 
@@ -69,10 +70,9 @@ export default defineComponent({
     data(): {
         behaviors: Behavior[];
     } {
-        console.log(this.entity);
         return {
             behaviors: _.map(this.entity.behaviors, (value, key) => {
-                return new Behavior(key, value!.lua);
+                return new Behavior(key, key, value!.lua);
             }),
         };
     },
