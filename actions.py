@@ -200,7 +200,9 @@ class Join(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         world.register(player)
         await world.bus.publish(PlayerJoined(player))
+        await ctx.hook("entered:before")
         await world.welcome_area().entered(world.bus, player)
+        await ctx.hook("entered:after")
         return Success("welcome!")
 
 
@@ -290,8 +292,14 @@ class Go(Action):
             destination = self.item.area
 
         await world.perform(player, Drop())
+
+        await ctx.hook("left:before")
         await area.left(world.bus, player)
+        await ctx.hook("left:after")
+
+        await ctx.hook("entered:before")
         await destination.entered(world.bus, player)
+        await ctx.hook("entered:after")
 
         return world.look(player)
 
