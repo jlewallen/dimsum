@@ -44,8 +44,11 @@ def create_parser():
         hug:               "hug" _WS noun
         kiss:              "kiss" _WS noun
         kick:              "kick" _WS noun
-        tickle:            "tickle" _WS noun
-        poke:              "poke" _WS noun
+        tickle:            "tickle" _WS noun (_WS "with" _WS noun)?
+        poke:              "poke" _WS noun (_WS "with" _WS noun)?
+
+        water:             "water" _WS noun (_WS "with" _WS noun)?
+        pour:              "pour" _WS noun (_WS "on" _WS noun)?
 
         auth:              "auth" _WS TEXT
 

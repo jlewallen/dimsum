@@ -231,16 +231,18 @@ class Person(entity.Entity):
 
     def consume(self, item):
         FoodFields = [
-            SumFields("sugar"),
-            SumFields("fat"),
-            SumFields("protein"),
-            SumFields("toxicity"),
-            SumFields("caffeine"),
-            SumFields("alcohol"),
-            SumFields("nutrition"),
-            SumFields("vitamins"),
+            props.SumFields("sugar"),
+            props.SumFields("fat"),
+            props.SumFields("protein"),
+            props.SumFields("toxicity"),
+            props.SumFields("caffeine"),
+            props.SumFields("alcohol"),
+            props.SumFields("nutrition"),
+            props.SumFields("vitamins"),
         ]
-        changes = merge_dictionaries(self.details.map, item.details.map, FoodFields)
+        changes = props.merge_dictionaries(
+            self.details.map, item.details.map, FoodFields
+        )
         logging.info("merged %s" % (changes,))
         self.details.update(changes)
 
@@ -658,7 +660,7 @@ class Ctx:
         scope = self.scope.extend(**kwargs)
 
         for b in found:
-            self.se.execute(behavior.GenericThunk, scope, b.lua)
+            self.se.execute(behavior.GenericThunk, scope, b)
 
 
 class Action:

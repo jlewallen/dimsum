@@ -145,28 +145,6 @@ end
     logging.info(await execute(world, jacob, l.parse("hold hammer")))
     logging.info(await execute(world, jacob, l.parse("drop")))
 
-    if True:
-        return
-    bmap = BehaviorMap()
-    bmap.map["b:jacob:drop"] = "ok"
-    print(bmap.get_all("drop"))
-
-    thunk = behavior.GenericThunk
-    source = """
-function(s, world, player)
-    s.changes.msg("Hello, world!")
-    return nil
-end
-"""
-
-    se = behavior.ScriptEngine()
-    changes = behavior.Changes()
-    scope = behavior.Scope(world=world, person=jacob, changes=changes)
-    value = se.execute(thunk, scope, source)
-
-    print(changes)
-    print(value)
-
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
