@@ -4,6 +4,7 @@ import base64
 
 from game import *
 from props import *
+import hooks
 
 
 class Unknown(Action):

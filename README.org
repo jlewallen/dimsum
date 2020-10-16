@@ -21,6 +21,10 @@
 ** DONE Climbing
 ** DONE Water/Pour
 ** DONE Saving behaviors should compile or error.
+** TODO Countable things.
+
+   give NUMBER noun to noun
+
 ** TODO Make maze.
 
    Just randomly generates a maze that gets populated with stuff.
