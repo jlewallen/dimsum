@@ -38,6 +38,7 @@ import _ from "lodash";
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
 import store, { SaveEntityBehaviorAction } from "@/store";
+import { getTimeStamp } from "@/datetime";
 
 import CodeEditor from "../shared/CodeEditor.vue";
 
@@ -49,7 +50,7 @@ export class Behavior {
     return nil
 end
 `;
-        const uniq = Math.random();
+        const uniq = getTimeStamp();
         return new Behavior(`b:${uniq}:hold:after`, template);
     }
 }

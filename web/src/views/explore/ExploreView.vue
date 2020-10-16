@@ -39,7 +39,7 @@ export default defineComponent({
         viewFor(response: ReplResponse): string | null {
             return response?.reply.kind || null;
         },
-        onSelected(entity: Entity): void {
+        onSelected(entity: Entity): Promise<any> {
             console.log("explore:selected", entity);
             return this.$router.push({ path: `/entities/${entity.key}` });
         },
