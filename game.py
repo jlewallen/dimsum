@@ -268,6 +268,9 @@ class Person(entity.Entity):
     def __str__(self):
         return self.details.name
 
+    def __repr__(self):
+        return str(self)
+
     def saved(self):
         p = super().saved()
         p.update(
@@ -494,6 +497,9 @@ class Area(entity.Entity):
     def __str__(self):
         return self.details.name
 
+    def __repr__(self):
+        return str(self)
+
     async def entered(self, bus: EventBus, player: Player):
         self.here.append(player)
         await bus.publish(PlayerEnteredArea(player, self))
@@ -609,6 +615,12 @@ class World(entity.Entity):
         area = self.find_player_area(player)
         ctx = Ctx(world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
+
+    def __str__(self):
+        return "$world"
+
+    def __repr__(self):
+        return "$world"
 
 
 class HooksAround:

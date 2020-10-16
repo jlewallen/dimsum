@@ -365,7 +365,7 @@ modify when eaten
         key = str(author.id)
 
         if not self.world:
-            raise ExceptioException("initializing")
+            raise Exception("initializing")
 
         if key in self.players:
             self.players[key].channel = channel
