@@ -48,18 +48,18 @@ async def test_run():
 
     trampoline = Item(owner=jacob, details=Details("Trampoline", desc="It's bouncy."))
 
-    await world.perform(jacob, actions.Make(trampoline))
+    await world.perform(jacob, actions.Make(item=trampoline))
     await world.perform(jacob, actions.Drop())
     await world.perform(jacob, actions.Hold(item=trampoline))
     await world.perform(jacob, actions.Drop())
 
     idea = Item(owner=jacob, details=Details("Idea", desc="It's genius."))
-    await world.perform(jacob, actions.Make(idea))
+    await world.perform(jacob, actions.Make(item=idea))
     logging.info(world.look(jacob))
     await world.perform(jacob, actions.Drop())
 
     door = Item(owner=jacob, details=Details("Door", desc="It's wooden."))
-    await world.perform(jacob, actions.Make(door))
+    await world.perform(jacob, actions.Make(item=door))
     await world.perform(jacob, actions.Go(item=door))
     logging.info(world.look(jacob))
     await world.perform(jacob, actions.Go(item=door))

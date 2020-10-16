@@ -57,22 +57,25 @@ class Home(Action):
 
 
 class Make(Action):
-    def __init__(self, item, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.item = item
+        self.item = None
+        self.template = None
+        if "template" in kwargs:
+            self.template = kwargs["template"]
+        if "item" in kwargs:
+            self.item = kwargs["item"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if isinstance(self.item, MaybeItem):
-            self.item = self.item.make(player)
-
-        if not isinstance(self.item, Item):
-            return Failure("call jacob")
-
-        world.register(self.item)
-        player.hold(self.item)
+        item = self.item
+        if self.template:
+            item = self.template.apply_item_template(owner=player)
+        print(item)
+        world.register(item)
+        player.hold(item)
         area = world.find_player_area(player)
-        await world.bus.publish(ItemMade(player, area, self.item))
-        return Success("you're now holding a %s" % (self.item,))
+        await world.bus.publish(ItemMade(player, area, item))
+        return Success("you're now holding a %s" % (item,))
 
 
 class Hug(Action):

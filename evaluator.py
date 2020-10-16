@@ -32,7 +32,7 @@ class Evaluate(lark.Transformer):
         return actions.Hold(item=args[0])
 
     def make(self, args):
-        return actions.Make(args[0])
+        return actions.Make(template=args[0])
 
     def forget(self, args):
         return actions.Forget(name=args[0])
@@ -119,7 +119,7 @@ class Evaluate(lark.Transformer):
 
     def make_quantified(self, args):
         quantity = args[0]
-        return actions.Make(item=game.MaybeQuantifiedItem(args[1], quantity))
+        return actions.Make(template=game.MaybeQuantifiedItem(args[1], quantity))
 
     def makeable_noun(self, args):
         area, item = self.world.search(self.player, str(args[0]))

@@ -107,24 +107,29 @@ class QuantifiedItem(Item):
         self.quantity = properties["quantity"] if "quantity" else 0
 
 
-class MaybeItem:
+class IsItemTemplate:
+    def apply_item_template(self, **kwargs):
+        raise Exception("unimplemented")
+
+
+class MaybeItem(IsItemTemplate):
     def __init__(self, name: str):
         self.name = name
 
-    def make(self, player):
-        return Item(details=props.Details(self.name), owner=player)
+    def apply_item_template(self, **kwargs):
+        return Item(details=props.Details(self.name), **kwargs)
 
 
-class MaybeQuantifiedItem(MaybeItem):
+class MaybeQuantifiedItem(IsItemTemplate):
     def __init__(self, template: MaybeItem, quantity: float):
         self.template = template
         self.quantity = quantity
 
-    def make(self, player):
+    def apply_item_template(self, **kwargs):
         return QuantifiedItem(
             details=props.Details(self.template.name),
-            owner=player,
             quantity=self.quantity,
+            **kwargs,
         )
 
 
@@ -154,7 +159,10 @@ class Recipe(Item):
         self.required = {k: world.find(v) for k, v in properties["required"].items()}
 
     def invoke(self, player):
-        return Item(owner=player, details=props.Details.from_base(self.base))
+        # TODO Also sign with the recipe
+        return Item(
+            owner=player, details=props.Details.from_base(self.base), kind=self.kind
+        )
 
 
 class ObservedEntity:
