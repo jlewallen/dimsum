@@ -55,6 +55,12 @@ class PropertyMap:
     def clone(self):
         return PropertyMap(self.map)
 
+    def __str__(self):
+        return str(self.map)
+
+    def __repr__(self):
+        return str(self.map)
+
 
 class Details(PropertyMap):
     def __init__(self, name: str = "", **kwargs):
@@ -98,6 +104,3 @@ class Details(PropertyMap):
 
     def touch(self):
         self.touched = time.time()
-
-    def __str__(self):
-        return str(self.map)

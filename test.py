@@ -123,10 +123,6 @@ async def test_run():
     logging.info(world.look(jacob))
 
 
-class Example:
-    def __getitem__(self, key):
-        pass
-
 async def test_behavior():
     bus = game.EventBus()
     world = game.World(bus)
@@ -144,7 +140,12 @@ async def test_behavior():
         "b:test:drop:after",
         lua="""
 function(s, world, player)
-    player.gold = 0
+    if not player.gold then
+        player.gold = 0
+    end
+    if player.gold < 10 then
+        player.gold = player.gold + 1
+    end
     debug("gold")
 end
 """,

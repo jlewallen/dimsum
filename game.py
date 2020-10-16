@@ -517,45 +517,31 @@ class Area(entity.Entity):
             await bus.publish(ItemDropped(player, self, item))
         return dropped
 
-class LupaWorld:
+class LupaEntity:
     def __init__(self, entity):
         self.entity = entity
 
     def __setitem__(self, key, value):
-        print("worldworld s", self, key, value)
+        logging.info("entity:entity s: %s %s=%s" % (str(self), str(key), str(value)))
+        self.entity.details.map[key] = value
 
     def __getitem__(self, key):
-        print("worldworld g", self, key)
+        logging.info("entity:entity g: %s %s" % (str(self), str(key)))
+        if key in self.entity.details.map:
+            return self.entity.details.map[key]
+        return None
+    
+class LupaWorld(LupaEntity):
+    pass
 
-class LupaArea:
-    def __init__(self, entity):
-        self.entity = entity
+class LupaArea(LupaEntity):
+    pass
 
-    def __setitem__(self, key, value):
-        print("arearea s", self, key, value)
+class LupaItem(LupaEntity):
+    pass
 
-    def __getitem__(self, key):
-        print("arearea g", self, key)
-
-class LupaItem:
-    def __init__(self, entity):
-        self.entity = entity
-
-    def __setitem__(self, key, value):
-        print("itemitem s", self, key, value)
-
-    def __getitem__(self, key):
-        print("itemitem g", self, key)
-
-class LupaPerson:
-    def __init__(self, entity):
-        self.entity = entity
-
-    def __setitem__(self, key, value):
-        print("personperson s", self, key, value)
-
-    def __getitem__(self, key):
-        print("personperson g", self, key)
+class LupaPerson(LupaEntity):
+    pass
 
 def lupa_for(entity: entity.Entity):
     if entity is None:
