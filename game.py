@@ -43,6 +43,7 @@ class Item(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.areas = kwargs["areas"] if "areas" in kwargs else {}
+        self.quantity = kwargs["quantity"] if "quantity" in kwargs else 1
         if "kind" in kwargs:
             self.kind = kwargs["kind"]
         else:
@@ -64,6 +65,7 @@ class Item(entity.Entity):
             {
                 "kind": self.kind.saved(),
                 "areas": {k: v.key for k, v in self.areas.items()},
+                "quantity": self.quantity,
             }
         )
         return p
@@ -77,6 +79,7 @@ class Item(entity.Entity):
             }
         if "kind" in properties:
             self.areas = Kind(**properties["kind"])
+        self.quantity = properties["quantity"] if "quantity" else 1
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)
@@ -89,22 +92,27 @@ class Item(entity.Entity):
 
 
 class QuantifiedItem(Item):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.quantity = kwargs["quantity"] if "quantity" else 0
+    def separate(self, player, quantity):
+        if quantity < 1:
+            raise Exception("too few to separate")
 
-    def saved(self):
-        p = super().saved()
-        p.update(
-            {
-                "quantity": self.quantity,
-            }
-        )
-        return p
+        if quantity > self.quantity:
+            raise Exception("too many to separate")
 
-    def load(self, world, properties):
-        super().load(world, properties)
-        self.quantity = properties["quantity"] if "quantity" else 0
+        self.quantity -= quantity
+
+        return [
+            QuantifiedItem(
+                owner=player,
+                kind=self.kind,
+                details=self.details,
+                behaviors=self.behaviors,
+                quantity=quantity,
+            )
+        ]
+
+    def __str__(self):
+        return "%d %s" % (self.quantity, p.plural(self.details.name, self.quantity))
 
 
 class IsItemTemplate:

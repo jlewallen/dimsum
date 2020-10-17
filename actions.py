@@ -70,12 +70,11 @@ class Make(Action):
         item = self.item
         if self.template:
             item = self.template.apply_item_template(owner=player)
-        print(item)
         world.register(item)
         player.hold(item)
         area = world.find_player_area(player)
         await world.bus.publish(ItemMade(player, area, item))
-        return Success("you're now holding a %s" % (item,))
+        return Success("you're now holding %s" % (item,))
 
 
 class Hug(Action):
@@ -265,12 +264,37 @@ class Drink(Action):
 class Drop(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.quantity = None
+        if "quantity" in kwargs:
+            self.quantity = kwargs["quantity"]
+        self.item = None
+        if "item" in kwargs:
+            self.item = kwargs["item"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        area = world.find_player_area(player)
-        dropped = await area.drop(world.bus, player)
-        if len(dropped) == 0:
+        if len(player.holding) == 0:
             return Failure("nothing to drop")
+
+        area = world.find_player_area(player)
+        dropped = []
+        if self.quantity:
+            if not self.item:
+                return Failure("please specify what?")
+
+            if self.quantity > self.item.quantity or self.quantity < 1:
+                return Failure("you should check how many you have")
+
+            dropped = self.item.separate(player, self.quantity)
+
+            if self.item.quantity == 0:
+                world.unregister(self.item)
+                player.drop(self.item)
+        else:
+            dropped = player.drop_all()
+
+        for item in dropped:
+            area.here.append(item)
+            await world.bus.publish(ItemDropped(player, self, item))
         await ctx.extend(dropped=dropped).hook("drop:after")
         return Success("you dropped %s" % (p.join(dropped),))
 
