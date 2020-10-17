@@ -100,13 +100,13 @@ class Item(entity.Entity):
         return visitor.item(self)
 
     def __str__(self):
+        if self.quantity > 1:
+            return "%d %s" % (self.quantity, p.plural(self.details.name, self.quantity))
         return p.a(self.details.name)
 
     def __repr__(self):
         return str(self)
 
-
-class QuantifiedItem(Item):
     def separate(self, player, quantity):
         if quantity < 1:
             raise Exception("too few to separate")
@@ -117,7 +117,7 @@ class QuantifiedItem(Item):
         self.quantity -= quantity
 
         return [
-            QuantifiedItem(
+            Item(
                 owner=player,
                 kind=self.kind,
                 details=self.details,
@@ -125,9 +125,6 @@ class QuantifiedItem(Item):
                 quantity=quantity,
             )
         ]
-
-    def __str__(self):
-        return "%d %s" % (self.quantity, p.plural(self.details.name, self.quantity))
 
 
 class IsItemTemplate:
@@ -149,7 +146,7 @@ class MaybeQuantifiedItem(IsItemTemplate):
         self.quantity = quantity
 
     def apply_item_template(self, **kwargs):
-        return QuantifiedItem(
+        return Item(
             details=props.Details(self.template.name),
             quantity=self.quantity,
             **kwargs,
@@ -181,10 +178,10 @@ class Recipe(Item):
         self.base = properties["base"] if "base" in properties else {}
         self.required = {k: world.find(v) for k, v in properties["required"].items()}
 
-    def invoke(self, player):
+    def apply_item_template(self, **kwargs):
         # TODO Also sign with the recipe
         return Item(
-            owner=player, details=props.Details.from_base(self.base), kind=self.kind
+            details=props.Details.from_base(self.base), kind=self.kind, **kwargs
         )
 
 
@@ -274,9 +271,12 @@ class Person(entity.Entity):
 
     def find_memory(self, q: str):
         for name, entity in self.memory.items():
+            if q.lower() in name.lower():
+                return entity
+        for name, entity in self.memory.items():
             if entity.describes(q):
-                return name, entity
-        return None, None
+                return entity
+        return None
 
     def find_recipe(self, q: str):
         for name, entity in self.memory.items():

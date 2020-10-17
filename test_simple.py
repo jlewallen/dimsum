@@ -46,7 +46,6 @@ async def test_obliterate():
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="todo")
 async def test_recipe_simple():
     tw = test.TestWorld()
     await tw.initialize()
@@ -54,10 +53,9 @@ async def test_recipe_simple():
     await tw.execute("modify alcohol 100")
     assert tw.player.holding[0].details["alcohol"] == 100
 
-    await tw.execute("call this IPA")
+    assert len(tw.player.memory.keys()) == 0
+    await tw.execute("call this Fancy IPA")
+    assert len(tw.player.memory.keys()) == 1
+
+    await tw.execute("make fancy")
     assert len(tw.player.holding) == 1
-    await tw.execute("make fancy")
-    assert len(tw.player.holding) == 2
-    await tw.execute("forget fancy")
-    await tw.execute("make fancy")
-    assert len(tw.player.holding) == 2

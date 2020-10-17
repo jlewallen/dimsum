@@ -450,8 +450,8 @@ class CallThis(Action):
         if not self.item:
             return Failure("you don't have anything")
 
+        # Copy all of the base details from the item. Exclude stamps.
         base = self.item.details.to_base()
-
         if "created" in base:
             del base["created"]
         if "touched" in base:
@@ -459,7 +459,9 @@ class CallThis(Action):
 
         recipe = Recipe(
             owner=player,
-            details=props.Details(self.name),
+            details=self.item.details.clone(),
+            behaviors=self.item.behaviors,
+            kind=self.item.kind,
             base=base,
         )
         world.register(recipe)
