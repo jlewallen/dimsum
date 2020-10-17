@@ -72,3 +72,10 @@ async def test_recipe_simple():
 
     await tw.execute("make fancy")
     assert len(tw.player.holding) == 1
+
+
+@pytest.mark.asyncio
+async def test_look_for():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("look for keys")

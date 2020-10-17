@@ -689,13 +689,15 @@ def lupa_for(thing):
         return LupaArea(thing)
     if isinstance(thing, Item):
         return LupaItem(thing)
-    raise Exception(
-        "no wrapper for entity: %s (%s)"
-        % (
-            thing,
-            type(thing),
+    if isinstance(thing, entity.Entity):
+        raise Exception(
+            "no wrapper for entity: %s (%s)"
+            % (
+                thing,
+                type(thing),
+            )
         )
-    )
+    return thing
 
 
 class World(entity.Entity):
