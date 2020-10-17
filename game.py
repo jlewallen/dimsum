@@ -774,6 +774,21 @@ class World(entity.Entity):
         ctx = Ctx(self.wrapping_fn, world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
 
+    async def tick(self, time: float):
+        return await self.everywhere("tick", time=time)
+
+    async def everywhere(self, name: str, **kwargs):
+        everything = list(self.entities.values())
+        for entity in everything:
+            behaviors = entity.get_behaviors(name)
+            if len(behaviors) > 0:
+                log.info(entity)
+                area = self.find_entity_area(entity)
+                ctx = Ctx(
+                    self.wrapping_fn, world=self, area=area, entity=entity, **kwargs
+                )
+                await ctx.hook(name)
+
     def __str__(self):
         return "$world"
 
@@ -795,7 +810,7 @@ class Ctx:
         self.wrapping_fn = wrapping_fn
         self.scope = behavior.Scope(**kwargs)
         self.world = kwargs["world"]
-        self.person = kwargs["person"]
+        self.person = kwargs["person"] if "person" in kwargs else None
 
     def extend(self, **kwargs):
         self.scope = self.scope.extend(**kwargs)
@@ -829,7 +844,10 @@ class Ctx:
         scope = self.scope.extend(**kwargs)
         prepared = self.se.prepare(scope, self.wrapping_fn)
         for b in found:
-            actions = self.se.execute(behavior.GenericThunk, prepared, b)
+            thunk = behavior.GenericThunk
+            if "person" in scope.map:
+                thunk = behavior.PersonThunk
+            actions = self.se.execute(thunk, prepared, b)
             if actions:
                 for action in actions:
                     await self.world.perform(self.person, action)
@@ -840,6 +858,8 @@ class Action:
     def __init__(self, **kwargs):
         pass
 
+
+class PersonAction(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         raise Exception("unimplemented")
 

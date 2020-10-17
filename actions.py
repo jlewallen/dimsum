@@ -10,7 +10,7 @@ MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
 
 
-class Unknown(Action):
+class Unknown(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -18,7 +18,7 @@ class Unknown(Action):
         return Failure("sorry, i don't understand")
 
 
-class Auth(Action):
+class Auth(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.password = kwargs["password"]
@@ -41,7 +41,7 @@ class Auth(Action):
         return Success("done, https://mud.espial.me")
 
 
-class Home(Action):
+class Home(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -50,7 +50,7 @@ class Home(Action):
         return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
 
-class AddItemArea(Action):
+class AddItemArea(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -72,7 +72,7 @@ class ItemsAppeared(Event):
         return "%s appeared" % (p.join(self.items),)
 
 
-class Make(Action):
+class Make(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = None
@@ -93,7 +93,7 @@ class Make(Action):
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
-class Hug(Action):
+class Hug(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -105,7 +105,7 @@ class Hug(Action):
         return Success("you hugged %s" % (self.who))
 
 
-class Heal(Action):
+class Heal(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -117,7 +117,7 @@ class Heal(Action):
         return Success("you healed %s" % (self.who))
 
 
-class Kick(Action):
+class Kick(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -129,7 +129,7 @@ class Kick(Action):
         return Success("you kicked %s" % (self.who))
 
 
-class Kiss(Action):
+class Kiss(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -141,7 +141,7 @@ class Kiss(Action):
         return Success("you kissed %s" % (self.who))
 
 
-class Tickle(Action):
+class Tickle(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -153,7 +153,7 @@ class Tickle(Action):
         return Success("you tickled %s" % (self.who))
 
 
-class Poke(Action):
+class Poke(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.who = kwargs["who"]
@@ -166,7 +166,7 @@ class Poke(Action):
         return Success("you poked %s" % (self.who))
 
 
-class Plant(Action):
+class Plant(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -179,7 +179,7 @@ class Plant(Action):
         return Success("you planted %s" % (self.item))
 
 
-class Shake(Action):
+class Shake(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -192,7 +192,7 @@ class Shake(Action):
         return Success("you shook %s" % (self.item))
 
 
-class Hit(Action):
+class Hit(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -205,7 +205,7 @@ class Hit(Action):
         return Success("you hit %s" % (self.item))
 
 
-class Swing(Action):
+class Swing(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -218,7 +218,7 @@ class Swing(Action):
         return Success("you swung %s" % (self.item))
 
 
-class Wear(Action):
+class Wear(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -236,7 +236,7 @@ class Wear(Action):
         return Success("you wore %s" % (self.item))
 
 
-class Remove(Action):
+class Remove(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -251,7 +251,7 @@ class Remove(Action):
         return Success("you removed %s" % (self.item))
 
 
-class Eat(Action):
+class Eat(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -272,7 +272,7 @@ class Eat(Action):
         return Success("you ate %s" % (self.item))
 
 
-class Drink(Action):
+class Drink(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -293,7 +293,7 @@ class Drink(Action):
         return Success("you drank %s" % (self.item))
 
 
-class Drop(Action):
+class Drop(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.quantity = None
@@ -334,7 +334,7 @@ class Drop(Action):
         return Success("you dropped %s" % (p.join(dropped),))
 
 
-class Join(Action):
+class Join(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -347,7 +347,7 @@ class Join(Action):
         return Success("welcome!")
 
 
-class LookFor(Action):
+class LookFor(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = kwargs["name"] if "name" in kwargs else None
@@ -361,7 +361,7 @@ class LookFor(Action):
         return PersonalObservation(observed)
 
 
-class LookMyself(Action):
+class LookMyself(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -371,7 +371,7 @@ class LookMyself(Action):
         return PersonalObservation(observed)
 
 
-class LookDown(Action):
+class LookDown(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -380,7 +380,7 @@ class LookDown(Action):
         return EntitiesObservation(player.holding)
 
 
-class Look(Action):
+class Look(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"] if "item" in kwargs else None
@@ -392,7 +392,7 @@ class Look(Action):
         return world.look(player)
 
 
-class Hold(Action):
+class Hold(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -415,7 +415,7 @@ class Hold(Action):
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
-class MovingAction(Action):
+class MovingAction(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.area = kwargs["area"] if "area" in kwargs else None
@@ -467,7 +467,7 @@ class Go(MovingAction):
         return await self.move(DefaultMoveVerb, ctx, world, player)
 
 
-class Obliterate(Action):
+class Obliterate(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -486,7 +486,7 @@ class Obliterate(Action):
         return Success("you obliterated %s" % (p.join(list(map(str, items))),))
 
 
-class CallThis(Action):
+class CallThis(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -517,7 +517,7 @@ class CallThis(Action):
         )
 
 
-class Forget(Action):
+class Forget(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = kwargs["name"]
@@ -529,7 +529,7 @@ class Forget(Action):
         return Failure("huh, seems i already have forgotten that!")
 
 
-class Remember(Action):
+class Remember(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -539,7 +539,7 @@ class Remember(Action):
         return Success("you'll be able to remember this place, oh yeah")
 
 
-class ModifyField(Action):
+class ModifyField(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -551,7 +551,7 @@ class ModifyField(Action):
         return Success("done")
 
 
-class ModifyActivity(Action):
+class ModifyActivity(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.item = kwargs["item"]
@@ -564,3 +564,11 @@ class ModifyActivity(Action):
         self.item.link_activity(self.activity, self.value)
         self.item.details.set(self.activity, self.value)
         return Success("done")
+
+
+class Tick(Action):
+    def __init__(self, **kwargs):
+        self.time = kwargs["time"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        return None

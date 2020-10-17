@@ -2,8 +2,9 @@ import sys
 import logging
 import pytest
 
-import game
 import props
+import game
+import actions
 import test
 
 
@@ -15,7 +16,7 @@ async def test_drop_hammer_funny_gold(caplog):
     hammer.add_behavior(
         "b:test:drop:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     if not player.gold then
         player.gold = { total = 0 }
     end
@@ -51,7 +52,7 @@ async def test_wear_cape(caplog):
     cape.add_behavior(
         "b:test:wear:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     player.invisible()
     debug(player.is_invisible())
 end
@@ -60,7 +61,7 @@ end
     cape.add_behavior(
         "b:test:remove:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     player.visible()
 end
 """,
@@ -89,7 +90,7 @@ async def test_behavior_move(caplog):
     cape.add_behavior(
         "b:test:wear:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     debug('wear', wear)
     debug('wear[0].worn', wear[0].worn)
     return player.go(wear[0].worn)
@@ -117,7 +118,7 @@ async def test_behavior_create_item(caplog):
     box.add_behavior(
         "b:test:shake:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     debug(area)
     return player.make({
         name = "Flower Petal",
@@ -147,7 +148,7 @@ async def test_behavior_create_quantified_item(caplog):
     box.add_behavior(
         "b:test:shake:after",
         lua="""
-function(s, world, player)
+function(s, world, area, player)
     debug(area)
     return area.make({
         name = "Flower Petal",
@@ -173,3 +174,30 @@ end
 @pytest.mark.asyncio
 async def test_behavior_create_area(caplog):
     pass
+
+
+@pytest.mark.asyncio
+async def test_behavior_time_passing(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    tree = tw.add_item(
+        game.Item(owner=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    debug("ok", area, item)
+    return area.make({
+        name = "Flower Petal",
+        quantity = 10,
+        color = "red",
+    })
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.world.tick(0)
+    await tw.world.tick(100)

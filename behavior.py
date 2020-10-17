@@ -71,7 +71,13 @@ class Behavior:
 
 GenericThunk = """
 function(scope, g)
-    return g(scope, scope.world, scope.person)
+    return g(scope, scope.world, scope.area, scope.entity)
+end
+"""
+
+PersonThunk = """
+function(scope, g)
+    return g(scope, scope.world, scope.area, scope.person)
 end
 """
 
