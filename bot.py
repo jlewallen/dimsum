@@ -1,3 +1,4 @@
+import base64
 import discord
 import discord.ext.commands
 import logging
@@ -362,7 +363,8 @@ modify when eaten
     async def get_player(self, message):
         author = message.author
         channel = message.channel
-        key = str(author.id)
+        raw_key = str(author.id)
+        key = base64.b64encode(bytes(raw_key, "utf-8")).decode("utf-8")
 
         if not self.world:
             raise Exception("initializing")

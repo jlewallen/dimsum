@@ -135,6 +135,11 @@ class WebModelVisitor:
         return e
 
 
+def url_key(key):
+    b = bytes.fromhex(key)
+    return base64.b64encode(b).decode("utf-8")
+
+
 def create(state):
     app = quart.Quart(__name__)
     app = quart_cors.cors(app)
@@ -187,12 +192,13 @@ def create(state):
 
         return {"people": [a.accept(makeWeb) for a in world.people()]}
 
-    @app.route("/api/entities/<string:key>")
-    def get_entity(key: str):
+    @app.route("/api/entities/<string:ukey>")
+    def get_entity(ukey: str):
         world, token = authenticate()
         if world is None:
             return {"loading": True}
 
+        key = url_key(ukey)
         logging.info("key: %s" % (key,))
 
         if world.contains(key):
@@ -202,12 +208,13 @@ def create(state):
 
         return {"entity": None}
 
-    @app.route("/api/entities/<string:key>/details", methods=["POST"])
-    async def update_entity_details(key: str):
+    @app.route("/api/entities/<string:ukey>/details", methods=["POST"])
+    async def update_entity_details(ukey: str):
         world, token = authenticate()
         if world is None:
             return {"loading": True}
 
+        key = url_key(ukey)
         logging.info("key: %s" % (key,))
 
         if world.contains(key):
@@ -233,12 +240,13 @@ def create(state):
 
         return {"entity": None}
 
-    @app.route("/api/entities/<string:key>/behavior", methods=["POST"])
+    @app.route("/api/entities/<string:ukey>/behavior", methods=["POST"])
     async def update_entity_behavior(key: str):
         world, token = authenticate()
         if world is None:
             return {"loading": True}
 
+        key = url_key(ukey)
         logging.info("key: %s" % (key,))
 
         if world.contains(key):

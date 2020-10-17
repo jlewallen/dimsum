@@ -26,6 +26,18 @@ export * from "./types";
 
 type ActionParameters = ActionContext<RootState, RootState>;
 
+function base64ToHex(key: string): string {
+    let hex = "";
+    const bytes = atob(key);
+    for (let i = 0; i < bytes.length; ++i) {
+        const byte = bytes.charCodeAt(i).toString(16);
+        hex += byte.length === 2 ? byte : "0" + byte;
+    }
+    return hex;
+}
+
+const urlKey = base64ToHex;
+
 export default createStore<RootState>({
     plugins: [createLogger()],
     state: new RootState(),
@@ -98,18 +110,18 @@ export default createStore<RootState>({
             if (state.entities[payload.key]) {
                 return Promise.resolve();
             }
-            return http<EntityResponse>({ url: `/entities/${payload.key}`, headers: state.headers }).then((data) => {
+            return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
         [ActionTypes.NEED_ENTITY]: ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
-            return http<EntityResponse>({ url: `/entities/${payload.key}`, headers: state.headers }).then((data) => {
+            return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
         [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
             return http<EntityResponse>({
-                url: `/entities/${payload.form.key}/details`,
+                url: `/entities/${urlKey(payload.form.key)}/details`,
                 method: "POST",
                 data: payload.form,
                 headers: state.headers,
@@ -120,7 +132,7 @@ export default createStore<RootState>({
         },
         [ActionTypes.SAVE_ENTITY_BEHAVIOR]: ({ state, commit }: ActionParameters, payload: SaveEntityBehaviorAction) => {
             return http<EntityResponse>({
-                url: `/entities/${payload.key}/behavior`,
+                url: `/entities/${urlKey(payload.key)}/behavior`,
                 method: "POST",
                 data: payload.form,
                 headers: state.headers,
