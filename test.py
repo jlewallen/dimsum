@@ -57,10 +57,3 @@ class TestWorld:
         response = await self.world.perform(self.player, action)
         logging.info("response: %s" % (response,))
         return response
-
-
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    print()
-    logging.info("test_basic")
-    asyncio.run(test_run())

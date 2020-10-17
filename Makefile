@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-default: checks
+default: checks test
 
 checks: env
 	env/bin/mypy *.py --ignore-missing-imports

@@ -241,7 +241,7 @@ def create(state):
         return {"entity": None}
 
     @app.route("/api/entities/<string:ukey>/behavior", methods=["POST"])
-    async def update_entity_behavior(key: str):
+    async def update_entity_behavior(ukey: str):
         world, token = authenticate()
         if world is None:
             return {"loading": True}

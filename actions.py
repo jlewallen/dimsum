@@ -6,6 +6,8 @@ from game import *
 from props import *
 import hooks
 
+MemoryAreaKey = "m:area"
+
 
 class Unknown(Action):
     def __init__(self, **kwargs):
@@ -36,15 +38,6 @@ class Auth(Action):
             base64.b64encode(key).decode("utf-8"),
         ]
         return Success("done, https://mud.espial.me")
-
-
-class Plant(Action):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.item = kwargs["item"]
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        pass
 
 
 class Home(Action):
@@ -158,7 +151,7 @@ class Plant(Action):
         if not self.item:
             return Failure("plant what?")
         await ctx.extend(plant=self.item).hook("plant")
-        return Success("you poked %s" % (self.who))
+        return Success("you planted %s" % (self.item))
 
 
 class Shake(Action):

@@ -559,10 +559,10 @@ class Area(entity.Entity):
         self.here: List[entity.Entity] = []
 
     @property
-    def items(self):
+    def items(self) -> List[Item]:
         return [e for e in self.here if isinstance(e, Item)]
 
-    def entities(self):
+    def entities(self) -> List[entity.Entity]:
         return self.here
 
     def contains(self, e: entity.Entity):
@@ -580,7 +580,7 @@ class Area(entity.Entity):
         return AreaObservation(player.observe(), self, people, items)
 
     def add_item(self, item: Item):
-        for h in self.here:
+        for h in self.items:
             if item.kind.same(h.kind):
                 h.quantity += item.quantity
 
