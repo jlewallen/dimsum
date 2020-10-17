@@ -188,7 +188,7 @@ async def test_behavior_time_passing(caplog):
         "b:test:tick",
         lua="""
 function(s, world, area, item)
-    debug("ok", area, item)
+    debug("ok", area, item, time)
     return area.make({
         name = "Flower Petal",
         quantity = 10,

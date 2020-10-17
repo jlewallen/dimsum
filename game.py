@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Sequence
+from typing import List, Tuple, Dict, Sequence, Optional
 
 import logging
 import sys
@@ -774,8 +774,10 @@ class World(entity.Entity):
         ctx = Ctx(self.wrapping_fn, world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
 
-    async def tick(self, time: float):
-        return await self.everywhere("tick", time=time)
+    async def tick(self, now: Optional[float] = None):
+        if now is None:
+            now = time.time()
+        return await self.everywhere("tick", time=now)
 
     async def everywhere(self, name: str, **kwargs):
         everything = list(self.entities.values())
