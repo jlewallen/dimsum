@@ -107,7 +107,7 @@ class Item(entity.Entity):
     def __repr__(self):
         return str(self)
 
-    def separate(self, player, quantity):
+    def separate(self, world, player, quantity):
         if quantity < 1:
             raise Exception("too few to separate")
 
@@ -116,15 +116,17 @@ class Item(entity.Entity):
 
         self.quantity -= quantity
 
-        return [
-            Item(
-                owner=player,
-                kind=self.kind,
-                details=self.details,
-                behaviors=self.behaviors,
-                quantity=quantity,
-            )
-        ]
+        item = Item(
+            owner=player,
+            kind=self.kind,
+            details=self.details,
+            behaviors=self.behaviors,
+            quantity=quantity,
+        )
+
+        world.register(item)
+
+        return [item]
 
 
 class IsItemTemplate:

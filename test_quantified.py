@@ -20,6 +20,7 @@ async def test_quantified_drop_partial_and_hold():
     assert len(tw.area.items) == 1
     assert tw.player.holding[0].quantity == 15
     assert tw.area.items[0].quantity == 5
+    assert tw.player.holding[0].key in tw.world.entities  # Meh
 
     await tw.execute("hold coin")
     assert len(tw.player.holding) == 1

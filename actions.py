@@ -284,8 +284,7 @@ class Drop(Action):
             if self.quantity > self.item.quantity or self.quantity < 1:
                 return Failure("you should check how many you have")
 
-            dropped = self.item.separate(player, self.quantity)
-
+            dropped = self.item.separate(world, player, self.quantity)
             if self.item.quantity == 0:
                 world.unregister(self.item)
                 player.drop(self.item)
