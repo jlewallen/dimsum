@@ -17,3 +17,14 @@ async def test_simple_wear_and_remove():
     await tw.execute("remove shoes")
     assert len(tw.player.holding) == 1
     assert len(tw.player.wearing) == 0
+
+
+@pytest.mark.asyncio
+async def test_wearing():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Shoes")
+    r = await tw.execute("wear shoes")
+    assert isinstance(r, game.Failure)
+    assert len(tw.player.holding) == 1
+    assert len(tw.player.wearing) == 0

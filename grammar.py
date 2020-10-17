@@ -34,30 +34,34 @@ def create_parser():
         give:              "give"
         take:              "take"
         home:              "home"
-        think:             "think"
+
 
         hold:              "hold" unheld_noun
         drop:              "drop"             -> drop
                          | "drop" number noun -> drop_quantity
                          | "drop" noun        -> drop_item
 
+        go:                "go" noun
+        climb:             "climb" noun
+
         obliterate:        "obliterate"
-        remember:          "remember"
         make:              "make" makeable_noun        -> make
                          | "make" number makeable_noun -> make_quantified
 
+        think:             "think"
+        forget:            "forget" noun
+        remember:          "remember"
 
-        go:                "go" noun
-        eat:               "eat" noun
-        drink:             "drink" noun
-        plant:             "plant" (noun)?
         wear:              "wear" noun
         remove:            "remove" noun
+
+        eat:               "eat" noun
+        drink:             "drink" noun
+
+        plant:             "plant" (noun)?
         swing:             "swing" noun
         shake:             "shake" noun
-        forget:            "forget" noun
         heal:              "heal" noun
-        climb:             "climb" noun
         hug:               "hug" noun
         kiss:              "kiss" noun
         kick:              "kick" noun
@@ -68,16 +72,17 @@ def create_parser():
         water:             "water" noun ("with" noun)?
         pour:              "pour" noun (("on"|"over") noun)?
 
-        auth:              "auth" TEXT
-
         modify:            "modify" TEXT_FIELD text               -> modify_field
                          | "modify" NUMERIC_FIELD number          -> modify_field
+                         | "modify" "when" "worn"                 -> when_worn
                          | "modify" "when" "opened"               -> when_opened
                          | "modify" "when" "eaten"                -> when_eaten
                          | "modify" "when" "drank"                -> when_drank
                          | "modify" "when" "activated"            -> when_activated
                          | "modify" "when" "triggered"            -> when_triggered
                          | "modify" "when" "closed"               -> when_closed
+
+        auth:              "auth" TEXT
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD:     "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS

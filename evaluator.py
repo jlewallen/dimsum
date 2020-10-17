@@ -170,6 +170,11 @@ class Evaluate(lark.Transformer):
         value = args[1]
         return actions.ModifyField(item=item, field=field, value=value)
 
+    def when_worn(self, args):
+        return actions.ModifyActivity(
+            item=self.get_item_held(), activity="worn", value=True
+        )
+
     def when_opened(self, args):
         return actions.ModifyActivity(
             item=self.get_item_held(), activity="opened", value=True

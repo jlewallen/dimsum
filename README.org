@@ -17,19 +17,9 @@
 
    N-Hops aways, etc...
 
-** DONE Planting
-** DONE Climbing
-** DONE Water/Pour
-** DONE Saving behaviors should compile or error.
 ** TODO Time passing.
 
    Maybe a tick hook that fires once a minutes for everything, staggered.
-
-** DONE Countable things.
-
-   give NUMBER noun to noun
-
-   Recipes have a kind identity. This same kind identity is used for QuantifiedItems to group them.
 
 ** TODO Make maze.
 
@@ -86,10 +76,21 @@
 
    Present good options for b:key:verb:when
 
+** TODO CLI mode for testing.
 ** DONE Allow naming of common things that get made.
 ** DONE Modify credentials in game.
 ** DONE Toggle eating and drinking of things.
 ** DONE Timestamps.
+** DONE Planting
+** DONE Climbing
+** DONE Water/Pour
+** DONE Saving behaviors should compile or error.
+** DONE Countable things.
+
+   give NUMBER noun to noun
+
+   Recipes have a kind identity. This same kind identity is used for QuantifiedItems to group them.
+
 **  Example Session
 
 	[[./docs/areas.png]]
