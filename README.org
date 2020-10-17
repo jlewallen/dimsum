@@ -17,7 +17,7 @@
 
    N-Hops aways, etc...
 
-** TODO Time passing.
+** DONE Time passing.
 
    Maybe a tick hook that fires once a minutes for everything, staggered.
 

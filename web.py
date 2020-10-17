@@ -83,6 +83,11 @@ class WebModelVisitor:
     def identity(self, identity):
         return {"public": identity.public, "signature": identity.signature}
 
+    def details_value(self, value):
+        if isinstance(value, game.Kind):
+            return value.saved()
+        return value
+
     def entity(self, entity):
         return {
             "key": entity.key,
@@ -90,7 +95,10 @@ class WebModelVisitor:
             "kind": entity.__class__.__name__,
             "identity": self.identity(entity.identity),
             "owner": self.ref(entity.owner),
-            "details": entity.details.map,
+            "details": {
+                key: self.details_value(value)
+                for key, value in entity.details.map.items()
+            },
             "behaviors": self.behaviors(entity.behaviors),
         }
 
