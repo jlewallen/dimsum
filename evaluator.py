@@ -29,7 +29,7 @@ class Evaluate(lark.Transformer):
         return actions.Drop(quantity=args[0], item=args[1])
 
     def drop_item(self, args):
-        return actions.Drop()
+        return actions.Drop(item=args[0])
 
     def home(self, args):
         return actions.Home()

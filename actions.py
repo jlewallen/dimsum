@@ -206,7 +206,7 @@ class Wear(Action):
         if not self.item:
             return Failure("wear what?")
         player.wear(self.item)
-        await ctx.extend(wear=self.item).hook("wear:after")
+        await ctx.extend(wear=[self.item]).hook("wear:after")
         return Success("you wore %s" % (self.item))
 
 
@@ -219,7 +219,7 @@ class Remove(Action):
         if not self.item:
             return Failure("remove what?")
         player.remove(self.item)
-        await ctx.extend(remove=self.item).hook("remove:after")
+        await ctx.extend(remove=[self.item]).hook("remove:after")
         return Success("you removed %s" % (self.item))
 
 
@@ -229,6 +229,9 @@ class Eat(Action):
         self.item = kwargs["item"]
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("dunno where that is")
+
         if not self.item.details.when_eaten():
             return Failure("you can't eat that")
 
@@ -238,7 +241,7 @@ class Eat(Action):
         player.consume(self.item)
         await world.bus.publish(ItemEaten(player, area, self.item))
         await ctx.extend(eat=self.item).hook("eat:after")
-        return Failure("you ate %s" % (self.item))
+        return Success("you ate %s" % (self.item))
 
 
 class Drink(Action):
@@ -249,6 +252,7 @@ class Drink(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("dunno where that is")
+
         if not self.item.details.when_drank():
             return Failure("you can't drink that")
 
@@ -289,7 +293,10 @@ class Drop(Action):
                 world.unregister(self.item)
                 player.drop(self.item)
         else:
-            dropped = player.drop_all()
+            if self.item:
+                dropped = player.drop(self.item)
+            else:
+                dropped = player.drop_all()
 
         for item in dropped:
             area.add_item(item)

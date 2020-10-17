@@ -26,6 +26,19 @@ async def test_make_hold_drop():
 
 
 @pytest.mark.asyncio
+async def test_make_hold_drop_specific():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Hammer")
+    await tw.execute("make Ball")
+    assert len(tw.player.holding) == 2
+    await tw.execute("drop ball")
+    assert len(tw.player.holding) == 1
+    await tw.execute("hold ball")
+    assert len(tw.player.holding) == 2
+
+
+@pytest.mark.asyncio
 async def test_simple_action_verbs():
     tw = test.TestWorld()
     await tw.initialize()
