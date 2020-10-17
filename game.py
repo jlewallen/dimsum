@@ -794,6 +794,8 @@ class Ctx:
         self.se = scriptEngine
         self.wrapping_fn = wrapping_fn
         self.scope = behavior.Scope(**kwargs)
+        self.world = kwargs["world"]
+        self.person = kwargs["person"]
 
     def extend(self, **kwargs):
         self.scope = self.scope.extend(**kwargs)
@@ -827,7 +829,11 @@ class Ctx:
         scope = self.scope.extend(**kwargs)
         prepared = self.se.prepare(scope, self.wrapping_fn)
         for b in found:
-            self.se.execute(behavior.GenericThunk, prepared, b)
+            actions = self.se.execute(behavior.GenericThunk, prepared, b)
+            if actions:
+                for action in actions:
+                    await self.world.perform(self.person, action)
+                    log.info("performing: %s", action)
 
 
 class Action:

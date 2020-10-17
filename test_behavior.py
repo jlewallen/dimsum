@@ -74,3 +74,43 @@ end
     await tw.execute("remove cape")
     assert tw.jacob.visible == {}
     await tw.execute("drop")
+
+
+@pytest.mark.asyncio
+async def test_behavior_move(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    mystery_area = game.Area(owner=tw.player, details=props.Details("A Mystery Area"))
+    tw.world.register(mystery_area)
+
+    cape = tw.add_item(game.Item(owner=tw.jacob, details=props.Details("Cape")))
+    cape.link_activity("worn", mystery_area)
+    cape.add_behavior(
+        "b:test:wear:after",
+        lua="""
+function(s, world, player)
+    debug('wear', wear)
+    debug('wear[0].worn', wear[0].worn)
+    return player.go(wear[0].worn)
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.execute("look")
+    await tw.execute("hold cape")
+    await tw.execute("wear cape")
+    await tw.execute("look")
+
+    assert tw.world.find_player_area(tw.player) == mystery_area
+
+
+@pytest.mark.asyncio
+async def test_behavior_create_item(caplog):
+    pass
+
+
+@pytest.mark.asyncio
+async def test_behavior_create_area(caplog):
+    pass

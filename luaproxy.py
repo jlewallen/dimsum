@@ -79,7 +79,7 @@ class LupaPerson(LupaEntity):
         return self.entity.is_invisible
 
     def go(self, area) -> Sequence[game.Action]:
-        return []
+        return [actions.Go(area=area)]
 
 
 def wrap(thing):
