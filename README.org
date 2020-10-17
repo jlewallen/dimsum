@@ -25,7 +25,7 @@
 
    Maybe a tick hook that fires once a minutes for everything, staggered.
 
-** TODO Countable things.
+** DONE Countable things.
 
    give NUMBER noun to noun
 
