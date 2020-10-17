@@ -60,6 +60,7 @@ class AddItemArea(PersonAction):
         world.register(self.item)
         self.area.add_item(self.item)
         await world.bus.publish(ItemsAppeared(self.area, [self.item]))
+        await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
 
 

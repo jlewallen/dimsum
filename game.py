@@ -780,6 +780,7 @@ class World(entity.Entity):
         return await self.everywhere("tick", time=now)
 
     async def everywhere(self, name: str, **kwargs):
+        log.info("everywhere:%s %s", name, kwargs)
         everything = list(self.entities.values())
         for entity in everything:
             behaviors = entity.get_behaviors(name)
@@ -831,7 +832,7 @@ class Ctx:
 
         return get_entities_inside(self.scope.values())
 
-    async def hook(self, name, **kwargs):
+    async def hook(self, name):
         found = []
         entities = self.entities()
         log.info("hook:%s %s" % (name, entities))
@@ -843,7 +844,7 @@ class Ctx:
                 )
             found.extend(behaviors)
 
-        scope = self.scope.extend(**kwargs)
+        scope = self.scope
         prepared = self.se.prepare(scope, self.wrapping_fn)
         for b in found:
             thunk = behavior.GenericThunk

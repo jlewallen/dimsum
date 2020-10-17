@@ -109,9 +109,8 @@ class SystemTickCog(discord.ext.commands.Cog):
     def cog_unload(self):
         self.tick.cancel()
 
-    @discord.ext.tasks.loop(seconds=5)
+    @discord.ext.tasks.loop(minutes=1)
     async def tick(self):
-        log.info("tick")
         await self.world.tick()
 
 
