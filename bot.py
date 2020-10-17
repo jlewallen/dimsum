@@ -3,13 +3,15 @@ import discord
 import discord.ext.commands
 import logging
 import inflect
+import lark
+
 import props
 import game
-import lark
 import persistence
 import grammar
 import evaluator
 import actions
+import luaproxy
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.discord")
@@ -334,7 +336,7 @@ modify when eaten
 
     async def initialize(self):
         self.bus = DiscordEventBus(self.bot)
-        self.world = game.World(self.bus)
+        self.world = game.World(self.bus, luaproxy.wrap)
 
         db = persistence.SqlitePersistence()
         await db.open("world.sqlite3")

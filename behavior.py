@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Sequence, Dict
 
 import sys
 import logging
@@ -6,6 +6,7 @@ import datetime
 import time
 import asyncio
 import lupa
+
 import props
 
 log = logging.getLogger("dimsum")

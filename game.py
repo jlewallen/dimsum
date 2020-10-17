@@ -12,8 +12,10 @@ import props
 import entity
 import behavior
 
-p = inflect.engine()
 DefaultMoveVerb = "walk"
+
+p = inflect.engine()
+scriptEngine = behavior.ScriptEngine()
 log = logging.getLogger("dimsum")
 
 
@@ -664,89 +666,13 @@ class Area(entity.Entity):
         await bus.publish(PlayerLeftArea(player, self))
 
 
-class LupaEntity:
-    def __init__(self, entity):
-        self.entity = entity
-
-    def unlua(self, value):
-        if lupa.lua_type(value) == "table":
-            v = {}
-            for key, val in value.items():
-                v[key] = val
-            return v
-        return value
-
-    def __setitem__(self, key, value):
-        log.info(
-            "entity:entity s: %s %s=%s (%s)"
-            % (str(self), str(key), str(value), lupa.lua_type(value))
-        )
-        self.entity.details.map[key] = self.unlua(value)
-
-    def __getitem__(self, key):
-        log.info("entity:entity g: %s %s" % (str(self), str(key)))
-        if key in self.entity.details.map:
-            return self.entity.details.map[key]
-        if hasattr(self, key):
-            return getattr(self, key)
-        return None
-
-
-class LupaWorld(LupaEntity):
-    pass
-
-
-class LupaArea(LupaEntity):
-    pass
-
-
-class LupaItem(LupaEntity):
-    pass
-
-
-class LupaPerson(LupaEntity):
-    def visible(self):
-        return self.entity.make_visible()
-
-    def invisible(self):
-        return self.entity.make_invisible()
-
-    def is_invisible(self):
-        return self.entity.is_invisible
-
-
-def lupa_for(thing):
-    if thing is None:
-        return None
-    if isinstance(thing, list):
-        return [lupa_for(e) for e in thing]
-    if isinstance(thing, dict):
-        return {key: lupa_for(value) for key, value in thing.items()}
-    if isinstance(thing, World):
-        return LupaWorld(thing)
-    if isinstance(thing, Person):
-        return LupaPerson(thing)
-    if isinstance(thing, Area):
-        return LupaArea(thing)
-    if isinstance(thing, Item):
-        return LupaItem(thing)
-    if isinstance(thing, entity.Entity):
-        raise Exception(
-            "no wrapper for entity: %s (%s)"
-            % (
-                thing,
-                type(thing),
-            )
-        )
-    return thing
-
-
 class World(entity.Entity):
-    def __init__(self, bus: EventBus):
+    def __init__(self, bus: EventBus, wrapping_fn):
         super().__init__()
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
+        self.wrapping_fn = wrapping_fn
         self.entities: Dict[str, entity.Entity] = {}
 
     def register(self, entity: entity.Entity):
@@ -845,7 +771,7 @@ class World(entity.Entity):
 
     async def perform(self, player: Player, action):
         area = self.find_player_area(player)
-        ctx = Ctx(world=self, person=player, area=area)
+        ctx = Ctx(self.wrapping_fn, world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
 
     def __str__(self):
@@ -863,12 +789,10 @@ class HooksAround:
         pass
 
 
-scriptEngine = behavior.ScriptEngine()
-
-
 class Ctx:
-    def __init__(self, **kwargs):
+    def __init__(self, wrapping_fn, **kwargs):
         self.se = scriptEngine
+        self.wrapping_fn = wrapping_fn
         self.scope = behavior.Scope(**kwargs)
 
     def extend(self, **kwargs):
@@ -896,13 +820,12 @@ class Ctx:
             behaviors = entity.get_behaviors(name)
             if len(behaviors) > 0:
                 log.info(
-                    "entity:behaviors invoke '%s' %d behavior"
-                    % (entity, len(behaviors))
+                    "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
                 )
             found.extend(behaviors)
 
         scope = self.scope.extend(**kwargs)
-        prepared = self.se.prepare(scope, lupa_for)
+        prepared = self.se.prepare(scope, self.wrapping_fn)
         for b in found:
             self.se.execute(behavior.GenericThunk, prepared, b)
 
