@@ -61,6 +61,12 @@ class Identity:
         signature = base64.b64encode(signature_bytes).decode("utf-8")
         return Identity(private=other.private, public=other.public, signature=signature)
 
+    def __str__(self):
+        return "identity<%s>" % (self.public,)
+
+    def __repr__(self):
+        return str(self)
+
 
 def generate_identity_from(other: Identity):
     return other.sign(generate_identity())

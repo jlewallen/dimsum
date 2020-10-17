@@ -20,6 +20,8 @@ class EntityVisitor:
 
 class Entity:
     def __init__(self, **kwargs):
+        self.kind = None
+
         if "owner" in kwargs:
             self.owner = kwargs["owner"]
         else:

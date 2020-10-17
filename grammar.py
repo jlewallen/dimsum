@@ -14,7 +14,9 @@ def create_parser():
         USEFUL_WORD:      /(?!(on|with|over)\b)[\w][\w]*/i
 
         makeable_noun:     TEXT
+        unheld_noun:       USEFUL_WORD+
         noun:              USEFUL_WORD+
+
         this:              "this"
         that:              "that"
 
@@ -34,6 +36,7 @@ def create_parser():
         home:              "home"
         think:             "think"
 
+        hold:              "hold" unheld_noun
         drop:              "drop"             -> drop
                          | "drop" number noun -> drop_quantity
                          | "drop" noun        -> drop_item
@@ -42,7 +45,8 @@ def create_parser():
         remember:          "remember"
         make:              "make" makeable_noun        -> make
                          | "make" number makeable_noun -> make_quantified
-        hold:              "hold" noun
+
+
         go:                "go" noun
         eat:               "eat" noun
         drink:             "drink" noun

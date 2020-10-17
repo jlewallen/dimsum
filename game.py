@@ -35,8 +35,19 @@ class Kind:
         else:
             self.identity = crypto.generate_identity()
 
+    def same(self, other: "Kind"):
+        if other is None:
+            return False
+        return self.identity.public == other.identity.public
+
     def saved(self):
         return {"identity": self.identity.saved()}
+
+    def __str__(self):
+        return "kind<%s>" % (self.identity,)
+
+    def __repr__(self):
+        return str(self)
 
 
 class Item(entity.Entity):
@@ -54,7 +65,11 @@ class Item(entity.Entity):
         self.details.touch()
 
     def describes(self, q: str):
-        return q.lower() in self.details.name.lower()
+        if q.lower() in self.details.name.lower():
+            return True
+        if q.lower() in str(self).lower():
+            return True
+        return False
 
     def observe(self):
         return ObservedEntity(self)
@@ -287,6 +302,17 @@ class Person(entity.Entity):
         return item in self.holding
 
     def hold(self, item: Item):
+        # See if there's a kind already in inventory.
+        for holding in self.holding:
+            if item.kind.same(holding.kind):
+                # This will probably need more protection haha
+                holding.quantity += item.quantity
+                holding.touch()
+
+                # We return, which skips the append to holding below,
+                # and that has the effect of obliterating the item we
+                # picked up, merging with the one in our hands.
+                return
         self.holding.append(item)
         item.touch()
 
@@ -519,6 +545,10 @@ class Area(entity.Entity):
         self.details = kwargs["details"]
         self.here: List[entity.Entity] = []
 
+    @property
+    def items(self):
+        return [e for e in self.here if isinstance(e, Item)]
+
     def entities(self):
         return self.here
 
@@ -537,6 +567,15 @@ class Area(entity.Entity):
         return AreaObservation(player.observe(), self, people, items)
 
     def add_item(self, item: Item):
+        for h in self.here:
+            if item.kind.same(h.kind):
+                h.quantity += item.quantity
+
+                # We return, which skips the append to holding below,
+                # and that has the effect of obliterating the item we
+                # picked up, merging with the one in our hands.
+                return self
+
         self.here.append(item)
         return self
 
@@ -578,13 +617,6 @@ class Area(entity.Entity):
     async def left(self, bus: EventBus, player: Player):
         self.here.remove(player)
         await bus.publish(PlayerLeftArea(player, self))
-
-    async def drop(self, bus: EventBus, player: Player):
-        dropped = player.drop_all()
-        for item in dropped:
-            self.here.append(item)
-            await bus.publish(ItemDropped(player, self, item))
-        return dropped
 
 
 class LupaEntity:
@@ -738,15 +770,17 @@ class World(entity.Entity):
     def search(self, player: Player, whereQ: str, **kwargs):
         area = self.find_player_area(player)
 
-        item = player.find(whereQ)
-        if item:
-            return area, item
+        order = [player.find, area.find]
 
-        item = area.find(whereQ)
-        if item:
-            return area, item
+        if "unheld" in kwargs:
+            order = [area.find, player.find]
 
-        return None, None
+        for fn in order:
+            item = fn(whereQ)
+            if item:
+                return item
+
+        return None
 
     async def perform(self, player: Player, action):
         area = self.find_player_area(player)
@@ -906,14 +940,14 @@ class ItemDrank(Event):
         return "%s just drank %s!" % (self.player, self.item)
 
 
-class ItemDropped(Event):
-    def __init__(self, player: Player, area: Area, item: Item):
+class ItemsDropped(Event):
+    def __init__(self, player: Player, area: Area, items: List[Item]):
         self.player = player
         self.area = area
-        self.item = item
+        self.items = items
 
     def __str__(self):
-        return "%s dropped %s" % (self.player, self.item)
+        return "%s dropped %s" % (self.player, p.join(self.items))
 
 
 class ItemObliterated(Event):

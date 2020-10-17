@@ -293,8 +293,9 @@ class Drop(Action):
             dropped = player.drop_all()
 
         for item in dropped:
-            area.here.append(item)
-            await world.bus.publish(ItemDropped(player, self, item))
+            area.add_item(item)
+
+        await world.bus.publish(ItemsDropped(player, area, dropped))
         await ctx.extend(dropped=dropped).hook("drop:after")
         return Success("you dropped %s" % (p.join(dropped),))
 

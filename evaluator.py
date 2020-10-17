@@ -128,16 +128,16 @@ class Evaluate(lark.Transformer):
         return actions.Make(template=game.MaybeQuantifiedItem(args[1], quantity))
 
     def makeable_noun(self, args):
-        area, item = self.world.search(self.player, str(args[0]))
+        item = self.world.search(self.player, str(args[0]))
         if item:
             return item
         return game.MaybeItem(str(args[0]))
 
+    def unheld_noun(self, args):
+        return self.world.search(self.player, str(args[0]), unheld=True)
+
     def noun(self, args):
-        area, item = self.world.search(self.player, str(args[0]))
-        if item:
-            return item
-        return None
+        return self.world.search(self.player, str(args[0]))
 
     def this(self, args):
         return self.get_item_held()
