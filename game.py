@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Sequence
 
 import logging
 import sys
@@ -14,6 +14,10 @@ import behavior
 
 p = inflect.engine()
 DefaultMoveVerb = "walk"
+
+
+class Observable:
+    pass
 
 
 class Event:
@@ -82,8 +86,8 @@ class Item(entity.Entity):
             return True
         return False
 
-    def observe(self):
-        return ObservedEntity(self)
+    def observe(self) -> Sequence["ObservedEntity"]:
+        return [ObservedEntity(self)]
 
     def saved(self):
         p = super().saved()
@@ -201,7 +205,7 @@ class Recipe(Item):
         )
 
 
-class ObservedEntity:
+class ObservedEntity(Observable):
     def __init__(self, entity: entity.Entity):
         self.entity = entity
 
@@ -215,7 +219,7 @@ class ObservedEntity:
         return str(self)
 
 
-class ObservedEntities:
+class ObservedEntities(Observable):
     def __init__(self, entities: List[entity.Entity]):
         self.entities = entities
 
@@ -281,9 +285,11 @@ class Person(entity.Entity):
                 return entity
         return None
 
-    def observe(self):
+    def observe(self) -> Sequence["ObservedPerson"]:
+        if "hidden" in self.visible:
+            return []
         activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
-        return ObservedPerson(self, activities)
+        return [ObservedPerson(self, activities)]
 
     def describes(self, q: str):
         return q.lower() in self.details.name.lower()
@@ -416,8 +422,8 @@ class Person(entity.Entity):
             self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
 
-class ObservedPerson:
-    def __init__(self, person: Person, activities: List[Activity]):
+class ObservedPerson(Observable):
+    def __init__(self, person: Person, activities: Sequence[Activity]):
         self.person = person
         self.activities = activities
 
@@ -472,7 +478,7 @@ class Failure(SimpleReply):
         return "Failure<%s>" % (self.message,)
 
 
-class Observation(Reply):
+class Observation(Reply, Observable):
     pass
 
 
@@ -591,7 +597,8 @@ class Area(entity.Entity):
             e.observe() for e in self.here if isinstance(e, Person) and e != player
         ]
         items = [e.observe() for e in self.here if isinstance(e, Item)]
-        return AreaObservation(player.observe(), self, people, items)
+        observed_self = player.observe()[0]
+        return AreaObservation(observed_self, self, flatten(people), flatten(items))
 
     def add_item(self, item: Item):
         for h in self.items:
@@ -855,9 +862,6 @@ class Ctx:
         return self
 
     def entities(self):
-        def flatten(l):
-            return [item for sl in l for item in sl]
-
         def get_entities_inside(array):
             return flatten([get_entities(e) for e in array])
 
@@ -998,3 +1002,7 @@ class ItemObliterated(Event):
 
     def __str__(self):
         return "%s obliterated %s" % (self.player, self.item)
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]

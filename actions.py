@@ -328,7 +328,8 @@ class LookFor(Action):
         await ctx.extend(here=area.here).extend(holding=player.holding).extend(
             name=self.name
         ).hook("look-for")
-        return PersonalObservation(player.observe())
+        observed = player.observe()[0]
+        return PersonalObservation(observed)
 
 
 class LookMyself(Action):
@@ -337,7 +338,8 @@ class LookMyself(Action):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-myself")
-        return PersonalObservation(player.observe())
+        observed = player.observe()[0]
+        return PersonalObservation(observed)
 
 
 class LookDown(Action):
@@ -356,7 +358,8 @@ class Look(Action):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
-            return DetailedObservation(player.observe(), self.item)
+            observed = player.observe()[0]
+            return DetailedObservation(observed, self.item)
         return world.look(player)
 
 

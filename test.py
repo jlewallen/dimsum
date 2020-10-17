@@ -36,7 +36,14 @@ class TestWorld:
             owner=self.world,
             details=props.Details("Carla", desc="Chief Salad Officer."),
         )
-        await self.world.perform(self.carla, actions.Join())
+        return await self.world.perform(self.carla, actions.Join())
+
+    async def add_tomi(self):
+        self.tomi = game.Player(
+            owner=self.world,
+            details=props.Details("Tomi", desc="Chief Crying Officer."),
+        )
+        return await self.world.perform(self.tomi, actions.Join())
 
     async def initialize(self):
         self.world.add_area(self.area)
