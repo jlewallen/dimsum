@@ -1,6 +1,7 @@
 import lark
 import game
 import actions
+import props
 
 
 class Evaluate(lark.Transformer):
@@ -172,22 +173,22 @@ class Evaluate(lark.Transformer):
 
     def when_worn(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity="worn", value=True
+            item=self.get_item_held(), activity=props.Worn, value=True
         )
 
     def when_opened(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity="opened", value=True
+            item=self.get_item_held(), activity=props.Opened, value=True
         )
 
     def when_eaten(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity="eaten", value=True
+            item=self.get_item_held(), activity=props.Eaten, value=True
         )
 
     def when_drank(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity="drank", value=True
+            item=self.get_item_held(), activity=props.Drank, value=True
         )
 
     def remember(self, args):

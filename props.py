@@ -1,6 +1,14 @@
 import time
 import re
 
+Created = "created"
+Touched = "touched"
+Desc = "desc"
+Worn = "worn"
+Opened = "opened"
+Eaten = "eaten"
+Drank = "drank"
+
 
 class FieldMergeStrategy:
     def __init__(self, name: str):
@@ -72,7 +80,7 @@ class Details(PropertyMap):
     def __init__(self, name: str = "", **kwargs):
         super().__init__(**kwargs)
         self.name = name
-        self.desc = kwargs["desc"] if "desc" in kwargs else name
+        self.desc = kwargs[Desc] if Desc in kwargs else name
         self.presence = ""
         self.created = time.time()
         self.touched = time.time()
@@ -93,23 +101,26 @@ class Details(PropertyMap):
 
     def to_base(self):
         base = self.map.copy()
-        if "created" in base:
-            del base["created"]
-        if "touched" in base:
-            del base["touched"]
+        if Created in base:
+            del base[Created]
+        if Touched in base:
+            del base[Touched]
         return base
 
     def clone(self):
         return Details(self.name, desc=self.desc)
 
     def when_worn(self):
-        return self.map["worn"] if "worn" in self.map else False
+        return self.map[Worn] if Worn in self.map else False
 
     def when_eaten(self):
-        return self.map["eaten"] if "eaten" in self.map else False
+        return self.map[Eaten] if Eaten in self.map else False
+
+    def when_opened(self):
+        return self.map[Opened] if Opened in self.map else False
 
     def when_drank(self):
-        return self.map["drank"] if "drank" in self.map else False
+        return self.map[Drank] if Drank in self.map else False
 
     def touch(self):
         self.touched = time.time()

@@ -215,6 +215,8 @@ class Remove(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("remove what?")
+        if not player.is_wearing(self.item):
+            return Failure("you aren't wearing that")
         player.remove(self.item)
         await ctx.extend(remove=[self.item]).hook("remove:after")
         return Success("you removed %s" % (self.item))
@@ -527,5 +529,6 @@ class ModifyActivity(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("nothing to modify")
+        self.item.link_activity(self.activity, self.value)
         self.item.details.set(self.activity, self.value)
         return Success("done")

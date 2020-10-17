@@ -84,14 +84,10 @@ class ScriptEngine:
         messages: List[str] = []
 
         def debug(*args):
-            message = " ".join(args)
-            logging.info(
-                "lua:debug:%s: %s"
-                % (
-                    "",
-                    message,
-                )
-            )
+            message = str(args)
+            if isinstance(args, list):
+                message = " ".join([str(e) for e in args])
+            logging.info("lua:debug: " + message)
             now = datetime.datetime.now()
             stamped = now.strftime("%Y/%m/%d %H:%M:%S") + " " + message
             messages.append(stamped)

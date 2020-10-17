@@ -8,7 +8,7 @@ import test
 
 
 @pytest.mark.asyncio
-async def test_simple_behavior(caplog):
+async def test_drop_hammer_funny_gold(caplog):
     tw = test.TestWorld()
 
     hammer = tw.add_item(game.Item(owner=tw.jacob, details=props.Details("Hammer")))
@@ -39,3 +39,37 @@ end
     await tw.execute("drop")
 
     assert tw.jacob.details["gold"]["total"] == 2
+
+
+@pytest.mark.asyncio
+async def test_wear_cape(caplog):
+    tw = test.TestWorld()
+
+    cape = tw.add_item(game.Item(owner=tw.jacob, details=props.Details("Cape")))
+    cape.link_activity("worn")
+    cape.add_behavior(
+        "b:test:wear:after",
+        lua="""
+function(s, world, player)
+    debug(player)
+    player.invisible()
+end
+""",
+    )
+    cape.add_behavior(
+        "b:test:remove:after",
+        lua="""
+function(s, world, player)
+    player.visible()
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.execute("look")
+    await tw.execute("hold cape")
+    await tw.execute("wear cape")
+    assert tw.jacob.visible == {"hidden": True}
+    await tw.execute("remove cape")
+    assert tw.jacob.visible == {}
+    await tw.execute("drop")

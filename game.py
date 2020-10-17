@@ -69,6 +69,9 @@ class Item(entity.Entity):
         else:
             self.areas[DefaultMoveVerb] = new_area
 
+    def link_activity(self, name, activity=True):
+        self.details.set(name, activity)
+
     def touch(self):
         self.details.touch()
 
@@ -338,6 +341,14 @@ class Person(entity.Entity):
         self.hold(item)
         self.wearing.remove(item)
         item.touch()
+
+    def make_visible(self):
+        logging.info("person:visible")
+        self.visible = {}
+
+    def make_invisible(self):
+        logging.info("person:invisible")
+        self.visible = {"hidden": True}
 
     def consume(self, item):
         FoodFields = [
@@ -658,6 +669,8 @@ class LupaEntity:
         logging.info("entity:entity g: %s %s" % (str(self), str(key)))
         if key in self.entity.details.map:
             return self.entity.details.map[key]
+        if hasattr(self, key):
+            return getattr(self, key)
         return None
 
 
@@ -674,7 +687,11 @@ class LupaItem(LupaEntity):
 
 
 class LupaPerson(LupaEntity):
-    pass
+    def visible(self):
+        return self.entity.make_visible()
+
+    def invisible(self):
+        return self.entity.make_invisible()
 
 
 def lupa_for(thing):
