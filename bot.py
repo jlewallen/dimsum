@@ -1,6 +1,7 @@
 import base64
 import discord
 import discord.ext.commands
+import discord.ext.tasks
 import logging
 import inflect
 import lark
@@ -100,6 +101,20 @@ class ReplyVisitor(EmbedObservationVisitor):
         return {"content": reply.message}
 
 
+class SystemTickCog(discord.ext.commands.Cog):
+    def __init__(self, world):
+        self.world = world
+        self.tick.start()
+
+    def cog_unload(self):
+        self.tick.cancel()
+
+    @discord.ext.tasks.loop(seconds=5)
+    async def tick(self):
+        log.info("tick")
+        await self.world.tick()
+
+
 class GameBot:
     def __init__(self, token):
         bot = discord.ext.commands.Bot(".")
@@ -114,6 +129,7 @@ class GameBot:
         @bot.event
         async def on_ready():
             self.world = await self.initialize()
+            bot.add_cog(SystemTickCog(self.world))
             log.info(f"{bot.user} has connected")
 
         @bot.command(
