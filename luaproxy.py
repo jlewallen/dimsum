@@ -6,6 +6,7 @@ import lupa
 import entity
 import game
 import actions
+import props
 
 log = logging.getLogger("dimsum")
 
@@ -48,15 +49,37 @@ class LupaWorld(LupaEntity):
 
 class LupaArea(LupaEntity):
     @property
-    def person(self) -> game.Area:
+    def area(self) -> game.Area:
         if not isinstance(self.entity, game.Area):
             raise Exception()
         return self.entity
 
+    def make(self, table):
+        log.info(
+            "area:make: %s",
+            ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
+        )
+
+        quantity = table["quantity"] if "quantity" in table else 1
+
+        del table["quantity"]
+
+        details = props.Details(name=table.name)
+        for key, value in table.items():
+            details.map[key] = value
+
+        item = game.Item(
+            details=details,
+            owner=self.area,
+            quantity=quantity,
+        )
+
+        return [actions.Make(item=item)]
+
 
 class LupaItem(LupaEntity):
     @property
-    def person(self) -> game.Item:
+    def item(self) -> game.Item:
         if not isinstance(self.entity, game.Item):
             raise Exception()
         return self.entity

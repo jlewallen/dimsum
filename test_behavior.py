@@ -108,7 +108,64 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_create_item(caplog):
-    pass
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    box = tw.add_item(
+        game.Item(owner=tw.jacob, details=props.Details("A Colorful Box"))
+    )
+    box.add_behavior(
+        "b:test:shake:after",
+        lua="""
+function(s, world, player)
+    debug(area)
+    return area.make({
+        name = "Flower Petal",
+        color = "red",
+    })
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.execute("look")
+    await tw.execute("hold box")
+    assert len(tw.player.holding) == 1
+    await tw.execute("shake box")
+    assert len(tw.player.holding) == 2
+    await tw.execute("look")
+
+
+@pytest.mark.asyncio
+async def test_behavior_create_quantified_item(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    box = tw.add_item(
+        game.Item(owner=tw.jacob, details=props.Details("A Colorful Box"))
+    )
+    box.add_behavior(
+        "b:test:shake:after",
+        lua="""
+function(s, world, player)
+    debug(area)
+    return area.make({
+        name = "Flower Petal",
+        quantity = 10,
+        color = "red",
+    })
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.execute("look")
+    await tw.execute("hold box")
+    assert len(tw.player.holding) == 1
+    await tw.execute("shake box")
+    assert len(tw.player.holding) == 2
+    assert tw.player.holding[1].quantity == 10
+    await tw.execute("look")
 
 
 @pytest.mark.asyncio
