@@ -111,7 +111,7 @@ class Evaluate(lark.Transformer):
         return actions.Unknown()
 
     def think(self, args):
-        return actions.Myself()
+        return actions.LookMyself()
 
     def look_myself(self, args):
         return actions.LookMyself()

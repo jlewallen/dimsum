@@ -19,26 +19,25 @@ class EntityVisitor:
 
 
 class Entity:
-    def __init__(self, **kwargs):
-        self.kind = None
+    def __init__(
+        self,
+        key=None,
+        identity=None,
+        details=None,
+        behaviors=None,
+        owner=None,
+        kind=None,
+        frozen=None,
+        visible=None,
+        **kwargs
+    ):
+        self.kind = kind
+        self.owner = owner
+        self.visible = visible if visible else {}
+        self.frozen = frozen if frozen else {}
 
-        if "owner" in kwargs:
-            self.owner = kwargs["owner"]
-        else:
-            self.owner = None
-
-        if "frozen" in kwargs:
-            self.frozen = kwargs["frozen"]
-        else:
-            self.frozen = {}
-
-        if "visible" in kwargs:
-            self.visible = kwargs["visible"]
-        else:
-            self.visible = {}
-
-        if "identity" in kwargs:
-            self.identity = kwargs["identity"]
+        if identity:
+            self.identity = identity
         else:
             # If we have an owner and no identity then we generate one
             # based on them, forming a chain.
@@ -46,19 +45,20 @@ class Entity:
                 self.identity = crypto.generate_identity_from(self.owner.identity)
             else:
                 self.identity = crypto.generate_identity()
-
             # If we aren't given a key, the default one is our public key.
             self.key = self.identity.public
 
-        if "key" in kwargs:
-            self.key = kwargs["key"]
+        if key:
+            self.key = key
 
-        if "details" in kwargs:
-            self.details = kwargs["details"]
-        else:
-            self.details = props.Details("Unknown")
+        self.details = details if details else props.Details("Unknown")
+        self.behaviors = behaviors
 
-        self.behaviors = behavior.BehaviorMap()
+        if not self.behaviors:
+            self.behaviors = behavior.BehaviorMap()
+
+    def touch(self):
+        self.details.touch()
 
     def validate(self):
         if not self.owner:
@@ -74,34 +74,6 @@ class Entity:
 
     def describes(self, q: str):
         return False
-
-    def saved(self):
-        return {
-            "key": self.key,
-            "details": self.details.map,
-            # Unwraps the Behavior instances.
-            "behaviors": {k: v.__dict__ for k, v in self.behaviors.map.items()},
-            "identity": self.identity.saved(),
-            "frozen": self.frozen,  # TODO Map Dict
-            "visible": self.visible,  # TODO Map Dict
-        }
-
-    def load(self, world, properties):
-        self.key = properties["key"]
-        if "frozen" in properties:
-            self.frozen = properties["frozen"]  # TODO Resolve key/values
-        if "visible" in properties:
-            self.visible = properties["visible"]  # TODO Resolve key/values
-        self.identity = crypto.Identity(**properties["identity"])
-        if "details" in properties:
-            self.details = props.Details.from_map(properties["details"])
-        if "behaviors" in properties:
-            self.behaviors = behavior.BehaviorMap(
-                **{
-                    key: behavior.Behavior(**value)
-                    for key, value in properties["behaviors"].items()
-                }
-            )
 
     def accept(self, visitor: EntityVisitor):
         raise Exception("unimplemented")

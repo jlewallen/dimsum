@@ -9,140 +9,9 @@ import hashlib
 import game
 import grammar
 import evaluator
+import serializing
 
 log = logging.getLogger("dimsum.web")
-
-
-class WebModelVisitor:
-    def entityUrl(self, e):
-        return ("/api/entities/%s" % (e.key,),)
-
-    def ref(self, entity):
-        return {
-            "key": entity.key,
-            "url": self.entityUrl(entity),
-            "kind": entity.__class__.__name__,
-            "name": entity.details.name,
-        }
-
-    def failure(self, reply):
-        return {"kind": reply.__class__.__name__, "failure": reply.message}
-
-    def success(self, reply):
-        return {"kind": reply.__class__.__name__, "success": reply.message}
-
-    def observed_person(self, observed):
-        return observed.person.accept(self)
-
-    def observed_entity(self, observed):
-        return observed.entity.accept(self)
-
-    def observed_entities(self, observed):
-        return [e.accept(self) for e in observed.entities]
-
-    def personal_observation(self, obs):
-        return {
-            "kind": obs.__class__.__name__,
-            "personal": {
-                "who": obs.who.accept(self),
-            },
-        }
-
-    def entities_observation(self, obs):
-        return {
-            "kind": obs.__class__.__name__,
-            "entities": [e.accept(self) for e in obs.entities],
-        }
-
-    def detailed_observation(self, obs):
-        return {
-            "kind": obs.__class__.__name__,
-            "detailed": {
-                "who": obs.who.accept(self),
-                "what": obs.what.accept(self),
-            },
-        }
-
-    def area_observation(self, obs):
-        return {
-            "kind": obs.__class__.__name__,
-            "area": {
-                "who": obs.who.accept(self),
-                "where": obs.where.accept(self),
-                "people": [e.accept(self) for e in obs.people],
-                "items": [e.accept(self) for e in obs.items],
-            },
-        }
-
-    def behavior(self, b):
-        return {"lua": b.lua, "logs": b.logs}
-
-    def behaviors(self, bs):
-        return {key: self.behavior(value) for key, value in bs.items()}
-
-    def identity(self, identity):
-        return {"public": identity.public, "signature": identity.signature}
-
-    def details_value(self, value):
-        if isinstance(value, game.Kind):
-            return value.saved()
-        return value
-
-    def entity(self, entity):
-        return {
-            "key": entity.key,
-            "url": self.entityUrl(entity),
-            "kind": entity.__class__.__name__,
-            "identity": self.identity(entity.identity),
-            "owner": self.ref(entity.owner),
-            "details": {
-                key: self.details_value(value)
-                for key, value in entity.details.map.items()
-            },
-            "behaviors": self.behaviors(entity.behaviors),
-        }
-
-    def recipe(self, recipe):
-        e = self.entity(recipe)
-        e.update(
-            {
-                "base": recipe.base,
-                "required": {k: self.ref(e) for k, e in recipe.required.items()},
-            }
-        )
-        return e
-
-    def item(self, item):
-        e = self.entity(item)
-        e.update(
-            {
-                "quantity": item.quantity,
-                "areas": {k: self.ref(e) for k, e in item.areas.items()},
-            }
-        )
-        return e
-
-    def area(self, area):
-        e = self.entity(area)
-        e.update(
-            {
-                "entities": [self.ref(e) for e in area.entities()],
-            }
-        )
-        return e
-
-    def person(self, person):
-        e = self.entity(person)
-        e.update(
-            {
-                "holding": [self.ref(e) for e in person.holding],
-                "wearing": [self.ref(e) for e in person.wearing],
-                "memory": {
-                    key: self.ref(value) for key, value in person.memory.items()
-                },
-            }
-        )
-        return e
 
 
 def url_key(key):
@@ -188,9 +57,7 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        makeWeb = WebModelVisitor()
-
-        return {"areas": [a.accept(makeWeb) for a in world.areas()]}
+        return serializing.serialize({"areas": world.areas()})
 
     @app.route("/api/people")
     def people_index():
@@ -198,9 +65,7 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        makeWeb = WebModelVisitor()
-
-        return {"people": [a.accept(makeWeb) for a in world.people()]}
+        return serializing.serialize({"people": world.people()})
 
     @app.route("/api/entities/<string:ukey>")
     def get_entity(ukey: str):
@@ -213,8 +78,7 @@ def create(state):
 
         if world.contains(key):
             entity = world.find(key)
-            makeWeb = WebModelVisitor()
-            return {"entity": entity.accept(makeWeb)}
+            return serializing.serialize({"entity": entity})
 
         return {"entity": None}
 
@@ -245,8 +109,7 @@ def create(state):
 
             await state.save()
 
-            makeWeb = WebModelVisitor()
-            return {"entity": entity.accept(makeWeb)}
+            return serializing.serialize({"entity": entity})
 
         return {"entity": None}
 
@@ -267,8 +130,7 @@ def create(state):
             entity.behaviors.replace(form)
             await state.save()
 
-            makeWeb = WebModelVisitor()
-            return {"entity": entity.accept(makeWeb)}
+            return serializing.serialize({"entity": entity})
 
         return {"entity": None}
 
@@ -294,8 +156,7 @@ def create(state):
         reply = await world.perform(player, action)
         await state.save()
 
-        makeWeb = WebModelVisitor()
-        return {"reply": reply.accept(makeWeb)}
+        return serializing.serialize({"reply": reply})
 
     @app.route("/api/login", methods=["POST"])
     async def login():

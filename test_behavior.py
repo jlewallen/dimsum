@@ -200,33 +200,6 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
-    await tw.world.tick(1)
-
-
-@pytest.mark.asyncio
-async def test_behavior_time_passing(caplog):
-    caplog.set_level(logging.INFO)
-    tw = test.TestWorld()
-
-    tree = tw.add_item(
-        game.Item(owner=tw.jacob, details=props.Details("A Lovely Tree"))
-    )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
-function(s, world, area, item)
-    debug("ok", area, item, time)
-    return area.make({
-        name = "Flower Petal",
-        quantity = 10,
-        color = "red",
-    })
-end
-""",
-    )
-
-    await tw.initialize()
-    await tw.world.tick(0)
     assert len(tw.area.items) == 2
 
     await tw.world.tick(1)

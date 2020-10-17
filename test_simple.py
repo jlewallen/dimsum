@@ -1,9 +1,14 @@
 import pytest
 import logging
 
+import entity
 import game
 import props
+import serializing
+import persistence
 import test
+
+log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
@@ -127,3 +132,46 @@ async def test_look_people_invisible():
     assert isinstance(r, game.AreaObservation)
     assert len(r.items) == 0
     assert len(r.people) == 1
+
+
+@pytest.mark.asyncio
+async def test_think():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.execute("think")
+
+
+@pytest.mark.asyncio
+async def test_serialize():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    tree = tw.add_item(
+        game.Item(owner=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    clearing = tw.add_simple_area_here("Door", "Clearing")
+    tree.link_area(clearing)
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    debug("ok", area, item, time)
+    return area.make({
+        kind = item.kind("petals"),
+        name = "Flower Petal",
+        quantity = 10,
+        color = "red",
+    })
+end
+""",
+    )
+
+    db = persistence.SqlitePersistence()
+    await db.open("test.sqlite3")
+    await db.save(tw.world)
+
+    empty = game.World(tw.bus, wrapping_fn=None)
+    await db.load(empty)
+
+    logging.info("%s", empty.entities)

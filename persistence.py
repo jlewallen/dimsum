@@ -1,9 +1,14 @@
+from typing import Dict
+
 import logging
 import sqlite3
 import json
+
 import props
+import entity
 import crypto
 import game
+import serializing
 
 
 class SqlitePersistence:
@@ -15,18 +20,20 @@ class SqlitePersistence:
         )
         self.db.commit()
 
-    async def save(self, world):
+    async def save(self, world: game.World):
         self.dbc = self.db.cursor()
 
         for key in world.entities.keys():
             entity = world.entities[key]
-            props = json.dumps(entity.saved())
             klass = entity.__class__.__name__
+            props = serializing.serialize(entity)
             identity_field = {
                 "private": entity.identity.private,
                 "signature": entity.identity.signature,
             }
+
             try:
+                logging.info("saving %s %s %s", key, entity, entity.__class__.__name__)
                 self.dbc.execute(
                     "INSERT INTO entities (key, klass, identity, owner, properties) VALUES (?, ?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, klass = EXCLUDED.klass, properties = EXCLUDED.properties",
                     [
@@ -39,57 +46,44 @@ class SqlitePersistence:
                 )
             except:
                 logging.error(
-                    "error:saving %s %s %s", key, entity, entity.__class__.__name__
+                    "error:saving %s %s %s",
+                    key,
+                    entity,
+                    entity.__class__.__name__,
+                    exc_info=True,
                 )
-                logging.error("error", exc_info=True)
                 raise
 
         self.db.commit()
 
-    async def load(self, world):
+    async def load(self, world: game.World):
         self.dbc = self.db.cursor()
 
-        factories = {
-            "Player": game.Player,
-            "Item": game.Item,
-            "Area": game.Area,
-            "Recipe": game.Recipe,
-        }
-
         rows = {}
-
         for row in self.dbc.execute(
             "SELECT key, klass, identity, owner, properties FROM entities"
         ):
             rows[row[0]] = row
 
-        keyed = {}
+        cached: Dict[str, entity.Entity] = {}
 
-        def get_instance(key):
-            if key == "world":
+        def lookup(key: str):
+            if key is None or key == "world":
                 return world
-            if key in keyed:
-                return keyed[key][0]
+            if key in cached:
+                return cached[key]
             row = rows[key]
-            factory = factories[row[1]]
-            identity = json.loads(row[2])
-            owner = get_instance(row[3])
-            instance = factory(
-                key=row[0],
-                owner=owner,
-                identity=crypto.Identity(**identity),
-                details=props.Details(),
-            )
-            instance.key = key
-            properties = json.loads(row[4])
-            keyed[key] = [instance, properties]
+            logging.info("restoring: key=%s %s", key, row[1])
+            instance = serializing.deserialize(row[4], lookup)
+            if not isinstance(instance, entity.Entity):
+                logging.error("error deserializing: %s", row[4])
+                raise Exception("expected entity")
+            cached[key] = instance
             return instance
 
         for key in rows.keys():
-            world.register(get_instance(key))
-
-        for key in keyed.keys():
-            instance, properties = keyed[key]
-            instance.load(world, properties)
+            instance = lookup(key)
+            logging.info("registering: %s %s", type(instance), instance)
+            world.register(instance)
 
         self.db.commit()

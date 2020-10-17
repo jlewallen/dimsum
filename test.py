@@ -55,6 +55,7 @@ class TestWorld:
         return self.area
 
     def add_item(self, item):
+        self.world.register(item)
         self.get_default_area().add_item(item)
         return item
 

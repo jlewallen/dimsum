@@ -370,6 +370,9 @@ modify when eaten
                 )
             )
 
+            log.info("created world")
+            await db.save(self.world)
+
         return self.world
 
     async def save(self):
@@ -388,11 +391,16 @@ modify when eaten
 
         if key in self.players:
             self.players[key].channel = channel
-            return self.players[key].player
+            player = self.players[key].player
+            if not player:
+                raise Exception("no player")
+            return player
 
         if self.world.contains(key):
             player = self.world.find(key)
             self.players[key] = BotPlayer(player, channel)
+            if not player:
+                raise Exception("no player")
             return player
 
         player = game.Player(

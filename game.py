@@ -37,9 +37,9 @@ class Activity:
 
 
 class Kind:
-    def __init__(self, **kwargs):
-        if "identity" in kwargs:
-            self.identity = crypto.Identity(**kwargs["identity"])
+    def __init__(self, identity=None, **kwargs):
+        if identity:
+            self.identity = identity
         else:
             self.identity = crypto.generate_identity()
 
@@ -47,9 +47,6 @@ class Kind:
         if other is None:
             return False
         return self.identity.public == other.identity.public
-
-    def saved(self):
-        return {"identity": self.identity.saved()}
 
     def __str__(self):
         return "kind<%s>" % (self.identity,)
@@ -59,28 +56,19 @@ class Kind:
 
 
 class Item(entity.Entity):
-    def __init__(self, **kwargs):
+    def __init__(self, areas=None, quantity=1, mobility=None, kind=None, **kwargs):
         super().__init__(**kwargs)
-        self.areas = kwargs["areas"] if "areas" in kwargs else {}
-        self.quantity = kwargs["quantity"] if "quantity" in kwargs else 1
-        self.mobility = kwargs["mobility"] if "mobility" in kwargs else {}
-        if "kind" in kwargs:
-            self.kind = kwargs["kind"]
-        else:
-            self.kind = Kind()
+        self.areas = areas if areas else {}
+        self.mobility = mobility if areas else {}
+        self.quantity = quantity
+        self.kind = kind if kind else Kind()
         self.validate()
 
-    def link_area(self, new_area, **kwargs):
-        if "verb" in kwargs:
-            self.areas[kwargs["verb"]] = new_area
-        else:
-            self.areas[DefaultMoveVerb] = new_area
+    def link_area(self, new_area, verb=DefaultMoveVerb, **kwargs):
+        self.areas[verb] = new_area
 
     def link_activity(self, name, activity=True):
         self.details.set(name, activity)
-
-    def touch(self):
-        self.details.touch()
 
     def describes(self, q: str):
         if q.lower() in self.details.name.lower():
@@ -91,18 +79,6 @@ class Item(entity.Entity):
 
     def observe(self) -> Sequence["ObservedEntity"]:
         return [ObservedEntity(self)]
-
-    def saved(self):
-        p = super().saved()
-        p.update(
-            {
-                "kind": self.kind.saved(),
-                "areas": {k: v.key for k, v in self.areas.items()},
-                "quantity": self.quantity,
-                "mobility": self.mobility,
-            }
-        )
-        return p
 
     def load(self, world, properties):
         super().load(world, properties)
@@ -181,29 +157,14 @@ class MaybeQuantifiedItem(IsItemTemplate):
 
 
 class Recipe(Item):
-    def __init__(self, **kwargs):
+    def __init__(self, required=None, base=None, **kwargs):
         super().__init__(**kwargs)
-        self.required = kwargs["required"] if "required" in kwargs else {}
-        self.base = kwargs["base"] if "base" in kwargs else {}
+        self.required = required if required else {}
+        self.base = base if base else {}
         self.validate()
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.recipe(self)
-
-    def saved(self):
-        p = super().saved()
-        p.update(
-            {
-                "base": self.base,
-                "required": {k: e.key for k, e in self.required.items()},
-            }
-        )
-        return p
-
-    def load(self, world, properties):
-        super().load(world, properties)
-        self.base = properties["base"] if "base" in properties else {}
-        self.required = {k: world.find(v) for k, v in properties["required"].items()}
 
     def apply_item_template(self, **kwargs):
         # TODO Also sign with the recipe
@@ -253,11 +214,11 @@ class Holding(Activity):
 
 
 class Person(entity.Entity):
-    def __init__(self, **kwargs):
+    def __init__(self, holding=None, wearing=None, memory=None, **kwargs):
         super().__init__(**kwargs)
-        self.holding: List[entity.Entity] = []
-        self.wearing: List[entity.Entity] = []
-        self.memory = {}
+        self.holding: List[entity.Entity] = holding if holding else []
+        self.wearing: List[entity.Entity] = wearing if wearing else []
+        self.memory = memory if memory else {}
 
     def find(self, q: str):
         for entity in self.holding:
@@ -313,9 +274,13 @@ class Person(entity.Entity):
     def is_holding(self, item):
         return item in self.holding
 
+    @property
+    def items_in_hands(self) -> Sequence[Item]:
+        return [e for e in self.holding if isinstance(e, Item)]
+
     def hold(self, item: Item):
         # See if there's a kind already in inventory.
-        for holding in self.holding:
+        for holding in self.items_in_hands:
             if item.kind.same(holding.kind):
                 # This will probably need more protection haha
                 holding.quantity += item.quantity
@@ -385,29 +350,6 @@ class Person(entity.Entity):
 
     def __repr__(self):
         return str(self)
-
-    def saved(self):
-        p = super().saved()
-        p.update(
-            {
-                "holding": [e.key for e in self.holding],
-                "wearing": [e.key for e in self.wearing],
-                "memory": {k: e.key for k, e in self.memory.items()},
-            }
-        )
-        return p
-
-    def load(self, world, properties):
-        super().load(world, properties)
-        self.holding = (
-            world.resolve(properties["holding"]) if "holding" in properties else []
-        )
-        self.wearing = (
-            world.resolve(properties["wearing"]) if "wearing" in properties else []
-        )
-        self.memory = {}
-        if "memory" in properties:
-            self.memory = {k: world.find(v) for k, v in properties["memory"].items()}
 
 
 class ObservedPerson(Observable):
@@ -561,11 +503,9 @@ class AreaObservation(Observation):
 
 
 class Area(entity.Entity):
-    def __init__(self, **kwargs):
+    def __init__(self, here=None, **kwargs):
         super().__init__(**kwargs)
-        self.owner = kwargs["owner"]
-        self.details = kwargs["details"]
-        self.here: List[entity.Entity] = []
+        self.here: List[entity.Entity] = here if here else []
 
     @property
     def items(self) -> List[Item]:
@@ -607,22 +547,6 @@ class Area(entity.Entity):
             if entity.describes(q):
                 return entity
         return None
-
-    def saved(self):
-        p = super().saved()
-        p.update(
-            {
-                "details": self.details.map,
-                "owner": self.owner.key,
-                "here": [e.key for e in self.entities()],
-            }
-        )
-        return p
-
-    def load(self, world, properties):
-        super().load(world, properties)
-        self.details = props.Details.from_map(properties["details"])
-        self.here = world.resolve(properties["here"])
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
@@ -689,7 +613,8 @@ class World(entity.Entity):
         return None
 
     def find_player_area(self, player: Player):
-        return self.find_entity_area(player)
+        area = self.find_entity_area(player)
+        return area
 
     def contains(self, key):
         return key in self.entities
@@ -761,7 +686,7 @@ class World(entity.Entity):
         for entity in everything:
             behaviors = entity.get_behaviors(name)
             if len(behaviors) > 0:
-                log.info(entity)
+                log.info("tick: %s", entity)
                 area = self.find_entity_area(entity)
                 ctx = Ctx(
                     self.wrapping_fn, world=self, area=area, entity=entity, **kwargs
@@ -784,12 +709,12 @@ class HooksAround:
 
 
 class Ctx:
-    def __init__(self, wrapping_fn, **kwargs):
+    def __init__(self, wrapping_fn, world=None, person=None, **kwargs):
         self.se = scriptEngine
         self.wrapping_fn = wrapping_fn
-        self.scope = behavior.Scope(**kwargs)
-        self.world = kwargs["world"]
-        self.person = kwargs["person"] if "person" in kwargs else None
+        self.world = world
+        self.person = person
+        self.scope = behavior.Scope(world=world, person=person, **kwargs)
 
     def extend(self, **kwargs):
         self.scope = self.scope.extend(**kwargs)
@@ -824,7 +749,7 @@ class Ctx:
         prepared = self.se.prepare(scope, self.wrapping_fn)
         for b in found:
             thunk = behavior.GenericThunk
-            if "person" in scope.map:
+            if "person" in scope.map and scope.map["person"]:
                 thunk = behavior.PersonThunk
             actions = self.se.execute(thunk, prepared, b)
             if actions:

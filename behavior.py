@@ -53,9 +53,9 @@ class Changes:
 
 
 class Behavior:
-    def __init__(self, **kwargs):
-        self.lua = kwargs["lua"] if "lua" in kwargs else None
-        self.logs = kwargs["logs"] if "logs" in kwargs else []
+    def __init__(self, lua=None, logs=None, **kwargs):
+        self.lua = lua
+        self.logs = logs if logs else []
 
     def check(self):
         eng = lupa.LuaRuntime(unpack_returned_tuples=True)
