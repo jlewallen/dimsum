@@ -19,6 +19,7 @@ class TestWorld:
         )
         self.player = self.jacob
         self.area = game.Area(owner=self.jacob, details=props.Details("Living room"))
+        self.world.register(self.area)
         self.l = grammar.create_parser()
 
     async def add_carla(self):
