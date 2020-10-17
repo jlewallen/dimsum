@@ -106,6 +106,7 @@ class WebModelVisitor:
         e = self.entity(item)
         e.update(
             {
+                "quantity": item.quantity,
                 "areas": {k: self.ref(e) for k, e in item.areas.items()},
             }
         )

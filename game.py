@@ -93,7 +93,7 @@ class Item(entity.Entity):
                 key: world.find(value) for key, value in properties["areas"].items()
             }
         if "kind" in properties:
-            self.areas = Kind(**properties["kind"])
+            self.kind = Kind(**properties["kind"])
         self.quantity = properties["quantity"] if "quantity" else 1
 
     def accept(self, visitor: entity.EntityVisitor):
