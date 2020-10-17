@@ -27,6 +27,11 @@ class Entity:
         else:
             self.owner = None
 
+        if "frozen" in kwargs:
+            self.frozen = kwargs["frozen"]
+        else:
+            self.frozen = None
+
         if "identity" in kwargs:
             self.identity = kwargs["identity"]
         else:
@@ -72,10 +77,13 @@ class Entity:
             # Unwraps the Behavior instances.
             "behaviors": {k: v.__dict__ for k, v in self.behaviors.map.items()},
             "identity": self.identity.saved(),
+            "frozen": self.frozen,  # Dict
         }
 
     def load(self, world, properties):
         self.key = properties["key"]
+        if "frozen" in properties:
+            self.frozen = properties["frozen"]
         self.identity = crypto.Identity(**properties["identity"])
         if "details" in properties:
             self.details = props.Details.from_map(properties["details"])
