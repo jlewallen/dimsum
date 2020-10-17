@@ -38,6 +38,25 @@ class LupaEntity:
             return getattr(self, key)
         return None
 
+    def make_item_from_table(self, table, **kwargs) -> game.Item:
+        log.info(
+            "area:make: %s",
+            ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
+        )
+
+        quantity = table["quantity"] if "quantity" in table else 1
+        del table["quantity"]
+
+        details = props.Details(name=table.name)
+        del table["name"]
+
+        for key, value in table.items():
+            details.map[key] = value
+
+        item = game.Item(details=details, quantity=quantity, **kwargs)
+
+        return item
+
 
 class LupaWorld(LupaEntity):
     @property
@@ -55,26 +74,8 @@ class LupaArea(LupaEntity):
         return self.entity
 
     def make(self, table):
-        log.info(
-            "area:make: %s",
-            ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
-        )
-
-        quantity = table["quantity"] if "quantity" in table else 1
-
-        del table["quantity"]
-
-        details = props.Details(name=table.name)
-        for key, value in table.items():
-            details.map[key] = value
-
-        item = game.Item(
-            details=details,
-            owner=self.area,
-            quantity=quantity,
-        )
-
-        return [actions.Make(item=item)]
+        item = self.make_item_from_table(table, owner=self.area)
+        return [actions.AddItemArea(area=self.area, item=item)]
 
 
 class LupaItem(LupaEntity):
@@ -103,6 +104,10 @@ class LupaPerson(LupaEntity):
 
     def go(self, area) -> Sequence[game.Action]:
         return [actions.Go(area=area)]
+
+    def make(self, table) -> Sequence[game.Action]:
+        item = self.make_item_from_table(table, owner=self.person)
+        return [actions.Make(item=item)]
 
 
 def wrap(thing):

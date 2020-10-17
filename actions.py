@@ -50,6 +50,28 @@ class Home(Action):
         return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
 
+class AddItemArea(Action):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.item = kwargs["item"]
+        self.area = kwargs["area"]
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        world.register(self.item)
+        self.area.add_item(self.item)
+        await world.bus.publish(ItemsAppeared(self.area, [self.item]))
+        return Success("%s appeared" % (p.join([self.item]),))
+
+
+class ItemsAppeared(Event):
+    def __init__(self, area: Area, items: Sequence[Item]):
+        self.area = area
+        self.items = items
+
+    def __str__(self):
+        return "%s appeared" % (p.join(self.items),)
+
+
 class Make(Action):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -139,6 +161,7 @@ class Poke(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
             return Failure("who?")
+        # TODO Publish
         await ctx.extend(poke=self.who).hook("poke:after")
         return Success("you poked %s" % (self.who))
 
@@ -151,6 +174,7 @@ class Plant(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("plant what?")
+        # TODO Publish
         await ctx.extend(plant=self.item).hook("plant")
         return Success("you planted %s" % (self.item))
 
@@ -163,6 +187,7 @@ class Shake(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("shake what?")
+        # TODO Publish
         await ctx.extend(shake=self.item).hook("shake")
         return Success("you shook %s" % (self.item))
 
@@ -175,6 +200,7 @@ class Hit(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("hit what?")
+        # TODO Publish
         await ctx.extend(swing=self.item).hook("hit")
         return Success("you hit %s" % (self.item))
 
@@ -187,6 +213,7 @@ class Swing(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("swing what?")
+        # TODO Publish
         await ctx.extend(swing=self.item).hook("swing")
         return Success("you swung %s" % (self.item))
 
@@ -204,6 +231,7 @@ class Wear(Action):
             return Failure("you can't wear that")
 
         player.wear(self.item)
+        # TODO Publish
         await ctx.extend(wear=[self.item]).hook("wear:after")
         return Success("you wore %s" % (self.item))
 

@@ -119,7 +119,7 @@ async def test_behavior_create_item(caplog):
         lua="""
 function(s, world, player)
     debug(area)
-    return area.make({
+    return player.make({
         name = "Flower Petal",
         color = "red",
     })
@@ -162,9 +162,11 @@ end
     await tw.execute("look")
     await tw.execute("hold box")
     assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 0
     await tw.execute("shake box")
-    assert len(tw.player.holding) == 2
-    assert tw.player.holding[1].quantity == 10
+    assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 1
+    assert tw.area.items[0].quantity == 10
     await tw.execute("look")
 
 
