@@ -41,7 +41,10 @@ export default defineComponent({
         },
         onSelected(entity: Entity): Promise<any> {
             console.log("explore:selected", entity);
-            return this.$router.push({ path: `/entities/${entity.key}` });
+            return this.$router.push({
+                name: "entity",
+                params: { key: entity.key },
+            });
         },
     },
 });

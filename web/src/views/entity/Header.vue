@@ -3,7 +3,7 @@
         <h3>{{ entity.kind }}: {{ entity.details.name }}</h3>
         <div>
             <div class="btn-group" role="group" aria-label="Basic example">
-                <router-link :to="{ name: 'entity-general', params: { key: entity.key } }">
+                <router-link :to="{ name: 'entity', params: { key: entity.key } }">
                     <button type="button" class="btn btn-secondary">General</button>
                 </router-link>
                 <router-link :to="{ name: 'entity-behavior', params: { key: entity.key } }">

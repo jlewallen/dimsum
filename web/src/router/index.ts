@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/entities/:key",
-        name: "entity-general",
+        name: "entity",
         component: GeneralView,
     },
     {

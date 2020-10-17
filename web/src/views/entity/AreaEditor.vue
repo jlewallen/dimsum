@@ -33,16 +33,21 @@ export default defineComponent({
     },
     computed: {
         adjacent(): EntityRef[] {
-            return _.flatten(this.entity.entities
-                .map((ref) => store.state.entities[ref.key])
-                .filter((e) => e && e.areas)
-                .map((e) => Object.values(e.areas!)));
+            return _.flatten(
+                this.entity.entities
+                    .map((ref) => store.state.entities[ref.key])
+                    .filter((e) => e && e.areas)
+                    .map((e) => Object.values(e.areas!))
+            );
         },
     },
     methods: {
         entitySelected(entity: Entity) {
             console.log("area:selected", entity);
-            return this.$router.push({ path: `/entities/${entity.key}` });
+            return this.$router.push({
+                name: "entity",
+                params: { key: entity.key },
+            });
         },
     },
 });
