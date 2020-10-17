@@ -257,7 +257,7 @@ class Person(entity.Entity):
     def wearing(self):
         return self.__wearing
 
-    @holding.setter
+    @wearing.setter
     def wearing(self, value):
         self.__wearing = value
 
@@ -271,6 +271,9 @@ class Person(entity.Entity):
 
     def find(self, q: str):
         for entity in self.holding:
+            if entity.describes(q):
+                return entity
+        for entity in self.wearing:
             if entity.describes(q):
                 return entity
         return None

@@ -198,6 +198,10 @@ class Wear(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("wear what?")
+
+        if not self.item.details.when_worn():
+            return Failure("you can't wear that")
+
         player.wear(self.item)
         await ctx.extend(wear=[self.item]).hook("wear:after")
         return Success("you wore %s" % (self.item))
