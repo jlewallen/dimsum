@@ -14,6 +14,7 @@ import behavior
 
 p = inflect.engine()
 DefaultMoveVerb = "walk"
+log = logging.getLogger("dimsum")
 
 
 class Observable:
@@ -26,7 +27,7 @@ class Event:
 
 class EventBus:
     async def publish(self, event: Event):
-        logging.info("publish:%s", event)
+        log.info("publish:%s", event)
 
 
 class Activity:
@@ -353,11 +354,11 @@ class Person(entity.Entity):
         item.touch()
 
     def make_visible(self):
-        logging.info("person:visible")
+        log.info("person:visible")
         self.visible = {}
 
     def make_invisible(self):
-        logging.info("person:invisible")
+        log.info("person:invisible")
         self.visible = {"hidden": True}
 
     def consume(self, item):
@@ -374,7 +375,7 @@ class Person(entity.Entity):
         changes = props.merge_dictionaries(
             self.details.map, item.details.map, FoodFields
         )
-        logging.info("merged %s" % (changes,))
+        log.info("merged %s" % (changes,))
         self.details.update(changes)
 
     def drop_all(self):
@@ -670,14 +671,14 @@ class LupaEntity:
         return value
 
     def __setitem__(self, key, value):
-        logging.info(
+        log.info(
             "entity:entity s: %s %s=%s (%s)"
             % (str(self), str(key), str(value), lupa.lua_type(value))
         )
         self.entity.details.map[key] = self.unlua(value)
 
     def __getitem__(self, key):
-        logging.info("entity:entity g: %s %s" % (str(self), str(key)))
+        log.info("entity:entity g: %s %s" % (str(self), str(key)))
         if key in self.entity.details.map:
             return self.entity.details.map[key]
         if hasattr(self, key):
@@ -797,7 +798,7 @@ class World(entity.Entity):
             self.register(entity)
 
     def build_new_area(self, player: Player, fromArea: Area, entry: Item):
-        logging.info("building new area")
+        log.info("building new area")
 
         verb = DefaultMoveVerb
         theWayBack = Item(owner=player, details=entry.details.clone())
@@ -884,11 +885,11 @@ class Ctx:
     async def hook(self, name, **kwargs):
         found = []
         entities = self.entities()
-        logging.info("hook:%s %s" % (name, entities))
+        log.info("hook:%s %s" % (name, entities))
         for entity in entities:
             behaviors = entity.get_behaviors(name)
             if len(behaviors) > 0:
-                logging.info(
+                log.info(
                     "entity:behaviors invoke '%s' %d behavior"
                     % (entity, len(behaviors))
                 )

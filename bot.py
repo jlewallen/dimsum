@@ -12,6 +12,7 @@ import evaluator
 import actions
 
 p = inflect.engine()
+log = logging.getLogger("dimsum.discord")
 
 
 class DiscordEventBus(game.EventBus):
@@ -19,7 +20,7 @@ class DiscordEventBus(game.EventBus):
         self.bot = bot
 
     async def publish(self, event: game.Event):
-        logging.info("publish:%s", event)
+        log.info("publish:%s", event)
         for channel in self.bot.get_all_channels():
             if channel.name == "IGNORED":
                 await channel.send(str(event))
@@ -111,7 +112,7 @@ class GameBot:
         @bot.event
         async def on_ready():
             self.world = await self.initialize()
-            print(f"{bot.user} has connected")
+            log.info(f"{bot.user} has connected")
 
         @bot.command(
             name="look",
@@ -295,13 +296,12 @@ modify when eaten
     def parse_as(self, evaluator, prefix, remaining=""):
         full = prefix + " " + remaining
         tree = self.l.parse(full.strip())
-        logging.info(str(tree))
+        log.info(str(tree))
         return evaluator.transform(tree)
 
     async def send(self, ctx, reply):
         visitor = ReplyVisitor()
         visual = reply.accept(visitor)
-        print(reply, visual)
         if visual:
             await ctx.message.channel.send(**visual)
 
@@ -316,14 +316,14 @@ modify when eaten
             return reply
 
         reply = await self.translate(op)
-        logging.info("reply: %s", (reply,))
+        log.info("reply: %s", reply)
         await self.send(ctx, reply)
 
     async def translate(self, mutation):
         try:
             return await mutation()
         except Exception as err:
-            logging.error("error", exc_info=True)
+            log.error("error", exc_info=True)
             return game.Failure("oops, %s" % (err,))
 
     def run(self):

@@ -8,6 +8,8 @@ import asyncio
 import lupa
 import props
 
+log = logging.getLogger("dimsum")
+
 
 class Scope:
     def __init__(self, **kwargs):
@@ -89,7 +91,7 @@ class ScriptEngine:
                 message = " ".join([str(e) for e in args])
             else:
                 raise Exception("unexpected debug")
-            logging.info("lua:debug: " + message)
+            log.info("lua:debug: " + message)
             now = datetime.datetime.now()
             stamped = now.strftime("%Y/%m/%d %H:%M:%S") + " " + message
             messages.append(stamped)
@@ -107,7 +109,7 @@ class ScriptEngine:
             main.done(messages)
             return rv
         except Exception as err:
-            logging.error("error: %s" % (err,), exc_info=True)
+            log.error("error: %s" % (err,), exc_info=True)
             main.error(messages, err)
         return None
 
@@ -133,12 +135,3 @@ class BehaviorMap(props.PropertyMap):
         for key, value in typed.items():
             value.check()
         return super().replace(**typed)
-
-
-async def tests():
-    pass
-
-
-if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    asyncio.run(tests())

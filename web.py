@@ -10,6 +10,8 @@ import game
 import grammar
 import evaluator
 
+log = logging.getLogger("dimsum.web")
+
 
 class WebModelVisitor:
     def entityUrl(self, e):
@@ -199,7 +201,7 @@ def create(state):
             return {"loading": True}
 
         key = url_key(ukey)
-        logging.info("key: %s" % (key,))
+        log.info("key: %s" % (key,))
 
         if world.contains(key):
             entity = world.find(key)
@@ -215,11 +217,11 @@ def create(state):
             return {"loading": True}
 
         key = url_key(ukey)
-        logging.info("key: %s" % (key,))
+        log.info("key: %s" % (key,))
 
         if world.contains(key):
             form = await quart.request.get_json()
-            logging.info("form: %s" % (form,))
+            log.info("form: %s" % (form,))
 
             # Verify we can find the owner.
             owner = world
@@ -247,11 +249,11 @@ def create(state):
             return {"loading": True}
 
         key = url_key(ukey)
-        logging.info("key: %s" % (key,))
+        log.info("key: %s" % (key,))
 
         if world.contains(key):
             form = await quart.request.get_json()
-            logging.info("form: %s" % (form,))
+            log.info("form: %s" % (form,))
 
             entity = world.find(key)
             entity.behaviors.replace(form)
@@ -275,7 +277,7 @@ def create(state):
 
         def parse_as(evaluator, full):
             tree = l.parse(full.strip())
-            logging.info(str(tree))
+            log.info(str(tree))
             return evaluator.transform(tree)
 
         person_key = token["key"]
