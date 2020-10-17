@@ -56,6 +56,7 @@ class Item(entity.Entity):
         super().__init__(**kwargs)
         self.areas = kwargs["areas"] if "areas" in kwargs else {}
         self.quantity = kwargs["quantity"] if "quantity" in kwargs else 1
+        self.mobility = kwargs["mobility"] if "mobility" in kwargs else {}
         if "kind" in kwargs:
             self.kind = kwargs["kind"]
         else:
@@ -88,6 +89,7 @@ class Item(entity.Entity):
                 "kind": self.kind.saved(),
                 "areas": {k: v.key for k, v in self.areas.items()},
                 "quantity": self.quantity,
+                "mobility": self.mobility,
             }
         )
         return p
@@ -101,6 +103,8 @@ class Item(entity.Entity):
             }
         if "kind" in properties:
             self.kind = Kind(**properties["kind"])
+        if "mobility" in properties:
+            self.mobility = properties["mobility"]
         self.quantity = properties["quantity"] if "quantity" else 1
 
     def accept(self, visitor: entity.EntityVisitor):
