@@ -259,30 +259,6 @@ class Person(entity.Entity):
         self.wearing: List[entity.Entity] = []
         self.memory = {}
 
-    @property
-    def holding(self):
-        return self.__holding
-
-    @holding.setter
-    def holding(self, value):
-        self.__holding = value
-
-    @property
-    def wearing(self):
-        return self.__wearing
-
-    @wearing.setter
-    def wearing(self, value):
-        self.__wearing = value
-
-    @property
-    def memory(self):
-        return self.__memory
-
-    @memory.setter
-    def memory(self, value):
-        self.__memory = value
-
     def find(self, q: str):
         for entity in self.holding:
             if entity.describes(q):
