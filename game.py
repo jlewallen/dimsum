@@ -161,17 +161,21 @@ class MaybeItem(IsItemTemplate):
         return Item(details=props.Details(self.name), **kwargs)
 
 
+class RecipeItem(IsItemTemplate):
+    def __init__(self, recipe: "Recipe"):
+        self.recipe = recipe
+
+    def apply_item_template(self, **kwargs):
+        return self.recipe.apply_item_template(**kwargs)
+
+
 class MaybeQuantifiedItem(IsItemTemplate):
     def __init__(self, template: MaybeItem, quantity: float):
         self.template = template
         self.quantity = quantity
 
     def apply_item_template(self, **kwargs):
-        return Item(
-            details=props.Details(self.template.name),
-            quantity=self.quantity,
-            **kwargs,
-        )
+        return self.template.apply_item_template(quantity=self.quantity, **kwargs)
 
 
 class Recipe(Item):
@@ -342,9 +346,10 @@ class Person(entity.Entity):
                 # We return, which skips the append to holding below,
                 # and that has the effect of obliterating the item we
                 # picked up, merging with the one in our hands.
-                return
+                return holding
         self.holding.append(item)
         item.touch()
+        return item
 
     def remove(self, item: Item):
         if not self.is_wearing(item):
@@ -463,8 +468,9 @@ class Reply:
 
 
 class SimpleReply(Reply):
-    def __init__(self, message: str):
+    def __init__(self, message: str, **kwargs):
         self.message = message
+        self.item = kwargs["item"] if "item" in kwargs else None
 
 
 class Success(SimpleReply):

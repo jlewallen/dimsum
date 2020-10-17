@@ -65,10 +65,10 @@ class Make(Action):
         if self.template:
             item = self.template.apply_item_template(owner=player)
         world.register(item)
-        player.hold(item)
+        after_hold = player.hold(item)
         area = world.find_player_area(player)
-        await world.bus.publish(ItemMade(player, area, item))
-        return Success("you're now holding %s" % (item,))
+        await world.bus.publish(ItemMade(player, area, after_hold))
+        return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
 class Hug(Action):
@@ -379,12 +379,12 @@ class Hold(Action):
             return Failure("you're already holding that")
 
         area.remove(self.item)
-        player.hold(self.item)
-        await world.bus.publish(ItemHeld(player, area, self.item))
+        after_hold = player.hold(self.item)
+        await world.bus.publish(ItemHeld(player, area, after_hold))
 
-        await ctx.extend(hold=[self.item]).hook("hold:after")
+        await ctx.extend(hold=[after_hold]).hook("hold:after")
 
-        return Success("you picked up %s" % (self.item,))
+        return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
 class MovingAction(Action):

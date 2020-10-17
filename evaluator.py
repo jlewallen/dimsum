@@ -133,11 +133,7 @@ class Evaluate(lark.Transformer):
 
         recipe = self.player.find_memory(q)
         if recipe:
-            return recipe
-
-        item = self.world.search(self.player, q)
-        if item:
-            return item
+            return game.RecipeItem(recipe)
 
         return game.MaybeItem(q)
 

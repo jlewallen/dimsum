@@ -66,3 +66,43 @@ async def test_quantified_drop_inflected():
     await tw.execute("drop 10 coins")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 1
+
+
+@pytest.mark.asyncio
+async def test_quantified_from_recipe_holding_template(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    await tw.initialize()
+    await tw.execute("make Gold Coin")
+    await tw.execute("call this cash")
+    r = await tw.execute("make 4 cash")
+    assert isinstance(r, game.Success)
+    assert r.item.quantity == 5
+    assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 0
+
+    await tw.execute("look down")
+    assert tw.player.holding[0].quantity == 5
+
+
+@pytest.mark.asyncio
+async def test_quantified_from_recipe(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    await tw.initialize()
+    await tw.execute("make Gold Coin")
+    await tw.execute("call this cash")
+    await tw.execute("obliterate")
+
+    await tw.execute("make 20 cash")
+    assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 0
+
+    await tw.execute("make 20 cash")
+    assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 0
+
+    await tw.execute("look down")
+    assert tw.player.holding[0].quantity == 40
