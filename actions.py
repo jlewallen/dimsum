@@ -395,7 +395,8 @@ class MovingAction(Action):
                 self.item.areas[verb] = new_area
             destination = self.item.areas[verb]
 
-        await world.perform(player, Drop())
+            # TODO Only drop the door!
+            await world.perform(player, Drop())
 
         await ctx.extend(area=area).hook("left:before")
         await area.left(world.bus, player)
