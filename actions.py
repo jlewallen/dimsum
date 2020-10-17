@@ -392,11 +392,14 @@ class MovingAction(Action):
                 if self.item.owner != player:
                     return Failure("you can only do that with things you own")
                 new_area = world.build_new_area(player, area, self.item)
-                self.item.areas[verb] = new_area
+                self.item.link_area(new_area, verb=verb)
             destination = self.item.areas[verb]
 
             # TODO Only drop the door!
             await world.perform(player, Drop())
+
+        if not destination:
+            return Failure("where?")
 
         await ctx.extend(area=area).hook("left:before")
         await area.left(world.bus, player)
@@ -411,6 +414,7 @@ class MovingAction(Action):
 
 class Climb(MovingAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        # If climb ever becomes a string outside of this function, rethink.
         await ctx.extend().hook("climb:before")
         return await self.move("climb", ctx, world, player)
 
@@ -418,7 +422,7 @@ class Climb(MovingAction):
 class Go(MovingAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.extend().hook("walk:before")
-        return await self.move("walk", ctx, world, player)
+        return await self.move(DefaultMoveVerb, ctx, world, player)
 
 
 class Obliterate(Action):

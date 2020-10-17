@@ -13,6 +13,7 @@ import entity
 import behavior
 
 p = inflect.engine()
+DefaultMoveVerb = "walk"
 
 
 class Event:
@@ -60,6 +61,12 @@ class Item(entity.Entity):
         else:
             self.kind = Kind()
         self.validate()
+
+    def link_area(self, new_area, **kwargs):
+        if "verb" in kwargs:
+            self.areas[kwargs["verb"]] = new_area
+        else:
+            self.areas[DefaultMoveVerb] = new_area
 
     def touch(self):
         self.details.touch()

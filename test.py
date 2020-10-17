@@ -18,9 +18,18 @@ class TestWorld:
             details=props.Details("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.area = game.Area(owner=self.jacob, details=props.Details("Living room"))
+        self.area = game.Area(owner=self.player, details=props.Details("Living room"))
         self.world.register(self.area)
         self.l = grammar.create_parser()
+
+    def add_simple_area_here(self, door, name):
+        door = game.Item(owner=self.player, details=props.Details(door))
+        area = game.Area(owner=self.player, details=props.Details(name))
+        door.link_area(area)
+        self.area.add_item(door)
+        self.world.register(door)
+        self.world.register(area)
+        return area
 
     async def add_carla(self):
         self.carla = game.Player(
