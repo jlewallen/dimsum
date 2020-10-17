@@ -52,6 +52,9 @@ class PropertyMap:
     def replace(self, **replacing):
         self.__dict__ = replacing
 
+    def __getitem__(self, key):
+        return self.__dict__[key]
+
     def clone(self):
         return PropertyMap(self.map)
 
@@ -59,7 +62,7 @@ class PropertyMap:
         return str(self.map)
 
     def __repr__(self):
-        return str(self.map)
+        return str(self)
 
 
 class Details(PropertyMap):

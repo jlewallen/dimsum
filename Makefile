@@ -14,9 +14,7 @@ run:
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/python3 behavior.py
-	env/bin/python3 game.py
-	env/bin/python3 test.py
+	env/bin/python3 -m pytest test_*.py
 
 env:
 	python3 -m venv env

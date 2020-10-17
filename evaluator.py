@@ -25,6 +25,12 @@ class Evaluate(lark.Transformer):
     def drop(self, args):
         return actions.Drop()
 
+    def drop_quantity(self, args):
+        return actions.Drop()
+
+    def drop_item(self, args):
+        return actions.Drop()
+
     def home(self, args):
         return actions.Home()
 
@@ -131,7 +137,7 @@ class Evaluate(lark.Transformer):
         area, item = self.world.search(self.player, str(args[0]))
         if item:
             return item
-        return game.MaybeItem(str(args[0]))
+        return None
 
     def this(self, args):
         return self.get_item_held()

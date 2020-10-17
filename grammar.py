@@ -33,7 +33,11 @@ def create_parser():
         take:              "take"
         home:              "home"
         think:             "think"
-        drop:              "drop"
+
+        drop:              "drop"             -> drop
+                         | "drop" number noun -> drop_quantity
+                         | "drop" noun        -> drop_item
+
         obliterate:        "obliterate"
         remember:          "remember"
         make:              "make" makeable_noun        -> make

@@ -471,6 +471,9 @@ class EntitiesObservation(Observation):
     def accept(self, visitor):
         return visitor.entities_observation(self)
 
+    def __str__(self):
+        return "observed %s" % (p.join(self.entities),)
+
 
 class AreaObservation(Observation):
     def __init__(
