@@ -757,7 +757,12 @@ class World(entity.Entity):
             self.register(entity)
 
     def build_new_area(self, player: Player, fromArea: Area, entry: Item):
-        theWayBack = Item(owner=player, details=entry.details.clone(), area=fromArea)
+        logging.info("building new area")
+
+        verb = DefaultMoveVerb
+        theWayBack = Item(owner=player, details=entry.details.clone())
+        theWayBack.link_area(fromArea, verb=verb)
+
         area = Area(
             owner=player,
             details=props.Details(

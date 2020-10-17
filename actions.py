@@ -388,6 +388,7 @@ class MovingAction(Action):
         # If the person owns this item and they try to go the thing,
         # this is how new areas area created, one of them.
         if self.item:
+            logging.info("verb check: %s" % (verb,))
             if verb not in self.item.areas:
                 if self.item.owner != player:
                     return Failure("you can only do that with things you own")
