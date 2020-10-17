@@ -1,7 +1,8 @@
 <template>
     <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
         <div class="one">
-            <div class="name">{{ entity.details.name }}</div>
+            <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.details.name }}</div>
+            <div class="name" v-else>{{ entity.details.name }}</div>
             <div class="owner">
                 {{ entity.owner.name }}
             </div>
