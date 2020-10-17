@@ -43,6 +43,7 @@ end
 
 @pytest.mark.asyncio
 async def test_wear_cape(caplog):
+    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     cape = tw.add_item(game.Item(owner=tw.jacob, details=props.Details("Cape")))
@@ -51,8 +52,8 @@ async def test_wear_cape(caplog):
         "b:test:wear:after",
         lua="""
 function(s, world, player)
-    debug(player)
     player.invisible()
+    debug(player.is_invisible())
 end
 """,
     )

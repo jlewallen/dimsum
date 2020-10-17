@@ -285,8 +285,12 @@ class Person(entity.Entity):
                 return entity
         return None
 
+    @property
+    def is_invisible(self):
+        return "hidden" in self.visible
+
     def observe(self) -> Sequence["ObservedPerson"]:
-        if "hidden" in self.visible:
+        if self.is_invisible:
             return []
         activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
         return [ObservedPerson(self, activities)]
@@ -699,6 +703,9 @@ class LupaPerson(LupaEntity):
 
     def invisible(self):
         return self.entity.make_invisible()
+
+    def is_invisible(self):
+        return self.entity.is_invisible
 
 
 def lupa_for(thing):
