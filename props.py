@@ -52,6 +52,9 @@ class PropertyMap:
     def replace(self, **replacing):
         self.__dict__ = replacing
 
+    def __contains__(self, key):
+        return key in self.__dict__
+
     def __getitem__(self, key):
         return self.__dict__[key]
 
