@@ -151,6 +151,7 @@ async def test_serialize():
         game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
+    tree.get_kind("petals")
     tree.link_area(clearing)
     tree.add_behavior(
         "b:test:tick",

@@ -18,6 +18,25 @@ class EntityVisitor:
         pass
 
 
+class Kind:
+    def __init__(self, identity=None, **kwargs):
+        if identity:
+            self.identity = identity
+        else:
+            self.identity = crypto.generate_identity()
+
+    def same(self, other: "Kind"):
+        if other is None:
+            return False
+        return self.identity.public == other.identity.public
+
+    def __str__(self):
+        return "kind<%s>" % (self.identity,)
+
+    def __repr__(self):
+        return str(self)
+
+
 class Entity:
     def __init__(
         self,
@@ -53,6 +72,12 @@ class Entity:
 
         self.details = details if details else props.Details("Unknown")
         self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
+
+    def get_kind(self, name: str) -> Kind:
+        key = "k:" + name
+        if not key in self.details.map:
+            self.details.map[key] = Kind()
+        return self.details.map[key]
 
     def touch(self):
         self.details.touch()

@@ -36,32 +36,13 @@ class Activity:
     pass
 
 
-class Kind:
-    def __init__(self, identity=None, **kwargs):
-        if identity:
-            self.identity = identity
-        else:
-            self.identity = crypto.generate_identity()
-
-    def same(self, other: "Kind"):
-        if other is None:
-            return False
-        return self.identity.public == other.identity.public
-
-    def __str__(self):
-        return "kind<%s>" % (self.identity,)
-
-    def __repr__(self):
-        return str(self)
-
-
 class Item(entity.Entity):
     def __init__(self, areas=None, quantity=1, mobility=None, kind=None, **kwargs):
         super().__init__(**kwargs)
         self.areas = areas if areas else {}
         self.mobility = mobility if areas else {}
         self.quantity = quantity
-        self.kind = kind if kind else Kind()
+        self.kind = kind if kind else entity.Kind()
         self.validate()
 
     def link_area(self, new_area, verb=DefaultMoveVerb, **kwargs):
@@ -79,19 +60,6 @@ class Item(entity.Entity):
 
     def observe(self) -> Sequence["ObservedEntity"]:
         return [ObservedEntity(self)]
-
-    def load(self, world, properties):
-        super().load(world, properties)
-        self.areas = {}
-        if "areas" in properties:
-            self.areas = {
-                key: world.find(value) for key, value in properties["areas"].items()
-            }
-        if "kind" in properties:
-            self.kind = Kind(**properties["kind"])
-        if "mobility" in properties:
-            self.mobility = properties["mobility"]
-        self.quantity = properties["quantity"] if "quantity" else 1
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)

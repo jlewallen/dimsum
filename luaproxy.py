@@ -78,7 +78,7 @@ class LupaEntity:
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
         )
 
-        kind = table["kind"] if "kind" in table else game.Kind()
+        kind = table["kind"] if "kind" in table else entity.Kind()
         del table["kind"]
 
         quantity = table["quantity"] if "quantity" in table else 1
@@ -122,11 +122,8 @@ class LupaItem(LupaEntity):
             raise Exception()
         return self.entity
 
-    def kind(self, name: str) -> game.Kind:
-        key = "k:" + name
-        if not key in self.entity.details.map:
-            self.entity.details.map[key] = game.Kind()
-        return self.entity.details.map[key]
+    def kind(self, name: str) -> entity.Kind:
+        return self.entity.get_kind(name)
 
 
 class LupaPerson(LupaEntity):
