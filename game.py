@@ -88,6 +88,7 @@ class Item(entity.Entity):
             quantity=quantity,
         )
 
+        # TODO Move to caller
         world.register(item)
 
         return [item]
@@ -226,18 +227,6 @@ class Person(entity.Entity):
                     return entity
         return None
 
-    def is_wearing(self, item):
-        return item in self.wearing
-
-    def wear(self, item: Item):
-        if not self.is_holding(item):
-            raise Exception("wear before hold")
-        self.drop(item)
-        if self.is_holding(item):
-            raise Exception("wear before hold")
-        self.wearing.append(item)
-        item.touch()
-
     def is_holding(self, item):
         return item in self.holding
 
@@ -245,7 +234,7 @@ class Person(entity.Entity):
     def items_in_hands(self) -> Sequence[Item]:
         return [e for e in self.holding if isinstance(e, Item)]
 
-    def hold(self, item: Item):
+    def hold(self, item: Item, quantity=None):
         # See if there's a kind already in inventory.
         for holding in self.items_in_hands:
             if item.kind.same(holding.kind):
@@ -261,7 +250,35 @@ class Person(entity.Entity):
         item.touch()
         return item
 
-    def remove(self, item: Item):
+    def drop_all(self):
+        dropped = []
+        while len(self.holding) > 0:
+            item = self.holding[0]
+            self.drop(item)
+            item.touch()
+            dropped.append(item)
+        return dropped
+
+    def drop(self, item: Item):
+        if item in self.holding:
+            self.holding.remove(item)
+            item.touch()
+            return [item]
+        return []
+
+    def is_wearing(self, item):
+        return item in self.wearing
+
+    def wear(self, item: Item):
+        if not self.is_holding(item):
+            raise Exception("wear before hold")
+        self.drop(item)
+        if self.is_holding(item):
+            raise Exception("wear before hold")
+        self.wearing.append(item)
+        item.touch()
+
+    def remove(self, item: Item, **kwargs):
         if not self.is_wearing(item):
             raise Exception("remove before wear")
         self.hold(item)
@@ -292,22 +309,6 @@ class Person(entity.Entity):
         )
         log.info("merged %s" % (changes,))
         self.details.update(changes)
-
-    def drop_all(self):
-        dropped = []
-        while len(self.holding) > 0:
-            item = self.holding[0]
-            self.drop(item)
-            item.touch()
-            dropped.append(item)
-        return dropped
-
-    def drop(self, item: Item):
-        if item in self.holding:
-            self.holding.remove(item)
-            item.touch()
-            return [item]
-        return []
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.person(self)
@@ -468,8 +469,10 @@ class AreaObservation(Observation):
             self.items,
         )
 
+
 def remove_nones(l):
     return [e for e in l if e]
+
 
 class Area(entity.Entity):
     def __init__(self, here=None, **kwargs):
@@ -486,9 +489,9 @@ class Area(entity.Entity):
     def contains(self, e: entity.Entity):
         return e in self.here
 
-    def remove(self, e: entity.Entity):
+    def remove(self, e: entity.Entity, **kwargs):
         self.here.remove(e)
-        return self
+        return e
 
     def look(self, player: Player):
         people = [
@@ -720,6 +723,7 @@ class Ctx:
 
         scope = self.scope
         for entity, behaviors in found.items():
+
             def create_context():
                 return self.context_factory(creator=entity)
 

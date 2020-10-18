@@ -299,45 +299,6 @@ class Drink(PersonAction):
         return Success("you drank %s" % (self.item))
 
 
-class Drop(PersonAction):
-    def __init__(self, item=None, quantity=None, **kwargs):
-        super().__init__(**kwargs)
-        self.quantity = quantity if quantity else None
-        self.item = item if item else None
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if len(player.holding) == 0:
-            return Failure("nothing to drop")
-
-        area = world.find_player_area(player)
-        dropped = []
-        if self.quantity:
-            if not self.item:
-                return Failure("please specify what?")
-
-            if self.quantity > self.item.quantity or self.quantity < 1:
-                return Failure("you should check how many you have")
-
-            dropped = self.item.separate(world, player, self.quantity)
-            if self.item.quantity == 0:
-                world.unregister(self.item)
-                player.drop(self.item)
-        else:
-            if self.item:
-                dropped = player.drop(self.item)
-            else:
-                dropped = player.drop_all()
-
-        for item in dropped:
-            after_add = area.add_item(item)
-            if after_add != item:
-                world.unregister(item)
-
-        await world.bus.publish(ItemsDropped(player, area, dropped))
-        await ctx.extend(dropped=dropped).hook("drop:after")
-        return Success("you dropped %s" % (p.join(dropped),))
-
-
 class Join(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -398,21 +359,68 @@ class Look(PersonAction):
         return world.look(player)
 
 
+class Drop(PersonAction):
+    def __init__(self, item=None, quantity=None, **kwargs):
+        super().__init__(**kwargs)
+        self.quantity = quantity if quantity else None
+        self.item = item if item else None
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if len(player.holding) == 0:
+            return Failure("nothing to drop")
+
+        area = world.find_player_area(player)
+        dropped = []
+        if self.quantity:
+            if not self.item:
+                return Failure("please specify what?")
+
+            if self.quantity > self.item.quantity or self.quantity < 1:
+                return Failure("you should check how many you have")
+
+            dropped = self.item.separate(world, player, self.quantity)
+            if self.item.quantity == 0:
+                world.unregister(self.item)
+                player.drop(self.item)
+        else:
+            if self.item:
+                dropped = player.drop(self.item)
+            else:
+                dropped = player.drop_all()
+
+        for item in dropped:
+            after_add = area.add_item(item)
+            if after_add != item:
+                world.unregister(item)
+
+        await world.bus.publish(ItemsDropped(player, area, dropped))
+        await ctx.extend(dropped=dropped).hook("drop:after")
+        return Success("you dropped %s" % (p.join(dropped),))
+
+
 class Hold(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item=None, quantity=None, **kwargs):
         super().__init__(**kwargs)
         self.item = item
+        self.quantity = quantity
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("sorry, hold what?")
 
-        area = world.find_player_area(player)
-
         if player.is_holding(self.item):
             return Failure("you're already holding that")
 
-        area.remove(self.item)
+        area = world.find_player_area(player)
+        if self.quantity:
+            removed = self.item.separate(world, player, self.quantity)
+            if self.item.quantity == 0:
+                world.unregister(self.item)
+                area.remove(self.item)
+            self.item = removed[0]
+        else:
+            area.remove(self.item)
+
         after_hold = player.hold(self.item)
         if after_hold != self.item:
             world.unregister(self.item)

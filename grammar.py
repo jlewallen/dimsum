@@ -11,7 +11,7 @@ def create_parser():
                       | call | forget | think | give | take
                       | hug | kiss | kick | tickle | poke | heal | auth | say | tell
 
-        USEFUL_WORD:      /(?!(on|with|over)\b)[\w][\w]*/i
+        USEFUL_WORD:      /(?!(on|with|over)\b)[a-zA-Z][a-zA-Z0-9]*/i
 
         makeable_noun:     TEXT
         unheld_noun:       USEFUL_WORD+
@@ -36,10 +36,12 @@ def create_parser():
         home:              "home"
 
 
-        hold:              "hold" unheld_noun
-        drop:              "drop"             -> drop
-                         | "drop" number noun -> drop_quantity
-                         | "drop" noun        -> drop_item
+        hold:              "hold" unheld_noun         -> hold
+                         | "hold" number unheld_noun  -> hold_quantity
+
+        drop:              "drop"                     -> drop
+                         | "drop" number noun         -> drop_quantity
+                         | "drop" noun                -> drop_item
 
         go:                "go" noun
         climb:             "climb" noun

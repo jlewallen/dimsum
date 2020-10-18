@@ -43,6 +43,20 @@ async def test_quantified_drop_partial_and_hold():
 
 
 @pytest.mark.asyncio
+async def test_quantified_hold_number():
+    tw = test.TestWorld()
+
+    await tw.initialize()
+    await tw.execute("make 20 Coin")
+    await tw.execute("drop 20 coin")
+    assert len(tw.player.holding) == 0
+    assert len(tw.area.items) == 1
+    await tw.execute("hold 10 coin")
+    assert len(tw.player.holding) == 1
+    assert len(tw.area.items) == 1
+
+    
+@pytest.mark.asyncio
 async def test_quantified_drop_all():
     tw = test.TestWorld()
 

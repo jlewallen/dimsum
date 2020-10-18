@@ -38,6 +38,9 @@ class Evaluate(lark.Transformer):
     def hold(self, args):
         return actions.Hold(item=args[0])
 
+    def hold_quantity(self, args):
+        return actions.Hold(item=args[1], quantity=args[0])
+
     def make(self, args):
         return actions.Make(template=args[0])
 
