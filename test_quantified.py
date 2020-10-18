@@ -14,6 +14,7 @@ async def test_quantified_drop_partial_and_hold():
     await tw.execute("make 20 Coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 0
+    assert len(tw.world.items()) == 1
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
@@ -21,20 +22,24 @@ async def test_quantified_drop_partial_and_hold():
     assert tw.player.holding[0].quantity == 15
     assert tw.area.items[0].quantity == 5
     assert tw.player.holding[0].key in tw.world.entities  # Meh
+    assert len(tw.world.items()) == 2
 
     await tw.execute("hold coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 0
+    assert len(tw.world.items()) == 1
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 1
+    assert len(tw.world.items()) == 2
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 1
     assert tw.player.holding[0].quantity == 10
     assert tw.area.items[0].quantity == 10
+    assert len(tw.world.items()) == 2
 
 
 @pytest.mark.asyncio
@@ -45,11 +50,13 @@ async def test_quantified_drop_all():
     await tw.execute("make 20 Coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 0
+    assert len(tw.world.items()) == 1
 
     await tw.execute("drop 20 coin")
     assert len(tw.player.holding) == 0
     assert len(tw.area.items) == 1
     assert tw.area.here[1].quantity == 20
+    assert len(tw.world.items()) == 1
 
 
 @pytest.mark.asyncio

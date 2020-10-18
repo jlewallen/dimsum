@@ -58,6 +58,7 @@ class AddItemArea(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         after_add = self.area.add_item(self.item)
+        world.register(after_add)
 
         # We do this after because we may consolidate this Item and
         # this keeps us from having to unregister the item.
@@ -328,7 +329,9 @@ class Drop(PersonAction):
                 dropped = player.drop_all()
 
         for item in dropped:
-            area.add_item(item)
+            after_add = area.add_item(item)
+            if after_add != item:
+                world.unregister(item)
 
         await world.bus.publish(ItemsDropped(player, area, dropped))
         await ctx.extend(dropped=dropped).hook("drop:after")
@@ -411,6 +414,8 @@ class Hold(PersonAction):
 
         area.remove(self.item)
         after_hold = player.hold(self.item)
+        if after_hold != self.item:
+            world.unregister(self.item)
         await world.bus.publish(ItemHeld(player, area, after_hold))
         await ctx.extend(hold=[after_hold]).hook("hold:after")
         return Success("you picked up %s" % (after_hold,), item=after_hold)

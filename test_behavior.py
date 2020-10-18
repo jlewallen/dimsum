@@ -203,9 +203,11 @@ end
     await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.items) == 2
+    assert len(tw.world.items()) == 2
 
     await tw.world.tick(1)
     assert len(tw.area.items) == 3
+    assert len(tw.world.items()) == 3
 
 
 @pytest.mark.asyncio
@@ -234,10 +236,13 @@ end
     await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.items) == 2
+    assert len(tw.world.items()) == 2
     await tw.world.tick(1)
     assert len(tw.area.items) == 2
+    assert len(tw.world.items()) == 2
     await tw.world.tick(2)
     assert len(tw.area.items) == 2
+    assert len(tw.world.items()) == 2
 
     
 @pytest.mark.asyncio

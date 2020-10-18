@@ -552,6 +552,9 @@ class World(entity.Entity):
     def empty(self):
         return len(self.entities.keys()) == 0
 
+    def items(self):
+        return [e for e in self.entities.values() if isinstance(e, Item)]
+
     def areas(self):
         return [e for e in self.entities.values() if isinstance(e, Area)]
 
