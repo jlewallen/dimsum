@@ -50,7 +50,7 @@ def create(state):
     @app.route("/api")
     def main_index():
         authenticate()
-        return areas_index()
+        return serializing.serialize()
 
     @app.route("/api/areas")
     def areas_index():
@@ -100,7 +100,7 @@ def create(state):
 
             entity = world.find(key)
             entity.details.update(form)
-
+            entity.touch()
             await state.save()
 
             return serializing.serialize({"entity": entity})
@@ -122,6 +122,7 @@ def create(state):
 
             entity = world.find(key)
             entity.behaviors.replace(form)
+            entity.touch()
             await state.save()
 
             return serializing.serialize({"entity": entity})

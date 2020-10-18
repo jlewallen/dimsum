@@ -97,7 +97,7 @@ export default createStore<RootState>({
         },
         [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
             return Promise.all([
-                http<AreasResponse>({ url: "", headers: state.headers }).then((data) => {
+                http<AreasResponse>({ url: "/areas", headers: state.headers }).then((data) => {
                     commit(MutationTypes.AREAS, data.areas);
                 }),
                 http<PeopleResponse>({ url: "/people", headers: state.headers }).then((data) => {
