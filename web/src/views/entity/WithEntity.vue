@@ -20,6 +20,10 @@ export default defineComponent({
             type: String,
             required: true,
         },
+		force: {
+			type: Boolean,
+			default: false,
+		},
     },
     computed: {
         entity(): Entity | null {
@@ -27,7 +31,7 @@ export default defineComponent({
         },
     },
     mounted(): Promise<void> {
-        if (this.entity == null) {
+        if (this.force || this.entity == null) {
             return store.dispatch(new NeedEntityAction(this.entityKey));
         }
         return Promise.resolve();

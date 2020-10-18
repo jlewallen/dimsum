@@ -3,6 +3,7 @@ import logging
 import quart
 import quart_cors
 import jwt
+import uuid
 import base64
 import hashlib
 
@@ -149,7 +150,7 @@ def create(state):
         reply = await world.perform(player, action)
         await state.save()
 
-        return serializing.serialize({"reply": reply})
+        return serializing.serialize({"id": uuid.uuid1(), "reply": reply})
 
     @app.route("/api/login", methods=["POST"])
     async def login():
