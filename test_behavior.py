@@ -222,7 +222,6 @@ async def test_behavior_create_kind(caplog):
         "b:test:tick",
         lua="""
 function(s, world, area, item)
-    debug("ok", area, item, time)
     return area.make({
         kind = item.kind("petals"),
         name = "Flower Petal",
@@ -244,7 +243,7 @@ end
     assert len(tw.area.items) == 2
     assert len(tw.world.items()) == 2
 
-    
+
 @pytest.mark.asyncio
 async def test_behavior_random(caplog):
     caplog.set_level(logging.INFO)
@@ -264,3 +263,72 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
+
+
+@pytest.mark.asyncio
+async def test_behavior_numbering_by_kind(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    tree = tw.add_item(
+        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    if area.number(item.kind("petals")) == 0 then
+        return area.make({
+            kind = item.kind("petals"),
+            name = "Flower Petal",
+            quantity = 10,
+            color = "red",
+        })
+    else
+        return area.make({
+            kind = item.kind("leaves"),
+            name = "Oak Leaves",
+            quantity = 10,
+            color = "red",
+        })
+    end
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.world.tick(0)
+    assert len(tw.area.items) == 2
+    await tw.world.tick(1)
+    assert len(tw.area.items) == 3
+
+
+@pytest.mark.asyncio
+async def test_behavior_numbering_person_by_name(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    tree = tw.add_item(
+        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    if area.number("Jacob") == 0 then
+        return area.make({
+            kind = item.kind("leaves"),
+            name = "Oak Leaves",
+            quantity = 10,
+            color = "red",
+        })
+    end
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.world.tick(0)
+    assert len(tw.area.items) == 1
+    await tw.world.tick(1)
+    assert len(tw.area.items) == 1

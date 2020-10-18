@@ -521,6 +521,18 @@ class Area(entity.Entity):
                 return entity
         return None
 
+    def entities_named(self, of: str):
+        return [e for e in self.here if e.describes(of)]
+
+    def entities_of_kind(self, kind: entity.Kind):
+        return [e for e in self.here if e.kind and e.kind.same(kind)]
+
+    def number_of_named(self, of: str) -> int:
+        return sum([e.quantity for e in self.entities_named(of)])
+
+    def number_of_kind(self, kind: entity.Kind) -> int:
+        return sum([e.quantity for e in self.entities_of_kind(kind)])
+
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 

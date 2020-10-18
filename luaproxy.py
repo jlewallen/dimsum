@@ -14,6 +14,7 @@ log = logging.getLogger("dimsum")
 def context_factory(**kwargs):
     return LupaContext(**kwargs)
 
+
 class LupaContext:
     def __init__(self, creator=None):
         self.creator = creator
@@ -110,6 +111,11 @@ class LupaArea(LupaEntity):
             raise Exception()
         return self.entity
 
+    def number(self, of):
+        if isinstance(of, str):
+            return self.area.number_of_named(of)
+        return self.area.number_of_kind(of)
+
     def make(self, table):
         item = self.make_item_from_table(table, creator=self.ctx.creator)
         return [actions.AddItemArea(area=self.area, item=item)]
@@ -148,5 +154,3 @@ class LupaPerson(LupaEntity):
     def make(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.person)
         return [actions.Make(item=item)]
-
-
