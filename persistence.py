@@ -26,7 +26,7 @@ class SqlitePersistence:
         for key in world.entities.keys():
             entity = world.entities[key]
             klass = entity.__class__.__name__
-            props = serializing.serialize(entity)
+            props = serializing.serialize(entity, secure=True)
             identity_field = {
                 "private": entity.identity.private,
                 "signature": entity.identity.signature,

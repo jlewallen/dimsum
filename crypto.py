@@ -36,21 +36,10 @@ def generate_identity():
 
 
 class Identity:
-    def __init__(self, **kwargs):
-        self.private = kwargs["private"]
-
-        if "public" in kwargs:
-            self.public = kwargs["public"]
-        else:
-            self.public = get_public_from_private_bytes(self.private)
-
-        if "signature" in kwargs:
-            self.signature = kwargs["signature"]
-        else:
-            self.signature = None
-
-    def saved(self):
-        return {"private": self.private, "signature": self.signature}
+    def __init__(self, public=None,private=None,signature=None, **kwargs):
+        self.private = private
+        self.public = public if public else get_public_from_private_bytes(self.private)
+        self.signature = signature
 
     def private_key(self):
         return get_private_key(self.private)

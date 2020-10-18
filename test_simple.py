@@ -1,9 +1,9 @@
 import pytest
 import logging
 
+import props
 import entity
 import game
-import props
 import serializing
 import persistence
 import test
