@@ -85,6 +85,7 @@ end
 class ScriptEngine:
     def __init__(self):
         self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+        self.lua.eval("math.randomseed(os.time())")
 
     def prepare(self, scope: Scope, wrap):
         return scope.prepare(wrap)
