@@ -1,6 +1,6 @@
 <template>
     <div class="entity-header">
-        <h3>{{ entity.kind }}: {{ entity.details.name }}</h3>
+        <h3>{{ entityToKind(entity) }}: {{ entity.details.name }}</h3>
         <div>
             <div class="btn-group" role="group" aria-label="Basic example">
                 <router-link :to="{ name: 'entity', params: { key: entity.key } }">
@@ -17,6 +17,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
+import { entityToKind } from "@/store";
 
 export default defineComponent({
     name: "Header",
@@ -31,7 +32,9 @@ export default defineComponent({
         return {};
     },
     computed: {},
-    methods: {},
+    methods: {
+        entityToKind: entityToKind,
+    },
 });
 </script>
 

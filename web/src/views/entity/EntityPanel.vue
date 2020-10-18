@@ -1,5 +1,5 @@
 <template>
-    <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
+    <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entityToClass(entity)">
         <div class="one">
             <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.details.name }}</div>
             <div class="name" v-else>{{ entity.details.name }}</div>
@@ -18,6 +18,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { EntityRef, Entity } from "@/http";
+import { entityToClass } from "@/store";
 
 export default defineComponent({
     name: "EntityPanel",
@@ -41,6 +42,7 @@ export default defineComponent({
         },
     },
     methods: {
+        entityToClass: entityToClass,
         raiseSelected(entity: Entity): void {
             this.$emit("selected", entity);
         },

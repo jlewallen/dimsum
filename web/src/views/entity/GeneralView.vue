@@ -21,6 +21,7 @@ import AreaEditor from "./AreaEditor.vue";
 import ItemEditor from "./ItemEditor.vue";
 import PersonEditor from "./PersonEditor.vue";
 import { Entity } from "@/http";
+import { entityToKind } from "@/store";
 
 export default defineComponent({
     name: "GeneralView",
@@ -41,7 +42,7 @@ export default defineComponent({
     watch: {},
     methods: {
         kindSpecific(entity: Entity): string {
-            return entity.kind + "Editor";
+            return entityToKind(entity) + "Editor";
         },
     },
 });

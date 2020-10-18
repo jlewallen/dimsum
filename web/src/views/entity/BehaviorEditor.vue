@@ -48,7 +48,7 @@ import { getTimeStamp } from "@/datetime";
 import CodeEditor from "../shared/CodeEditor.vue";
 
 const HookTemplate = `
-function(s, world, person)
+function(s, world, area, person)
     return nil
 end
 `;
@@ -78,9 +78,14 @@ export default defineComponent({
         behaviors: Behavior[];
     } {
         return {
-            behaviors: _.map(this.entity.behaviors, (value, key) => {
-                return new Behavior(key, key, value!.lua, value!.logs);
-            }),
+            behaviors: _.compact(
+                _.map(this.entity.behaviors, (value, key) => {
+                    if (key != "py/object") {
+                        return new Behavior(key, key, value!.lua, value!.logs);
+                    }
+                    return null;
+                })
+            ),
         };
     },
     computed: {},

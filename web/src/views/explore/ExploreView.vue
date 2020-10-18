@@ -3,7 +3,7 @@
         <Repl @send="send" />
 
         <div v-for="response in responses" v-bind:key="response.key" class="response">
-            <component v-bind:is="viewFor(response)" :response="response" @selected="onSelected" />
+            <component v-bind:is="viewFor(response)" :response="response" :reply="response.reply" @selected="onSelected" />
         </div>
     </div>
 </template>
@@ -37,7 +37,8 @@ export default defineComponent({
             return store.dispatch(new ReplAction(command));
         },
         viewFor(response: ReplResponse): string | null {
-            return response?.reply.kind || null;
+            const pyObject: string = (response?.reply as any)["py/object"] || "";
+            return pyObject.replace("game.", "") || null;
         },
         onSelected(entity: Entity): Promise<any> {
             console.log("explore:selected", entity);

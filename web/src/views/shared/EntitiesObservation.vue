@@ -2,8 +2,10 @@
     <div class="response area-observation card">
         <div class="card-body">
             <div class="entities">
-                <div v-for="entity in response.reply.entities" v-bind:key="entity.key">
-                    <TinyEntityPanel :entity="entity" @selected="(e) => onSelected(e)" />
+                <div v-for="entity in reply.entities" v-bind:key="entity.key">
+                    <WithEntity :entityKey="entity.key" v-slot="withEntity">
+                        <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
+                    </WithEntity>
                 </div>
             </div>
         </div>
@@ -12,17 +14,19 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity, ReplResponse } from "@/store";
+import { Entity, EntitiesObservation } from "@/store";
+import WithEntity from "../entity/WithEntity.vue";
 import TinyEntityPanel from "../entity/TinyEntityPanel.vue";
 
 export default defineComponent({
     name: "EntitiesObservation",
     components: {
+        WithEntity,
         TinyEntityPanel,
     },
     props: {
-        response: {
-            type: Object as () => ReplResponse,
+        reply: {
+            type: Object as () => EntitiesObservation,
             required: true,
         },
     },

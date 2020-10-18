@@ -4,13 +4,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ReplResponse } from "@/store";
+import { DetailedObservation } from "@/store";
 
 export default defineComponent({
     name: "DetailedObservation",
     props: {
-        response: {
-            type: Object as () => ReplResponse,
+        reply: {
+            type: Object as () => DetailedObservation,
             required: true,
         },
     },

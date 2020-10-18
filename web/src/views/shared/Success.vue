@@ -1,18 +1,18 @@
 <template>
     <div class="alert alert-dismissible alert-success">
-        <div class="response success">{{ response.reply.success }}</div>
+        <div class="response success">{{ reply.message }}</div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ReplResponse } from "@/store";
+import { Success } from "@/store";
 
 export default defineComponent({
     name: "Success",
     props: {
-        response: {
-            type: Object as () => ReplResponse,
+        reply: {
+            type: Object as () => Success,
             required: true,
         },
     },

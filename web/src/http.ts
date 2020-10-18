@@ -11,10 +11,28 @@ export interface ReplPayload {
     command: string;
 }
 
+export interface ObservedItem {
+    entity: EntityRef;
+}
+
+export interface ObservedPerson {
+    activities: never[];
+    person: EntityRef;
+}
+
+export interface AreaObservation {
+    where: EntityRef;
+    people: ObservedPerson[];
+    items: ObservedItem[];
+}
+
+export interface DetailedObservation {
+    who: any;
+    what: any;
+}
+
 export interface ReplResponse {
-    reply: {
-        kind: string;
-    };
+    reply: AreaObservation | EntitiesObservation | DetailedObservation | PersonalObservation | Success | Failure;
 }
 
 export type PropertyMap = { [index: string]: any };
@@ -51,7 +69,6 @@ export type EntityKey = string;
 export interface EntityRef {
     key: string;
     kind: string;
-    url: string;
     name: string;
 }
 
@@ -81,7 +98,7 @@ export interface Person extends Entity {
 }
 
 export interface Area extends Entity {
-    entities: Entity[];
+    here: Entity[];
 }
 
 export interface Item extends Entity {
@@ -98,4 +115,20 @@ export interface AreasResponse {
 
 export interface PeopleResponse {
     people: Person[];
+}
+
+export interface Success {
+    message: string;
+}
+
+export interface Failure {
+    message: string;
+}
+
+export interface EntitiesObservation {
+    entities: EntityRef[];
+}
+
+export interface PersonalObservation {
+    who: ObservedPerson;
 }

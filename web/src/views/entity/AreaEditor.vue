@@ -5,9 +5,9 @@
             <Entities :entityRefs="adjacent" @selected="entitySelected" />
         </div>
 
-        <div v-if="entity.entities?.length > 0">
+        <div v-if="entity.here.length > 0">
             <h4>Also Here:</h4>
-            <Entities :entityRefs="entity.entities" @selected="entitySelected" />
+            <Entities :entityRefs="entity.here" @selected="entitySelected" />
         </div>
     </div>
 </template>
@@ -34,7 +34,7 @@ export default defineComponent({
     computed: {
         adjacent(): EntityRef[] {
             return _.flatten(
-                this.entity.entities
+                this.entity.here
                     .map((ref) => store.state.entities[ref.key])
                     .filter((e) => e && e.areas)
                     .map((e) => Object.values(e.areas!))

@@ -1,42 +1,49 @@
 <template>
     <div class="response area-observation card">
-        <div class="card-body">
-            <h4 class="card-title">{{ response.reply.area.where.details.name }}</h4>
-            <h6 class="card-subtitle">{{ response.reply.area.where.details.desc }}</h6>
-            <div class="people">
-                <div v-for="person in response.reply.area.people" v-bind:key="person.key">
-                    <TinyEntityPanel :entity="person" @selected="(e) => onSelected(e)" />
+        <WithEntity :entityKey="reply.where.key" v-slot="where">
+            <div class="card-body">
+                <h4 class="card-title">{{ where.entity.details.name }}</h4>
+                <h6 class="card-subtitle">{{ where.entity.details.desc }}</h6>
+                <div class="people">
+                    <div v-for="observed in reply.people" v-bind:key="observed.person.key">
+                        <WithEntity :entityKey="observed.person.key" v-slot="withEntity">
+                            <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
+                        </WithEntity>
+                    </div>
+                </div>
+                <div class="entities">
+                    <div v-for="observed in reply.items" v-bind:key="observed.entity.key">
+                        <WithEntity :entityKey="observed.entity.key" v-slot="withEntity">
+                            <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
+                        </WithEntity>
+                    </div>
                 </div>
             </div>
-            <div class="entities">
-                <div v-for="entity in response.reply.area.items" v-bind:key="entity.key">
-                    <TinyEntityPanel :entity="entity" @selected="(e) => onSelected(e)" />
-                </div>
-            </div>
-        </div>
+        </WithEntity>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Entity, ReplResponse } from "@/store";
+import { Entity, AreaObservation, Area } from "@/store";
+import WithEntity from "../entity/WithEntity.vue";
 import TinyEntityPanel from "../entity/TinyEntityPanel.vue";
 
 export default defineComponent({
     name: "AreaObservation",
     components: {
+        WithEntity,
         TinyEntityPanel,
     },
     props: {
-        response: {
-            type: Object as () => ReplResponse,
+        reply: {
+            type: Object as () => AreaObservation,
             required: true,
         },
     },
     data(): {} {
         return {};
     },
-    computed: {},
     methods: {
         onSelected(entity: Entity): void {
             this.$emit("selected", entity);

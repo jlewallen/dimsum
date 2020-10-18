@@ -1,5 +1,5 @@
 <template>
-    <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entity.kind.toLowerCase()">
+    <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entityToClass(entity)">
         <template v-if="entity.quantity == 1">
             {{ entity.details.name }}
         </template>
@@ -10,6 +10,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { EntityRef, Entity } from "@/http";
+import { entityToClass } from "@/store";
 
 export default defineComponent({
     name: "TinyEntityPanel",
@@ -21,6 +22,7 @@ export default defineComponent({
     },
     computed: {},
     methods: {
+        entityToClass: entityToClass,
         onSelected(entity: Entity): void {
             this.$emit("selected", entity);
         },

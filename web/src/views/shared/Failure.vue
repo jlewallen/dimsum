@@ -1,18 +1,18 @@
 <template>
     <div class="alert alert-dismissible alert-danger">
-        <div class="response failure">{{ response.reply.failure }}</div>
+        <div class="response failure">{{ reply.message }}</div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { ReplResponse } from "@/store";
+import { Failure } from "@/store";
 
 export default defineComponent({
     name: "Failure",
     props: {
-        response: {
-            type: Object as () => ReplResponse,
+        reply: {
+            type: Object as () => Failure,
             required: true,
         },
     },
