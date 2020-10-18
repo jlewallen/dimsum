@@ -19,9 +19,9 @@ class Unknown(PersonAction):
 
 
 class Auth(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, password=None, **kwargs):
         super().__init__(**kwargs)
-        self.password = kwargs["password"]
+        self.password = password
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if "s:password" in player.details.map:
@@ -51,10 +51,10 @@ class Home(PersonAction):
 
 
 class AddItemArea(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, area=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
-        self.area = kwargs["area"]
+        self.item = item
+        self.area = area
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         world.register(self.item)
@@ -74,14 +74,12 @@ class ItemsAppeared(Event):
 
 
 class Make(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, template=None, item=None, **kwargs):
         super().__init__(**kwargs)
         self.item = None
         self.template = None
-        if "template" in kwargs:
-            self.template = kwargs["template"]
-        if "item" in kwargs:
-            self.item = kwargs["item"]
+        self.template = template
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         item = self.item
@@ -95,9 +93,9 @@ class Make(PersonAction):
 
 
 class Hug(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -107,9 +105,9 @@ class Hug(PersonAction):
 
 
 class Heal(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -119,9 +117,9 @@ class Heal(PersonAction):
 
 
 class Kick(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -131,9 +129,9 @@ class Kick(PersonAction):
 
 
 class Kiss(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -143,9 +141,9 @@ class Kiss(PersonAction):
 
 
 class Tickle(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -155,9 +153,9 @@ class Tickle(PersonAction):
 
 
 class Poke(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, who=None, **kwargs):
         super().__init__(**kwargs)
-        self.who = kwargs["who"]
+        self.who = who
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.who:
@@ -168,9 +166,9 @@ class Poke(PersonAction):
 
 
 class Plant(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -181,9 +179,9 @@ class Plant(PersonAction):
 
 
 class Shake(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -194,9 +192,9 @@ class Shake(PersonAction):
 
 
 class Hit(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -207,9 +205,9 @@ class Hit(PersonAction):
 
 
 class Swing(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -220,9 +218,9 @@ class Swing(PersonAction):
 
 
 class Wear(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -238,9 +236,9 @@ class Wear(PersonAction):
 
 
 class Remove(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -253,9 +251,9 @@ class Remove(PersonAction):
 
 
 class Eat(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -274,9 +272,9 @@ class Eat(PersonAction):
 
 
 class Drink(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -295,14 +293,10 @@ class Drink(PersonAction):
 
 
 class Drop(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, quantity=None, **kwargs):
         super().__init__(**kwargs)
-        self.quantity = None
-        if "quantity" in kwargs:
-            self.quantity = kwargs["quantity"]
-        self.item = None
-        if "item" in kwargs:
-            self.item = kwargs["item"]
+        self.quantity = quantity if quantity else None
+        self.item = item if item else None
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if len(player.holding) == 0:
@@ -349,9 +343,9 @@ class Join(PersonAction):
 
 
 class LookFor(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, name=None, **kwargs):
         super().__init__(**kwargs)
-        self.name = kwargs["name"] if "name" in kwargs else None
+        self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
@@ -382,9 +376,9 @@ class LookDown(PersonAction):
 
 
 class Look(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"] if "item" in kwargs else None
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
@@ -396,9 +390,9 @@ class Look(PersonAction):
 
 
 class Hold(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -412,17 +406,15 @@ class Hold(PersonAction):
         area.remove(self.item)
         after_hold = player.hold(self.item)
         await world.bus.publish(ItemHeld(player, area, after_hold))
-
         await ctx.extend(hold=[after_hold]).hook("hold:after")
-
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
 class MovingAction(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, area=None, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.area = kwargs["area"] if "area" in kwargs else None
-        self.item = kwargs["item"] if "item" in kwargs else None
+        self.area = area
+        self.item = item
 
     async def move(self, verb: str, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
@@ -488,10 +480,10 @@ class Obliterate(PersonAction):
 
 
 class CallThis(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, name=None, item=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
-        self.name = kwargs["name"]
+        self.item = item
+        self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -519,9 +511,9 @@ class CallThis(PersonAction):
 
 
 class Forget(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, name=None, **kwargs):
         super().__init__(**kwargs)
-        self.name = kwargs["name"]
+        self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.name in player.memory:
@@ -541,11 +533,11 @@ class Remember(PersonAction):
 
 
 class ModifyField(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, field=None, value=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
-        self.field = kwargs["field"]
-        self.value = kwargs["value"]
+        self.item = item
+        self.field = field
+        self.value = value
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         self.item.details.set(self.field, self.value)
@@ -553,11 +545,11 @@ class ModifyField(PersonAction):
 
 
 class ModifyActivity(PersonAction):
-    def __init__(self, **kwargs):
+    def __init__(self, item=None, activity=None, value=None, **kwargs):
         super().__init__(**kwargs)
-        self.item = kwargs["item"]
-        self.activity = kwargs["activity"]
-        self.value = kwargs["value"]
+        self.item = item
+        self.activity = activity
+        self.value = value
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
@@ -568,8 +560,8 @@ class ModifyActivity(PersonAction):
 
 
 class Tick(Action):
-    def __init__(self, **kwargs):
-        self.time = kwargs["time"]
+    def __init__(self, time=None, **kwargs):
+        self.time = time
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         return None
