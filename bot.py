@@ -358,19 +358,8 @@ modify when eaten
         await db.load(self.world)
 
         if self.world.empty():
-            self.world.add_area(
-                game.Area(
-                    creator=self.world,
-                    details=props.Details("Living room", desc="It's got walls."),
-                ).add_item(
-                    game.Item(
-                        creator=self.world,
-                        details=props.Details("Hammer", desc="It's heavy."),
-                    )
-                )
-            )
-
-            log.info("created world")
+            log.info("creating example world")
+            self.world.add_area(library.create_example_world(self.world))
             await db.save(self.world)
 
         return self.world
