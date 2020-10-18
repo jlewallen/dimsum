@@ -236,3 +236,24 @@ end
     assert len(tw.area.items) == 2
     await tw.world.tick(2)
     assert len(tw.area.items) == 2
+
+    
+@pytest.mark.asyncio
+async def test_behavior_random(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    tree = tw.add_item(
+        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    debug("random", math.random())
+end
+""",
+    )
+
+    await tw.initialize()
+    await tw.world.tick(0)
