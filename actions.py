@@ -57,8 +57,12 @@ class AddItemArea(PersonAction):
         self.area = area
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        world.register(self.item)
-        self.area.add_item(self.item)
+        after_add = self.area.add_item(self.item)
+
+        # We do this after because we may consolidate this Item and
+        # this keeps us from having to unregister the item.
+        world.register(after_add)
+
         await world.bus.publish(ItemsAppeared(self.area, [self.item]))
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
@@ -85,8 +89,10 @@ class Make(PersonAction):
         item = self.item
         if self.template:
             item = self.template.apply_item_template(creator=player)
-        world.register(item)
         after_hold = player.hold(item)
+        # We do this after because we may consolidate this Item and
+        # this keeps us from having to unregister the item.
+        world.register(after_hold)
         area = world.find_player_area(player)
         await world.bus.publish(ItemMade(player, area, after_hold))
         return Success("you're now holding %s" % (after_hold,), item=after_hold)

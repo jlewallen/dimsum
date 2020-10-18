@@ -505,10 +505,10 @@ class Area(entity.Entity):
                 # We return, which skips the append to holding below,
                 # and that has the effect of obliterating the item we
                 # picked up, merging with the one in our hands.
-                return self
+                return h
 
         self.here.append(item)
-        return self
+        return item
 
     def find(self, q: str):
         for entity in self.here:
