@@ -73,3 +73,36 @@ async def test_climb_wall(caplog):
     await tw.execute("climb wall")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after == area_before
+
+
+@pytest.mark.asyncio
+async def test_directional_moving_nowhere():
+    tw = test.TestWorld()
+
+    await tw.initialize()
+
+    area_before = tw.world.find_player_area(tw.player)
+    await tw.execute("go north")
+    area_after = tw.world.find_player_area(tw.player)
+    assert area_before == area_after
+
+
+@pytest.mark.asyncio
+async def test_directional_moving():
+    tw = test.TestWorld()
+
+    await tw.initialize()
+
+    obs = await tw.execute("look")
+    assert obs
+
+    park = game.Area(details=props.Details("North Park"))
+
+    tw.world.add_area(park)
+    tw.area.add_route(game.DirectionalRoute(direction=game.Direction.NORTH, area=park))
+
+    area_before = tw.world.find_player_area(tw.player)
+    await tw.execute("go north")
+    area_after = tw.world.find_player_area(tw.player)
+    assert area_after != area_before
+    assert area_after == park

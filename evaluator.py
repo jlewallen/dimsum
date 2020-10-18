@@ -1,7 +1,10 @@
+import logging
 import lark
 import game
 import actions
 import props
+
+log = logging.getLogger("dimsum")
 
 
 class Evaluate(lark.Transformer):
@@ -47,8 +50,17 @@ class Evaluate(lark.Transformer):
     def forget(self, args):
         return actions.Forget(name=args[0])
 
+    def climb(self, args):
+        return actions.Climb(finder=args[0])
+
+    def run(self, args):
+        return actions.Climb(finder=args[0])
+
     def go(self, args):
-        return actions.Go(item=args[0])
+        return actions.Go(finder=args[0])
+
+    def walk(self, args):
+        return actions.Go(finder=args[0])
 
     def eat(self, args):
         return actions.Eat(item=args[0])
@@ -91,9 +103,6 @@ class Evaluate(lark.Transformer):
 
     def wear(self, args):
         return actions.Wear(item=args[0])
-
-    def climb(self, args):
-        return actions.Climb(item=args[0])
 
     def remove(self, args):
         return actions.Remove(item=args[0])
@@ -145,6 +154,18 @@ class Evaluate(lark.Transformer):
 
     def noun(self, args):
         return self.world.search(self.player, str(args[0]))
+
+    def direction(self, args):
+        for d in game.Direction:
+            if str(args[0]).lower() == d.name.lower():
+                return game.FindDirectionalRoute(d)
+        raise Exception("unknown directional route")
+
+    def route(self, args):
+        return args[0]
+
+    def named_route(self, args):
+        return game.FindNamedRoute(str(args[0]))
 
     def this(self, args):
         return self.get_item_held()

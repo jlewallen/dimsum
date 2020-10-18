@@ -52,5 +52,12 @@ async def test_try_drink():
 
 
 @pytest.mark.asyncio
-async def test_multiple_sips():
+@pytest.mark.skip(reason="todo")
+async def test_taking_multiple_bites():
+    pass
+
+
+@pytest.mark.asyncio
+@pytest.mark.skip(reason="todo")
+async def test_taking_multiple_sips():
     pass

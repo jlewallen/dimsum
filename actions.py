@@ -366,36 +366,15 @@ class Drop(PersonAction):
         self.item = item if item else None
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if len(player.holding) == 0:
-            return Failure("nothing to drop")
-
-        area = world.find_player_area(player)
-        dropped = []
-        if self.quantity:
-            if not self.item:
-                return Failure("please specify what?")
-
-            if self.quantity > self.item.quantity or self.quantity < 1:
-                return Failure("you should check how many you have")
-
-            dropped = self.item.separate(world, player, self.quantity)
-            if self.item.quantity == 0:
-                world.unregister(self.item)
-                player.drop(self.item)
-        else:
-            if self.item:
-                dropped = player.drop(self.item)
-            else:
-                dropped = player.drop_all()
-
-        for item in dropped:
-            after_add = area.add_item(item)
-            if after_add != item:
-                world.unregister(item)
-
-        await world.bus.publish(ItemsDropped(player, area, dropped))
-        await ctx.extend(dropped=dropped).hook("drop:after")
-        return Success("you dropped %s" % (p.join(dropped),))
+        dropped, failure = player.drop_here(
+            world, item=self.item, quantity=self.quantity
+        )
+        if dropped:
+            area = world.find_player_area(player)
+            await world.bus.publish(ItemsDropped(player, area, dropped))
+            await ctx.extend(dropped=dropped).hook("drop:after")
+            return Success("you dropped %s" % (p.join(dropped),))
+        return Failure(failure)
 
 
 class Hold(PersonAction):
@@ -430,30 +409,21 @@ class Hold(PersonAction):
 
 
 class MovingAction(PersonAction):
-    def __init__(self, area=None, item=None, **kwargs):
+    def __init__(self, area: Area = None, finder: FindsRoute = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
-        self.item = item
+        self.finder = finder
 
-    async def move(self, verb: str, ctx: Ctx, world: World, player: Player):
+    async def move(self, ctx: Ctx, world: World, player: Player, verb=DefaultMoveVerb):
         area = world.find_player_area(player)
 
         destination = self.area
 
-        # If the person owns this item and they try to go the thing,
-        # this is how new areas area created, one of them.
-        if self.item:
-            have_verb = verb in self.item.areas
-            log.info("verb check: %s (%s)" % (verb, have_verb))
-            if not have_verb:
-                new_area = world.build_new_area(player, area, self.item, verb=verb)
-                self.item.link_area(new_area, verb=verb)
+        if self.finder:
+            log.info("finder: %s", self.finder)
+            destination = await self.finder.find(world, player, verb=verb)
 
-            destination = self.item.areas[verb]
-            # TODO Only drop the door!
-            await world.perform(player, Drop())
-
-        if not destination:
+        if destination is None:
             return Failure("where?")
 
         await ctx.extend(area=area).hook("left:before")
@@ -470,14 +440,12 @@ class MovingAction(PersonAction):
 class Climb(MovingAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         # If climb ever becomes a string outside of this function, rethink.
-        await ctx.extend().hook("climb:before")
-        return await self.move("climb", ctx, world, player)
+        return await self.move(ctx, world, player, verb="climb")
 
 
 class Go(MovingAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        await ctx.extend().hook("walk:before")
-        return await self.move(DefaultMoveVerb, ctx, world, player)
+        return await self.move(ctx, world, player)
 
 
 class Obliterate(PersonAction):

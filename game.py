@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict, Sequence, Optional
 
 import logging
 import sys
+import enum
 import time
 import inflect
 import lupa
@@ -45,7 +46,6 @@ class Item(entity.Entity):
         self.validate()
 
     def link_area(self, new_area, verb=DefaultMoveVerb, **kwargs):
-        log.info("linking area %s = %s", verb, new_area)
         self.areas[verb] = new_area
 
     def link_activity(self, name, activity=True):
@@ -93,6 +93,83 @@ class Item(entity.Entity):
         world.register(item)
 
         return [item]
+
+
+class AreaRoute:
+    def go(self) -> None:
+        pass
+
+    def available(self) -> bool:
+        return False
+
+    def satisfies(self, **kwargs) -> bool:
+        log.info("NOPE")
+        return False
+
+
+class Direction(enum.Enum):
+    NORTH = 1
+    SOUTH = 2
+    WEST = 3
+    EAST = 4
+
+
+class FindsRoute:
+    async def find(self, world, player, verb=DefaultMoveVerb):
+        raise Exception("unimplemented")
+
+
+class FindDirectionalRoute(FindsRoute):
+    def __init__(self, direction: Direction):
+        self.direction = direction
+
+    async def find(self, world, player, **kwargs):
+        area = world.find_player_area(player)
+        route = area.find_route(direction=self.direction)
+        if route:
+            return route.area
+        return None
+
+
+class FindNamedRoute(FindsRoute):
+    def __init__(self, name: str):
+        self.name = name
+
+    async def find(self, world, player, verb=DefaultMoveVerb):
+        item = world.search(player, self.name)
+        if item is None:
+            log.info("no named route: %s", self.name)
+            return None
+
+        log.info("found named route: %s = %s", self.name, item)
+
+        # If the person owns this item and they try to go the thing,
+        # this is how new areas area created, one of them.
+        have_verb = verb in item.areas
+        if not have_verb:
+            area = world.find_player_area(player)
+            new_area = world.build_new_area(player, area, item, verb=verb)
+            item.link_area(new_area, verb=verb)
+
+        destination = item.areas[verb]
+
+        player.drop_here(world, item=item)
+
+        return destination
+
+
+class DirectionalRoute(AreaRoute):
+    def __init__(self, direction: Direction = None, area: "Area" = None):
+        if direction is None:
+            raise Exception("direction is required")
+        self.direction = direction
+        if area is None:
+            raise Exception("area is required")
+        self.area = area
+
+    def satisfies(self, direction=None, **kwargs) -> bool:
+        log.info("%s %s", direction, self.direction)
+        return self.direction == direction
 
 
 class IsItemTemplate:
@@ -269,6 +346,36 @@ class Person(LivingCreature):
             item.touch()
             dropped.append(item)
         return dropped
+
+    def drop_here(self, world, item=None, quantity=None):
+        if len(self.holding) == 0:
+            return None, "nothing to drop"
+
+        area = world.find_player_area(self)
+        dropped = []
+        if quantity:
+            if not item:
+                return None, "please specify what?"
+
+            if quantity > item.quantity or quantity < 1:
+                return None, "you should check how many you have"
+
+            dropped = item.separate(world, self, quantity)
+            if item.quantity == 0:
+                world.unregister(item)
+                self.drop(item)
+        else:
+            if item:
+                dropped = self.drop(item)
+            else:
+                dropped = self.drop_all()
+
+        for item in dropped:
+            after_add = area.add_item(item)
+            if after_add != item:
+                world.unregister(item)
+
+        return dropped, None
 
     def drop(self, item: Item):
         if item in self.holding:
@@ -481,14 +588,11 @@ class AreaObservation(Observation):
         )
 
 
-def remove_nones(l):
-    return [e for e in l if e]
-
-
 class Area(entity.Entity):
-    def __init__(self, here=None, **kwargs):
+    def __init__(self, here=None, routes=None, **kwargs):
         super().__init__(**kwargs)
         self.here: List[entity.Entity] = remove_nones(here if here else [])
+        self.routes: List[AreaRoute] = routes if routes else []
 
     @property
     def items(self) -> List[Item]:
@@ -504,6 +608,14 @@ class Area(entity.Entity):
         self.here.remove(e)
         return e
 
+    def find_route(self, **kwargs) -> Optional[AreaRoute]:
+        log.info("find-route: %s %s", kwargs, self.routes)
+        for r in self.routes:
+            if r.satisfies(**kwargs):
+                log.info("f")
+                return r
+        return None
+
     def look(self, player: Player):
         people = [
             e.observe() for e in self.here if isinstance(e, Person) and e != player
@@ -512,11 +624,15 @@ class Area(entity.Entity):
         observed_self = player.observe()[0]
         return AreaObservation(observed_self, self, flatten(people), flatten(items))
 
-    def add_living(self, living: LivingCreature):
+    def add_route(self, route: AreaRoute) -> AreaRoute:
+        self.routes.append(route)
+        return route
+
+    def add_living(self, living: LivingCreature) -> LivingCreature:
         self.here.append(living)
         return living
 
-    def add_item(self, item: Item):
+    def add_item(self, item: Item) -> Item:
         for h in self.items:
             if item.kind.same(h.kind):
                 h.quantity += item.quantity
@@ -529,7 +645,7 @@ class Area(entity.Entity):
         self.here.append(item)
         return item
 
-    def find(self, q: str):
+    def find(self, q: str) -> Optional[entity.Entity]:
         for entity in self.here:
             if entity.describes(q):
                 return entity
@@ -885,3 +1001,7 @@ class ItemObliterated(Event):
 
 def flatten(l):
     return [item for sl in l for item in sl]
+
+
+def remove_nones(l):
+    return [e for e in l if e]

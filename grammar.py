@@ -6,10 +6,13 @@ def create_parser():
         """
         start: verbs | verb
 
-        verbs.2: look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour | climb
-                      | eat | drink | home | hit
-                      | call | forget | think | give | take
-                      | hug | kiss | kick | tickle | poke | heal | auth | say | tell
+        verbs.2:           look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
+                         | go | climb | walk | run
+                         | eat | drink | home | hit
+                         | call | forget | think | give | take
+                         | hug | kiss | kick | tickle | poke | heal | auth | say | tell
+
+        verb.1:            WORD (this | that | noun)?
 
         USEFUL_WORD:      /(?!(on|with|over)\b)[a-zA-Z][a-zA-Z0-9]*/i
 
@@ -21,34 +24,45 @@ def create_parser():
         that:              "that"
 
         look:              "look"
-                         | "look" ("down")            -> look_down
-                         | "look" ("at" "myself")     -> look_myself
-                         | "look" ("at" noun)         -> look_item
-                         | "look" ("for" noun)        -> look_for
+                         | "look" ("down")                         -> look_down
+                         | "look" ("at" "myself")                  -> look_myself
+                         | "look" ("at" noun)                      -> look_item
+                         | "look" ("for" noun)                     -> look_for
         call:              "call" this NAME
 
         say:               "say" TEXT
         tell:              "tell" TEXT
 
-        verb.1:            WORD (this | that | noun)?
         give:              "give"
-        take:              "take"
         home:              "home"
 
 
-        hold:              "hold" unheld_noun         -> hold
-                         | "hold" number unheld_noun  -> hold_quantity
+        eat:               "eat" noun
+        drink:             "drink" noun
 
-        drop:              "drop"                     -> drop
-                         | "drop" number noun         -> drop_quantity
-                         | "drop" noun                -> drop_item
+        take:              "take"                                  -> take
+                         | "take" "bite" "of" noun                 -> take_bite
+                         | "take" "sip" "of" noun                  -> take_sip
 
-        go:                "go" noun
-        climb:             "climb" noun
+        hold:              "hold" unheld_noun                      -> hold
+                         | "hold" number unheld_noun               -> hold_quantity
+
+        drop:              "drop"                                  -> drop
+                         | "drop" number noun                      -> drop_quantity
+                         | "drop" noun                             -> drop_item
+
+        named_route:       USEFUL_WORD
+        DIRECTION:         "north" | "west" | "east" | "south"
+        direction:         DIRECTION
+        route:             direction | named_route
+        go:                "go" route
+        climb:             "climb" route
+        walk:              "walk" route
+        run:               "run" route
 
         obliterate:        "obliterate"
-        make:              "make" makeable_noun        -> make
-                         | "make" number makeable_noun -> make_quantified
+        make:              "make" makeable_noun                    -> make
+                         | "make" number makeable_noun             -> make_quantified
 
         think:             "think"
         forget:            "forget" noun
@@ -56,9 +70,6 @@ def create_parser():
 
         wear:              "wear" noun
         remove:            "remove" noun
-
-        eat:               "eat" noun
-        drink:             "drink" noun
 
         plant:             "plant" (noun)?
         swing:             "swing" noun
@@ -74,15 +85,15 @@ def create_parser():
         water:             "water" noun ("with" noun)?
         pour:              "pour" noun (("on"|"over") noun)?
 
-        modify:            "modify" TEXT_FIELD text               -> modify_field
-                         | "modify" NUMERIC_FIELD number          -> modify_field
-                         | "modify" "when" "worn"                 -> when_worn
-                         | "modify" "when" "opened"               -> when_opened
-                         | "modify" "when" "eaten"                -> when_eaten
-                         | "modify" "when" "drank"                -> when_drank
-                         | "modify" "when" "activated"            -> when_activated
-                         | "modify" "when" "triggered"            -> when_triggered
-                         | "modify" "when" "closed"               -> when_closed
+        modify:            "modify" TEXT_FIELD text                -> modify_field
+                         | "modify" NUMERIC_FIELD number           -> modify_field
+                         | "modify" "when" "worn"                  -> when_worn
+                         | "modify" "when" "opened"                -> when_opened
+                         | "modify" "when" "eaten"                 -> when_eaten
+                         | "modify" "when" "drank"                 -> when_drank
+                         | "modify" "when" "activated"             -> when_activated
+                         | "modify" "when" "triggered"             -> when_triggered
+                         | "modify" "when" "closed"                -> when_closed
 
         auth:              "auth" TEXT
 
