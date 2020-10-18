@@ -68,7 +68,7 @@ export default defineComponent({
         },
     },
     data(): { fields: Field[]; field: { name: string }; form: PropertyMap } {
-        const readOnly = ["created", "touched"];
+        const readOnly = ["py/object", "created", "touched"];
         const fields = _.map(this.entity.details, (value, key) => {
             return {
                 name: key,
