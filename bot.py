@@ -353,7 +353,7 @@ modify when eaten
         self.bus = DiscordEventBus(self.bot)
         self.world = game.World(self.bus, luaproxy.context_factory)
 
-        db = persistence.SqlitePersistence()
+        db = persistence.SqliteDatabase()
         await db.open("world.sqlite3")
         await db.load(self.world)
 
@@ -380,7 +380,7 @@ modify when eaten
         await self.save()
 
     async def save(self):
-        db = persistence.SqlitePersistence()
+        db = persistence.SqliteDatabase()
         await db.open("world.sqlite3")
         await db.save(self.world)
 

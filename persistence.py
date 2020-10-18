@@ -12,7 +12,8 @@ import serializing
 
 log = logging.getLogger("dimsum")
 
-class SqlitePersistence:
+
+class SqliteDatabase:
     async def open(self, path: str):
         self.db = sqlite3.connect(path)
         self.dbc = self.db.cursor()
@@ -21,11 +22,30 @@ class SqlitePersistence:
         )
         self.db.commit()
 
+    async def number_of_entities(self):
+        self.dbc = self.db.cursor()
+        return self.dbc.execute("SELECT COUNT(*) FROM entities").fetchone()[0]
+
+    async def purge(self):
+        self.dbc = self.db.cursor()
+        self.dbc.execute("DELETE FROM entities")
+        self.db.commit()
+        return
+
     async def save(self, world: game.World):
         self.dbc = self.db.cursor()
 
-        for key in world.entities.keys():
-            entity = world.entities[key]
+        for key, entity in world.destroyed.items():
+            klass = entity.__class__.__name__
+            log.info("destroying %s %s %s", key, entity, entity.__class__.__name__)
+            self.dbc.execute(
+                "DELETE FROM entities WHERE key = ?",
+                [
+                    entity.key,
+                ],
+            )
+
+        for key, entity in world.entities.items():
             klass = entity.__class__.__name__
             props = serializing.serialize(entity, secure=True)
             identity_field = {

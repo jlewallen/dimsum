@@ -55,7 +55,7 @@ async def test_quantified_hold_number():
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 1
 
-    
+
 @pytest.mark.asyncio
 async def test_quantified_drop_all():
     tw = test.TestWorld()
@@ -115,7 +115,11 @@ async def test_quantified_from_recipe(caplog):
     await tw.initialize()
     await tw.execute("make Gold Coin")
     await tw.execute("call this cash")
+    item = tw.player.holding[0]
+    assert item
+
     await tw.execute("obliterate")
+    assert item.destroyed
 
     await tw.execute("make 20 cash")
     assert len(tw.player.holding) == 1

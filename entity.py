@@ -46,6 +46,7 @@ class Entity:
         creator=None,
         kind=None,
         frozen=None,
+        destroyed=None,
         visible=None,
         **kwargs
     ):
@@ -53,6 +54,7 @@ class Entity:
         self.creator = creator
         self.visible = visible if visible else {}
         self.frozen = frozen if frozen else {}
+        self.destroyed = destroyed if destroyed else False
 
         if identity:
             self.identity = identity
@@ -80,6 +82,9 @@ class Entity:
 
     def touch(self):
         self.details.touch()
+
+    def destroy(self):
+        self.destroyed = True
 
     def validate(self):
         if not self.creator:

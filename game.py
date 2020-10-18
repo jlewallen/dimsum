@@ -189,6 +189,10 @@ class Person(entity.Entity):
         self.wearing: List[entity.Entity] = remove_nones(wearing if wearing else [])
         self.memory = memory if memory else {}
 
+    @property
+    def quantity(self):
+        return 1
+
     def find(self, q: str):
         for entity in self.holding:
             if entity.describes(q):
@@ -536,12 +540,6 @@ class Area(entity.Entity):
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
-    def __str__(self):
-        return self.details.name
-
-    def __repr__(self):
-        return str(self)
-
     async def entered(self, bus: EventBus, player: Player):
         self.here.append(player)
         await bus.publish(PlayerEnteredArea(player, self))
@@ -549,6 +547,12 @@ class Area(entity.Entity):
     async def left(self, bus: EventBus, player: Player):
         self.here.remove(player)
         await bus.publish(PlayerLeftArea(player, self))
+
+    def __str__(self):
+        return self.details.name
+
+    def __repr__(self):
+        return str(self)
 
 
 class World(entity.Entity):
@@ -559,12 +563,15 @@ class World(entity.Entity):
         self.bus = bus
         self.context_factory = context_factory
         self.entities: Dict[str, entity.Entity] = {}
+        self.destroyed: Dict[str, entity.Entity] = {}
 
     def register(self, entity: entity.Entity):
         self.entities[entity.key] = entity
 
     def unregister(self, entity: entity.Entity):
+        entity.destroy()
         del self.entities[entity.key]
+        self.destroyed[entity.key] = entity
 
     def empty(self):
         return len(self.entities.keys()) == 0

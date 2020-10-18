@@ -168,7 +168,7 @@ end
 """,
     )
 
-    db = persistence.SqlitePersistence()
+    db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
     await db.save(tw.world)
 
@@ -177,3 +177,32 @@ end
 
     logging.info("%s", empty.entities)
 
+
+@pytest.mark.asyncio
+async def test_unregister_destroys(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    db = persistence.SqliteDatabase()
+    await db.open("test.sqlite3")
+    await db.purge()
+
+    assert await db.number_of_entities() == 0
+
+    await tw.initialize()
+    await tw.execute("make Box")
+    box = tw.player.holding[0]
+    assert box.destroyed == False
+    await db.save(tw.world)
+
+    assert await db.number_of_entities() == 3
+
+    await tw.execute("obliterate")
+    assert box.destroyed == True
+    await db.save(tw.world)
+
+    assert await db.number_of_entities() == 2
+
+    empty = game.World(tw.bus, context_factory=None)
+    await db.load(empty)
