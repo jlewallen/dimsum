@@ -1,25 +1,7 @@
 * DimSum
-** TODO Lua Customization
-
-   Per-Behavior Hooks
-
-   These can be on entities, for example if they're on an Item and
-   that the user "shakes" that item, then we run the "b:shake" for
-   that item. If the behavior is on a room then we also call the
-   b:shake hook for the room.
-
-   Verb Entities
-
-   This would be of the form "v:shake" and define the behavior of that
-   verb. In many cases these just invoke the behavior.
-
 ** TODO Distance effects.
 
    N-Hops aways, etc...
-
-** DONE Time passing.
-
-   Maybe a tick hook that fires once a minutes for everything, staggered.
 
 ** TODO Make maze.
 
@@ -77,6 +59,24 @@
    Present good options for b:key:verb:when
 
 ** TODO CLI mode for testing.
+** DONE Lua Customization
+
+   Per-Behavior Hooks
+
+   These can be on entities, for example if they're on an Item and
+   that the user "shakes" that item, then we run the "b:shake" for
+   that item. If the behavior is on a room then we also call the
+   b:shake hook for the room.
+
+   Verb Entities
+
+   This would be of the form "v:shake" and define the behavior of that
+   verb. In many cases these just invoke the behavior.
+
+** DONE Time passing.
+
+   Maybe a tick hook that fires once a minutes for everything, staggered.
+
 ** DONE Allow naming of common things that get made.
 ** DONE Modify credentials in game.
 ** DONE Toggle eating and drinking of things.

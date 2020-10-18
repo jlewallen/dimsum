@@ -443,12 +443,13 @@ class MovingAction(PersonAction):
         # If the person owns this item and they try to go the thing,
         # this is how new areas area created, one of them.
         if self.item:
-            log.info("verb check: %s" % (verb,))
-            if verb not in self.item.areas:
-                new_area = world.build_new_area(player, area, self.item)
+            have_verb = verb in self.item.areas
+            log.info("verb check: %s (%s)" % (verb, have_verb))
+            if not have_verb:
+                new_area = world.build_new_area(player, area, self.item, verb=verb)
                 self.item.link_area(new_area, verb=verb)
-            destination = self.item.areas[verb]
 
+            destination = self.item.areas[verb]
             # TODO Only drop the door!
             await world.perform(player, Drop())
 

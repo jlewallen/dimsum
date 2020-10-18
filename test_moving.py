@@ -1,3 +1,4 @@
+import logging
 import pytest
 
 import game
@@ -48,5 +49,27 @@ async def test_make_door_and_go_and_get_the_fuck_back():
     await tw.execute("look down")
 
     await tw.execute("go Door")
+    area_after = tw.world.find_player_area(tw.player)
+    assert area_after == area_before
+
+
+@pytest.mark.asyncio
+async def test_climb_wall(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+
+    await tw.initialize()
+
+    await tw.execute("make Wall")
+
+    area_before = tw.world.find_player_area(tw.player)
+
+    await tw.execute("climb wall")
+    area_after = tw.world.find_player_area(tw.player)
+    assert area_after != area_before
+
+    await tw.execute("look")
+
+    await tw.execute("climb wall")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after == area_before
