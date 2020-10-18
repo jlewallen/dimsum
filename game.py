@@ -184,8 +184,8 @@ class Holding(Activity):
 class Person(entity.Entity):
     def __init__(self, holding=None, wearing=None, memory=None, **kwargs):
         super().__init__(**kwargs)
-        self.holding: List[entity.Entity] = holding if holding else []
-        self.wearing: List[entity.Entity] = wearing if wearing else []
+        self.holding: List[entity.Entity] = remove_nones(holding if holding else [])
+        self.wearing: List[entity.Entity] = remove_nones(wearing if wearing else [])
         self.memory = memory if memory else {}
 
     def find(self, q: str):
@@ -469,11 +469,13 @@ class AreaObservation(Observation):
             self.items,
         )
 
+def remove_nones(l):
+    return [e for e in l if e]
 
 class Area(entity.Entity):
     def __init__(self, here=None, **kwargs):
         super().__init__(**kwargs)
-        self.here: List[entity.Entity] = here if here else []
+        self.here: List[entity.Entity] = remove_nones(here if here else [])
 
     @property
     def items(self) -> List[Item]:

@@ -72,6 +72,9 @@ class SqlitePersistence:
                 return world
             if key in cached:
                 return cached[key]
+            if key not in rows:
+                log.info("gone: key=%s", key)
+                return None
             row = rows[key]
             log.info("restoring: key=%s %s", key, row[1])
             instance = serializing.deserialize(row[3], lookup)
