@@ -388,8 +388,10 @@ class Look(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
-            observed = player.observe()[0]
-            return DetailedObservation(observed, self.item)
+            observed = player.observe()
+            if len(observed) == 0:
+                raise Exception("invisible observation")
+            return DetailedObservation(observed[0], ObservedEntity(self.item))
         return world.look(player)
 
 

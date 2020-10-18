@@ -27,8 +27,8 @@ export interface AreaObservation {
 }
 
 export interface DetailedObservation {
-    who: any;
-    what: any;
+    person: ObservedPerson;
+    item: ObservedItem;
 }
 
 export interface ReplResponse {
