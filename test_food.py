@@ -49,3 +49,8 @@ async def test_try_drink():
     r = await tw.execute("drink ipa")
     assert isinstance(r, game.Failure)
     assert len(tw.player.holding) == 1
+
+
+@pytest.mark.asyncio
+async def test_multiple_sips():
+    pass

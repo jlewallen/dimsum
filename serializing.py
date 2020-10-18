@@ -12,7 +12,9 @@ log = logging.getLogger("dimsum")
 @jsonpickle.handlers.register(crypto.Identity, base=True)
 class IdentityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        return crypto.Identity(public=obj["public"], private=obj["private"], signature=obj["signature"])
+        return crypto.Identity(
+            public=obj["public"], private=obj["private"], signature=obj["signature"]
+        )
 
     def flatten(self, obj, data):
         data["public"] = obj.public
@@ -20,6 +22,7 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         if self.context.secure:
             data["private"] = obj.private
         return data
+
 
 @jsonpickle.handlers.register(game.World, base=True)
 class WorldHandler(jsonpickle.handlers.BaseHandler):
@@ -52,6 +55,7 @@ class SecureUnpickler(jsonpickle.pickler.Pickler):
         super().__init__()
         self.secure = secure
 
+
 class CustomUnpickler(jsonpickle.unpickler.Unpickler):
     def __init__(self, lookup, **kwargs):
         super().__init__()
@@ -63,7 +67,7 @@ def deriveFrom(klass):
     return type("Root" + name, (klass,), {})
 
 
-allowed = [game.Item, game.Recipe, game.Area, game.Person, game.Player]
+allowed = [game.Item, game.Recipe, game.Area, game.Animal, game.Person, game.Player]
 classes = {k: deriveFrom(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
 
@@ -82,7 +86,11 @@ def serialize_full(value):
 def serialize(value, indent=None, unpicklable=True, secure=False):
     prepared = serialize_full(value)
     return jsonpickle.encode(
-        prepared, context=SecureUnpickler(secure=secure), indent=indent, unpicklable=unpicklable, make_refs=False
+        prepared,
+        context=SecureUnpickler(secure=secure),
+        indent=indent,
+        unpicklable=unpicklable,
+        make_refs=False,
     )
 
 

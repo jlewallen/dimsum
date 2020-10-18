@@ -182,7 +182,7 @@ class Holding(Activity):
         return str(self)
 
 
-class Person(entity.Entity):
+class LivingCreature(entity.Entity):
     def __init__(self, holding=None, wearing=None, memory=None, **kwargs):
         super().__init__(**kwargs)
         self.holding: List[entity.Entity] = remove_nones(holding if holding else [])
@@ -193,6 +193,16 @@ class Person(entity.Entity):
     def quantity(self):
         return 1
 
+    @property
+    def is_invisible(self):
+        return "hidden" in self.visible
+
+
+class Animal(LivingCreature):
+    pass
+
+
+class Person(LivingCreature):
     def find(self, q: str):
         for entity in self.holding:
             if entity.describes(q):
@@ -201,10 +211,6 @@ class Person(entity.Entity):
             if entity.describes(q):
                 return entity
         return None
-
-    @property
-    def is_invisible(self):
-        return "hidden" in self.visible
 
     def observe(self) -> Sequence["ObservedPerson"]:
         if self.is_invisible:
@@ -505,6 +511,10 @@ class Area(entity.Entity):
         items = [e.observe() for e in self.here if isinstance(e, Item)]
         observed_self = player.observe()[0]
         return AreaObservation(observed_self, self, flatten(people), flatten(items))
+
+    def add_living(self, living: LivingCreature):
+        self.here.append(living)
+        return living
 
     def add_item(self, item: Item):
         for h in self.items:

@@ -30,6 +30,8 @@ class LupaContext:
             return LupaWorld(self, thing)
         if isinstance(thing, game.Person):
             return LupaPerson(self, thing)
+        if isinstance(thing, game.Animal):
+            return LupaAnimal(self, thing)
         if isinstance(thing, game.Area):
             return LupaArea(self, thing)
         if isinstance(thing, game.Item):
@@ -132,13 +134,7 @@ class LupaItem(LupaEntity):
         return self.entity.get_kind(name)
 
 
-class LupaPerson(LupaEntity):
-    @property
-    def person(self) -> game.Person:
-        if not isinstance(self.entity, game.Person):
-            raise Exception()
-        return self.entity
-
+class LupaLivingCreature(LupaEntity):
     def visible(self):
         return self.entity.make_visible()
 
@@ -152,5 +148,21 @@ class LupaPerson(LupaEntity):
         return [actions.Go(area=area)]
 
     def make(self, table) -> Sequence[game.Action]:
-        item = self.make_item_from_table(table, creator=self.person)
+        item = self.make_item_from_table(table, creator=self.entity)
         return [actions.Make(item=item)]
+
+
+class LupaPerson(LupaLivingCreature):
+    @property
+    def person(self) -> game.Person:
+        if not isinstance(self.entity, game.Person):
+            raise Exception()
+        return self.entity
+
+
+class LupaAnimal(LupaLivingCreature):
+    @property
+    def animal(self) -> game.Animal:
+        if not isinstance(self.entity, game.Animal):
+            raise Exception()
+        return self.entity

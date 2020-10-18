@@ -83,18 +83,25 @@ export interface Entity {
     key: string;
     kind: string;
     url: string;
-    owner: EntityRef;
+    creator: EntityRef;
     details: Details;
-    holding?: Entity[];
-    entities?: Entity[];
+    holding?: EntityRef[];
+    entities?: EntityRef[];
     areas?: { [index: string]: EntityRef };
-    memory?: EntityRef | null;
+    memory?: { [index: string]: EntityRef };
     behaviors: Behaviors;
 }
 
 export interface Person extends Entity {
-    holding: Entity[];
-    memory: EntityRef | null;
+    holding: EntityRef[];
+    wearing: EntityRef[];
+    memory: { [index: string]: EntityRef };
+}
+
+export interface Animal extends Entity {
+    holding: EntityRef[];
+    wearing: EntityRef[];
+    memory: { [index: string]: EntityRef };
 }
 
 export interface Area extends Entity {
