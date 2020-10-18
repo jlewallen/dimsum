@@ -3,8 +3,8 @@
         <div class="one">
             <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.details.name }}</div>
             <div class="name" v-else>{{ entity.details.name }}</div>
-            <div class="owner">
-                {{ entity.owner.name }}
+            <div class="creator">
+                {{ entity.creator.name }}
             </div>
         </div>
         <div class="desc">{{ entity.details.desc }}</div>

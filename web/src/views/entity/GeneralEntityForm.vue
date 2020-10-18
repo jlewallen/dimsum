@@ -24,18 +24,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2">owner</label>
-                        <div class="col-sm-5">
-                            <select class="form-control" v-model="form.owner">
-                                <option disabled value="">Please select one</option>
-                                <option v-for="person in people" v-bind:key="person.key" :value="person.key">
-                                    {{ person.details.name }}
-                                </option>
-                                <option value="world">World</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="">
                         <input type="submit" value="Save" class="btn btn-primary" />
                     </div>
@@ -85,7 +73,6 @@ export default defineComponent({
             },
             form: {
                 key: this.entity.key,
-                owner: this.entity.owner.key,
                 ...this.entity.details,
             },
         };

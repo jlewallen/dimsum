@@ -440,13 +440,13 @@ class PersonalObservation(Observation):
 
 
 class DetailedObservation(Observation):
-    def __init__(self, who: ObservedPerson, what: entity.Entity):
-        self.who = who
-        self.what = what
+    def __init__(self, person: ObservedPerson, item: ObservedEntity):
+        self.person = person
+        self.item = item
 
     @property
     def details(self):
-        return self.what.details
+        return self.item.details
 
     @property
     def properties(self):
@@ -457,7 +457,7 @@ class DetailedObservation(Observation):
 
     def __str__(self):
         return "%s observes %s" % (
-            self.who,
+            self.person,
             self.properties,
         )
 
