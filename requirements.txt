@@ -17,12 +17,14 @@ hpack==4.0.0
 Hypercorn==0.11.1
 hyperframe==6.0.0
 idna==2.10
+importlib-metadata==2.0.0
 inflect==4.1.0
 iniconfig==1.1.1
 iso8601==0.1.8
 itsdangerous==1.1.0
 jedi==0.17.2
 Jinja2==2.11.2
+jsonpickle==1.4.1
 lark-parser==0.10.0
 lupa==1.9
 MarkupSafe==1.1.1
@@ -55,3 +57,4 @@ urllib3==1.25.10
 Werkzeug==1.0.1
 wsproto==0.15.0
 yarl==1.6.0
+zipp==3.3.1
