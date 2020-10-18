@@ -134,6 +134,7 @@ end
     assert len(tw.player.holding) == 1
     await tw.execute("shake box")
     assert len(tw.player.holding) == 2
+    assert tw.player.holding[1].creator == tw.player
     await tw.execute("look")
 
 
@@ -167,6 +168,7 @@ end
     await tw.execute("shake box")
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 1
+    assert tw.area.items[0].creator == box
     assert tw.area.items[0].quantity == 10
     await tw.execute("look")
 

@@ -87,8 +87,9 @@ class ScriptEngine:
         self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
         self.lua.eval("math.randomseed(os.time())")
 
-    def prepare(self, scope: Scope, wrap):
-        return scope.prepare(wrap)
+    def prepare(self, scope: Scope, context_factory):
+        ctx = context_factory()
+        return scope.prepare(ctx.wrap)
 
     def execute(self, thunk: str, scope: Scope, main: Behavior):
         messages: List[str] = []

@@ -171,7 +171,7 @@ end
     await db.open("test.sqlite3")
     await db.save(tw.world)
 
-    empty = game.World(tw.bus, wrapping_fn=None)
+    empty = game.World(tw.bus, context_factory=None)
     await db.load(empty)
 
     logging.info("%s", empty.entities)

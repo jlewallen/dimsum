@@ -14,7 +14,7 @@ import luaproxy
 class TestWorld:
     def __init__(self):
         self.bus = game.EventBus()
-        self.world = game.World(self.bus, luaproxy.wrap)
+        self.world = game.World(self.bus, luaproxy.context_factory)
         self.jacob = game.Player(
             creator=self.world,
             details=props.Details("Jacob", desc="Curly haired bastard."),

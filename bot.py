@@ -102,8 +102,8 @@ class ReplyVisitor(EmbedObservationVisitor):
 
 
 class SystemTickCog(discord.ext.commands.Cog):
-    def __init__(self, world):
-        self.world = world
+    def __init__(self, gameBot: "GameBot"):
+        self.gameBot = gameBot
         self.tick.start()
 
     def cog_unload(self):
@@ -111,7 +111,7 @@ class SystemTickCog(discord.ext.commands.Cog):
 
     @discord.ext.tasks.loop(minutes=1)
     async def tick(self):
-        await self.world.tick()
+        await self.gameBot.tick()
 
 
 class GameBot:
@@ -128,7 +128,7 @@ class GameBot:
         @bot.event
         async def on_ready():
             self.world = await self.initialize()
-            bot.add_cog(SystemTickCog(self.world))
+            bot.add_cog(SystemTickCog(self))
             log.info(f"{bot.user} has connected")
 
         @bot.command(
@@ -351,7 +351,7 @@ modify when eaten
 
     async def initialize(self):
         self.bus = DiscordEventBus(self.bot)
-        self.world = game.World(self.bus, luaproxy.wrap)
+        self.world = game.World(self.bus, luaproxy.context_factory)
 
         db = persistence.SqlitePersistence()
         await db.open("world.sqlite3")
@@ -374,6 +374,10 @@ modify when eaten
             await db.save(self.world)
 
         return self.world
+
+    async def tick(self):
+        await self.world.tick()
+        await self.save()
 
     async def save(self):
         db = persistence.SqlitePersistence()

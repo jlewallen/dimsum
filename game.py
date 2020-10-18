@@ -567,12 +567,12 @@ class Area(entity.Entity):
 
 
 class World(entity.Entity):
-    def __init__(self, bus: EventBus, wrapping_fn):
+    def __init__(self, bus: EventBus, context_factory):
         super().__init__()
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus
-        self.wrapping_fn = wrapping_fn
+        self.context_factory = context_factory
         self.entities: Dict[str, entity.Entity] = {}
 
     def register(self, entity: entity.Entity):
@@ -672,7 +672,7 @@ class World(entity.Entity):
 
     async def perform(self, player: Player, action):
         area = self.find_player_area(player)
-        ctx = Ctx(self.wrapping_fn, world=self, person=player, area=area)
+        ctx = Ctx(self.context_factory, world=self, person=player, area=area)
         return await action.perform(ctx, self, player)
 
     async def tick(self, now: Optional[float] = None):
@@ -689,7 +689,7 @@ class World(entity.Entity):
                 log.info("tick: %s", entity)
                 area = self.find_entity_area(entity)
                 ctx = Ctx(
-                    self.wrapping_fn, world=self, area=area, entity=entity, **kwargs
+                    self.context_factory, world=self, area=area, entity=entity, **kwargs
                 )
                 await ctx.hook(name)
 
@@ -709,9 +709,10 @@ class HooksAround:
 
 
 class Ctx:
-    def __init__(self, wrapping_fn, world=None, person=None, **kwargs):
+    # This should eventually get worked out. Just return Ctx from this function?
+    def __init__(self, context_factory, world=None, person=None, **kwargs):
         self.se = scriptEngine
-        self.wrapping_fn = wrapping_fn
+        self.context_factory = context_factory
         self.world = world
         self.person = person
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
@@ -734,7 +735,7 @@ class Ctx:
         return get_entities_inside(self.scope.values())
 
     async def hook(self, name):
-        found = []
+        found = {}
         entities = self.entities()
         log.info("hook:%s %s" % (name, entities))
         for entity in entities:
@@ -743,19 +744,23 @@ class Ctx:
                 log.info(
                     "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
                 )
-            found.extend(behaviors)
+            found[entity] = behaviors
 
         scope = self.scope
-        prepared = self.se.prepare(scope, self.wrapping_fn)
-        for b in found:
-            thunk = behavior.GenericThunk
-            if "person" in scope.map and scope.map["person"]:
-                thunk = behavior.PersonThunk
-            actions = self.se.execute(thunk, prepared, b)
-            if actions:
-                for action in actions:
-                    await self.world.perform(self.person, action)
-                    log.info("performing: %s", action)
+        for entity, behaviors in found.items():
+            def create_context():
+                return self.context_factory(creator=entity)
+
+            for b in behaviors:
+                prepared = self.se.prepare(scope, create_context)
+                thunk = behavior.GenericThunk
+                if "person" in scope.map and scope.map["person"]:
+                    thunk = behavior.PersonThunk
+                actions = self.se.execute(thunk, prepared, b)
+                if actions:
+                    for action in actions:
+                        await self.world.perform(self.person, action)
+                        log.info("performing: %s", action)
 
 
 class Action:
