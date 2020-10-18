@@ -10,6 +10,7 @@ import crypto
 import game
 import serializing
 
+log = logging.getLogger("dimsum")
 
 class SqlitePersistence:
     async def open(self, path: str):
@@ -33,7 +34,7 @@ class SqlitePersistence:
             }
 
             try:
-                logging.info("saving %s %s %s", key, entity, entity.__class__.__name__)
+                log.info("saving %s %s %s", key, entity, entity.__class__.__name__)
                 self.dbc.execute(
                     "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
                     [
@@ -44,7 +45,7 @@ class SqlitePersistence:
                     ],
                 )
             except:
-                logging.error(
+                log.error(
                     "error:saving %s %s %s",
                     key,
                     entity,
@@ -72,17 +73,17 @@ class SqlitePersistence:
             if key in cached:
                 return cached[key]
             row = rows[key]
-            logging.info("restoring: key=%s %s", key, row[1])
+            log.info("restoring: key=%s %s", key, row[1])
             instance = serializing.deserialize(row[3], lookup)
             if not isinstance(instance, entity.Entity):
-                logging.error("error deserializing: %s", row[3])
+                log.error("error deserializing: %s", row[3])
                 raise Exception("expected entity")
             cached[key] = instance
             return instance
 
         for key in rows.keys():
             instance = lookup(key)
-            logging.info("registering: %s %s", type(instance), instance)
+            log.info("registering: %s %s", type(instance), instance)
             world.register(instance)
 
         self.db.commit()
