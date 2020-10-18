@@ -148,7 +148,7 @@ async def test_serialize():
     await tw.initialize()
 
     tree = tw.add_item(
-        game.Item(owner=tw.jacob, details=props.Details("A Lovely Tree"))
+        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.link_area(clearing)

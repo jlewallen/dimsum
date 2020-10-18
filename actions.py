@@ -86,7 +86,7 @@ class Make(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         item = self.item
         if self.template:
-            item = self.template.apply_item_template(owner=player)
+            item = self.template.apply_item_template(creator=player)
         world.register(item)
         after_hold = player.hold(item)
         area = world.find_player_area(player)
@@ -432,8 +432,6 @@ class MovingAction(PersonAction):
         if self.item:
             log.info("verb check: %s" % (verb,))
             if verb not in self.item.areas:
-                if self.item.owner != player:
-                    return Failure("you can only do that with things you own")
                 new_area = world.build_new_area(player, area, self.item)
                 self.item.link_area(new_area, verb=verb)
             destination = self.item.areas[verb]
@@ -505,7 +503,7 @@ class CallThis(PersonAction):
             del base["touched"]
 
         recipe = Recipe(
-            owner=player,
+            creator=player,
             details=self.item.details.clone(),
             behaviors=self.item.behaviors,
             kind=self.item.kind,

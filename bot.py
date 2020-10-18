@@ -360,11 +360,11 @@ modify when eaten
         if self.world.empty():
             self.world.add_area(
                 game.Area(
-                    owner=self.world,
+                    creator=self.world,
                     details=props.Details("Living room", desc="It's got walls."),
                 ).add_item(
                     game.Item(
-                        owner=self.world,
+                        creator=self.world,
                         details=props.Details("Hammer", desc="It's heavy."),
                     )
                 )
@@ -405,7 +405,7 @@ modify when eaten
 
         player = game.Player(
             key=key,
-            owner=self.world,
+            creator=self.world,
             details=props.Details(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)

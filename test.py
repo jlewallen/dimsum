@@ -16,17 +16,17 @@ class TestWorld:
         self.bus = game.EventBus()
         self.world = game.World(self.bus, luaproxy.wrap)
         self.jacob = game.Player(
-            owner=self.world,
+            creator=self.world,
             details=props.Details("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.area = game.Area(owner=self.player, details=props.Details("Living room"))
+        self.area = game.Area(creator=self.player, details=props.Details("Living room"))
         self.world.register(self.area)
         self.l = grammar.create_parser()
 
     def add_simple_area_here(self, door, name):
-        door = game.Item(owner=self.player, details=props.Details(door))
-        area = game.Area(owner=self.player, details=props.Details(name))
+        door = game.Item(creator=self.player, details=props.Details(door))
+        area = game.Area(creator=self.player, details=props.Details(name))
         door.link_area(area)
         self.area.add_item(door)
         self.world.register(door)
@@ -35,14 +35,14 @@ class TestWorld:
 
     async def add_carla(self):
         self.carla = game.Player(
-            owner=self.world,
+            creator=self.world,
             details=props.Details("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(self.carla, actions.Join())
 
     async def add_tomi(self):
         self.tomi = game.Player(
-            owner=self.world,
+            creator=self.world,
             details=props.Details("Tomi", desc="Chief Crying Officer."),
         )
         return await self.world.perform(self.tomi, actions.Join())

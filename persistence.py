@@ -16,7 +16,7 @@ class SqlitePersistence:
         self.db = sqlite3.connect(path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, identity TEXT NOT NULL, owner TEXT NOT NULL, properties TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, identity TEXT NOT NULL, serialized TEXT NOT NULL)"
         )
         self.db.commit()
 
@@ -35,12 +35,11 @@ class SqlitePersistence:
             try:
                 logging.info("saving %s %s %s", key, entity, entity.__class__.__name__)
                 self.dbc.execute(
-                    "INSERT INTO entities (key, klass, identity, owner, properties) VALUES (?, ?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET owner = EXCLUDED.owner, klass = EXCLUDED.klass, properties = EXCLUDED.properties",
+                    "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
                     [
                         entity.key,
                         klass,
                         json.dumps(identity_field),
-                        entity.owner.key,
                         props,
                     ],
                 )
@@ -61,7 +60,7 @@ class SqlitePersistence:
 
         rows = {}
         for row in self.dbc.execute(
-            "SELECT key, klass, identity, owner, properties FROM entities"
+            "SELECT key, klass, identity, serialized FROM entities"
         ):
             rows[row[0]] = row
 
@@ -74,9 +73,9 @@ class SqlitePersistence:
                 return cached[key]
             row = rows[key]
             logging.info("restoring: key=%s %s", key, row[1])
-            instance = serializing.deserialize(row[4], lookup)
+            instance = serializing.deserialize(row[3], lookup)
             if not isinstance(instance, entity.Entity):
-                logging.error("error deserializing: %s", row[4])
+                logging.error("error deserializing: %s", row[3])
                 raise Exception("expected entity")
             cached[key] = instance
             return instance

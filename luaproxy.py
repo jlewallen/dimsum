@@ -77,7 +77,7 @@ class LupaArea(LupaEntity):
         return self.entity
 
     def make(self, table):
-        item = self.make_item_from_table(table, owner=self.area)
+        item = self.make_item_from_table(table, creator=self.area)
         return [actions.AddItemArea(area=self.area, item=item)]
 
 
@@ -115,7 +115,7 @@ class LupaPerson(LupaEntity):
         return [actions.Go(area=area)]
 
     def make(self, table) -> Sequence[game.Action]:
-        item = self.make_item_from_table(table, owner=self.person)
+        item = self.make_item_from_table(table, creator=self.person)
         return [actions.Make(item=item)]
 
 

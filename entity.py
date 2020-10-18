@@ -25,24 +25,24 @@ class Entity:
         identity=None,
         details=None,
         behaviors=None,
-        owner=None,
+        creator=None,
         kind=None,
         frozen=None,
         visible=None,
         **kwargs
     ):
         self.kind = kind
-        self.owner = owner
+        self.creator = creator
         self.visible = visible if visible else {}
         self.frozen = frozen if frozen else {}
 
         if identity:
             self.identity = identity
         else:
-            # If we have an owner and no identity then we generate one
+            # If we have an creator and no identity then we generate one
             # based on them, forming a chain.
-            if self.owner:
-                self.identity = crypto.generate_identity_from(self.owner.identity)
+            if self.creator:
+                self.identity = crypto.generate_identity_from(self.creator.identity)
             else:
                 self.identity = crypto.generate_identity()
             # If we aren't given a key, the default one is our public key.
@@ -52,19 +52,16 @@ class Entity:
             self.key = key
 
         self.details = details if details else props.Details("Unknown")
-        self.behaviors = behaviors
-
-        if not self.behaviors:
-            self.behaviors = behavior.BehaviorMap()
+        self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
 
     def touch(self):
         self.details.touch()
 
     def validate(self):
-        if not self.owner:
-            raise Exception("entity owner required")
+        if not self.creator:
+            raise Exception("entity creator required")
         if not self.details:
-            raise Exception("entity owner required")
+            raise Exception("entity details required")
 
     def get_behaviors(self, name):
         return self.behaviors.get_all(name)

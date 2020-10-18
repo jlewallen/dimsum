@@ -114,7 +114,7 @@ class Item(entity.Entity):
         self.quantity -= quantity
 
         item = Item(
-            owner=player,
+            creator=player,
             kind=self.kind,
             details=self.details,
             behaviors=self.behaviors,
@@ -634,11 +634,11 @@ class World(entity.Entity):
         log.info("building new area")
 
         verb = DefaultMoveVerb
-        theWayBack = Item(owner=player, details=entry.details.clone())
+        theWayBack = Item(creator=player, details=entry.details.clone())
         theWayBack.link_area(fromArea, verb=verb)
 
         area = Area(
-            owner=player,
+            creator=player,
             details=props.Details(
                 "A pristine, new place.",
                 desc="Nothing seems to be here, maybe you should decorate?",

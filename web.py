@@ -95,17 +95,17 @@ def create(state):
             form = await quart.request.get_json()
             log.info("form: %s" % (form,))
 
-            # Verify we can find the owner.
-            owner = world
-            if world.contains(form["owner"]):
-                owner = world.find(form["owner"])
+            # Verify we can find the creator.
+            creator = world
+            if world.contains(form["creator"]):
+                creator = world.find(form["creator"])
 
             del form["key"]
-            del form["owner"]
+            del form["creator"]
 
             entity = world.find(key)
             entity.details.update(form)
-            entity.owner = owner
+            entity.creator = creator
 
             await state.save()
 
