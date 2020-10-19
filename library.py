@@ -37,8 +37,8 @@ class LargeOakTree(Factory):
             lua="""
 function(s, world, area, item)
     return area.make({
-        kind = item.kind("leaves-1"),
-        name = "Oak Leaves",
+        kind = item.kind("leaf-1"),
+        name = "Oak Leaf",
         quantity = 1,
         color = "red",
     })
