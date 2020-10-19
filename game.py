@@ -5,12 +5,16 @@ import sys
 import enum
 import time
 import inflect
+import abc
 import lupa
 
 import crypto
 import props
 import entity
 import behavior
+
+import occupyable
+import carryable
 
 DefaultMoveVerb = "walk"
 
@@ -28,6 +32,7 @@ class Event:
 
 
 class Wearable:
+    @abc.abstractmethod
     def touch(self):
         pass
 
@@ -39,29 +44,6 @@ class EventBus:
 
 class Activity:
     pass
-
-
-class CarryableMixin:
-    def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
-        super().__init__(**kwargs)
-        self.kind = kind if kind else entity.Kind()
-        self.quantity = quantity if quantity else 1
-        self.wtf = True
-        log.info("KIND: %s", self.kind)
-
-    def increase_quantity(self, q: int):
-        self.quantity += q
-        return self
-
-    def decrease_quantity(self, q: int):
-        if q < 1:
-            raise Exception("too few to separate")
-
-        if q > self.quantity:
-            raise Exception("too many to separate")
-
-        self.quantity -= q
-        return self
 
 
 class HasRoutesMixin:
@@ -165,7 +147,7 @@ class EdibleMixin:
 class Item(
     entity.Entity,
     Wearable,
-    CarryableMixin,
+    carryable.CarryableMixin,
     HasRoutesMixin,
     InteractableMixin,
     MovementMixin,
@@ -209,140 +191,6 @@ class Item(
 
     def __repr__(self):
         return str(self)
-
-
-class ContainingMixin:
-    def __init__(self, holding=None, **kwargs):
-        super().__init__(**kwargs)
-        self.holding = holding if holding else []
-
-    @property
-    def items(self) -> List[Item]:
-        return [e for e in self.holding if isinstance(e, Item)]
-
-    def contains(self, e: CarryableMixin):
-        return e in self.holding
-
-    def remove(self, e: CarryableMixin, **kwargs):
-        self.holding.remove(e)
-        return e
-
-    def add_item(self, item: CarryableMixin) -> CarryableMixin:
-        for h in self.items:
-            if item.kind.same(h.kind):
-                h.quantity += item.quantity
-
-                # We return, which skips the append to holding below,
-                # and that has the effect of obliterating the item we
-                # picked up, merging with the one in our hands.
-                return h
-
-        self.holding.append(item)
-        return item
-
-    def find(self, q: str) -> Optional[entity.Entity]:
-        for entity in self.holding:
-            if entity.describes(q):
-                return entity
-        return None
-
-    def drop_all(self):
-        dropped = []
-        while len(self.holding) > 0:
-            item = self.holding[0]
-            self.drop(item)
-            item.touch()
-            dropped.append(item)
-        return dropped
-
-    def is_holding(self, item: CarryableMixin):
-        return item in self.holding
-
-    @property
-    def items_in_hands(self) -> Sequence[Item]:
-        return [e for e in self.holding if isinstance(e, Item)]
-
-    def hold(self, item: CarryableMixin, quantity: int = None):
-        # See if there's a kind already in inventory.
-        for already in self.items_in_hands:
-            if item.kind.same(already.kind):
-                # This will probably need more protection haha
-                already.quantity += item.quantity
-                already.touch()
-
-                # We return, which skips the append to containing below,
-                # and that has the effect of obliterating the item we
-                # picked up, merging with the one in our hands.
-                return already
-        self.holding.append(item)
-        item.touch()
-        return item
-
-    def drop_here(self, world, item: CarryableMixin = None, quantity=None):
-        if len(self.holding) == 0:
-            return None, "nothing to drop"
-
-        area = world.find_player_area(self)
-        dropped = []
-        if quantity:
-            if not item:
-                return None, "please specify what?"
-
-            if quantity > item.quantity or quantity < 1:
-                return None, "you should check how many you have"
-
-            dropped = item.separate(world, self, quantity)
-            if item.quantity == 0:
-                world.unregister(item)
-                self.drop(item)
-        else:
-            if item:
-                dropped = self.drop(item)
-            else:
-                dropped = self.drop_all()
-
-        for item in dropped:
-            after_add = area.add_item(item)
-            if after_add != item:
-                world.unregister(item)
-
-        return dropped, None
-
-    def drop(self, item: CarryableMixin):
-        if item in self.holding:
-            self.holding.remove(item)
-            item.touch()
-            return [item]
-        return []
-
-
-class CarryingMixin(ContainingMixin):
-    pass
-
-
-class Living:
-    pass
-
-
-class OccupyableMixin:
-    def __init__(self, occupied=None, **kwargs):
-        super().__init__(**kwargs)
-        self.occupied = occupied if occupied else []
-
-    def add_living(self, living: Living) -> Living:
-        self.occupied.append(living)
-        return living
-
-    def occupying(self, living: Living) -> bool:
-        return living in self.occupied
-
-    async def entered(self, bus: EventBus, player: "Player"):
-        self.occupied.append(player)
-        await bus.publish(PlayerEnteredArea(player, self))
-
-    async def left(self, bus: EventBus, player: "Player"):
-        self.occupied.remove(player)
-        await bus.publish(PlayerLeftArea(player, self))
 
 
 class ApparalMixin:
@@ -554,7 +402,12 @@ class MemoryMixin:
 
 
 class LivingCreature(
-    entity.Entity, Living, CarryingMixin, ApparalMixin, VisibilityMixin, MemoryMixin
+    entity.Entity,
+    occupyable.Living,
+    carryable.CarryingMixin,
+    ApparalMixin,
+    VisibilityMixin,
+    MemoryMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -753,7 +606,9 @@ class AreaObservation(Observation):
         )
 
 
-class Area(entity.Entity, ContainingMixin, OccupyableMixin, MovementMixin):
+class Area(
+    entity.Entity, carryable.ContainingMixin, occupyable.OccupyableMixin, MovementMixin
+):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
 
@@ -1023,26 +878,6 @@ class AreaConstructed(Event):
 
     def __str__(self):
         return "%s constructed %s" % (self.player, self.area)
-
-
-class PlayerEnteredArea(Event):
-    def __init__(self, player: Player, area: Area):
-        super().__init__()
-        self.player = player
-        self.area = area
-
-    def __str__(self):
-        return "%s entered %s" % (self.player, self.area)
-
-
-class PlayerLeftArea(Event):
-    def __init__(self, player: Player, area: Area):
-        super().__init__()
-        self.player = player
-        self.area = area
-
-    def __str__(self):
-        return "%s left %s" % (self.player, self.area)
 
 
 class ItemHeld(Event):

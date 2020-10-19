@@ -2,7 +2,7 @@ import props
 import behavior
 import crypto
 
-
+# TODO Move this
 class EntityVisitor:
     def item(self, item):
         pass
@@ -14,6 +14,9 @@ class EntityVisitor:
         pass
 
     def area(self, area):
+        pass
+
+    def animal(self, animal):
         pass
 
 
@@ -102,5 +105,5 @@ class Entity:
     def describes(self, q: str):
         return False
 
-    def accept(self, visitor: EntityVisitor):
+    def accept(self, visitor: "EntityVisitor"):
         raise Exception("unimplemented")
