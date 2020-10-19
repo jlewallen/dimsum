@@ -76,6 +76,9 @@ export default defineComponent({
 .entity.recipe {
     background-color: thistle;
 }
+.entity.animal {
+    background-color: darkseagreen;
+}
 
 .entity .one {
     display: flex;

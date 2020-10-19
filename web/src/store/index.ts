@@ -75,6 +75,9 @@ export default createStore<RootState>({
         [MutationTypes.ENTITY]: (state: RootState, entity: Entity) => {
             state.entities[entity.key] = entity;
         },
+        [MutationTypes.REPLY]: (state: RootState, response: ReplResponse) => {
+            state.responses.unshift(response);
+        },
     },
     actions: {
         [ActionTypes.LOGIN]: ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
@@ -91,7 +94,7 @@ export default createStore<RootState>({
         },
         [ActionTypes.REPL]: ({ state, commit }: ActionParameters, payload: ReplAction) => {
             return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((response) => {
-                state.responses.unshift(response);
+                commit(MutationTypes.REPLY, response);
                 return response;
             });
         },

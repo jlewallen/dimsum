@@ -5,15 +5,15 @@
                 <h4 class="card-title">{{ where.entity.details.name }}</h4>
                 <h6 class="card-subtitle">{{ where.entity.details.desc }}</h6>
                 <div class="people">
-                    <div v-for="observed in reply.people" v-bind:key="observed.person.key">
-                        <WithEntity :entityKey="observed.person.key" :force="true" v-slot="withEntity">
+                    <div v-for="observed in reply.living" v-bind:key="observed.living.key">
+                        <WithEntity :entityKey="observed.living.key" :force="true" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>
                 </div>
                 <div class="entities">
-                    <div v-for="observed in reply.items" v-bind:key="observed.entity.key">
-                        <WithEntity :entityKey="observed.entity.key" :force="true" v-slot="withEntity">
+                    <div v-for="observed in reply.items" v-bind:key="observed.item.key">
+                        <WithEntity :entityKey="observed.item.key" :force="true" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>

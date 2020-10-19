@@ -28,6 +28,7 @@ export enum MutationTypes {
     PEOPLE = "PEOPLE",
     AREAS = "AREAS",
     ENTITY = "ENTITY",
+    REPLY = "REPLY",
 }
 
 export class LoadingAction {

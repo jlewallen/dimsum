@@ -54,4 +54,7 @@ export default defineComponent({
 .entity.recipe {
     background-color: thistle;
 }
+.entity.animal {
+    background-color: darkseagreen;
+}
 </style>

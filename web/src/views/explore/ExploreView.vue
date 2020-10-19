@@ -38,7 +38,7 @@ export default defineComponent({
         },
         viewFor(response: ReplResponse): string | null {
             const pyObject: string = (response?.reply as any)["py/object"] || "";
-            return pyObject.replace("game.", "") || null;
+            return pyObject.replace("reply.", "") || null;
         },
         onSelected(entity: Entity): Promise<any> {
             console.log("explore:selected", entity);

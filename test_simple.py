@@ -96,7 +96,7 @@ async def test_look_empty():
     r = await tw.execute("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
-    assert len(r.people) == 0
+    assert len(r.living) == 0
 
 
 @pytest.mark.asyncio
@@ -108,18 +108,18 @@ async def test_look_items():
     r = await tw.execute("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 1
-    assert len(r.people) == 0
+    assert len(r.living) == 0
 
 
 @pytest.mark.asyncio
-async def test_look_people():
+async def test_look_living():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.add_carla()
     r = await tw.execute("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
-    assert len(r.people) == 1
+    assert len(r.living) == 1
 
 
 @pytest.mark.asyncio
@@ -133,7 +133,7 @@ async def test_look_people_invisible():
     r = await tw.execute("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
-    assert len(r.people) == 1
+    assert len(r.living) == 1
 
 
 @pytest.mark.asyncio

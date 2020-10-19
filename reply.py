@@ -61,46 +61,50 @@ class ObservedItem(ObservedEntity):
         return str(self)
 
 
-class ObservedAnimal(ObservedEntity):
-    def __init__(self, animal: game.Animal):
+class ObservedLiving(ObservedEntity):
+    def __init__(self, living: game.LivingCreature):
         super().__init__()
-        self.animal = animal
-
-    def accept(self, visitor):
-        return visitor.observed_person(self)
-
-    def __str__(self):
-        return "%s" % (self.animal,)
-
-    def __repr__(self):
-        return str(self)
-
-
-class ObservedPerson(ObservedEntity):
-    def __init__(self, person: game.Person):
-        super().__init__()
-        self.person = person
-        activities = [game.HoldingActivity(e) for e in person.holding]
-        self.activities: Sequence[game.Activity] = activities
+        self.living = living
+        self.activities: Sequence[game.Activity] = [
+            game.HoldingActivity(e) for e in living.holding
+        ]
 
     @property
     def holding(self):
-        return self.person.holding
+        return self.living.holding
 
     @property
     def memory(self):
-        return self.person.memory
+        return self.living.memory
 
     def accept(self, visitor):
-        return visitor.observed_person(self)
+        return visitor.observed_living(self)
 
     def __str__(self):
         if len(self.activities) == 0:
-            return "%s" % (self.person,)
-        return "%s who is %s" % (self.person, p.join(list(map(str, self.activities))))
+            return "%s" % (self.living,)
+        return "%s who is %s" % (self.living, p.join(list(map(str, self.activities))))
 
     def __repr__(self):
         return str(self)
+
+
+class ObservedAnimal(ObservedLiving):
+    def accept(self, visitor):
+        return visitor.observed_animal(self)
+
+    @property
+    def animal(self):
+        return self.living
+
+
+class ObservedPerson(ObservedLiving):
+    def accept(self, visitor):
+        return visitor.observed_person(self)
+
+    @property
+    def person(self):
+        return self.living
 
 
 class ObservedEntities(Observable):
@@ -185,7 +189,7 @@ class AreaObservation(Observation):
         super().__init__()
         self.who: ObservedPerson = ObservedPerson(person)
         self.where: game.Area = area
-        self.people: List[ObservedPerson] = flatten(
+        self.living: List[ObservedLiving] = flatten(
             [observe(e) for e in area.occupied if e != person]
         )
         self.items: List[ObservedEntity] = flatten(
@@ -203,7 +207,7 @@ class AreaObservation(Observation):
         return "%s observes %s, also here %s and visible is %s" % (
             self.who,
             self.details,
-            self.people,
+            self.living,
             self.items,
         )
 
