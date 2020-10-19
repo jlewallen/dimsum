@@ -247,7 +247,7 @@ class ObservedEntities(Observable):
         return str(self)
 
 
-class Holding(Activity):
+class HoldingActivity(Activity):
     def __init__(self, item: Item):
         super().__init__()
         self.item = item
@@ -292,7 +292,7 @@ class Person(LivingCreature):
     def observe(self) -> Sequence["ObservedPerson"]:
         if self.is_invisible:
             return []
-        activities = [Holding(e) for e in self.holding if isinstance(e, Item)]
+        activities = [HoldingActivity(e) for e in self.holding if isinstance(e, Item)]
         return [ObservedPerson(self, activities)]
 
     def describes(self, q: str):
