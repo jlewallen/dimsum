@@ -61,19 +61,44 @@ class CarryableMixin:
         return self
 
 
-class Item(entity.Entity, Wearable, CarryableMixin):
-    def __init__(self, areas=None, mobility=None, kind=None, **kwargs):
-        super().__init__(**kwargs)
+class HasRoutesMixin:
+    def __init__(self, areas=None, **kwargs):
+        super().__init__()
         self.areas = areas if areas else {}
-        self.mobility = mobility if areas else {}
-        self.kind = kind if kind else entity.Kind()
-        self.validate()
 
     def link_area(self, new_area, verb=DefaultMoveVerb, **kwargs):
         self.areas[verb] = new_area
 
-    def link_activity(self, name, activity=True):
-        self.details.set(name, activity)
+
+class InteractableMixin:
+    def __init__(self, interactions=None, **kwargs):
+        super().__init__()
+        self.interactions = interactions if interactions else {}
+
+    def link_activity(self, name: str, activity=True):
+        self.interactions[name] = activity
+
+    def when_activity(self, name: str):
+        return self.interactions[name] if name in self.interactions else False
+
+    def when_worn(self):
+        return self.when_activity(props.Worn)
+
+    def when_eaten(self):
+        return self.when_activity(props.Eaten)
+
+    def when_opened(self):
+        return self.when_activity(props.Opened)
+
+    def when_drank(self):
+        return self.when_activity(props.Drank)
+
+
+class Item(entity.Entity, Wearable, CarryableMixin, HasRoutesMixin, InteractableMixin):
+    def __init__(self, kind=None, areas=None, **kwargs):
+        super().__init__(**kwargs)
+        self.kind = kind if kind else entity.Kind()
+        self.validate()
 
     def describes(self, q: str):
         if q.lower() in self.details.name.lower():

@@ -73,6 +73,8 @@ class LupaEntity:
             return self.entity.details.map[key]
         if hasattr(self, key):
             return getattr(self, key)
+        if hasattr(self.entity, key):
+            return getattr(self.entity, key)
         return None
 
     def make_item_from_table(self, table, **kwargs) -> game.Item:

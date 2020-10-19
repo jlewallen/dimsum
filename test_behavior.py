@@ -91,9 +91,8 @@ async def test_behavior_move(caplog):
         "b:test:wear:after",
         lua="""
 function(s, world, area, player)
-    debug('wear', wear)
-    debug('wear[0].worn', wear[0].worn)
-    return player.go(wear[0].worn)
+    debug('wear[0].worn', wear[0].interactions.worn)
+    return player.go(wear[0].interactions.worn)
 end
 """,
     )

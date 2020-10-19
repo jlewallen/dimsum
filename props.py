@@ -110,17 +110,5 @@ class Details(PropertyMap):
     def clone(self):
         return Details(self.name, desc=self.desc)
 
-    def when_worn(self):
-        return self.map[Worn] if Worn in self.map else False
-
-    def when_eaten(self):
-        return self.map[Eaten] if Eaten in self.map else False
-
-    def when_opened(self):
-        return self.map[Opened] if Opened in self.map else False
-
-    def when_drank(self):
-        return self.map[Drank] if Drank in self.map else False
-
     def touch(self):
         self.touched = time.time()

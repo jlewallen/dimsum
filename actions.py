@@ -233,7 +233,7 @@ class Wear(PersonAction):
         if not self.item:
             return Failure("wear what?")
 
-        if not self.item.details.when_worn():
+        if not self.item.when_worn():
             return Failure("you can't wear that")
 
         player.wear(self.item)
@@ -266,7 +266,7 @@ class Eat(PersonAction):
         if not self.item:
             return Failure("dunno where that is")
 
-        if not self.item.details.when_eaten():
+        if not self.item.when_eaten():
             return Failure("you can't eat that")
 
         area = world.find_player_area(player)
@@ -287,7 +287,7 @@ class Drink(PersonAction):
         if not self.item:
             return Failure("dunno where that is")
 
-        if not self.item.details.when_drank():
+        if not self.item.when_drank():
             return Failure("you can't drink that")
 
         area = world.find_player_area(player)
