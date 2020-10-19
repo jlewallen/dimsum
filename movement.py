@@ -84,7 +84,7 @@ class MovementMixin:
 
 
 class FindsRoute:
-    async def find(self, world, player, **kwargs) -> Optional[AreaRoute]:
+    async def find(self, area, player, **kwargs) -> Optional[AreaRoute]:
         raise Exception("unimplemented")
 
 
@@ -93,16 +93,16 @@ class FindNamedRoute(FindsRoute):
         super().__init__()
         self.name = name
 
-    async def find(
-        self, world, player, verb: str = DefaultMoveVerb, **kwargs
-    ) -> Optional[AreaRoute]:
-        item = world.search(player, self.name)
-        if item is None:
-            log.info("no named route: %s", self.name)
-            return None
+    async def find(self, area, player, builder=None, **kwargs) -> Optional[AreaRoute]:
+        item = area.find(self.name)
+        if not item:
+            item = player.find(self.name)
+            if not item:
+                log.info("no named route: %s", self.name)
+                return None
 
         log.info("named route: %s = %s", self.name, item)
-        return item.move_with(world.find_player_area(player), player, world, verb=verb)
+        return item.move_with(area, player, builder=builder, **kwargs)
 
 
 class FindDirectionalRoute(FindsRoute):
@@ -110,7 +110,6 @@ class FindDirectionalRoute(FindsRoute):
         super().__init__()
         self.direction = direction
 
-    async def find(self, world, player, **kwargs) -> Optional[AreaRoute]:
-        area = world.find_player_area(player)
+    async def find(self, area, player, **kwargs) -> Optional[AreaRoute]:
         route = area.find_route(direction=self.direction)
         return route

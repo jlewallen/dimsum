@@ -436,7 +436,8 @@ class MovingAction(PersonAction):
 
         if self.finder:
             log.info("finder: %s", self.finder)
-            route = await self.finder.find(world, player, verb=verb)
+            area = world.find_player_area(player)
+            route = await self.finder.find(area, player, verb=verb, builder=world)
             if route:
                 routed: Any = route.area
                 destination = routed
