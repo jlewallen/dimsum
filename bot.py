@@ -10,6 +10,8 @@ import props
 import game
 import bus
 import world
+import reply
+import library
 import persistence
 import grammar
 import evaluator
@@ -330,7 +332,7 @@ modify when eaten
             action = self.parse_as(
                 evaluator.create(self.world, player), full_command, q
             )
-            reply = await self.world.perform(player, action)
+            reply = await self.world.perform(action, player)
             await self.save()
             return reply
 
@@ -343,7 +345,7 @@ modify when eaten
             return await mutation()
         except Exception as err:
             log.error("error", exc_info=True)
-            return game.Failure("oops, %s" % (err,))
+            return reply.Failure("oops, %s" % (err,))
 
     def run(self):
         self.bot.run(self.token)
@@ -404,6 +406,6 @@ modify when eaten
             details=props.Details(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
-        await self.world.perform(player, actions.Join())
+        await self.world.perform(actions.Join(), player)
         await self.save()
         return player

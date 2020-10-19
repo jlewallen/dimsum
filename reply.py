@@ -61,6 +61,21 @@ class ObservedItem(ObservedEntity):
         return str(self)
 
 
+class ObservedAnimal(ObservedEntity):
+    def __init__(self, animal: game.Animal):
+        super().__init__()
+        self.animal = animal
+
+    def accept(self, visitor):
+        return visitor.observed_person(self)
+
+    def __str__(self):
+        return "%s" % (self.animal,)
+
+    def __repr__(self):
+        return str(self)
+
+
 class ObservedPerson(ObservedEntity):
     def __init__(self, person: game.Person):
         super().__init__()
@@ -128,10 +143,6 @@ class PersonalObservation(Observation):
             self.who,
             self.properties,
         )
-
-
-class ObservedAnimal:
-    pass
 
 
 class DetailedObservation(Observation):
@@ -202,9 +213,13 @@ def observe(entity: Any) -> Sequence[ObservedEntity]:
         if entity.is_invisible:
             return []
         return [ObservedPerson(entity)]
+    if isinstance(entity, game.Animal):
+        if entity.is_invisible:
+            return []
+        return [ObservedAnimal(entity)]
     if isinstance(entity, game.Item):
         return [ObservedItem(entity)]
-    raise Exception("unexpected observation target")
+    raise Exception("unexpected observation target: %s" % (entity,))
 
 
 def flatten(l):
