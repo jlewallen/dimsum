@@ -79,12 +79,12 @@ class MovementMixin:
         self.routes.append(route)
         return route
 
-    def move_with(self, area, person, builder: AreaBuilder, verb=None):
+    def move_with(self, area, person, builder: AreaBuilder, **kwargs):
         if len(self.routes) == 0:
-            destination = builder.build_new_area(person, self, verb=verb)
-            self.link_area(destination, verb=verb)
+            destination = builder.build_new_area(person, self, **kwargs)
+            self.link_area(destination, **kwargs)
 
-        route = self.find_route(verb=verb)
+        route = self.find_route(**kwargs)
         person.drop_here(area, item=self)
         return route
 
