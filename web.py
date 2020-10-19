@@ -148,7 +148,7 @@ def create(state):
         person_key = token["key"]
         player = world.find(person_key)
         action = parse_as(evaluator.create(world, player), command)
-        reply = await world.perform(player, action)
+        reply = await world.perform(action, player)
         await state.save()
 
         return serializing.serialize({"id": uuid.uuid1(), "reply": reply})
