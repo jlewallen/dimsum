@@ -149,32 +149,33 @@ class LivingCreature(
     def quantity(self):
         return 1
 
-
-class Animal(LivingCreature):
-    pass
-
-
-class Person(LivingCreature):
-    def find(self, q: str):
-        for entity in self.holding:
-            if entity.describes(q):
-                return entity
-        for entity in self.wearing:
-            if entity.describes(q):
-                return entity
-        return None
-
     def describes(self, q: str) -> bool:
         return q.lower() in self.details.name.lower()
 
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.person(self)
+    def find(self, q: str) -> Optional[carryable.CarryableMixin]:
+        for e in self.holding:
+            if e.describes(q):
+                return e
+        for e in self.wearing:
+            if e.describes(q):
+                return e
+        return None
 
     def __str__(self):
         return self.details.name
 
     def __repr__(self):
         return str(self)
+
+
+class Animal(LivingCreature):
+    def accept(self, visitor: entity.EntityVisitor):
+        return visitor.animal(self)
+
+
+class Person(LivingCreature):
+    def accept(self, visitor: entity.EntityVisitor):
+        return visitor.person(self)
 
 
 class Player(Person):
