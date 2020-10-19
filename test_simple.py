@@ -5,6 +5,7 @@ import props
 import entity
 import game
 import world
+import reply
 import serializing
 import persistence
 import test
@@ -93,7 +94,7 @@ async def test_look_empty():
     tw = test.TestWorld()
     await tw.initialize()
     r = await tw.execute("look")
-    assert isinstance(r, game.AreaObservation)
+    assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.people) == 0
 
@@ -105,7 +106,7 @@ async def test_look_items():
     await tw.execute("make IPA")
     await tw.execute("drop")
     r = await tw.execute("look")
-    assert isinstance(r, game.AreaObservation)
+    assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 1
     assert len(r.people) == 0
 
@@ -116,7 +117,7 @@ async def test_look_people():
     await tw.initialize()
     await tw.add_carla()
     r = await tw.execute("look")
-    assert isinstance(r, game.AreaObservation)
+    assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.people) == 1
 
@@ -130,7 +131,7 @@ async def test_look_people_invisible():
     tw.carla.make_invisible()
 
     r = await tw.execute("look")
-    assert isinstance(r, game.AreaObservation)
+    assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.people) == 1
 

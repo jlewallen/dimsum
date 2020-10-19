@@ -2,7 +2,6 @@ from typing import List, Tuple, Dict, Sequence, Optional
 
 import logging
 import abc
-
 import entity
 
 log = logging.getLogger("dimsum")
@@ -33,7 +32,7 @@ class CarryableMixin:
         pass
 
     @abc.abstractmethod
-    def separate(self, world, item, quantity: int):
+    def separate(self, item, quantity: int, registrar: entity.Registrar = None):
         pass
 
 
@@ -42,19 +41,15 @@ class ContainingMixin:
         super().__init__(**kwargs)
         self.holding = holding if holding else []
 
-    @property
-    def items(self) -> List[CarryableMixin]:
-        return self.holding
-
-    def contains(self, e: CarryableMixin):
+    def contains(self, e: CarryableMixin) -> bool:
         return e in self.holding
 
-    def remove(self, e: CarryableMixin, **kwargs):
+    def unhold(self, e: CarryableMixin, **kwargs) -> CarryableMixin:
         self.holding.remove(e)
         return e
 
     def add_item(self, item: CarryableMixin) -> CarryableMixin:
-        for h in self.items:
+        for h in self.holding:
             if item.kind.same(h.kind):
                 h.quantity += item.quantity
 
@@ -72,7 +67,7 @@ class ContainingMixin:
                 return entity
         return None
 
-    def drop_all(self):
+    def drop_all(self) -> List[CarryableMixin]:
         dropped = []
         while len(self.holding) > 0:
             item = self.holding[0]
@@ -84,13 +79,9 @@ class ContainingMixin:
     def is_holding(self, item: CarryableMixin):
         return item in self.holding
 
-    @property
-    def items_in_hands(self) -> Sequence[CarryableMixin]:
-        return self.holding
-
     def hold(self, item: CarryableMixin, quantity: int = None):
         # See if there's a kind already in inventory.
-        for already in self.items_in_hands:
+        for already in self.holding:
             if item.kind.same(already.kind):
                 # This will probably need more protection haha
                 already.quantity += item.quantity
@@ -104,12 +95,17 @@ class ContainingMixin:
         item.touch()
         return item
 
-    def drop_here(self, world, item: CarryableMixin = None, quantity=None):
+    def drop_here(
+        self,
+        area: "ContainingMixin",
+        item: CarryableMixin = None,
+        quantity: int = None,
+        registrar: entity.Registrar = None,
+    ):
         if len(self.holding) == 0:
             return None, "nothing to drop"
 
-        area = world.find_player_area(self)
-        dropped = []
+        dropped: List[CarryableMixin] = []
         if quantity:
             if not item:
                 return None, "please specify what?"
@@ -117,9 +113,10 @@ class ContainingMixin:
             if quantity > item.quantity or quantity < 1:
                 return None, "you should check how many you have"
 
-            dropped = item.separate(world, self, quantity)
+            dropped = item.separate(self, quantity, registrar=registrar)
             if item.quantity == 0:
-                world.unregister(item)
+                assert registrar
+                registrar.unregister(item)
                 self.drop(item)
         else:
             if item:
@@ -130,11 +127,12 @@ class ContainingMixin:
         for item in dropped:
             after_add = area.add_item(item)
             if after_add != item:
-                world.unregister(item)
+                assert registrar
+                registrar.unregister(item)
 
         return dropped, None
 
-    def drop(self, item: CarryableMixin):
+    def drop(self, item: CarryableMixin) -> List[CarryableMixin]:
         if item in self.holding:
             self.holding.remove(item)
             item.touch()

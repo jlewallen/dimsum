@@ -31,46 +31,52 @@ class SqliteDatabase:
         self.dbc = self.db.cursor()
         self.dbc.execute("DELETE FROM entities")
         self.db.commit()
-        return
+
+    async def destroy(self, entity: entity.Entity):
+        klass = entity.__class__.__name__
+        log.info("destroying %s %s %s", entity.key, entity, entity.__class__.__name__)
+        self.dbc.execute(
+            "DELETE FROM entities WHERE key = ?",
+            [
+                entity.key,
+            ],
+        )
+
+    async def update(self, entity: entity.Entity):
+        klass = entity.__class__.__name__
+        props = serializing.serialize(entity, secure=True)
+        identity_field = {
+            "private": entity.identity.private,
+            "signature": entity.identity.signature,
+        }
+        log.info("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
+        self.dbc.execute(
+            "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
+            [
+                entity.key,
+                klass,
+                json.dumps(identity_field),
+                props,
+            ],
+        )
 
     async def save(self, world: world.World):
         self.dbc = self.db.cursor()
 
-        for key, entity in world.destroyed.items():
-            klass = entity.__class__.__name__
-            log.info("destroying %s %s %s", key, entity, entity.__class__.__name__)
-            self.dbc.execute(
-                "DELETE FROM entities WHERE key = ?",
-                [
-                    entity.key,
-                ],
-            )
+        for key, entity in world.garbage.items():
+            await self.destroy(entity)
 
         for key, entity in world.entities.items():
-            klass = entity.__class__.__name__
-            props = serializing.serialize(entity, secure=True)
-            identity_field = {
-                "private": entity.identity.private,
-                "signature": entity.identity.signature,
-            }
-
             try:
-                log.info("saving %s %s %s", key, entity, entity.__class__.__name__)
-                self.dbc.execute(
-                    "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
-                    [
-                        entity.key,
-                        klass,
-                        json.dumps(identity_field),
-                        props,
-                    ],
-                )
+                if entity.destroyed:
+                    await self.destroy(entity)
+                else:
+                    await self.update(entity)
             except:
                 log.error(
-                    "error:saving %s %s %s",
+                    "error:saving %s = %s",
                     key,
                     entity,
-                    entity.__class__.__name__,
                     exc_info=True,
                 )
                 raise

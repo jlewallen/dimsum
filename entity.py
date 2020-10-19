@@ -1,3 +1,6 @@
+from typing import Type, List, Union, Any
+
+import abc
 import props
 import behavior
 import crypto
@@ -105,3 +108,24 @@ class Entity:
 
     def accept(self, visitor: "EntityVisitor"):
         raise Exception("unimplemented")
+
+
+class Registrar:
+    def __init__(self):
+        super().__init__()
+        self.entities: Dict[str, entity.Entity] = {}
+        self.garbage: Dict[str, entity.Entity] = {}
+
+    def register(self, entity: Union[Entity, Any]):
+        self.entities[entity.key] = entity
+
+    def unregister(self, entity: Union[Entity, Any]):
+        entity.destroy()
+        del self.entities[entity.key]
+        self.garbage[entity.key] = entity
+
+    def empty(self):
+        return len(self.entities.keys()) == 0
+
+    def all_of_type(self, klass: Type) -> List[Entity]:
+        return [e for e in self.entities.values() if isinstance(e, klass)]

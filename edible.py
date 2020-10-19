@@ -1,11 +1,12 @@
 import logging
+
 import props
 
 log = logging.getLogger("dimsum")
 
 
 class EdibleMixin:
-    def consumed(self, player):
+    def consumed(self, person):
         FoodFields = [
             props.SumFields("sugar"),
             props.SumFields("fat"),
@@ -17,7 +18,7 @@ class EdibleMixin:
             props.SumFields("vitamins"),
         ]
         changes = props.merge_dictionaries(
-            player.details.map, self.details.map, FoodFields
+            person.details.map, self.details.map, FoodFields
         )
         log.info("merged %s" % (changes,))
-        player.details.update(changes)
+        person.details.update(changes)

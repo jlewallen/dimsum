@@ -1,18 +1,12 @@
 from typing import List, Tuple, Dict, Sequence, Optional
-
 import logging
-import sys
-import enum
-import time
 import inflect
 import abc
-import lupa
 
 import crypto
 import props
 import entity
 import behavior
-
 import mechanics
 import occupyable
 import carryable
@@ -20,15 +14,8 @@ import edible
 import movement
 import apparel
 
-DefaultMoveVerb = "walk"
-
 p = inflect.engine()
-scriptEngine = behavior.ScriptEngine()
 log = logging.getLogger("dimsum")
-
-
-class Observable:
-    pass
 
 
 class Event:
@@ -59,7 +46,8 @@ class Item(
             return True
         return False
 
-    def separate(self, world, player, quantity):
+    def separate(self, player, quantity, registrar: entity.Registrar = None):
+        assert registrar
         self.decrease_quantity(quantity)
         item = Item(
             creator=player,
@@ -69,11 +57,8 @@ class Item(
             quantity=quantity,
         )
         # TODO Move to caller
-        world.register(item)
+        registrar.register(item)
         return [item]
-
-    def observe(self) -> Sequence["ObservedEntity"]:
-        return [ObservedEntity(self)]
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.item(self)
@@ -137,36 +122,6 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
         )
 
 
-class ObservedEntity(Observable):
-    def __init__(self, entity: entity.Entity):
-        super().__init__()
-        self.entity = entity
-
-    def accept(self, visitor):
-        return visitor.observed_entity(self)
-
-    def __str__(self):
-        return str(self.entity)
-
-    def __repr__(self):
-        return str(self)
-
-
-class ObservedEntities(Observable):
-    def __init__(self, entities: List[entity.Entity]):
-        super().__init__()
-        self.entities = entities
-
-    def accept(self, visitor):
-        return visitor.observed_entities(self)
-
-    def __str__(self):
-        return str(p.join(self.entities))
-
-    def __repr__(self):
-        return str(self)
-
-
 class HoldingActivity(Activity):
     def __init__(self, item: Item):
         super().__init__()
@@ -195,13 +150,8 @@ class LivingCreature(
         return 1
 
 
-class ObservedAnimal:
-    pass
-
-
 class Animal(LivingCreature):
-    def observe(self) -> Sequence["ObservedAnimal"]:
-        return []
+    pass
 
 
 class Person(LivingCreature):
@@ -213,12 +163,6 @@ class Person(LivingCreature):
             if entity.describes(q):
                 return entity
         return None
-
-    def observe(self) -> Sequence["ObservedPerson"]:
-        if self.is_invisible:
-            return []
-        activities = [HoldingActivity(e) for e in self.holding if isinstance(e, Item)]
-        return [ObservedPerson(self, activities)]
 
     def describes(self, q: str) -> bool:
         return q.lower() in self.details.name.lower()
@@ -233,159 +177,8 @@ class Person(LivingCreature):
         return str(self)
 
 
-class ObservedPerson(Observable):
-    def __init__(self, person: Person, activities: Sequence[Activity]):
-        super().__init__()
-        self.person = person
-        self.activities = activities
-
-    @property
-    def holding(self):
-        return self.person.holding
-
-    @property
-    def memory(self):
-        return self.person.memory
-
-    def accept(self, visitor):
-        return visitor.observed_person(self)
-
-    def __str__(self):
-        if len(self.activities) == 0:
-            return "%s" % (self.person,)
-        return "%s who is %s" % (self.person, p.join(list(map(str, self.activities))))
-
-    def __repr__(self):
-        return str(self)
-
-
 class Player(Person):
     pass
-
-
-class Reply:
-    def accept(self, visitor):
-        raise Error("unimplemented")
-
-
-class SimpleReply(Reply):
-    def __init__(self, message: str, **kwargs):
-        super().__init__()
-        self.message = message
-        self.item = kwargs["item"] if "item" in kwargs else None
-
-
-class Success(SimpleReply):
-    def accept(self, visitor):
-        return visitor.success(self)
-
-    def __str__(self):
-        return "Success<%s>" % (self.message,)
-
-
-class Failure(SimpleReply):
-    def accept(self, visitor):
-        return visitor.failure(self)
-
-    def __str__(self):
-        return "Failure<%s>" % (self.message,)
-
-
-class Observation(Reply, Observable):
-    pass
-
-
-class PersonalObservation(Observation):
-    def __init__(self, who: ObservedPerson):
-        super().__init__()
-        self.who = who
-
-    @property
-    def details(self):
-        return self.who.person.details
-
-    @property
-    def properties(self):
-        return self.details.map
-
-    @property
-    def memory(self):
-        return self.who.memory
-
-    def accept(self, visitor):
-        return visitor.personal_observation(self)
-
-    def __str__(self):
-        return "%s considers themselves %s" % (
-            self.who,
-            self.properties,
-        )
-
-
-class DetailedObservation(Observation):
-    def __init__(self, person: ObservedPerson, item: ObservedEntity):
-        super().__init__()
-        self.person = person
-        self.item = item
-
-    @property
-    def details(self):
-        return self.item.details
-
-    @property
-    def properties(self):
-        return self.details.map
-
-    def accept(self, visitor):
-        return visitor.detailed_observation(self)
-
-    def __str__(self):
-        return "%s observes %s" % (
-            self.person,
-            self.properties,
-        )
-
-
-class EntitiesObservation(Observation):
-    def __init__(self, entities: List[entity.Entity]):
-        super().__init__()
-        self.entities = entities
-
-    def accept(self, visitor):
-        return visitor.entities_observation(self)
-
-    def __str__(self):
-        return "observed %s" % (p.join(self.entities),)
-
-
-class AreaObservation(Observation):
-    def __init__(
-        self,
-        who: ObservedPerson,
-        where: entity.Entity,
-        people: List[ObservedPerson],
-        items: List[ObservedEntity],
-    ):
-        super().__init__()
-        self.who = who
-        self.where = where
-        self.people = people
-        self.items = items
-
-    @property
-    def details(self):
-        return self.where.details
-
-    def accept(self, visitor):
-        return visitor.area_observation(self)
-
-    def __str__(self):
-        return "%s observes %s, also here %s and visible is %s" % (
-            self.who,
-            self.details,
-            self.people,
-            self.items,
-        )
 
 
 class Area(
@@ -399,14 +192,12 @@ class Area(
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
 
+    @property
+    def items(self):
+        return self.holding
+
     def entities(self) -> List[entity.Entity]:
         return flatten([self.holding, self.occupied])
-
-    def look(self, player: Player):
-        people = [e.observe() for e in self.occupied if e != player]
-        items = [e.observe() for e in self.holding if e]
-        observed_self = player.observe()[0]
-        return AreaObservation(observed_self, self, flatten(people), flatten(items))
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(of)]
@@ -428,63 +219,6 @@ class Area(
 
     def __repr__(self):
         return str(self)
-
-
-class Ctx:
-    # This should eventually get worked out. Just return Ctx from this function?
-    def __init__(self, context_factory, world=None, person=None, **kwargs):
-        super().__init__()
-        self.se = scriptEngine
-        self.context_factory = context_factory
-        self.world = world
-        self.person = person
-        self.scope = behavior.Scope(world=world, person=person, **kwargs)
-
-    def extend(self, **kwargs):
-        self.scope = self.scope.extend(**kwargs)
-        return self
-
-    def entities(self):
-        def get_entities_inside(array):
-            return flatten([get_entities(e) for e in array])
-
-        def get_entities(thing):
-            if isinstance(thing, entity.Entity):
-                return [thing]
-            if isinstance(thing, list):
-                return get_entities_inside(thing)
-            return []
-
-        return get_entities_inside(self.scope.values())
-
-    async def hook(self, name):
-        found = {}
-        entities = self.entities()
-        log.info("hook:%s %s" % (name, entities))
-        for entity in entities:
-            behaviors = entity.get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info(
-                    "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
-                )
-            found[entity] = behaviors
-
-        scope = self.scope
-        for entity, behaviors in found.items():
-
-            def create_context():
-                return self.context_factory(creator=entity)
-
-            for b in behaviors:
-                prepared = self.se.prepare(scope, create_context)
-                thunk = behavior.GenericThunk
-                if "person" in scope.map and scope.map["person"]:
-                    thunk = behavior.PersonThunk
-                actions = self.se.execute(thunk, prepared, b)
-                if actions:
-                    for action in actions:
-                        await self.world.perform(self.person, action)
-                        log.info("performing: %s", action)
 
 
 class Action:

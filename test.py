@@ -42,18 +42,18 @@ class TestWorld:
             creator=self.world,
             details=props.Details("Carla", desc="Chief Salad Officer."),
         )
-        return await self.world.perform(self.carla, actions.Join())
+        return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
         self.tomi = game.Player(
             creator=self.world,
             details=props.Details("Tomi", desc="Chief Crying Officer."),
         )
-        return await self.world.perform(self.tomi, actions.Join())
+        return await self.world.perform(actions.Join(), self.tomi)
 
     async def initialize(self):
         self.world.add_area(self.area)
-        await self.world.perform(self.jacob, actions.Join())
+        await self.world.perform(actions.Join(), self.jacob)
 
     def get_default_area(self):
         return self.area
@@ -68,6 +68,6 @@ class TestWorld:
         tree = self.l.parse(command)
         log.info("parsed: %s" % (tree,))
         action = evaluator.create(self.world, self.player).transform(tree)
-        response = await self.world.perform(self.player, action)
+        response = await self.world.perform(action, self.player)
         log.info("response: %s" % (response,))
         return response

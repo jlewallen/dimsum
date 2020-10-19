@@ -1,7 +1,8 @@
 import pytest
 
-import game
 import props
+import game
+import reply
 import test
 
 
@@ -11,7 +12,7 @@ async def test_wearing_when_unwearable():
     await tw.initialize()
     await tw.execute("make Shoes")
     r = await tw.execute("wear shoes")
-    assert isinstance(r, game.Failure)
+    assert isinstance(r, reply.Failure)
     print(tw.player.holding)
     print(tw.player.wearing)
     assert len(tw.player.holding) == 1

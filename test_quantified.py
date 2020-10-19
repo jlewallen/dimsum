@@ -1,8 +1,9 @@
 import logging
 import pytest
 
-import game
 import props
+import game
+import reply
 import test
 
 
@@ -98,7 +99,7 @@ async def test_quantified_from_recipe_holding_template(caplog):
     await tw.execute("make Gold Coin")
     await tw.execute("call this cash")
     r = await tw.execute("make 4 cash")
-    assert isinstance(r, game.Success)
+    assert isinstance(r, reply.Success)
     assert r.item.quantity == 5
     assert len(tw.player.holding) == 1
     assert len(tw.area.items) == 0

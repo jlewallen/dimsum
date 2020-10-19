@@ -4,12 +4,14 @@ import os
 import hashlib
 import base64
 
+from reply import *
 from game import *
 from world import *
 
 import props
 import hooks
 import movement
+import reply
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
@@ -339,8 +341,7 @@ class LookFor(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         await ctx.extend(holding=player.holding).extend(name=self.name).hook("look-for")
-        observed = player.observe()[0]
-        return PersonalObservation(observed)
+        return reply.PersonalObservation(player)
 
 
 class LookMyself(PersonAction):
@@ -349,8 +350,7 @@ class LookMyself(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-myself")
-        observed = player.observe()[0]
-        return PersonalObservation(observed)
+        return reply.PersonalObservation(player)
 
 
 class LookDown(PersonAction):
@@ -359,7 +359,7 @@ class LookDown(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-down")
-        return EntitiesObservation(player.holding)
+        return reply.EntitiesObservation(player.holding)
 
 
 class Look(PersonAction):
@@ -369,11 +369,8 @@ class Look(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
-            observed = player.observe()
-            if len(observed) == 0:
-                raise Exception("invisible observation")
-            return DetailedObservation(observed[0], ObservedEntity(self.item))
-        return world.look(player)
+            return reply.DetailedObservation(reply.ObservedItem(self.item))
+        return reply.AreaObservation(world.find_player_area(player), player)
 
 
 class Drop(PersonAction):
@@ -383,8 +380,9 @@ class Drop(PersonAction):
         self.item = item if item else None
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        area = world.find_player_area(player)
         dropped, failure = player.drop_here(
-            world, item=self.item, quantity=self.quantity
+            area, self.item, quantity=self.quantity, registrar=world
         )
         if dropped:
             area = world.find_player_area(player)
@@ -409,13 +407,13 @@ class Hold(PersonAction):
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = self.item.separate(world, player, self.quantity)
+            removed = self.item.separate(player, self.quantity, registrar=world)
             if self.item.quantity == 0:
                 world.unregister(self.item)
                 area.remove(self.item)
             self.item = removed[0]
         else:
-            area.remove(self.item)
+            area.unhold(self.item)
 
         after_hold = player.hold(self.item)
         if after_hold != self.item:
@@ -454,7 +452,7 @@ class MovingAction(PersonAction):
         await destination.entered(world.bus, player)
         await ctx.extend(area=destination).hook("entered:after")
 
-        return world.look(player)
+        return reply.AreaObservation(world.find_player_area(player), player)
 
 
 class Climb(MovingAction):
@@ -478,6 +476,7 @@ class Obliterate(PersonAction):
         if len(items) == 0:
             return Failure("you're not holding anything")
 
+        item: Any = None  # TODO CarryableMixin to Entity
         for item in items:
             world.unregister(item)
             await world.bus.publish(ItemObliterated(player, area, item))

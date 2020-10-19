@@ -1,5 +1,5 @@
 from typing import List, Tuple, Dict, Sequence, Optional
-
+import abc
 import logging
 import enum
 
@@ -16,6 +16,12 @@ class Direction(enum.Enum):
 
 class Area:
     pass
+
+
+class AreaBuilder:
+    @abc.abstractmethod
+    def build_new_area(self, player, item, **kwargs) -> Area:
+        pass
 
 
 class AreaRoute:
@@ -67,14 +73,13 @@ class MovementMixin:
         self.routes.append(route)
         return route
 
-    def move_with(self, world, player, verb=None):
+    def move_with(self, area, player, builder: AreaBuilder, verb=None):
         if len(self.routes) == 0:
-            area = world.find_player_area(player)
-            destination = world.build_new_area(player, area, self, verb=verb)
+            destination = builder.build_new_area(player, self, verb=verb)
             self.link_area(destination, verb=verb)
 
         route = self.find_route(verb=verb)
-        player.drop_here(world, item=self)
+        player.drop_here(area, item=self)
         return route
 
 
@@ -97,7 +102,7 @@ class FindNamedRoute(FindsRoute):
             return None
 
         log.info("named route: %s = %s", self.name, item)
-        return item.move_with(world, player, verb=verb)
+        return item.move_with(world.find_player_area(player), player, world, verb=verb)
 
 
 class FindDirectionalRoute(FindsRoute):

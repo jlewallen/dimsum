@@ -4,9 +4,7 @@ import abc
 
 
 class Living:
-    @abc.abstractmethod
-    def observe(self):
-        pass
+    pass
 
 
 class OccupyableMixin:
