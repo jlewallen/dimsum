@@ -34,8 +34,6 @@ class Event:
     pass
 
 
-
-
 class EventBus:
     async def publish(self, event: Event):
         log.info("publish:%s", event)
@@ -43,8 +41,6 @@ class EventBus:
 
 class Activity:
     pass
-
-
 
 
 class InteractableMixin:
@@ -134,7 +130,6 @@ class Item(
 
     def __repr__(self):
         return str(self)
-
 
 
 class ItemFactory:
@@ -458,7 +453,11 @@ class AreaObservation(Observation):
 
 
 class Area(
-        entity.Entity, carryable.ContainingMixin, occupyable.OccupyableMixin, movement.MovementMixin, movement.Area
+    entity.Entity,
+    carryable.ContainingMixin,
+    occupyable.OccupyableMixin,
+    movement.MovementMixin,
+    movement.Area,
 ):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)

@@ -100,7 +100,9 @@ async def test_directional_moving():
     park = game.Area(details=props.Details("North Park"))
 
     tw.world.add_area(park)
-    tw.area.add_route(movement.DirectionalRoute(direction=movement.Direction.NORTH, area=park))
+    tw.area.add_route(
+        movement.DirectionalRoute(direction=movement.Direction.NORTH, area=park)
+    )
 
     area_before = tw.world.find_player_area(tw.player)
     await tw.execute("go north")

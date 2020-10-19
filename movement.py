@@ -6,15 +6,18 @@ import enum
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")
 
+
 class Direction(enum.Enum):
     NORTH = 1
     SOUTH = 2
     WEST = 3
     EAST = 4
 
+
 class Area:
     pass
-    
+
+
 class AreaRoute:
     def __init__(self, area: Area = None, **kwargs):
         super().__init__()
@@ -24,13 +27,13 @@ class AreaRoute:
     def satisfies(self, **kwargs) -> bool:
         return False
 
-    
+
 class VerbRoute(AreaRoute):
     def __init__(self, verb: str = None, **kwargs):
         super().__init__(**kwargs)
         assert verb
         self.verb = verb
-        
+
     def satisfies(self, verb=None, **kwargs) -> bool:
         return verb and verb == self.verb
 
@@ -44,7 +47,7 @@ class DirectionalRoute(AreaRoute):
     def satisfies(self, direction: Direction = None, **kwargs) -> bool:
         return self.direction == direction
 
-    
+
 class MovementMixin:
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
@@ -74,7 +77,7 @@ class MovementMixin:
         player.drop_here(world, item=self)
         return route
 
-    
+
 class FindsRoute:
     async def find(self, world, player, **kwargs) -> Optional[AreaRoute]:
         raise Exception("unimplemented")
@@ -85,7 +88,9 @@ class FindNamedRoute(FindsRoute):
         super().__init__()
         self.name = name
 
-    async def find(self, world, player, verb: str = DefaultMoveVerb, **kwargs) -> Optional[AreaRoute]:
+    async def find(
+        self, world, player, verb: str = DefaultMoveVerb, **kwargs
+    ) -> Optional[AreaRoute]:
         item = world.search(player, self.name)
         if item is None:
             log.info("no named route: %s", self.name)
@@ -94,7 +99,7 @@ class FindNamedRoute(FindsRoute):
         log.info("named route: %s = %s", self.name, item)
         return item.move_with(world, player, verb=verb)
 
-    
+
 class FindDirectionalRoute(FindsRoute):
     def __init__(self, direction: Direction):
         super().__init__()
@@ -104,4 +109,3 @@ class FindDirectionalRoute(FindsRoute):
         area = world.find_player_area(player)
         route = area.find_route(direction=self.direction)
         return route
-

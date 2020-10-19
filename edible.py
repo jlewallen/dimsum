@@ -3,6 +3,7 @@ import props
 
 log = logging.getLogger("dimsum")
 
+
 class EdibleMixin:
     def consumed(self, player):
         FoodFields = [

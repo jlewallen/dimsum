@@ -2,10 +2,12 @@ from typing import List
 
 import abc
 
+
 class Wearable:
     @abc.abstractmethod
     def touch(self):
         pass
+
 
 class ApparelMixin:
     def __init__(self, wearing=None, **kwargs):
@@ -24,4 +26,3 @@ class ApparelMixin:
         self.wearing.remove(item)
         item.touch()
         return True
-

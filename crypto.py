@@ -36,7 +36,7 @@ def generate_identity():
 
 
 class Identity:
-    def __init__(self, public=None,private=None,signature=None, **kwargs):
+    def __init__(self, public=None, private=None, signature=None, **kwargs):
         self.private = private
         self.public = public if public else get_public_from_private_bytes(self.private)
         self.signature = signature

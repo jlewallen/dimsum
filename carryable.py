@@ -36,6 +36,7 @@ class CarryableMixin:
     def separate(self, world, item, quantity: int):
         pass
 
+
 class ContainingMixin:
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)

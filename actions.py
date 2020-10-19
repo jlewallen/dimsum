@@ -244,7 +244,7 @@ class Wear(PersonAction):
 
         if player.wear(self.item):
             player.drop(self.item)
-            
+
         # TODO Publish
         await ctx.extend(wear=[self.item]).hook("wear:after")
         return Success("you wore %s" % (self.item))
