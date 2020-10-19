@@ -46,15 +46,15 @@ class Item(
             return True
         return False
 
-    def separate(self, player, quantity, registrar: entity.Registrar = None):
+    def separate(self, quantity, registrar: entity.Registrar = None, **kwargs):
         assert registrar
         self.decrease_quantity(quantity)
         item = Item(
-            creator=player,
             kind=self.kind,
             details=self.details,
             behaviors=self.behaviors,
             quantity=quantity,
+            **kwargs
         )
         # TODO Move to caller
         registrar.register(item)

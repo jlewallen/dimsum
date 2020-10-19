@@ -32,7 +32,7 @@ class CarryableMixin:
         pass
 
     @abc.abstractmethod
-    def separate(self, item, quantity: int, registrar: entity.Registrar = None):
+    def separate(self, quantity: int, registrar: entity.Registrar = None, **kwargs):
         pass
 
 
@@ -101,6 +101,7 @@ class ContainingMixin:
         item: CarryableMixin = None,
         quantity: int = None,
         registrar: entity.Registrar = None,
+        **kwargs,
     ):
         if len(self.holding) == 0:
             return None, "nothing to drop"
@@ -113,7 +114,7 @@ class ContainingMixin:
             if quantity > item.quantity or quantity < 1:
                 return None, "you should check how many you have"
 
-            dropped = item.separate(self, quantity, registrar=registrar)
+            dropped = item.separate(quantity, registrar=registrar, **kwargs)
             if item.quantity == 0:
                 assert registrar
                 registrar.unregister(item)

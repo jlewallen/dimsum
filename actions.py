@@ -382,7 +382,7 @@ class Drop(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         dropped, failure = player.drop_here(
-            area, self.item, quantity=self.quantity, registrar=world
+            area, self.item, quantity=self.quantity, registrar=world, creator=player
         )
         if dropped:
             area = world.find_player_area(player)
@@ -407,7 +407,7 @@ class Hold(PersonAction):
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = self.item.separate(player, self.quantity, registrar=world)
+            removed = self.item.separate(self.quantity, registrar=world, creator=player)
             if self.item.quantity == 0:
                 world.unregister(self.item)
                 area.remove(self.item)
