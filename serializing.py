@@ -4,7 +4,7 @@ import logging
 import crypto
 import entity
 import game
-
+import world
 
 log = logging.getLogger("dimsum")
 
@@ -24,7 +24,7 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(game.World, base=True)
+@jsonpickle.handlers.register(world.World, base=True)
 class WorldHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(None)

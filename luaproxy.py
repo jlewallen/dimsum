@@ -5,6 +5,7 @@ import lupa
 
 import entity
 import game
+import world
 import actions
 import props
 
@@ -26,7 +27,7 @@ class LupaContext:
             return [self.wrap(e) for e in thing]
         if isinstance(thing, dict):
             return {key: self.wrap(value) for key, value in thing.items()}
-        if isinstance(thing, game.World):
+        if isinstance(thing, world.World):
             return LupaWorld(self, thing)
         if isinstance(thing, game.Person):
             return LupaPerson(self, thing)
@@ -102,17 +103,15 @@ class LupaEntity:
 
 class LupaWorld(LupaEntity):
     @property
-    def world(self) -> game.World:
-        if not isinstance(self.entity, game.World):
-            raise Exception()
+    def world(self) -> world.World:
+        assert isinstance(self.entity, world.World)
         return self.entity
 
 
 class LupaArea(LupaEntity):
     @property
     def area(self) -> game.Area:
-        if not isinstance(self.entity, game.Area):
-            raise Exception()
+        assert isinstance(self.entity, game.Area)
         return self.entity
 
     def number(self, of):
@@ -128,8 +127,7 @@ class LupaArea(LupaEntity):
 class LupaItem(LupaEntity):
     @property
     def item(self) -> game.Item:
-        if not isinstance(self.entity, game.Item):
-            raise Exception()
+        assert isinstance(self.entity, game.Item)
         return self.entity
 
     def kind(self, name: str) -> entity.Kind:
@@ -157,14 +155,12 @@ class LupaLivingCreature(LupaEntity):
 class LupaPerson(LupaLivingCreature):
     @property
     def person(self) -> game.Person:
-        if not isinstance(self.entity, game.Person):
-            raise Exception()
+        assert isinstance(self.entity, game.Person)
         return self.entity
 
 
 class LupaAnimal(LupaLivingCreature):
     @property
     def animal(self) -> game.Animal:
-        if not isinstance(self.entity, game.Animal):
-            raise Exception()
+        assert isinstance(self.entity, game.Animal)
         return self.entity

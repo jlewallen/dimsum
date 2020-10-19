@@ -5,13 +5,19 @@ import hashlib
 import base64
 
 from game import *
-from props import *
+from world import *
 
+import props
 import hooks
 import movement
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
+
+
+class PersonAction(Action):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        raise Exception("unimplemented")
 
 
 class Unknown(PersonAction):

@@ -13,6 +13,7 @@ import props
 import entity
 import behavior
 
+import mechanics
 import occupyable
 import carryable
 import edible
@@ -34,63 +35,17 @@ class Event:
     pass
 
 
-class EventBus:
-    async def publish(self, event: Event):
-        log.info("publish:%s", event)
-
-
 class Activity:
     pass
-
-
-class InteractableMixin:
-    def __init__(self, interactions=None, **kwargs):
-        super().__init__(**kwargs)
-        self.interactions = interactions if interactions else {}
-
-    def link_activity(self, name: str, activity=True):
-        self.interactions[name] = activity
-
-    def when_activity(self, name: str):
-        return self.interactions[name] if name in self.interactions else False
-
-    def when_worn(self):
-        return self.when_activity(props.Worn)
-
-    def when_eaten(self):
-        return self.when_activity(props.Eaten)
-
-    def when_opened(self):
-        return self.when_activity(props.Opened)
-
-    def when_drank(self):
-        return self.when_activity(props.Drank)
-
-
-class VisibilityMixin:
-    def __init__(self, visible=None, **kwargs):
-        super().__init__(**kwargs)
-
-    def make_visible(self):
-        log.info("person:visible")
-        self.visible = {}
-
-    def make_invisible(self):
-        log.info("person:invisible")
-        self.visible = {"hidden": True}
-
-    @property
-    def is_invisible(self):
-        return "hidden" in self.visible
 
 
 class Item(
     entity.Entity,
     apparel.Wearable,
     carryable.CarryableMixin,
-    InteractableMixin,
+    mechanics.InteractableMixin,
     movement.MovementMixin,
-    VisibilityMixin,
+    mechanics.VisibilityMixin,
     edible.EdibleMixin,
 ):
     def __init__(self, **kwargs):
@@ -165,7 +120,7 @@ class MaybeQuantifiedItem(ItemFactory):
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
-class Recipe(Item, ItemFactory):
+class Recipe(Item, ItemFactory, mechanics.Memorable):
     def __init__(self, required=None, base=None, **kwargs):
         super().__init__(**kwargs)
         self.required = required if required else {}
@@ -224,36 +179,13 @@ class HoldingActivity(Activity):
         return str(self)
 
 
-class MemoryMixin:
-    def __init__(self, memory=None, **kwargs):
-        super().__init__()
-        self.memory = memory if memory else {}
-
-    def find_memory(self, q: str):
-        for name, entity in self.memory.items():
-            if q.lower() in name.lower():
-                return entity
-        for name, entity in self.memory.items():
-            if entity.describes(q):
-                return entity
-        return None
-
-    def find_recipe(self, q: str):
-        for name, entity in self.memory.items():
-            if name.startswith("r:"):
-                name = name.replace("r:", "")
-                if q.lower() in name.lower():
-                    return entity
-        return None
-
-
 class LivingCreature(
     entity.Entity,
     occupyable.Living,
     carryable.CarryingMixin,
     apparel.ApparelMixin,
-    VisibilityMixin,
-    MemoryMixin,
+    mechanics.VisibilityMixin,
+    mechanics.MemoryMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -263,8 +195,13 @@ class LivingCreature(
         return 1
 
 
-class Animal(LivingCreature):
+class ObservedAnimal:
     pass
+
+
+class Animal(LivingCreature):
+    def observe(self) -> Sequence["ObservedAnimal"]:
+        return []
 
 
 class Person(LivingCreature):
@@ -283,7 +220,7 @@ class Person(LivingCreature):
         activities = [HoldingActivity(e) for e in self.holding if isinstance(e, Item)]
         return [ObservedPerson(self, activities)]
 
-    def describes(self, q: str):
+    def describes(self, q: str) -> bool:
         return q.lower() in self.details.name.lower()
 
     def accept(self, visitor: entity.EntityVisitor):
@@ -323,8 +260,7 @@ class ObservedPerson(Observable):
 
 
 class Player(Person):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass
 
 
 class Reply:
@@ -458,6 +394,7 @@ class Area(
     occupyable.OccupyableMixin,
     movement.MovementMixin,
     movement.Area,
+    mechanics.Memorable,
 ):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
@@ -491,148 +428,6 @@ class Area(
 
     def __repr__(self):
         return str(self)
-
-
-class World(entity.Entity):
-    def __init__(self, bus: EventBus, context_factory):
-        super().__init__()
-        self.details = props.Details("World", desc="Ya know, everything")
-        self.key = "world"
-        self.bus = bus
-        self.context_factory = context_factory
-        self.entities: Dict[str, entity.Entity] = {}
-        self.destroyed: Dict[str, entity.Entity] = {}
-
-    def register(self, entity: entity.Entity):
-        self.entities[entity.key] = entity
-
-    def unregister(self, entity: entity.Entity):
-        entity.destroy()
-        del self.entities[entity.key]
-        self.destroyed[entity.key] = entity
-
-    def empty(self):
-        return len(self.entities.keys()) == 0
-
-    def items(self):
-        return [e for e in self.entities.values() if isinstance(e, Item)]
-
-    def areas(self):
-        return [e for e in self.entities.values() if isinstance(e, Area)]
-
-    def people(self):
-        return [e for e in self.entities.values() if isinstance(e, Person)]
-
-    def players(self):
-        return [e for e in self.entities.values() if isinstance(e, Player)]
-
-    def find_person_by_name(self, name):
-        for person in self.people():
-            if person.details.name == name:
-                return person
-        return None
-
-    def welcome_area(self):
-        return self.areas()[0]
-
-    def look(self, player: Player):
-        area = self.find_player_area(player)
-        return area.look(player)
-
-    def find_entity_area(self, entity: entity.Entity):
-        for area in self.areas():
-            if area.contains(entity) or area.occupying(entity):
-                return area
-        return None
-
-    def find_player_area(self, player: Player):
-        return self.find_entity_area(player)
-
-    def contains(self, key):
-        return key in self.entities
-
-    def find(self, key):
-        return self.entities[key]
-
-    def resolve(self, keys):
-        return [self.entities[key] for key in keys]
-
-    def add_area(self, area: Area):
-        self.register(area)
-        for entity in area.entities():
-            self.register(entity)
-
-    def build_new_area(
-        self, player: Player, fromArea: Area, entry: Item, verb: str = DefaultMoveVerb
-    ):
-        log.info("building new area")
-
-        theWayBack = Item(creator=player, details=entry.details.clone())
-        theWayBack.link_area(fromArea, verb=verb)
-
-        area = Area(
-            creator=player,
-            details=props.Details(
-                "A pristine, new place.",
-                desc="Nothing seems to be here, maybe you should decorate?",
-            ),
-        )
-        area.add_item(theWayBack)
-        self.add_area(area)
-        return area
-
-    def search_hands(self, player: Player, whereQ: str):
-        return player.find(whereQ)
-
-    def search_floor(self, player: Player, whereQ: str):
-        area = self.find_player_area(player)
-        return area.find(whereQ)
-
-    def search(self, player: Player, whereQ: str, unheld=None, **kwargs):
-        log.info("%s", player)
-        area = self.find_player_area(player)
-        log.info("%s", area)
-
-        order = [player.find, area.find]
-
-        if unheld:
-            order = [area.find, player.find]
-
-        for fn in order:
-            item = fn(whereQ)
-            if item:
-                return item
-
-        return None
-
-    async def perform(self, player: Player, action):
-        area = self.find_player_area(player)
-        ctx = Ctx(self.context_factory, world=self, person=player, area=area)
-        return await action.perform(ctx, self, player)
-
-    async def tick(self, now: Optional[float] = None):
-        if now is None:
-            now = time.time()
-        return await self.everywhere("tick", time=now)
-
-    async def everywhere(self, name: str, **kwargs):
-        log.info("everywhere:%s %s", name, kwargs)
-        everything = list(self.entities.values())
-        for entity in everything:
-            behaviors = entity.get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info("tick: %s", entity)
-                area = self.find_entity_area(entity)
-                ctx = Ctx(
-                    self.context_factory, world=self, area=area, entity=entity, **kwargs
-                )
-                await ctx.hook(name)
-
-    def __str__(self):
-        return "$world"
-
-    def __repr__(self):
-        return "$world"
 
 
 class Ctx:
@@ -695,11 +490,6 @@ class Ctx:
 class Action:
     def __init__(self, **kwargs):
         super().__init__()
-
-
-class PersonAction(Action):
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        raise Exception("unimplemented")
 
 
 class PlayerJoined(Event):

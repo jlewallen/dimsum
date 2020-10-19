@@ -1,15 +1,16 @@
 import props
 import game
+import world
 import actions
 
 
 class Factory:
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         raise Exception("unimplemented")
 
 
 class Hammer(Factory):
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         return game.Item(
             creator=world,
             details=props.Details("Hammer", desc="It's heavy."),
@@ -17,7 +18,7 @@ class Hammer(Factory):
 
 
 class BeerKeg(Factory):
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         item = game.Item(
             creator=world,
             details=props.Details("Beer Keg", desc="It's heavy."),
@@ -26,7 +27,7 @@ class BeerKeg(Factory):
 
 
 class LargeOakTree(Factory):
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         item = game.Item(
             creator=world,
             details=props.Details("Large Oak Tree", desc="It's heavy."),
@@ -48,7 +49,7 @@ end
 
 
 class TomorrowCat(Factory):
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         animal = game.Animal(
             creator=world,
             details=props.Details(
@@ -59,7 +60,7 @@ class TomorrowCat(Factory):
 
 
 class WelcomeArea(Factory):
-    def create(self, world: game.World):
+    def create(self, world: world.World):
         area = game.Area(
             creator=world,
             details=props.Details("Living room", desc="It's got walls."),
@@ -71,5 +72,5 @@ class WelcomeArea(Factory):
         return area
 
 
-def create_example_world(world: game.World) -> game.Area:
+def create_example_world(world: world.World) -> game.Area:
     return WelcomeArea().create(world)

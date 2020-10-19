@@ -8,6 +8,7 @@ import props
 import entity
 import crypto
 import game
+import world
 import serializing
 
 log = logging.getLogger("dimsum")
@@ -32,7 +33,7 @@ class SqliteDatabase:
         self.db.commit()
         return
 
-    async def save(self, world: game.World):
+    async def save(self, world: world.World):
         self.dbc = self.db.cursor()
 
         for key, entity in world.destroyed.items():
@@ -76,7 +77,7 @@ class SqliteDatabase:
 
         self.db.commit()
 
-    async def load(self, world: game.World):
+    async def load(self, world: world.World):
         self.dbc = self.db.cursor()
 
         rows = {}

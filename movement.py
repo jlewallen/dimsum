@@ -60,7 +60,7 @@ class MovementMixin:
                 return r
         return None
 
-    def link_area(self, area, verb=DefaultMoveVerb, **kwargs):
+    def link_area(self, area: Area, verb=DefaultMoveVerb, **kwargs):
         return self.add_route(VerbRoute(area=area, verb=verb))
 
     def add_route(self, route: AreaRoute) -> AreaRoute:

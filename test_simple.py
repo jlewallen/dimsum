@@ -4,6 +4,7 @@ import logging
 import props
 import entity
 import game
+import world
 import serializing
 import persistence
 import test
@@ -172,7 +173,7 @@ end
     await db.open("test.sqlite3")
     await db.save(tw.world)
 
-    empty = game.World(tw.bus, context_factory=None)
+    empty = world.World(tw.bus, context_factory=None)
     await db.load(empty)
 
     logging.info("%s", empty.entities)
@@ -204,5 +205,5 @@ async def test_unregister_destroys(caplog):
 
     assert await db.number_of_entities() == 2
 
-    empty = game.World(tw.bus, context_factory=None)
+    empty = world.World(tw.bus, context_factory=None)
     await db.load(empty)

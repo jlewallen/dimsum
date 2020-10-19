@@ -8,6 +8,8 @@ import lark
 
 import props
 import game
+import bus
+import world
 import persistence
 import grammar
 import evaluator
@@ -18,7 +20,7 @@ p = inflect.engine()
 log = logging.getLogger("dimsum.discord")
 
 
-class DiscordEventBus(game.EventBus):
+class DiscordEventBus(bus.EventBus):
     def __init__(self, bot):
         self.bot = bot
 
@@ -351,7 +353,7 @@ modify when eaten
 
     async def initialize(self):
         self.bus = DiscordEventBus(self.bot)
-        self.world = game.World(self.bus, luaproxy.context_factory)
+        self.world = world.World(self.bus, luaproxy.context_factory)
 
         db = persistence.SqliteDatabase()
         await db.open("world.sqlite3")

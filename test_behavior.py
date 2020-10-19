@@ -71,9 +71,9 @@ end
     await tw.execute("look")
     await tw.execute("hold cape")
     await tw.execute("wear cape")
-    assert tw.jacob.visible == {"hidden": True}
+    assert tw.jacob.is_invisible
     await tw.execute("remove cape")
-    assert tw.jacob.visible == {}
+    assert not tw.jacob.is_invisible
     await tw.execute("drop")
 
 

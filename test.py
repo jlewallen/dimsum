@@ -3,21 +3,22 @@ import logging
 import sys
 import lark
 
-import game
 import props
-import actions
 import grammar
+import game
+import world
+import actions
 import evaluator
 import luaproxy
-
+import bus
 
 log = logging.getLogger("dimsum")
 
 
 class TestWorld:
     def __init__(self):
-        self.bus = game.EventBus()
-        self.world = game.World(self.bus, luaproxy.context_factory)
+        self.bus = bus.EventBus()
+        self.world = world.World(self.bus, luaproxy.context_factory)
         self.jacob = game.Player(
             creator=self.world,
             details=props.Details("Jacob", desc="Curly haired bastard."),
