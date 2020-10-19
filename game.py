@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Sequence, Optional
+from typing import List, Tuple, Dict, Sequence, Optional, Any, cast
 import logging
 import inflect
 import abc
@@ -39,14 +39,16 @@ class Item(
         super().__init__(**kwargs)
         self.validate()
 
-    def describes(self, q: str):
+    def describes(self, q: str) -> bool:
         if q.lower() in self.details.name.lower():
             return True
         if q.lower() in str(self).lower():
             return True
         return False
 
-    def separate(self, quantity, registrar: entity.Registrar = None, **kwargs):
+    def separate(
+        self, quantity: int, registrar: entity.Registrar = None, **kwargs
+    ) -> List["Item"]:
         assert registrar
         self.decrease_quantity(quantity)
         item = Item(
@@ -60,7 +62,7 @@ class Item(
         registrar.register(item)
         return [item]
 
-    def accept(self, visitor: entity.EntityVisitor):
+    def accept(self, visitor: entity.EntityVisitor) -> Any:
         return visitor.item(self)
 
     def __str__(self):
@@ -73,7 +75,7 @@ class Item(
 
 
 class ItemFactory:
-    def create_item(self, **kwargs):
+    def create_item(self, **kwargs) -> Item:
         raise Exception("unimplemented")
 
 
@@ -82,7 +84,7 @@ class MaybeItem(ItemFactory):
         super().__init__()
         self.name = name
 
-    def create_item(self, **kwargs):
+    def create_item(self, **kwargs) -> Item:
         return Item(details=props.Details(self.name), **kwargs)
 
 
@@ -91,7 +93,7 @@ class RecipeItem(ItemFactory):
         super().__init__()
         self.recipe = recipe
 
-    def create_item(self, **kwargs):
+    def create_item(self, **kwargs) -> Item:
         return self.recipe.create_item(**kwargs)
 
 
@@ -101,7 +103,7 @@ class MaybeQuantifiedItem(ItemFactory):
         self.template: MaybeItem = template
         self.quantity: float = quantity
 
-    def create_item(self, **kwargs):
+    def create_item(self, **kwargs) -> Item:
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 

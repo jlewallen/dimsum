@@ -62,9 +62,9 @@ class ContainingMixin:
         return item
 
     def find(self, q: str) -> Optional[CarryableMixin]:
-        for entity in self.holding:
-            if entity.describes(q):
-                return entity
+        for e in self.holding:
+            if e.describes(q):
+                return e
         return None
 
     def drop_all(self) -> List[CarryableMixin]:

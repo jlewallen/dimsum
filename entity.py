@@ -1,9 +1,12 @@
-from typing import Type, List, Union, Any
+from typing import Type, List, Union, Any, Dict
 
 import abc
+import logging
 import props
 import behavior
 import crypto
+
+log = logging.getLogger("dimsum")
 
 # TODO Move this
 class EntityVisitor:
@@ -24,13 +27,12 @@ class EntityVisitor:
 
 
 class Kind:
-    def __init__(self, identity=None, **kwargs):
-        if identity:
-            self.identity = identity
-        else:
-            self.identity = crypto.generate_identity()
+    def __init__(self, identity: crypto.Identity = None, **kwargs):
+        self.identity: crypto.Identity = (
+            identity if identity else crypto.generate_identity()
+        )
 
-    def same(self, other: "Kind"):
+    def same(self, other: "Kind") -> bool:
         if other is None:
             return False
         return self.identity.public == other.identity.public
@@ -43,7 +45,7 @@ class Kind:
 
 
 class Criteria:
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, name: str = None, **kwargs):
         super().__init__()
         self.name = name
         self.kwargs = kwargs
@@ -57,21 +59,23 @@ class Finder:
 class Entity(Finder):
     def __init__(
         self,
-        key=None,
-        identity=None,
-        details=None,
-        behaviors=None,
-        creator=None,
-        kind=None,
-        frozen=None,
+        key: str = None,
+        identity: crypto.Identity = None,
+        details: props.Details = None,
+        behaviors: behavior.BehaviorMap = None,
+        creator: "Entity" = None,
+        kind: Kind = None,
+        related: Dict[str, Kind] = None,
+        frozen: Any = None,
         destroyed=None,
         **kwargs
     ):
-        super().__init__(**kwargs)
+        super().__init__(**kwargs)  # type: ignore
         self.kind = kind if kind else Kind()
-        self.creator = creator if creator else None
-        self.frozen = frozen if frozen else {}
-        self.destroyed = destroyed if destroyed else False
+        # Ignoring this error because we only ever have a None creator if we're the world.
+        self.creator: "Entity" = creator if creator else None  # type: ignore
+        self.frozen: Any = frozen if frozen else {}
+        self.destroyed: bool = destroyed if destroyed else False
 
         if identity:
             self.identity = identity
@@ -97,17 +101,15 @@ class Entity(Finder):
             self.details.map[key] = Kind()
         return self.details.map[key]
 
-    def touch(self):
+    def touch(self) -> None:
         self.details.touch()
 
-    def destroy(self):
+    def destroy(self) -> None:
         self.destroyed = True
 
-    def validate(self):
-        if not self.creator:
-            raise Exception("entity creator required")
-        if not self.details:
-            raise Exception("entity details required")
+    def validate(self) -> None:
+        assert self.creator
+        assert self.details
 
     def get_behaviors(self, name):
         return self.behaviors.get_all(name)
@@ -115,10 +117,10 @@ class Entity(Finder):
     def add_behavior(self, name, **kwargs):
         return self.behaviors.add(name, **kwargs)
 
-    def describes(self, q: str):
+    def describes(self, q: str) -> bool:
         return False
 
-    def accept(self, visitor: "EntityVisitor"):
+    def accept(self, visitor: "EntityVisitor") -> Any:
         raise Exception("unimplemented")
 
 
