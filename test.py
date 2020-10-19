@@ -11,6 +11,9 @@ import evaluator
 import luaproxy
 
 
+log = logging.getLogger("dimsum")
+
+
 class TestWorld:
     def __init__(self):
         self.bus = game.EventBus()
@@ -60,10 +63,10 @@ class TestWorld:
         return item
 
     async def execute(self, command: str):
-        logging.info("executing: %s" % (command,))
+        log.info("executing: %s" % (command,))
         tree = self.l.parse(command)
-        logging.info("parsed: %s" % (tree,))
+        log.info("parsed: %s" % (tree,))
         action = evaluator.create(self.world, self.player).transform(tree)
         response = await self.world.perform(self.player, action)
-        logging.info("response: %s" % (response,))
+        log.info("response: %s" % (response,))
         return response

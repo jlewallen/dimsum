@@ -777,12 +777,12 @@ class World(entity.Entity):
         area = self.find_player_area(player)
         return area.find(whereQ)
 
-    def search(self, player: Player, whereQ: str, **kwargs):
+    def search(self, player: Player, whereQ: str, unheld=None, **kwargs):
         area = self.find_player_area(player)
 
         order = [player.find, area.find]
 
-        if "unheld" in kwargs:
+        if unheld:
             order = [area.find, player.find]
 
         for fn in order:
@@ -822,17 +822,10 @@ class World(entity.Entity):
         return "$world"
 
 
-class HooksAround:
-    def __enter__(self):
-        return None
-
-    def __exit__(self, type, value, traceback):
-        pass
-
-
 class Ctx:
     # This should eventually get worked out. Just return Ctx from this function?
     def __init__(self, context_factory, world=None, person=None, **kwargs):
+        super().__init__()
         self.se = scriptEngine
         self.context_factory = context_factory
         self.world = world
@@ -888,7 +881,7 @@ class Ctx:
 
 class Action:
     def __init__(self, **kwargs):
-        pass
+        super().__init__()
 
 
 class PersonAction(Action):
@@ -898,6 +891,7 @@ class PersonAction(Action):
 
 class PlayerJoined(Event):
     def __init__(self, player: Player):
+        super().__init__()
         self.player = player
 
     def __str__(self):
@@ -906,6 +900,7 @@ class PlayerJoined(Event):
 
 class PlayerQuit(Event):
     def __init__(self, player: Player):
+        super().__init__()
         self.player = player
 
     def __str__(self):
@@ -914,6 +909,7 @@ class PlayerQuit(Event):
 
 class AreaConstructed(Event):
     def __init__(self, player: Player, area: Area):
+        super().__init__()
         self.player = player
         self.area = area
 
@@ -923,6 +919,7 @@ class AreaConstructed(Event):
 
 class PlayerEnteredArea(Event):
     def __init__(self, player: Player, area: Area):
+        super().__init__()
         self.player = player
         self.area = area
 
@@ -932,6 +929,7 @@ class PlayerEnteredArea(Event):
 
 class PlayerLeftArea(Event):
     def __init__(self, player: Player, area: Area):
+        super().__init__()
         self.player = player
         self.area = area
 
@@ -941,6 +939,7 @@ class PlayerLeftArea(Event):
 
 class ItemHeld(Event):
     def __init__(self, player: Player, area: Area, item: Item):
+        super().__init__()
         self.player = player
         self.area = area
         self.item = item
@@ -951,6 +950,7 @@ class ItemHeld(Event):
 
 class ItemMade(Event):
     def __init__(self, player: Player, area: Area, item: Item):
+        super().__init__()
         self.player = player
         self.area = area
         self.item = item
@@ -961,6 +961,7 @@ class ItemMade(Event):
 
 class ItemEaten(Event):
     def __init__(self, player: Player, area: Area, item: Item):
+        super().__init__()
         self.player = player
         self.area = area
         self.item = item
@@ -981,6 +982,7 @@ class ItemDrank(Event):
 
 class ItemsDropped(Event):
     def __init__(self, player: Player, area: Area, items: List[Item]):
+        super().__init__()
         self.player = player
         self.area = area
         self.items = items
@@ -991,6 +993,7 @@ class ItemsDropped(Event):
 
 class ItemObliterated(Event):
     def __init__(self, player: Player, area: Area, item: Item):
+        super().__init__()
         self.player = player
         self.area = area
         self.item = item

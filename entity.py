@@ -50,6 +50,7 @@ class Entity:
         visible=None,
         **kwargs
     ):
+        super().__init__(**kwargs)
         self.kind = kind
         self.creator = creator
         self.visible = visible if visible else {}
