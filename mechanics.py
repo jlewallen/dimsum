@@ -6,7 +6,7 @@ import props
 
 class InteractableMixin:
     def __init__(self, interactions: Dict[str, Any] = None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(**kwargs)  # type: ignore
         self.interactions = interactions if interactions else {}
 
     def link_activity(self, name: str, activity=True):
