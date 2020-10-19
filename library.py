@@ -48,6 +48,15 @@ end
         return item
 
 
+class WoodenLadder(Factory):
+    def create(self, world: world.World):
+        item = game.Item(
+            creator=world,
+            details=props.Details("Wooden Ladder", desc="Seems sturdy enough."),
+        )
+        return item
+
+
 class TomorrowCat(Factory):
     def create(self, world: world.World):
         animal = game.Animal(
@@ -57,6 +66,18 @@ class TomorrowCat(Factory):
             ),
         )
         return animal
+
+
+class ArtistsLoft(Factory):
+    def create(self, world: world.World):
+        area = game.Area(
+            creator=world,
+            details=props.Details(
+                "Artist's loft",
+                desc="Everything is very colorful, because everything has got paint on it.",
+            ),
+        )
+        return area
 
 
 class WelcomeArea(Factory):
@@ -69,6 +90,11 @@ class WelcomeArea(Factory):
         area.add_item(LargeOakTree().create(world))
         area.add_item(Hammer().create(world))
         area.add_living(TomorrowCat().create(world))
+
+        loft = ArtistsLoft().create(world)
+        ladder = WoodenLadder().create(world)
+        ladder.link_area(loft)
+        area.add_item(ladder)
         return area
 
 

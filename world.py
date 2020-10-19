@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List, Sequence
+from typing import Optional, Dict, List, Sequence, cast
 
 import time
 import logging
@@ -64,6 +64,10 @@ class World(entity.Entity, entity.Registrar):
         self.register(area)
         for entity in area.entities():
             self.register(entity)
+        for item in area.items:
+            for linked in item.adjacent():
+                log.info("linked: %s", linked)
+                self.add_area(cast(game.Area, linked))
 
     def build_new_area(
         self,

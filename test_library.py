@@ -25,4 +25,4 @@ async def test_library(caplog):
     await db.purge()
     await db.save(tw.world)
 
-    assert await db.number_of_entities() == 7
+    assert await db.number_of_entities() == 9
