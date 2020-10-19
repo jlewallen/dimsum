@@ -1,10 +1,14 @@
+from typing import Any
+
 import os
 import hashlib
 import base64
 
 from game import *
 from props import *
+
 import hooks
+import movement
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
@@ -89,7 +93,7 @@ class Make(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         item = self.item
         if self.template:
-            item = self.template.apply_item_template(creator=player)
+            item = self.template.create_item(creator=player)
         after_hold = player.hold(item)
         # We do this after because we may consolidate this Item and
         # this keeps us from having to unregister the item.
@@ -236,7 +240,11 @@ class Wear(PersonAction):
         if not self.item.when_worn():
             return Failure("you can't wear that")
 
-        player.wear(self.item)
+        assert player.is_holding(self.item)
+
+        if player.wear(self.item):
+            player.drop(self.item)
+            
         # TODO Publish
         await ctx.extend(wear=[self.item]).hook("wear:after")
         return Success("you wore %s" % (self.item))
@@ -252,7 +260,12 @@ class Remove(PersonAction):
             return Failure("remove what?")
         if not player.is_wearing(self.item):
             return Failure("you aren't wearing that")
-        player.unwear(self.item)
+
+        assert player.is_wearing(self.item)
+
+        if player.unwear(self.item):
+            player.hold(self.item)
+
         await ctx.extend(remove=[self.item]).hook("remove:after")
         return Success("you removed %s" % (self.item))
 
@@ -407,7 +420,7 @@ class Hold(PersonAction):
 
 
 class MovingAction(PersonAction):
-    def __init__(self, area: Area = None, finder: FindsRoute = None, **kwargs):
+    def __init__(self, area: Area = None, finder: movement.FindsRoute = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
         self.finder = finder
@@ -419,7 +432,10 @@ class MovingAction(PersonAction):
 
         if self.finder:
             log.info("finder: %s", self.finder)
-            destination = await self.finder.find(world, player, verb=verb)
+            route = await self.finder.find(world, player, verb=verb)
+            if route:
+                routed: Any = route.area
+                destination = routed
 
         if destination is None:
             return Failure("where?")

@@ -1,6 +1,7 @@
 import logging
 import lark
 import game
+import movement
 import actions
 import props
 
@@ -156,16 +157,16 @@ class Evaluate(lark.Transformer):
         return self.world.search(self.player, str(args[0]))
 
     def direction(self, args):
-        for d in game.Direction:
+        for d in movement.Direction:
             if str(args[0]).lower() == d.name.lower():
-                return game.FindDirectionalRoute(d)
+                return movement.FindDirectionalRoute(d)
         raise Exception("unknown directional route")
 
     def route(self, args):
         return args[0]
 
     def named_route(self, args):
-        return game.FindNamedRoute(str(args[0]))
+        return movement.FindNamedRoute(str(args[0]))
 
     def this(self, args):
         return self.get_item_held()

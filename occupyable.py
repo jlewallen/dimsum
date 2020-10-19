@@ -14,17 +14,17 @@ class OccupyableMixin:
     def occupying(self, living: Living) -> bool:
         return living in self.occupied
 
-    async def entered(self, bus: "EventBus", player: "Player"):
+    async def entered(self, bus, player):
         self.occupied.append(player)
         await bus.publish(PlayerEnteredArea(player, self))
 
-    async def left(self, bus: "EventBus", player: "Player"):
+    async def left(self, bus, player):
         self.occupied.remove(player)
         await bus.publish(PlayerLeftArea(player, self))
 
 
 class PlayerEnteredArea:
-    def __init__(self, player: "Player", area: "Area"):
+    def __init__(self, player, area):
         super().__init__()
         self.player = player
         self.area = area
@@ -34,7 +34,7 @@ class PlayerEnteredArea:
 
 
 class PlayerLeftArea:
-    def __init__(self, player: "Player", area: "Area"):
+    def __init__(self, player, area):
         super().__init__()
         self.player = player
         self.area = area

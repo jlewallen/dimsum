@@ -6,7 +6,7 @@ import test
 
 
 @pytest.mark.asyncio
-async def test_wearing():
+async def test_wearing_when_unwearable():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.execute("make Shoes")

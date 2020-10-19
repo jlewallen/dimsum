@@ -15,6 +15,9 @@ import behavior
 
 import occupyable
 import carryable
+import edible
+import movement
+import apparel
 
 DefaultMoveVerb = "walk"
 
@@ -31,10 +34,6 @@ class Event:
     pass
 
 
-class Wearable:
-    @abc.abstractmethod
-    def touch(self):
-        pass
 
 
 class EventBus:
@@ -46,13 +45,6 @@ class Activity:
     pass
 
 
-class HasRoutesMixin:
-    def __init__(self, areas=None, **kwargs):
-        super().__init__()
-        self.areas = areas if areas else {}
-
-    def link_area(self, new_area, verb=DefaultMoveVerb, **kwargs):
-        self.areas[verb] = new_area
 
 
 class InteractableMixin:
@@ -96,63 +88,14 @@ class VisibilityMixin:
         return "hidden" in self.visible
 
 
-class AreaRoute:
-    def go(self) -> None:
-        pass
-
-    def available(self) -> bool:
-        return False
-
-    def satisfies(self, **kwargs) -> bool:
-        return False
-
-
-class MovementMixin:
-    def __init__(self, routes=None, **kwargs):
-        super().__init__(**kwargs)
-        self.routes: List[AreaRoute] = routes if routes else []
-
-    def find_route(self, **kwargs) -> Optional[AreaRoute]:
-        log.info("find-route: %s %s", kwargs, self.routes)
-        for r in self.routes:
-            if r.satisfies(**kwargs):
-                log.info("f")
-                return r
-        return None
-
-    def add_route(self, route: AreaRoute) -> AreaRoute:
-        self.routes.append(route)
-        return route
-
-
-class EdibleMixin:
-    def consumed(self, player):
-        FoodFields = [
-            props.SumFields("sugar"),
-            props.SumFields("fat"),
-            props.SumFields("protein"),
-            props.SumFields("toxicity"),
-            props.SumFields("caffeine"),
-            props.SumFields("alcohol"),
-            props.SumFields("nutrition"),
-            props.SumFields("vitamins"),
-        ]
-        changes = props.merge_dictionaries(
-            player.details.map, self.details.map, FoodFields
-        )
-        log.info("merged %s" % (changes,))
-        player.details.update(changes)
-
-
 class Item(
     entity.Entity,
-    Wearable,
+    apparel.Wearable,
     carryable.CarryableMixin,
-    HasRoutesMixin,
     InteractableMixin,
-    MovementMixin,
+    movement.MovementMixin,
     VisibilityMixin,
-    EdibleMixin,
+    edible.EdibleMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -193,133 +136,41 @@ class Item(
         return str(self)
 
 
-class ApparalMixin:
-    def __init__(self, wearing=None, **kwargs):
-        super().__init__(**kwargs)
-        self.wearing = wearing if wearing else []
 
-    def is_wearing(self, item: Wearable) -> bool:
-        return item in self.wearing
-
-    def wear(self, item: Wearable):
-        if not self.is_holding(item):
-            raise Exception("wear before hold")
-        self.drop(item)
-        if self.is_holding(item):
-            raise Exception("wear before hold")
-        self.wearing.append(item)
-        item.touch()
-
-    def unwear(self, item: Wearable, **kwargs):
-        if not self.is_wearing(item):
-            raise Exception("remove before wear")
-        self.hold(item)
-        self.wearing.remove(item)
-        item.touch()
-
-
-class Direction(enum.Enum):
-    NORTH = 1
-    SOUTH = 2
-    WEST = 3
-    EAST = 4
-
-
-class FindsRoute:
-    async def find(self, world, player, verb=DefaultMoveVerb):
+class ItemFactory:
+    def create_item(self, **kwargs):
         raise Exception("unimplemented")
 
 
-class FindDirectionalRoute(FindsRoute):
-    def __init__(self, direction: Direction):
-        super().__init__()
-        self.direction = direction
-
-    async def find(self, world, player, **kwargs):
-        area = world.find_player_area(player)
-        route = area.find_route(direction=self.direction)
-        if route:
-            return route.area
-        return None
-
-
-class FindNamedRoute(FindsRoute):
+class MaybeItem(ItemFactory):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
 
-    async def find(self, world, player, verb=DefaultMoveVerb):
-        item = world.search(player, self.name)
-        if item is None:
-            log.info("no named route: %s", self.name)
-            return None
-
-        log.info("found named route: %s = %s", self.name, item)
-
-        # If the person owns this item and they try to go the thing,
-        # this is how new areas area created, one of them.
-        have_verb = verb in item.areas
-        if not have_verb:
-            area = world.find_player_area(player)
-            new_area = world.build_new_area(player, area, item, verb=verb)
-            item.link_area(new_area, verb=verb)
-
-        destination = item.areas[verb]
-
-        player.drop_here(world, item=item)
-
-        return destination
-
-
-class DirectionalRoute(AreaRoute):
-    def __init__(self, direction: Direction = None, area: "Area" = None):
-        super().__init__()
-        if direction is None:
-            raise Exception("direction is required")
-        self.direction = direction
-        if area is None:
-            raise Exception("area is required")
-        self.area = area
-
-    def satisfies(self, direction=None, **kwargs) -> bool:
-        log.info("%s %s", direction, self.direction)
-        return self.direction == direction
-
-
-class IsItemTemplate:
-    def apply_item_template(self, **kwargs):
-        raise Exception("unimplemented")
-
-
-class MaybeItem(IsItemTemplate):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
-
-    def apply_item_template(self, **kwargs):
+    def create_item(self, **kwargs):
         return Item(details=props.Details(self.name), **kwargs)
 
 
-class RecipeItem(IsItemTemplate):
+class RecipeItem(ItemFactory):
     def __init__(self, recipe: "Recipe"):
         super().__init__()
         self.recipe = recipe
 
-    def apply_item_template(self, **kwargs):
-        return self.recipe.apply_item_template(**kwargs)
+    def create_item(self, **kwargs):
+        return self.recipe.create_item(**kwargs)
 
 
-class MaybeQuantifiedItem(IsItemTemplate):
+class MaybeQuantifiedItem(ItemFactory):
     def __init__(self, template: MaybeItem, quantity: float):
         super().__init__()
-        self.template = template
-        self.quantity = quantity
+        self.template: MaybeItem = template
+        self.quantity: float = quantity
 
-    def apply_item_template(self, **kwargs):
-        return self.template.apply_item_template(quantity=self.quantity, **kwargs)
+    def create_item(self, **kwargs):
+        return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
-class Recipe(Item):
+class Recipe(Item, ItemFactory):
     def __init__(self, required=None, base=None, **kwargs):
         super().__init__(**kwargs)
         self.required = required if required else {}
@@ -329,7 +180,7 @@ class Recipe(Item):
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.recipe(self)
 
-    def apply_item_template(self, **kwargs):
+    def create_item(self, **kwargs):
         # TODO Also sign with the recipe
         return Item(
             details=props.Details.from_base(self.base), kind=self.kind, **kwargs
@@ -405,7 +256,7 @@ class LivingCreature(
     entity.Entity,
     occupyable.Living,
     carryable.CarryingMixin,
-    ApparalMixin,
+    apparel.ApparelMixin,
     VisibilityMixin,
     MemoryMixin,
 ):
@@ -607,7 +458,7 @@ class AreaObservation(Observation):
 
 
 class Area(
-    entity.Entity, carryable.ContainingMixin, occupyable.OccupyableMixin, MovementMixin
+        entity.Entity, carryable.ContainingMixin, occupyable.OccupyableMixin, movement.MovementMixin, movement.Area
 ):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)

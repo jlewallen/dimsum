@@ -1,6 +1,8 @@
 from typing import List, Tuple, Dict, Sequence, Optional
 
 import logging
+import abc
+
 import entity
 
 log = logging.getLogger("dimsum")
@@ -8,7 +10,7 @@ log = logging.getLogger("dimsum")
 
 class CarryableMixin:
     def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.kind = kind if kind else entity.Kind()
         self.quantity = quantity if quantity else 1
 
@@ -26,6 +28,13 @@ class CarryableMixin:
         self.quantity -= q
         return self
 
+    @abc.abstractmethod
+    def touch(self):
+        pass
+
+    @abc.abstractmethod
+    def separate(self, world, item, quantity: int):
+        pass
 
 class ContainingMixin:
     def __init__(self, holding=None, **kwargs):
