@@ -42,7 +42,19 @@ class Kind:
         return str(self)
 
 
-class Entity:
+class Criteria:
+    def __init__(self, name=None, **kwargs):
+        super().__init__()
+        self.name = name
+        self.kwargs = kwargs
+
+
+class Finder:
+    def find_things(self, criteria: Criteria) -> List["Entity"]:
+        return []
+
+
+class Entity(Finder):
     def __init__(
         self,
         key=None,

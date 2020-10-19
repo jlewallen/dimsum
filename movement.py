@@ -15,12 +15,18 @@ class Direction(enum.Enum):
 
 
 class Area:
-    pass
+    @abc.abstractmethod
+    def find(self, q: str):
+        pass
+
+    @abc.abstractmethod
+    def find_route(self, **kwargs):
+        pass
 
 
 class AreaBuilder:
     @abc.abstractmethod
-    def build_new_area(self, player, item, **kwargs) -> Area:
+    def build_new_area(self, person, item, **kwargs) -> Area:
         pass
 
 
@@ -73,18 +79,18 @@ class MovementMixin:
         self.routes.append(route)
         return route
 
-    def move_with(self, area, player, builder: AreaBuilder, verb=None):
+    def move_with(self, area, person, builder: AreaBuilder, verb=None):
         if len(self.routes) == 0:
-            destination = builder.build_new_area(player, self, verb=verb)
+            destination = builder.build_new_area(person, self, verb=verb)
             self.link_area(destination, verb=verb)
 
         route = self.find_route(verb=verb)
-        player.drop_here(area, item=self)
+        person.drop_here(area, item=self)
         return route
 
 
 class FindsRoute:
-    async def find(self, area, player, **kwargs) -> Optional[AreaRoute]:
+    async def find(self, area, person, **kwargs) -> Optional[AreaRoute]:
         raise Exception("unimplemented")
 
 
@@ -93,16 +99,18 @@ class FindNamedRoute(FindsRoute):
         super().__init__()
         self.name = name
 
-    async def find(self, area, player, builder=None, **kwargs) -> Optional[AreaRoute]:
+    async def find(
+        self, area: Area, person, builder=None, **kwargs
+    ) -> Optional[AreaRoute]:
         item = area.find(self.name)
         if not item:
-            item = player.find(self.name)
+            item = person.find(self.name)
             if not item:
                 log.info("no named route: %s", self.name)
                 return None
 
         log.info("named route: %s = %s", self.name, item)
-        return item.move_with(area, player, builder=builder, **kwargs)
+        return item.move_with(area, person, builder=builder, **kwargs)
 
 
 class FindDirectionalRoute(FindsRoute):
@@ -110,6 +118,5 @@ class FindDirectionalRoute(FindsRoute):
         super().__init__()
         self.direction = direction
 
-    async def find(self, area, player, **kwargs) -> Optional[AreaRoute]:
-        route = area.find_route(direction=self.direction)
-        return route
+    async def find(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+        return area.find_route(direction=self.direction)
