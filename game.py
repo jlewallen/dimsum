@@ -189,7 +189,7 @@ class Area(
     movement.Area,
     mechanics.Memorable,
 ):
-    def __init__(self, routes=None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     @property

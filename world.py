@@ -28,7 +28,7 @@ class World(entity.Entity, entity.Registrar):
         return self.all_of_type(game.Area)
 
     def people(self):
-        return self.all_of_type(game.People)
+        return self.all_of_type(game.Person)
 
     def players(self):
         return self.all_of_type(game.Player)

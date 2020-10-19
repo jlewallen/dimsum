@@ -66,17 +66,21 @@ class MovementMixin:
         self.routes: List[AreaRoute] = routes if routes else []
 
     def find_route(self, **kwargs) -> Optional[AreaRoute]:
-        log.info("find-route: %s %s", kwargs, self.routes)
+        log.info("find-route: %s %s", self.routes, kwargs)
         for r in self.routes:
             if r.satisfies(**kwargs):
                 return r
         return None
+
+    def adjacent(self) -> List[Area]:
+        return [r.area for r in self.routes]
 
     def link_area(self, area: Area, verb=DefaultMoveVerb, **kwargs):
         return self.add_route(VerbRoute(area=area, verb=verb))
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
         self.routes.append(route)
+        log.info("new route: %s", self.routes)
         return route
 
     def move_with(self, area, person, builder: AreaBuilder, **kwargs):

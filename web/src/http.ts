@@ -79,17 +79,19 @@ export interface Behavior {
 
 export type Behaviors = { [index: string]: Behavior };
 
+export type AreaRoute = any;
+
 export interface Entity {
     key: string;
     kind: string;
     url: string;
     creator: EntityRef;
     details: Details;
-    holding?: EntityRef[];
-    entities?: EntityRef[];
-    areas?: { [index: string]: EntityRef };
-    memory?: { [index: string]: EntityRef };
     behaviors: Behaviors;
+    holding?: EntityRef[];
+    occuped?: EntityRef[];
+    routes?: AreaRoute[];
+    memory?: { [index: string]: EntityRef };
 }
 
 export interface Person extends Entity {
@@ -105,7 +107,8 @@ export interface Animal extends Entity {
 }
 
 export interface Area extends Entity {
-    here: Entity[];
+    holding: EntityRef[];
+    occuped: EntityRef[];
 }
 
 export interface Item extends Entity {

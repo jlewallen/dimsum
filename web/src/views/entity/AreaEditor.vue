@@ -5,9 +5,14 @@
             <Entities :entityRefs="adjacent" @selected="entitySelected" />
         </div>
 
-        <div v-if="entity.here.length > 0">
+        <div v-if="entity.occupied.length > 0">
             <h4>Also Here:</h4>
-            <Entities :entityRefs="entity.here" @selected="entitySelected" />
+            <Entities :entityRefs="entity.occupied" @selected="entitySelected" />
+        </div>
+
+        <div v-if="entity.holding.length > 0">
+            <h4>Also Here:</h4>
+            <Entities :entityRefs="entity.holding" @selected="entitySelected" />
         </div>
     </div>
 </template>
@@ -15,7 +20,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Area, Entity, EntityRef } from "@/http";
+import { Area, Item, AreaRoute, Entity, EntityRef } from "@/http";
 import Entities from "./Entities.vue";
 import store from "@/store";
 
@@ -34,11 +39,13 @@ export default defineComponent({
     computed: {
         adjacent(): EntityRef[] {
             return _.flatten(
-                this.entity.here
-                    .map((ref) => store.state.entities[ref.key])
-                    .filter((e) => e && e.areas)
-                    .map((e) => Object.values(e.areas!))
-            );
+                this.entity.holding
+                    .map((ref: EntityRef) => store.state.entities[ref.key])
+                    .filter((e: Entity | undefined) => {
+                        return e && e.routes;
+                    })
+                    .map((e: Entity) => e.routes!)
+            ).map((e: AreaRoute) => e.area);
         },
     },
     methods: {

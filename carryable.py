@@ -9,7 +9,7 @@ log = logging.getLogger("dimsum")
 
 class CarryableMixin:
     def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.kind = kind if kind else entity.Kind()
         self.quantity = quantity if quantity else 1
 
