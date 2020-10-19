@@ -1,6 +1,7 @@
 from typing import Type, List, Union, Any, Dict
 
 import abc
+import copy
 import logging
 import props
 import behavior
@@ -94,12 +95,19 @@ class Entity(Finder):
 
         self.details = details if details else props.Details("Unknown")
         self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
+        self.related: Dict[str, Kind] = related if related else {}
+
+    def clone(self, **kwargs) -> "Entity":
+        state_copy = copy.deepcopy(self.__dict__)
+        state_copy.update(**kwargs)
+        klass = self.__class__
+        log.info("klass: %s", klass)
+        return klass(**state_copy)
 
     def get_kind(self, name: str) -> Kind:
-        key = "k:" + name
-        if not key in self.details.map:
-            self.details.map[key] = Kind()
-        return self.details.map[key]
+        if not name in self.related:
+            self.related[name] = Kind()
+        return self.related[name]
 
     def touch(self) -> None:
         self.details.touch()

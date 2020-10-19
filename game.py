@@ -1,6 +1,7 @@
 from typing import List, Tuple, Dict, Sequence, Optional, Any, cast
 import logging
 import inflect
+import copy
 import abc
 
 import crypto
@@ -108,20 +109,18 @@ class MaybeQuantifiedItem(ItemFactory):
 
 
 class Recipe(Item, ItemFactory, mechanics.Memorable):
-    def __init__(self, required=None, base=None, **kwargs):
+    def __init__(self, template=None, **kwargs):
         super().__init__(**kwargs)
-        self.required = required if required else {}
-        self.base = base if base else {}
-        self.validate()
+        assert template
+        self.template = template.clone()
 
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.recipe(self)
-
-    def create_item(self, **kwargs):
+    def create_item(self, **kwargs) -> Item:
         # TODO Also sign with the recipe
-        return Item(
-            details=props.Details.from_base(self.base), kind=self.kind, **kwargs
-        )
+        log.info("recipe:creating %s %s", self.template, kwargs)
+        return self.template.clone(**kwargs)
+
+    def accept(self, visitor: entity.EntityVisitor) -> Any:
+        return visitor.recipe(self)
 
 
 class HoldingActivity(Activity):

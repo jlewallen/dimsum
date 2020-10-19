@@ -498,18 +498,13 @@ class CallThis(PersonAction):
             return Failure("you don't have anything")
 
         # Copy all of the base details from the item. Exclude stamps.
-        base = self.item.details.to_base()
-        if "created" in base:
-            del base["created"]
-        if "touched" in base:
-            del base["touched"]
-
+        template = self.item
         recipe = Recipe(
             creator=player,
             details=self.item.details.clone(),
             behaviors=self.item.behaviors,
             kind=self.item.kind,
-            base=base,
+            template=template,
         )
         world.register(recipe)
         player.memory["r:" + self.name] = recipe
