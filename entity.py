@@ -51,8 +51,8 @@ class Entity:
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.kind = kind
-        self.creator = creator
+        self.kind = kind if kind else Kind()
+        self.creator = creator if creator else None
         self.visible = visible if visible else {}
         self.frozen = frozen if frozen else {}
         self.destroyed = destroyed if destroyed else False

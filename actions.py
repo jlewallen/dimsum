@@ -272,7 +272,7 @@ class Eat(PersonAction):
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
-        player.consume(self.item)
+        self.item.consumed(player)
         await world.bus.publish(ItemEaten(player, area, self.item))
         await ctx.extend(eat=self.item).hook("eat:after")
         return Success("you ate %s" % (self.item))
@@ -293,7 +293,7 @@ class Drink(PersonAction):
         area = world.find_player_area(player)
         world.unregister(self.item)
         player.drop(self.item)
-        player.consume(self.item)
+        self.item.consumed(player)
         await world.bus.publish(ItemDrank(player, area, self.item))
         await ctx.extend(drink=self.item).hook("drink:after")
         return Success("you drank %s" % (self.item))
@@ -319,9 +319,7 @@ class LookFor(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
-        await ctx.extend(here=area.here).extend(holding=player.holding).extend(
-            name=self.name
-        ).hook("look-for")
+        await ctx.extend(holding=player.holding).extend(name=self.name).hook("look-for")
         observed = player.observe()[0]
         return PersonalObservation(observed)
 

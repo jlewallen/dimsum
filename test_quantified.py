@@ -69,7 +69,7 @@ async def test_quantified_drop_all():
     await tw.execute("drop 20 coin")
     assert len(tw.player.holding) == 0
     assert len(tw.area.items) == 1
-    assert tw.area.here[1].quantity == 20
+    assert tw.area.holding[0].quantity == 20
     assert len(tw.world.items()) == 1
 
 

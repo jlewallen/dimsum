@@ -28,7 +28,7 @@ class Event:
 
 
 class Wearable:
-    def touch():
+    def touch(self):
         pass
 
 
@@ -42,9 +42,12 @@ class Activity:
 
 
 class CarryableMixin:
-    def __init__(self, quantity: int = None, **kwargs):
-        super().__init__()
+    def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
+        super().__init__(**kwargs)
+        self.kind = kind if kind else entity.Kind()
         self.quantity = quantity if quantity else 1
+        self.wtf = True
+        log.info("KIND: %s", self.kind)
 
     def increase_quantity(self, q: int):
         self.quantity += q
@@ -72,7 +75,7 @@ class HasRoutesMixin:
 
 class InteractableMixin:
     def __init__(self, interactions=None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
 
     def link_activity(self, name: str, activity=True):
@@ -94,10 +97,83 @@ class InteractableMixin:
         return self.when_activity(props.Drank)
 
 
-class Item(entity.Entity, Wearable, CarryableMixin, HasRoutesMixin, InteractableMixin):
-    def __init__(self, kind=None, areas=None, **kwargs):
+class VisibilityMixin:
+    def __init__(self, visible=None, **kwargs):
         super().__init__(**kwargs)
-        self.kind = kind if kind else entity.Kind()
+
+    def make_visible(self):
+        log.info("person:visible")
+        self.visible = {}
+
+    def make_invisible(self):
+        log.info("person:invisible")
+        self.visible = {"hidden": True}
+
+    @property
+    def is_invisible(self):
+        return "hidden" in self.visible
+
+
+class AreaRoute:
+    def go(self) -> None:
+        pass
+
+    def available(self) -> bool:
+        return False
+
+    def satisfies(self, **kwargs) -> bool:
+        return False
+
+
+class MovementMixin:
+    def __init__(self, routes=None, **kwargs):
+        super().__init__(**kwargs)
+        self.routes: List[AreaRoute] = routes if routes else []
+
+    def find_route(self, **kwargs) -> Optional[AreaRoute]:
+        log.info("find-route: %s %s", kwargs, self.routes)
+        for r in self.routes:
+            if r.satisfies(**kwargs):
+                log.info("f")
+                return r
+        return None
+
+    def add_route(self, route: AreaRoute) -> AreaRoute:
+        self.routes.append(route)
+        return route
+
+
+class EdibleMixin:
+    def consumed(self, player):
+        FoodFields = [
+            props.SumFields("sugar"),
+            props.SumFields("fat"),
+            props.SumFields("protein"),
+            props.SumFields("toxicity"),
+            props.SumFields("caffeine"),
+            props.SumFields("alcohol"),
+            props.SumFields("nutrition"),
+            props.SumFields("vitamins"),
+        ]
+        changes = props.merge_dictionaries(
+            player.details.map, self.details.map, FoodFields
+        )
+        log.info("merged %s" % (changes,))
+        player.details.update(changes)
+
+
+class Item(
+    entity.Entity,
+    Wearable,
+    CarryableMixin,
+    HasRoutesMixin,
+    InteractableMixin,
+    MovementMixin,
+    VisibilityMixin,
+    EdibleMixin,
+):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.validate()
 
     def describes(self, q: str):
@@ -106,6 +182,19 @@ class Item(entity.Entity, Wearable, CarryableMixin, HasRoutesMixin, Interactable
         if q.lower() in str(self).lower():
             return True
         return False
+
+    def separate(self, world, player, quantity):
+        self.decrease_quantity(quantity)
+        item = Item(
+            creator=player,
+            kind=self.kind,
+            details=self.details,
+            behaviors=self.behaviors,
+            quantity=quantity,
+        )
+        # TODO Move to caller
+        world.register(item)
+        return [item]
 
     def observe(self) -> Sequence["ObservedEntity"]:
         return [ObservedEntity(self)]
@@ -121,41 +210,24 @@ class Item(entity.Entity, Wearable, CarryableMixin, HasRoutesMixin, Interactable
     def __repr__(self):
         return str(self)
 
-    def separate(self, world, player, quantity):
-        self.decrease_quantity(quantity)
-        item = Item(
-            creator=player,
-            kind=self.kind,
-            details=self.details,
-            behaviors=self.behaviors,
-            quantity=quantity,
-        )
-        # TODO Move to caller
-        world.register(item)
-        return [item]
-
 
 class ContainingMixin:
-    def __init__(self, here=None, holding=[], **kwargs):
-        super().__init__()
-        self.here = here if here else []
+    def __init__(self, holding=None, **kwargs):
+        super().__init__(**kwargs)
         self.holding = holding if holding else []
 
     @property
     def items(self) -> List[Item]:
-        return [e for e in self.here if isinstance(e, Item)]
+        return [e for e in self.holding if isinstance(e, Item)]
 
-    def entities(self) -> List[entity.Entity]:
-        return self.here
+    def contains(self, e: CarryableMixin):
+        return e in self.holding
 
-    def contains(self, e: entity.Entity):
-        return e in self.here
-
-    def remove(self, e: entity.Entity, **kwargs):
-        self.here.remove(e)
+    def remove(self, e: CarryableMixin, **kwargs):
+        self.holding.remove(e)
         return e
 
-    def add_item(self, item: Item) -> Item:
+    def add_item(self, item: CarryableMixin) -> CarryableMixin:
         for h in self.items:
             if item.kind.same(h.kind):
                 h.quantity += item.quantity
@@ -165,26 +237,14 @@ class ContainingMixin:
                 # picked up, merging with the one in our hands.
                 return h
 
-        self.here.append(item)
+        self.holding.append(item)
         return item
 
     def find(self, q: str) -> Optional[entity.Entity]:
-        for entity in self.here:
+        for entity in self.holding:
             if entity.describes(q):
                 return entity
         return None
-
-    def entities_named(self, of: str):
-        return [e for e in self.here if e.describes(of)]
-
-    def entities_of_kind(self, kind: entity.Kind):
-        return [e for e in self.here if e.kind and e.kind.same(kind)]
-
-    def number_of_named(self, of: str) -> int:
-        return sum([e.quantity for e in self.entities_named(of)])
-
-    def number_of_kind(self, kind: entity.Kind) -> int:
-        return sum([e.quantity for e in self.entities_of_kind(kind)])
 
     def drop_all(self):
         dropped = []
@@ -195,39 +255,30 @@ class ContainingMixin:
             dropped.append(item)
         return dropped
 
-    def is_holding(self, item):
+    def is_holding(self, item: CarryableMixin):
         return item in self.holding
 
     @property
     def items_in_hands(self) -> Sequence[Item]:
         return [e for e in self.holding if isinstance(e, Item)]
 
-    def hold(self, item: Item, quantity=None):
+    def hold(self, item: CarryableMixin, quantity: int = None):
         # See if there's a kind already in inventory.
-        for holding in self.items_in_hands:
-            if item.kind.same(holding.kind):
+        for already in self.items_in_hands:
+            if item.kind.same(already.kind):
                 # This will probably need more protection haha
-                holding.quantity += item.quantity
-                holding.touch()
+                already.quantity += item.quantity
+                already.touch()
 
-                # We return, which skips the append to holding below,
+                # We return, which skips the append to containing below,
                 # and that has the effect of obliterating the item we
                 # picked up, merging with the one in our hands.
-                return holding
+                return already
         self.holding.append(item)
         item.touch()
         return item
 
-    def drop_all(self):
-        dropped = []
-        while len(self.holding) > 0:
-            item = self.holding[0]
-            self.drop(item)
-            item.touch()
-            dropped.append(item)
-        return dropped
-
-    def drop_here(self, world, item=None, quantity=None):
+    def drop_here(self, world, item: CarryableMixin = None, quantity=None):
         if len(self.holding) == 0:
             return None, "nothing to drop"
 
@@ -257,7 +308,7 @@ class ContainingMixin:
 
         return dropped, None
 
-    def drop(self, item: Item):
+    def drop(self, item: CarryableMixin):
         if item in self.holding:
             self.holding.remove(item)
             item.touch()
@@ -269,17 +320,37 @@ class CarryingMixin(ContainingMixin):
     pass
 
 
+class Living:
+    pass
+
+
 class OccupyableMixin:
-    def __init__(self, **kwargs):
-        super().__init__()
+    def __init__(self, occupied=None, **kwargs):
+        super().__init__(**kwargs)
+        self.occupied = occupied if occupied else []
+
+    def add_living(self, living: Living) -> Living:
+        self.occupied.append(living)
+        return living
+
+    def occupying(self, living: Living) -> bool:
+        return living in self.occupied
+
+    async def entered(self, bus: EventBus, player: "Player"):
+        self.occupied.append(player)
+        await bus.publish(PlayerEnteredArea(player, self))
+
+    async def left(self, bus: EventBus, player: "Player"):
+        self.occupied.remove(player)
+        await bus.publish(PlayerLeftArea(player, self))
 
 
 class ApparalMixin:
     def __init__(self, wearing=None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.wearing = wearing if wearing else []
 
-    def is_wearing(self, item: Wearable):
+    def is_wearing(self, item: Wearable) -> bool:
         return item in self.wearing
 
     def wear(self, item: Wearable):
@@ -299,33 +370,6 @@ class ApparalMixin:
         item.touch()
 
 
-class HoldingMixin:
-    def __init__(self, **kwargs):
-        super().__init__()
-
-
-class VisibilityMixin:
-    def __init__(self, **kwargs):
-        super().__init__()
-
-
-class MovementMixin:
-    def __init__(self, **kwargs):
-        super().__init__()
-
-
-class AreaRoute:
-    def go(self) -> None:
-        pass
-
-    def available(self) -> bool:
-        return False
-
-    def satisfies(self, **kwargs) -> bool:
-        log.info("NOPE")
-        return False
-
-
 class Direction(enum.Enum):
     NORTH = 1
     SOUTH = 2
@@ -340,6 +384,7 @@ class FindsRoute:
 
 class FindDirectionalRoute(FindsRoute):
     def __init__(self, direction: Direction):
+        super().__init__()
         self.direction = direction
 
     async def find(self, world, player, **kwargs):
@@ -352,6 +397,7 @@ class FindDirectionalRoute(FindsRoute):
 
 class FindNamedRoute(FindsRoute):
     def __init__(self, name: str):
+        super().__init__()
         self.name = name
 
     async def find(self, world, player, verb=DefaultMoveVerb):
@@ -379,6 +425,7 @@ class FindNamedRoute(FindsRoute):
 
 class DirectionalRoute(AreaRoute):
     def __init__(self, direction: Direction = None, area: "Area" = None):
+        super().__init__()
         if direction is None:
             raise Exception("direction is required")
         self.direction = direction
@@ -398,6 +445,7 @@ class IsItemTemplate:
 
 class MaybeItem(IsItemTemplate):
     def __init__(self, name: str):
+        super().__init__()
         self.name = name
 
     def apply_item_template(self, **kwargs):
@@ -406,6 +454,7 @@ class MaybeItem(IsItemTemplate):
 
 class RecipeItem(IsItemTemplate):
     def __init__(self, recipe: "Recipe"):
+        super().__init__()
         self.recipe = recipe
 
     def apply_item_template(self, **kwargs):
@@ -414,6 +463,7 @@ class RecipeItem(IsItemTemplate):
 
 class MaybeQuantifiedItem(IsItemTemplate):
     def __init__(self, template: MaybeItem, quantity: float):
+        super().__init__()
         self.template = template
         self.quantity = quantity
 
@@ -440,6 +490,7 @@ class Recipe(Item):
 
 class ObservedEntity(Observable):
     def __init__(self, entity: entity.Entity):
+        super().__init__()
         self.entity = entity
 
     def accept(self, visitor):
@@ -454,6 +505,7 @@ class ObservedEntity(Observable):
 
 class ObservedEntities(Observable):
     def __init__(self, entities: List[entity.Entity]):
+        super().__init__()
         self.entities = entities
 
     def accept(self, visitor):
@@ -478,44 +530,10 @@ class HoldingActivity(Activity):
         return str(self)
 
 
-class LivingCreature(entity.Entity):
-    def __init__(self, holding=None, wearing=None, memory=None, **kwargs):
-        super().__init__(**kwargs)
-        self.holding: List[entity.Entity] = remove_nones(holding if holding else [])
-        self.wearing: List[entity.Entity] = remove_nones(wearing if wearing else [])
+class MemoryMixin:
+    def __init__(self, memory=None, **kwargs):
+        super().__init__()
         self.memory = memory if memory else {}
-
-    @property
-    def quantity(self):
-        return 1
-
-    @property
-    def is_invisible(self):
-        return "hidden" in self.visible
-
-
-class Animal(LivingCreature):
-    pass
-
-
-class Person(LivingCreature, CarryingMixin, ApparalMixin):
-    def find(self, q: str):
-        for entity in self.holding:
-            if entity.describes(q):
-                return entity
-        for entity in self.wearing:
-            if entity.describes(q):
-                return entity
-        return None
-
-    def observe(self) -> Sequence["ObservedPerson"]:
-        if self.is_invisible:
-            return []
-        activities = [HoldingActivity(e) for e in self.holding if isinstance(e, Item)]
-        return [ObservedPerson(self, activities)]
-
-    def describes(self, q: str):
-        return q.lower() in self.details.name.lower()
 
     def find_memory(self, q: str):
         for name, entity in self.memory.items():
@@ -534,30 +552,40 @@ class Person(LivingCreature, CarryingMixin, ApparalMixin):
                     return entity
         return None
 
-    def make_visible(self):
-        log.info("person:visible")
-        self.visible = {}
 
-    def make_invisible(self):
-        log.info("person:invisible")
-        self.visible = {"hidden": True}
+class LivingCreature(
+    entity.Entity, Living, CarryingMixin, ApparalMixin, VisibilityMixin, MemoryMixin
+):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def consume(self, item):
-        FoodFields = [
-            props.SumFields("sugar"),
-            props.SumFields("fat"),
-            props.SumFields("protein"),
-            props.SumFields("toxicity"),
-            props.SumFields("caffeine"),
-            props.SumFields("alcohol"),
-            props.SumFields("nutrition"),
-            props.SumFields("vitamins"),
-        ]
-        changes = props.merge_dictionaries(
-            self.details.map, item.details.map, FoodFields
-        )
-        log.info("merged %s" % (changes,))
-        self.details.update(changes)
+    @property
+    def quantity(self):
+        return 1
+
+
+class Animal(LivingCreature):
+    pass
+
+
+class Person(LivingCreature):
+    def find(self, q: str):
+        for entity in self.holding:
+            if entity.describes(q):
+                return entity
+        for entity in self.wearing:
+            if entity.describes(q):
+                return entity
+        return None
+
+    def observe(self) -> Sequence["ObservedPerson"]:
+        if self.is_invisible:
+            return []
+        activities = [HoldingActivity(e) for e in self.holding if isinstance(e, Item)]
+        return [ObservedPerson(self, activities)]
+
+    def describes(self, q: str):
+        return q.lower() in self.details.name.lower()
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.person(self)
@@ -571,6 +599,7 @@ class Person(LivingCreature, CarryingMixin, ApparalMixin):
 
 class ObservedPerson(Observable):
     def __init__(self, person: Person, activities: Sequence[Activity]):
+        super().__init__()
         self.person = person
         self.activities = activities
 
@@ -606,6 +635,7 @@ class Reply:
 
 class SimpleReply(Reply):
     def __init__(self, message: str, **kwargs):
+        super().__init__()
         self.message = message
         self.item = kwargs["item"] if "item" in kwargs else None
 
@@ -632,6 +662,7 @@ class Observation(Reply, Observable):
 
 class PersonalObservation(Observation):
     def __init__(self, who: ObservedPerson):
+        super().__init__()
         self.who = who
 
     @property
@@ -658,6 +689,7 @@ class PersonalObservation(Observation):
 
 class DetailedObservation(Observation):
     def __init__(self, person: ObservedPerson, item: ObservedEntity):
+        super().__init__()
         self.person = person
         self.item = item
 
@@ -681,6 +713,7 @@ class DetailedObservation(Observation):
 
 class EntitiesObservation(Observation):
     def __init__(self, entities: List[entity.Entity]):
+        super().__init__()
         self.entities = entities
 
     def accept(self, visitor):
@@ -698,6 +731,7 @@ class AreaObservation(Observation):
         people: List[ObservedPerson],
         items: List[ObservedEntity],
     ):
+        super().__init__()
         self.who = who
         self.where = where
         self.people = people
@@ -719,45 +753,33 @@ class AreaObservation(Observation):
         )
 
 
-class Area(entity.Entity, ContainingMixin, OccupyableMixin):
+class Area(entity.Entity, ContainingMixin, OccupyableMixin, MovementMixin):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
-        self.routes: List[AreaRoute] = routes if routes else []
 
-    def find_route(self, **kwargs) -> Optional[AreaRoute]:
-        log.info("find-route: %s %s", kwargs, self.routes)
-        for r in self.routes:
-            if r.satisfies(**kwargs):
-                log.info("f")
-                return r
-        return None
+    def entities(self) -> List[entity.Entity]:
+        return flatten([self.holding, self.occupied])
 
     def look(self, player: Player):
-        people = [
-            e.observe() for e in self.here if isinstance(e, Person) and e != player
-        ]
-        items = [e.observe() for e in self.here if isinstance(e, Item)]
+        people = [e.observe() for e in self.occupied if e != player]
+        items = [e.observe() for e in self.holding if e]
         observed_self = player.observe()[0]
         return AreaObservation(observed_self, self, flatten(people), flatten(items))
 
-    def add_route(self, route: AreaRoute) -> AreaRoute:
-        self.routes.append(route)
-        return route
+    def entities_named(self, of: str):
+        return [e for e in self.entities() if e.describes(of)]
 
-    def add_living(self, living: LivingCreature) -> LivingCreature:
-        self.here.append(living)
-        return living
+    def entities_of_kind(self, kind: entity.Kind):
+        return [e for e in self.entities() if e.kind and e.kind.same(kind)]
+
+    def number_of_named(self, of: str) -> int:
+        return sum([e.quantity for e in self.entities_named(of)])
+
+    def number_of_kind(self, kind: entity.Kind) -> int:
+        return sum([e.quantity for e in self.entities_of_kind(kind)])
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
-
-    async def entered(self, bus: EventBus, player: Player):
-        self.here.append(player)
-        await bus.publish(PlayerEnteredArea(player, self))
-
-    async def left(self, bus: EventBus, player: Player):
-        self.here.remove(player)
-        await bus.publish(PlayerLeftArea(player, self))
 
     def __str__(self):
         return self.details.name
@@ -814,13 +836,12 @@ class World(entity.Entity):
 
     def find_entity_area(self, entity: entity.Entity):
         for area in self.areas():
-            if area.contains(entity):
+            if area.contains(entity) or area.occupying(entity):
                 return area
         return None
 
     def find_player_area(self, player: Player):
-        area = self.find_entity_area(player)
-        return area
+        return self.find_entity_area(player)
 
     def contains(self, key):
         return key in self.entities
@@ -863,7 +884,9 @@ class World(entity.Entity):
         return area.find(whereQ)
 
     def search(self, player: Player, whereQ: str, unheld=None, **kwargs):
+        log.info("%s", player)
         area = self.find_player_area(player)
+        log.info("%s", area)
 
         order = [player.find, area.find]
 
