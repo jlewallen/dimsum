@@ -252,7 +252,7 @@ class Remove(PersonAction):
             return Failure("remove what?")
         if not player.is_wearing(self.item):
             return Failure("you aren't wearing that")
-        player.remove(self.item)
+        player.unwear(self.item)
         await ctx.extend(remove=[self.item]).hook("remove:after")
         return Success("you removed %s" % (self.item))
 

@@ -27,6 +27,11 @@ class Event:
     pass
 
 
+class Wearable:
+    def touch():
+        pass
+
+
 class EventBus:
     async def publish(self, event: Event):
         log.info("publish:%s", event)
@@ -36,12 +41,31 @@ class Activity:
     pass
 
 
-class Item(entity.Entity):
-    def __init__(self, areas=None, quantity=1, mobility=None, kind=None, **kwargs):
+class CarryableMixin:
+    def __init__(self, quantity: int = None, **kwargs):
+        super().__init__()
+        self.quantity = quantity if quantity else 1
+
+    def increase_quantity(self, q: int):
+        self.quantity += q
+        return self
+
+    def decrease_quantity(self, q: int):
+        if q < 1:
+            raise Exception("too few to separate")
+
+        if q > self.quantity:
+            raise Exception("too many to separate")
+
+        self.quantity -= q
+        return self
+
+
+class Item(entity.Entity, Wearable, CarryableMixin):
+    def __init__(self, areas=None, mobility=None, kind=None, **kwargs):
         super().__init__(**kwargs)
         self.areas = areas if areas else {}
         self.mobility = mobility if areas else {}
-        self.quantity = quantity
         self.kind = kind if kind else entity.Kind()
         self.validate()
 
@@ -73,14 +97,7 @@ class Item(entity.Entity):
         return str(self)
 
     def separate(self, world, player, quantity):
-        if quantity < 1:
-            raise Exception("too few to separate")
-
-        if quantity > self.quantity:
-            raise Exception("too many to separate")
-
-        self.quantity -= quantity
-
+        self.decrease_quantity(quantity)
         item = Item(
             creator=player,
             kind=self.kind,
@@ -88,11 +105,188 @@ class Item(entity.Entity):
             behaviors=self.behaviors,
             quantity=quantity,
         )
-
         # TODO Move to caller
         world.register(item)
-
         return [item]
+
+
+class ContainingMixin:
+    def __init__(self, here=None, holding=[], **kwargs):
+        super().__init__()
+        self.here = here if here else []
+        self.holding = holding if holding else []
+
+    @property
+    def items(self) -> List[Item]:
+        return [e for e in self.here if isinstance(e, Item)]
+
+    def entities(self) -> List[entity.Entity]:
+        return self.here
+
+    def contains(self, e: entity.Entity):
+        return e in self.here
+
+    def remove(self, e: entity.Entity, **kwargs):
+        self.here.remove(e)
+        return e
+
+    def add_item(self, item: Item) -> Item:
+        for h in self.items:
+            if item.kind.same(h.kind):
+                h.quantity += item.quantity
+
+                # We return, which skips the append to holding below,
+                # and that has the effect of obliterating the item we
+                # picked up, merging with the one in our hands.
+                return h
+
+        self.here.append(item)
+        return item
+
+    def find(self, q: str) -> Optional[entity.Entity]:
+        for entity in self.here:
+            if entity.describes(q):
+                return entity
+        return None
+
+    def entities_named(self, of: str):
+        return [e for e in self.here if e.describes(of)]
+
+    def entities_of_kind(self, kind: entity.Kind):
+        return [e for e in self.here if e.kind and e.kind.same(kind)]
+
+    def number_of_named(self, of: str) -> int:
+        return sum([e.quantity for e in self.entities_named(of)])
+
+    def number_of_kind(self, kind: entity.Kind) -> int:
+        return sum([e.quantity for e in self.entities_of_kind(kind)])
+
+    def drop_all(self):
+        dropped = []
+        while len(self.holding) > 0:
+            item = self.holding[0]
+            self.drop(item)
+            item.touch()
+            dropped.append(item)
+        return dropped
+
+    def is_holding(self, item):
+        return item in self.holding
+
+    @property
+    def items_in_hands(self) -> Sequence[Item]:
+        return [e for e in self.holding if isinstance(e, Item)]
+
+    def hold(self, item: Item, quantity=None):
+        # See if there's a kind already in inventory.
+        for holding in self.items_in_hands:
+            if item.kind.same(holding.kind):
+                # This will probably need more protection haha
+                holding.quantity += item.quantity
+                holding.touch()
+
+                # We return, which skips the append to holding below,
+                # and that has the effect of obliterating the item we
+                # picked up, merging with the one in our hands.
+                return holding
+        self.holding.append(item)
+        item.touch()
+        return item
+
+    def drop_all(self):
+        dropped = []
+        while len(self.holding) > 0:
+            item = self.holding[0]
+            self.drop(item)
+            item.touch()
+            dropped.append(item)
+        return dropped
+
+    def drop_here(self, world, item=None, quantity=None):
+        if len(self.holding) == 0:
+            return None, "nothing to drop"
+
+        area = world.find_player_area(self)
+        dropped = []
+        if quantity:
+            if not item:
+                return None, "please specify what?"
+
+            if quantity > item.quantity or quantity < 1:
+                return None, "you should check how many you have"
+
+            dropped = item.separate(world, self, quantity)
+            if item.quantity == 0:
+                world.unregister(item)
+                self.drop(item)
+        else:
+            if item:
+                dropped = self.drop(item)
+            else:
+                dropped = self.drop_all()
+
+        for item in dropped:
+            after_add = area.add_item(item)
+            if after_add != item:
+                world.unregister(item)
+
+        return dropped, None
+
+    def drop(self, item: Item):
+        if item in self.holding:
+            self.holding.remove(item)
+            item.touch()
+            return [item]
+        return []
+
+
+class CarryingMixin(ContainingMixin):
+    pass
+
+
+class OccupyableMixin:
+    def __init__(self, **kwargs):
+        super().__init__()
+
+
+class ApparalMixin:
+    def __init__(self, wearing=None, **kwargs):
+        super().__init__()
+        self.wearing = wearing if wearing else []
+
+    def is_wearing(self, item: Wearable):
+        return item in self.wearing
+
+    def wear(self, item: Wearable):
+        if not self.is_holding(item):
+            raise Exception("wear before hold")
+        self.drop(item)
+        if self.is_holding(item):
+            raise Exception("wear before hold")
+        self.wearing.append(item)
+        item.touch()
+
+    def unwear(self, item: Wearable, **kwargs):
+        if not self.is_wearing(item):
+            raise Exception("remove before wear")
+        self.hold(item)
+        self.wearing.remove(item)
+        item.touch()
+
+
+class HoldingMixin:
+    def __init__(self, **kwargs):
+        super().__init__()
+
+
+class VisibilityMixin:
+    def __init__(self, **kwargs):
+        super().__init__()
+
+
+class MovementMixin:
+    def __init__(self, **kwargs):
+        super().__init__()
 
 
 class AreaRoute:
@@ -279,7 +473,7 @@ class Animal(LivingCreature):
     pass
 
 
-class Person(LivingCreature):
+class Person(LivingCreature, CarryingMixin, ApparalMixin):
     def find(self, q: str):
         for entity in self.holding:
             if entity.describes(q):
@@ -314,94 +508,6 @@ class Person(LivingCreature):
                 if q.lower() in name.lower():
                     return entity
         return None
-
-    def is_holding(self, item):
-        return item in self.holding
-
-    @property
-    def items_in_hands(self) -> Sequence[Item]:
-        return [e for e in self.holding if isinstance(e, Item)]
-
-    def hold(self, item: Item, quantity=None):
-        # See if there's a kind already in inventory.
-        for holding in self.items_in_hands:
-            if item.kind.same(holding.kind):
-                # This will probably need more protection haha
-                holding.quantity += item.quantity
-                holding.touch()
-
-                # We return, which skips the append to holding below,
-                # and that has the effect of obliterating the item we
-                # picked up, merging with the one in our hands.
-                return holding
-        self.holding.append(item)
-        item.touch()
-        return item
-
-    def drop_all(self):
-        dropped = []
-        while len(self.holding) > 0:
-            item = self.holding[0]
-            self.drop(item)
-            item.touch()
-            dropped.append(item)
-        return dropped
-
-    def drop_here(self, world, item=None, quantity=None):
-        if len(self.holding) == 0:
-            return None, "nothing to drop"
-
-        area = world.find_player_area(self)
-        dropped = []
-        if quantity:
-            if not item:
-                return None, "please specify what?"
-
-            if quantity > item.quantity or quantity < 1:
-                return None, "you should check how many you have"
-
-            dropped = item.separate(world, self, quantity)
-            if item.quantity == 0:
-                world.unregister(item)
-                self.drop(item)
-        else:
-            if item:
-                dropped = self.drop(item)
-            else:
-                dropped = self.drop_all()
-
-        for item in dropped:
-            after_add = area.add_item(item)
-            if after_add != item:
-                world.unregister(item)
-
-        return dropped, None
-
-    def drop(self, item: Item):
-        if item in self.holding:
-            self.holding.remove(item)
-            item.touch()
-            return [item]
-        return []
-
-    def is_wearing(self, item):
-        return item in self.wearing
-
-    def wear(self, item: Item):
-        if not self.is_holding(item):
-            raise Exception("wear before hold")
-        self.drop(item)
-        if self.is_holding(item):
-            raise Exception("wear before hold")
-        self.wearing.append(item)
-        item.touch()
-
-    def remove(self, item: Item, **kwargs):
-        if not self.is_wearing(item):
-            raise Exception("remove before wear")
-        self.hold(item)
-        self.wearing.remove(item)
-        item.touch()
 
     def make_visible(self):
         log.info("person:visible")
@@ -588,25 +694,10 @@ class AreaObservation(Observation):
         )
 
 
-class Area(entity.Entity):
-    def __init__(self, here=None, routes=None, **kwargs):
+class Area(entity.Entity, ContainingMixin, OccupyableMixin):
+    def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
-        self.here: List[entity.Entity] = remove_nones(here if here else [])
         self.routes: List[AreaRoute] = routes if routes else []
-
-    @property
-    def items(self) -> List[Item]:
-        return [e for e in self.here if isinstance(e, Item)]
-
-    def entities(self) -> List[entity.Entity]:
-        return self.here
-
-    def contains(self, e: entity.Entity):
-        return e in self.here
-
-    def remove(self, e: entity.Entity, **kwargs):
-        self.here.remove(e)
-        return e
 
     def find_route(self, **kwargs) -> Optional[AreaRoute]:
         log.info("find-route: %s %s", kwargs, self.routes)
@@ -631,37 +722,6 @@ class Area(entity.Entity):
     def add_living(self, living: LivingCreature) -> LivingCreature:
         self.here.append(living)
         return living
-
-    def add_item(self, item: Item) -> Item:
-        for h in self.items:
-            if item.kind.same(h.kind):
-                h.quantity += item.quantity
-
-                # We return, which skips the append to holding below,
-                # and that has the effect of obliterating the item we
-                # picked up, merging with the one in our hands.
-                return h
-
-        self.here.append(item)
-        return item
-
-    def find(self, q: str) -> Optional[entity.Entity]:
-        for entity in self.here:
-            if entity.describes(q):
-                return entity
-        return None
-
-    def entities_named(self, of: str):
-        return [e for e in self.here if e.describes(of)]
-
-    def entities_of_kind(self, kind: entity.Kind):
-        return [e for e in self.here if e.kind and e.kind.same(kind)]
-
-    def number_of_named(self, of: str) -> int:
-        return sum([e.quantity for e in self.entities_named(of)])
-
-    def number_of_kind(self, kind: entity.Kind) -> int:
-        return sum([e.quantity for e in self.entities_of_kind(kind)])
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
