@@ -66,6 +66,8 @@ class SqliteDatabase:
         for key, entity in world.garbage.items():
             await self.destroy(entity)
 
+        log.info("deleted %d entities in garbage", len(world.garbage.keys()))
+
         for key, entity in world.entities.items():
             try:
                 if entity.destroyed:
@@ -80,6 +82,8 @@ class SqliteDatabase:
                     exc_info=True,
                 )
                 raise
+
+        log.info("saved %d entities", len(world.entities.keys()))
 
         self.db.commit()
 

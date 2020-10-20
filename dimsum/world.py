@@ -38,6 +38,12 @@ class World(entity.Entity, entity.Registrar):
     def players(self):
         return self.all_of_type(animals.Player)
 
+    def find_entity_by_name(self, name):
+        for key, e in self.entities.items():
+            if name in e.details.name:
+                return e
+        return None
+
     def find_person_by_name(self, name):
         for person in self.people():
             if person.details.name == name:
@@ -129,8 +135,10 @@ class World(entity.Entity, entity.Registrar):
 
     async def perform(self, action, person: Optional[animals.Person]):
         area = self.find_player_area(person) if person else None
-        ctx = WorldCtx(self.context_factory, world=self, person=person, area=area)
-        return await action.perform(ctx, self, person)
+        with WorldCtx(
+            self.context_factory, world=self, person=person, area=area
+        ) as ctx:
+            return await action.perform(ctx, self, person)
 
     async def tick(self, now: Optional[float] = None):
         if now is None:
@@ -145,10 +153,11 @@ class World(entity.Entity, entity.Registrar):
             if len(behaviors) > 0:
                 log.info("tick: %s", entity)
                 area = self.find_entity_area(entity)
-                ctx = WorldCtx(
+                assert area
+                with WorldCtx(
                     self.context_factory, world=self, area=area, entity=entity, **kwargs
-                )
-                await ctx.hook(name)
+                ) as ctx:
+                    await ctx.hook(name)
 
     def __str__(self):
         return "$world"
@@ -173,6 +182,14 @@ class WorldCtx(context.Ctx):
         self.world = world
         self.person = person
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
+
+    def __enter__(self):
+        context.set(self)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        context.set(None)
+        return False
 
     def extend(self, **kwargs) -> "WorldCtx":
         self.scope = self.scope.extend(**kwargs)

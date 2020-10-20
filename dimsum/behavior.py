@@ -71,12 +71,18 @@ class Behavior:
 
 GenericThunk = """
 function(scope, g)
+    assert(scope, "scope is required (generic)")
+    assert(scope.world, "world is required (generic)")
+    assert(scope.area, "area is required (generic)")
     return g(scope, scope.world, scope.area, scope.entity)
 end
 """
 
 PersonThunk = """
 function(scope, g)
+    assert(scope, "scope is required (person)")
+    assert(scope.world, "world is required (person)")
+    assert(scope.area, "area is required (person)")
     return g(scope, scope.world, scope.area, scope.person)
 end
 """
@@ -105,12 +111,12 @@ class ScriptEngine:
             stamped = now.strftime("%Y/%m/%d %H:%M:%S") + " " + message
             messages.append(stamped)
 
-        debug("invoked")
-
         g = self.lua.globals()
-        g.debug = debug
         for key, value in scope.items():
+            log.debug("lua: %s = %s", key, value)
             g[key] = value
+        g.debug = debug
+
         thunker = self.lua.eval(thunk)
         fn = self.lua.eval(main.lua)
         try:

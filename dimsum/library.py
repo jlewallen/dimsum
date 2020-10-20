@@ -237,7 +237,9 @@ class WelcomeArea(Factory):
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details("Living room", desc="It's got walls."),
+            details=props.Details(
+                "Town Courtyard.", desc="There's a ton going on here."
+            ),
         )
         area.add_item(BeerKeg().create(world))
         area.add_item(LargeOakTree().create(world))

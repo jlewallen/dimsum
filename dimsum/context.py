@@ -1,6 +1,10 @@
+from typing import Any
 import logging
 import abc
 import entity
+import contextvars
+
+worldCtx: Any = contextvars.ContextVar("diimsum:ctx")
 
 
 class Ctx:
@@ -19,3 +23,11 @@ class Ctx:
     @abc.abstractmethod
     def extend(self, **kwargs) -> "Ctx":
         raise NotImplementedError
+
+
+def get():
+    return worldCtx.get()
+
+
+def set(ctx: Ctx):
+    worldCtx.set(ctx)

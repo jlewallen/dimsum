@@ -28,8 +28,13 @@ async def test_library(caplog):
     await db.purge()
     await db.save(tw.world)
 
-    empty = world.World(tw.bus, context_factory=None)
+    await tw.world.tick()
+
+    empty = world.World(tw.bus, context_factory=tw.world.context_factory)
     await db.load(empty)
+
+    await empty.tick()
+
     await db.save(empty)
 
     assert await db.number_of_entities() == 28
