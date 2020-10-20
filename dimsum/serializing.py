@@ -108,7 +108,9 @@ def serialize(value, indent=None, unpicklable=True, secure=False):
 
 def deserialize(encoded, lookup):
     decoded = jsonpickle.decode(
-        encoded, context=CustomUnpickler(lookup), classes=list(classes.values())
+        encoded,
+        context=CustomUnpickler(lookup),
+        classes=list(classes.values()),
     )
 
     if type(decoded) in inverted:

@@ -44,7 +44,7 @@ class SqliteDatabase:
 
     async def update(self, entity: entity.Entity):
         klass = entity.__class__.__name__
-        props = serializing.serialize(entity, secure=True)
+        props = serializing.serialize(entity, secure=True, indent=4)
         identity_field = {
             "private": entity.identity.private,
             "signature": entity.identity.signature,
@@ -92,28 +92,26 @@ class SqliteDatabase:
         ):
             rows[row[0]] = row
 
-        cached: Dict[str, entity.Entity] = {}
+        refs: Dict[str, Dict] = {}
 
-        def lookup(key: str):
-            if key is None or key == "world":
+        def reference(key):
+            if key is None:
                 return world
-            if key in cached:
-                return cached[key]
-            if key not in rows:
-                log.info("gone: key=%s", key)
-                return None
-            row = rows[key]
-            log.info("restoring: key=%s %s", key, row[1])
-            instance = serializing.deserialize(row[3], lookup)
-            if not isinstance(instance, entity.Entity):
-                log.error("error deserializing: %s", row[3])
-                raise Exception("expected entity")
-            cached[key] = instance
-            return instance
+            if key in refs:
+                return refs[key]
+            refs[key] = {"key": key}
+            return refs[key]
 
+        cached: Dict[str, entity.Entity] = {}
         for key in rows.keys():
-            instance = lookup(key)
-            log.info("registering: %s %s", type(instance), instance)
-            world.register(instance)
+            log.info("restoring: key=%s %s", key, row[1])
+            e = serializing.deserialize(row[3], reference)
+            assert isinstance(e, entity.Entity)
+            world.register(e)
+            cached[key] = e
+
+        for key, baby_entity in refs.items():
+            log.info("resolve: %s", key)
+            baby_entity.update(cached[key].__dict__)
 
         self.db.commit()

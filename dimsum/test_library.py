@@ -4,6 +4,7 @@ import logging
 import props
 import entity
 import game
+import world
 import serializing
 import persistence
 import library
@@ -24,5 +25,9 @@ async def test_library(caplog):
     await db.open("test.sqlite3")
     await db.purge()
     await db.save(tw.world)
+
+    empty = world.World(tw.bus, context_factory=None)
+    await db.load(empty)
+    await db.save(empty)
 
     assert await db.number_of_entities() == 21
