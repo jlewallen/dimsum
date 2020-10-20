@@ -66,7 +66,7 @@ class MovementMixin:
         self.routes: List[AreaRoute] = routes if routes else []
 
     def find_route(self, **kwargs) -> Optional[AreaRoute]:
-        log.info("find-route: %s %s", self.routes, kwargs)
+        log.debug("%s find-route: %s %s", self, self.routes, kwargs)
         for r in self.routes:
             if r.satisfies(**kwargs):
                 return r
@@ -84,8 +84,7 @@ class MovementMixin:
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
         self.routes.append(route)
-        if False:
-            log.info("new route: %s", self.routes)
+        log.debug("%s new route: %s", self, self.routes)
         return route
 
     def move_with(self, area, person, builder: AreaBuilder, **kwargs):
@@ -100,7 +99,7 @@ class MovementMixin:
 
 class FindsRoute:
     async def find(self, area, person, **kwargs) -> Optional[AreaRoute]:
-        raise Exception("unimplemented")
+        raise NotImplementedError
 
 
 class FindNamedRoute(FindsRoute):

@@ -129,7 +129,7 @@ class Entity(Finder):
         return False
 
     def accept(self, visitor: "EntityVisitor") -> Any:
-        raise Exception("unimplemented")
+        raise NotImplementedError
 
 
 class Registrar:

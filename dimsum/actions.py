@@ -25,7 +25,7 @@ log = logging.getLogger("dimsum")
 
 class PersonAction(Action):
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        raise Exception("unimplemented")
+        raise NotImplementedError
 
 
 class Unknown(PersonAction):

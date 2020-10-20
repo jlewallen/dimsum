@@ -48,7 +48,6 @@ class Area(
         copy.link_area(self)
         other_area = item.require_single_linked_area  # type: ignore
         other_area.add_item(copy)
-        log.info("link-back")
         return self, other_area
 
     def __str__(self):

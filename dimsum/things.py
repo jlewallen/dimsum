@@ -65,7 +65,7 @@ class Item(
 
 class ItemFactory:
     def create_item(self, **kwargs) -> Item:
-        raise Exception("unimplemented")
+        raise NotImplementedError
 
 
 class MaybeItem(ItemFactory):

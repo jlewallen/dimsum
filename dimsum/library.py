@@ -13,7 +13,7 @@ log = logging.getLogger("dimsum")
 
 class Factory:
     def create(self, world: world.World):
-        raise Exception("unimplemented")
+        raise NotImplementedError
 
 
 class Hammer(Factory):
