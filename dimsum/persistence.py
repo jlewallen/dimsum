@@ -91,30 +91,9 @@ class SqliteDatabase:
         self.dbc = self.db.cursor()
 
         rows = {}
-        for row in self.dbc.execute(
-            "SELECT key, klass, identity, serialized FROM entities"
-        ):
-            rows[row[0]] = row
+        for row in self.dbc.execute("SELECT key, serialized FROM entities"):
+            rows[row[0]] = row[1]
 
-        refs: Dict[str, Dict] = {}
-
-        def reference(key):
-            if key is None:
-                return world
-            if key in refs:
-                return refs[key]
-            refs[key] = {"key": key}
-            return refs[key]
-
-        cached: Dict[str, entity.Entity] = {}
-        for key in rows.keys():
-            log.debug("restoring: key=%s %s", key, rows[key][1])
-            e = serializing.deserialize(rows[key][3], reference)
-            assert isinstance(e, entity.Entity)
-            world.register(e)
-            cached[key] = e
-
-        for key, baby_entity in refs.items():
-            baby_entity.update(cached[key].__dict__)
+        entities = serializing.restore(world, rows)
 
         self.db.commit()

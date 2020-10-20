@@ -1,6 +1,6 @@
+from typing import Dict, Any
 import jsonpickle
 import logging
-
 import crypto
 import entity
 import game
@@ -118,3 +118,34 @@ def deserialize(encoded, lookup):
         return original(**decoded.__dict__)
 
     return decoded
+
+
+def all(world: world.World):
+    return {
+        key: serialize(entity, secure=True, indent=4)
+        for key, entity in world.entities.items()
+    }
+
+
+def restore(world: world.World, rows: Dict[str, Any]):
+    refs: Dict[str, Dict] = {}
+
+    def reference(key):
+        if key is None:
+            return world
+        if key in refs:
+            return refs[key]
+        refs[key] = {"key": key}
+        return refs[key]
+
+    cached: Dict[str, entity.Entity] = {}
+    for key in rows.keys():
+        e = deserialize(rows[key], reference)
+        assert isinstance(e, entity.Entity)
+        world.register(e)
+        cached[key] = e
+
+    for key, baby_entity in refs.items():
+        baby_entity.update(cached[key].__dict__)
+
+    return cached

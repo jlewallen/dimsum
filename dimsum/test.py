@@ -18,6 +18,10 @@ import bus
 log = logging.getLogger("dimsum")
 
 
+def create_empty_world():
+    return world.World(bus.EventBus(), luaproxy.context_factory)
+
+
 class TestWorld:
     def __init__(self):
         self.bus = bus.EventBus()
