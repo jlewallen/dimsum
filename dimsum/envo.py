@@ -1,5 +1,6 @@
 from typing import List
 import logging
+import props
 import entity
 import carryable
 import occupyable

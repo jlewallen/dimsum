@@ -1,5 +1,6 @@
 from typing import List, Optional, Any
 import logging
+import copy
 import inflect
 import props
 import crypto
@@ -50,6 +51,11 @@ class Item(
         # TODO Move to caller
         ctx.registrar().register(item)
         return [item]
+
+    def clone(self, **kwargs):
+        updated = copy.copy(self.__dict__)
+        updated.update(**kwargs)
+        return Item(**updated)
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:
         return visitor.item(self)

@@ -97,13 +97,6 @@ class Entity(Finder):
         self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
         self.related: Dict[str, Kind] = related if related else {}
 
-    def clone(self, **kwargs) -> "Entity":
-        state_copy = copy.deepcopy(self.__dict__)
-        state_copy.update(**kwargs)
-        klass = self.__class__
-        log.info("klass: %s", klass)
-        return klass(**state_copy)
-
     def get_kind(self, name: str) -> Kind:
         if not name in self.related:
             self.related[name] = Kind()
