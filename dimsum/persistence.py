@@ -104,7 +104,7 @@ class SqliteDatabase:
 
         cached: Dict[str, entity.Entity] = {}
         for key in rows.keys():
-            log.info("restoring: key=%s %s", key, row[1])
+            log.info("restoring: key=%s %s", key, rows[key][1])
             e = serializing.deserialize(row[3], reference)
             assert isinstance(e, entity.Entity)
             world.register(e)
