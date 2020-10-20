@@ -1,9 +1,10 @@
 import logging
 import lark
+import props
 import game
 import movement
+import things
 import actions
-import props
 
 log = logging.getLogger("dimsum")
 
@@ -139,16 +140,16 @@ class Evaluate(lark.Transformer):
 
     def make_quantified(self, args):
         quantity = args[0]
-        return actions.Make(template=game.MaybeQuantifiedItem(args[1], quantity))
+        return actions.Make(template=things.MaybeQuantifiedItem(args[1], quantity))
 
     def makeable_noun(self, args):
         q = str(args[0])
 
         recipe = self.player.find_memory(q)
         if recipe:
-            return game.RecipeItem(recipe)
+            return things.RecipeItem(recipe)
 
-        return game.MaybeItem(q)
+        return things.MaybeItem(q)
 
     def unheld_noun(self, args):
         return self.world.search(self.player, str(args[0]), unheld=True)

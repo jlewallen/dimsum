@@ -16,6 +16,7 @@ import persistence
 import grammar
 import evaluator
 import actions
+import events
 import luaproxy
 
 p = inflect.engine()
@@ -26,7 +27,7 @@ class DiscordEventBus(bus.EventBus):
     def __init__(self, bot):
         self.bot = bot
 
-    async def publish(self, event: game.Event):
+    async def publish(self, event: events.Event):
         log.info("publish:%s", event)
         for channel in self.bot.get_all_channels():
             if channel.name == "IGNORED":

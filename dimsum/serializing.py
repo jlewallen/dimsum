@@ -4,6 +4,10 @@ import logging
 import crypto
 import entity
 import game
+import envo
+import things
+import living
+import animals
 import world
 
 log = logging.getLogger("dimsum")
@@ -34,11 +38,12 @@ class WorldHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(game.Area)
-@jsonpickle.handlers.register(game.Player)
-@jsonpickle.handlers.register(game.Person)
-@jsonpickle.handlers.register(game.Item)
-@jsonpickle.handlers.register(game.Recipe)
+@jsonpickle.handlers.register(envo.Area)
+@jsonpickle.handlers.register(things.Item)
+@jsonpickle.handlers.register(things.Recipe)
+@jsonpickle.handlers.register(animals.Player)
+@jsonpickle.handlers.register(animals.Person)
+@jsonpickle.handlers.register(animals.Animal)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
@@ -67,7 +72,14 @@ def deriveFrom(klass):
     return type("Root" + name, (klass,), {})
 
 
-allowed = [game.Item, game.Recipe, game.Area, game.Animal, game.Person, game.Player]
+allowed = [
+    things.Item,
+    things.Recipe,
+    envo.Area,
+    animals.Animal,
+    animals.Person,
+    animals.Player,
+]
 classes = {k: deriveFrom(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
 

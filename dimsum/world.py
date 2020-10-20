@@ -8,6 +8,10 @@ import props
 import game
 import bus
 import behavior
+import things
+import envo
+import living
+import animals
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")
@@ -23,16 +27,16 @@ class World(entity.Entity, entity.Registrar):
         self.context_factory = context_factory
 
     def items(self):
-        return self.all_of_type(game.Item)
+        return self.all_of_type(things.Item)
 
     def areas(self):
-        return self.all_of_type(game.Area)
+        return self.all_of_type(envo.Area)
 
     def people(self):
-        return self.all_of_type(game.Person)
+        return self.all_of_type(animals.Person)
 
     def players(self):
-        return self.all_of_type(game.Player)
+        return self.all_of_type(animals.Player)
 
     def find_person_by_name(self, name):
         for person in self.people():
@@ -49,7 +53,7 @@ class World(entity.Entity, entity.Registrar):
                 return area
         return None
 
-    def find_player_area(self, player: game.Person):
+    def find_player_area(self, player: animals.Person):
         return self.find_entity_area(player)
 
     def contains(self, key):
@@ -61,28 +65,28 @@ class World(entity.Entity, entity.Registrar):
     def resolve(self, keys):
         return [self.entities[key] for key in keys]
 
-    def add_area(self, area: game.Area):
+    def add_area(self, area: envo.Area):
         self.register(area)
         for entity in area.entities():
             self.register(entity)
         for item in area.items:
             for linked in item.adjacent():
                 log.info("linked: %s", linked)
-                self.add_area(cast(game.Area, linked))
+                self.add_area(cast(envo.Area, linked))
 
     def build_new_area(
         self,
-        person: game.Person,
-        entry: game.Item,
+        person: animals.Person,
+        entry: things.Item,
         verb: str = DefaultMoveVerb,
     ):
         log.info("building new area")
 
-        fromArea: game.Area = self.find_player_area(person)
-        theWayBack = game.Item(creator=person, details=entry.details.clone())
+        fromArea: envo.Area = self.find_player_area(person)
+        theWayBack = things.Item(creator=person, details=entry.details.clone())
         theWayBack.link_area(fromArea, verb=verb)
 
-        area = game.Area(
+        area = envo.Area(
             creator=person,
             details=props.Details(
                 "A pristine, new place.",
@@ -93,14 +97,14 @@ class World(entity.Entity, entity.Registrar):
         self.add_area(area)
         return area
 
-    def search_hands(self, person: game.Person, whereQ: str):
+    def search_hands(self, person: animals.Person, whereQ: str):
         return person.find(whereQ)
 
-    def search_floor(self, person: game.Person, whereQ: str):
+    def search_floor(self, person: animals.Person, whereQ: str):
         area = self.find_player_area(person)
         return area.find(whereQ)
 
-    def search(self, person: game.Person, whereQ: str, unheld=None, **kwargs):
+    def search(self, person: animals.Person, whereQ: str, unheld=None, **kwargs):
         area = self.find_player_area(person)
 
         order = [person.find, area.find]
@@ -115,7 +119,7 @@ class World(entity.Entity, entity.Registrar):
 
         return None
 
-    async def perform(self, action, person: Optional[game.Person]):
+    async def perform(self, action, person: Optional[animals.Person]):
         area = self.find_player_area(person) if person else None
         ctx = WorldCtx(self.context_factory, world=self, person=person, area=area)
         return await action.perform(ctx, self, person)
@@ -148,7 +152,11 @@ class World(entity.Entity, entity.Registrar):
 class WorldCtx(context.Ctx):
     # This should eventually get worked out. Just return Ctx from this function?
     def __init__(
-        self, context_factory, world: World = None, person: game.Person = None, **kwargs
+        self,
+        context_factory,
+        world: World = None,
+        person: animals.Person = None,
+        **kwargs
     ):
         super().__init__()
         assert world

@@ -4,6 +4,8 @@ import pytest
 
 import props
 import game
+import things
+import envo
 import actions
 import test
 
@@ -12,7 +14,7 @@ import test
 async def test_drop_hammer_funny_gold(caplog):
     tw = test.TestWorld()
 
-    hammer = tw.add_item(game.Item(creator=tw.jacob, details=props.Details("Hammer")))
+    hammer = tw.add_item(things.Item(creator=tw.jacob, details=props.Details("Hammer")))
     hammer.add_behavior(
         "b:test:drop:after",
         lua="""
@@ -47,7 +49,7 @@ async def test_wear_cape(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
-    cape = tw.add_item(game.Item(creator=tw.jacob, details=props.Details("Cape")))
+    cape = tw.add_item(things.Item(creator=tw.jacob, details=props.Details("Cape")))
     cape.link_activity("worn")
     cape.add_behavior(
         "b:test:wear:after",
@@ -82,10 +84,10 @@ async def test_behavior_move(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
-    mystery_area = game.Area(creator=tw.player, details=props.Details("A Mystery Area"))
+    mystery_area = envo.Area(creator=tw.player, details=props.Details("A Mystery Area"))
     tw.world.register(mystery_area)
 
-    cape = tw.add_item(game.Item(creator=tw.jacob, details=props.Details("Cape")))
+    cape = tw.add_item(things.Item(creator=tw.jacob, details=props.Details("Cape")))
     cape.link_activity("worn", mystery_area)
     cape.add_behavior(
         "b:test:wear:after",
@@ -112,7 +114,7 @@ async def test_behavior_create_item(caplog):
     tw = test.TestWorld()
 
     box = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
+        things.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
     )
     box.add_behavior(
         "b:test:shake:after",
@@ -143,7 +145,7 @@ async def test_behavior_create_quantified_item(caplog):
     tw = test.TestWorld()
 
     box = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
+        things.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
     )
     box.add_behavior(
         "b:test:shake:after",
@@ -183,7 +185,7 @@ async def test_behavior_time_passing(caplog):
     tw = test.TestWorld()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     tree.add_behavior(
         "b:test:tick",
@@ -215,7 +217,7 @@ async def test_behavior_create_kind(caplog):
     tw = test.TestWorld()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     tree.add_behavior(
         "b:test:tick",
@@ -249,7 +251,7 @@ async def test_behavior_random(caplog):
     tw = test.TestWorld()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     tree.add_behavior(
         "b:test:tick",
@@ -270,7 +272,7 @@ async def test_behavior_numbering_by_kind(caplog):
     tw = test.TestWorld()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     tree.add_behavior(
         "b:test:tick",
@@ -308,7 +310,7 @@ async def test_behavior_numbering_person_by_name(caplog):
     tw = test.TestWorld()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     tree.add_behavior(
         "b:test:tick",

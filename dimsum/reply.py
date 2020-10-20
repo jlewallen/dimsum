@@ -1,9 +1,15 @@
 from typing import List, Sequence, Any
+import logging
 import inflect
 import entity
 import game
+import things
+import envo
+import living
+import animals
 
 p = inflect.engine()
+log = logging.getLogger("dimsum")
 
 
 class Observable:
@@ -47,7 +53,7 @@ class ObservedEntity(Observable):
 
 
 class ObservedItem(ObservedEntity):
-    def __init__(self, item: game.Item):
+    def __init__(self, item: things.Item):
         super().__init__()
         self.item = item
 
@@ -62,28 +68,28 @@ class ObservedItem(ObservedEntity):
 
 
 class ObservedLiving(ObservedEntity):
-    def __init__(self, living: game.LivingCreature):
+    def __init__(self, alive: living.Alive):
         super().__init__()
-        self.living = living
-        self.activities: Sequence[game.Activity] = [
-            game.HoldingActivity(e) for e in living.holding
+        self.alive = alive
+        self.activities: Sequence[living.Activity] = [
+            living.HoldingActivity(e) for e in alive.holding
         ]
 
     @property
     def holding(self):
-        return self.living.holding
+        return self.alive.holding
 
     @property
     def memory(self):
-        return self.living.memory
+        return self.alive.memory
 
     def accept(self, visitor):
         return visitor.observed_living(self)
 
     def __str__(self):
         if len(self.activities) == 0:
-            return "%s" % (self.living,)
-        return "%s who is %s" % (self.living, p.join(list(map(str, self.activities))))
+            return "%s" % (self.alive,)
+        return "%s who is %s" % (self.alive, p.join(list(map(str, self.activities))))
 
     def __repr__(self):
         return str(self)
@@ -104,7 +110,7 @@ class ObservedPerson(ObservedLiving):
 
     @property
     def person(self):
-        return self.living
+        return self.alive
 
 
 class ObservedEntities(Observable):
@@ -123,7 +129,7 @@ class ObservedEntities(Observable):
 
 
 class PersonalObservation(Observation):
-    def __init__(self, who: game.Person):
+    def __init__(self, who: animals.Person):
         super().__init__()
         self.who = ObservedPerson(who)
 
@@ -185,10 +191,10 @@ class EntitiesObservation(Observation):
 
 
 class AreaObservation(Observation):
-    def __init__(self, area: game.Area, person: game.Person):
+    def __init__(self, area: envo.Area, person: animals.Person):
         super().__init__()
         self.who: ObservedPerson = ObservedPerson(person)
-        self.where: game.Area = area
+        self.where: envo.Area = area
         self.living: List[ObservedLiving] = flatten(
             [observe(e) for e in area.occupied if e != person]
         )
@@ -213,15 +219,15 @@ class AreaObservation(Observation):
 
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if isinstance(entity, game.Person):
+    if isinstance(entity, animals.Person):
         if entity.is_invisible:
             return []
         return [ObservedPerson(entity)]
-    if isinstance(entity, game.Animal):
+    if isinstance(entity, animals.Animal):
         if entity.is_invisible:
             return []
         return [ObservedAnimal(entity)]
-    if isinstance(entity, game.Item):
+    if isinstance(entity, things.Item):
         return [ObservedItem(entity)]
     raise Exception("unexpected observation target: %s" % (entity,))
 

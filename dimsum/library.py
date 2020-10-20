@@ -1,6 +1,9 @@
 import props
 import game
 import world
+import things
+import envo
+import animals
 import actions
 
 
@@ -11,7 +14,7 @@ class Factory:
 
 class Hammer(Factory):
     def create(self, world: world.World):
-        return game.Item(
+        return things.Item(
             creator=world,
             details=props.Details("Hammer", desc="It's heavy."),
         )
@@ -19,7 +22,7 @@ class Hammer(Factory):
 
 class BeerKeg(Factory):
     def create(self, world: world.World):
-        item = game.Item(
+        item = things.Item(
             creator=world,
             details=props.Details("Beer Keg", desc="It's heavy."),
         )
@@ -28,7 +31,7 @@ class BeerKeg(Factory):
 
 class LargeOakTree(Factory):
     def create(self, world: world.World):
-        item = game.Item(
+        item = things.Item(
             creator=world,
             details=props.Details("Large Oak Tree", desc="It's heavy."),
         )
@@ -50,7 +53,7 @@ end
 
 class WoodenLadder(Factory):
     def create(self, world: world.World):
-        item = game.Item(
+        item = things.Item(
             creator=world,
             details=props.Details("Wooden Ladder", desc="Seems sturdy enough."),
         )
@@ -59,7 +62,7 @@ class WoodenLadder(Factory):
 
 class TomorrowCat(Factory):
     def create(self, world: world.World):
-        animal = game.Animal(
+        animal = animals.Animal(
             creator=world,
             details=props.Details(
                 "Tomorrow", desc="She's a Maine Coon, and very elegant and pretty."
@@ -70,7 +73,7 @@ class TomorrowCat(Factory):
 
 class ArtistsLoft(Factory):
     def create(self, world: world.World):
-        area = game.Area(
+        area = envo.Area(
             creator=world,
             details=props.Details(
                 "Artist's loft",
@@ -82,7 +85,7 @@ class ArtistsLoft(Factory):
 
 class WelcomeArea(Factory):
     def create(self, world: world.World):
-        area = game.Area(
+        area = envo.Area(
             creator=world,
             details=props.Details("Living room", desc="It's got walls."),
         )
@@ -98,5 +101,5 @@ class WelcomeArea(Factory):
         return area
 
 
-def create_example_world(world: world.World) -> game.Area:
+def create_example_world(world: world.World) -> envo.Area:
     return WelcomeArea().create(world)

@@ -4,6 +4,7 @@ import logging
 import props
 import entity
 import game
+import things
 import world
 import reply
 import serializing
@@ -72,7 +73,7 @@ async def test_recipe_simple():
     await tw.initialize()
     await tw.execute("make IPA")
     await tw.execute("modify alcohol 100")
-    assert tw.player.holding[0].details["alcohol"] == 100
+    assert tw.player.holding[0].nutrition.properties["alcohol"] == 100
 
     assert len(tw.player.memory.keys()) == 0
     await tw.execute("call this Fancy IPA")
@@ -150,7 +151,7 @@ async def test_serialize():
     await tw.initialize()
 
     tree = tw.add_item(
-        game.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.get_kind("petals")

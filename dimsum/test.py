@@ -7,6 +7,9 @@ import props
 import grammar
 import game
 import world
+import envo
+import things
+import animals
 import actions
 import evaluator
 import luaproxy
@@ -19,18 +22,18 @@ class TestWorld:
     def __init__(self):
         self.bus = bus.EventBus()
         self.world = world.World(self.bus, luaproxy.context_factory)
-        self.jacob = game.Player(
+        self.jacob = animals.Player(
             creator=self.world,
             details=props.Details("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.area = game.Area(creator=self.player, details=props.Details("Living room"))
+        self.area = envo.Area(creator=self.player, details=props.Details("Living room"))
         self.world.register(self.area)
         self.l = grammar.create_parser()
 
     def add_simple_area_here(self, door, name):
-        door = game.Item(creator=self.player, details=props.Details(door))
-        area = game.Area(creator=self.player, details=props.Details(name))
+        door = things.Item(creator=self.player, details=props.Details(door))
+        area = envo.Area(creator=self.player, details=props.Details(name))
         door.link_area(area)
         self.area.add_item(door)
         self.world.register(door)
@@ -38,14 +41,14 @@ class TestWorld:
         return area
 
     async def add_carla(self):
-        self.carla = game.Player(
+        self.carla = animals.Player(
             creator=self.world,
             details=props.Details("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
-        self.tomi = game.Player(
+        self.tomi = animals.Player(
             creator=self.world,
             details=props.Details("Tomi", desc="Chief Crying Officer."),
         )

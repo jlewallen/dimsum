@@ -1,21 +1,23 @@
 import logging
 import props
-import area
+import envo
 
 
 log = logging.getLogger("dimsum")
 
 
 NutritionFields = [
-    props.SumFields("sugar"),
-    props.SumFields("fat"),
-    props.SumFields("protein"),
-    props.SumFields("toxicity"),
-    props.SumFields("caffeine"),
-    props.SumFields("alcohol"),
-    props.SumFields("nutrition"),
-    props.SumFields("vitamins"),
+    "sugar",
+    "fat",
+    "protein",
+    "toxicity",
+    "caffeine",
+    "alcohol",
+    "nutrition",
+    "vitamins",
 ]
+
+Fields = [props.SumFields(name) for name in NutritionFields]
 
 
 class Nutrition:
@@ -24,9 +26,7 @@ class Nutrition:
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):
-        changes = props.merge_dictionaries(
-            self.properties, other.properties, NutritionFields
-        )
+        changes = props.merge_dictionaries(self.properties, other.properties, Fields)
         log.info("merged %s" % (changes,))
         self.properties.update(changes)
 
@@ -50,12 +50,12 @@ class HealthMixin:
 
     async def consume(self, edible: EdibleMixin, area=None, ctx=None, **kwargs):
         self.medical.nutrition.include(edible.nutrition)
-
         await ctx.publish(ItemEaten(self, area, edible))
+        self.drop(edible)
 
 
 class ItemEaten:
-    def __init__(self, player, area: area.Area, item: EdibleMixin):
+    def __init__(self, player, area: envo.Area, item: EdibleMixin):
         super().__init__()
         self.player = player
         self.area = area
@@ -66,7 +66,7 @@ class ItemEaten:
 
 
 class ItemDrank:
-    def __init__(self, player, area: area.Area, item: EdibleMixin):
+    def __init__(self, player, area: envo.Area, item: EdibleMixin):
         self.player = player
         self.area = area
         self.item = item

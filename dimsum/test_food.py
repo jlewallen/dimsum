@@ -16,7 +16,7 @@ async def test_make_food():
     r = await tw.execute("eat steak")
     assert isinstance(r, reply.Success)
     assert len(tw.player.holding) == 0
-    assert tw.player.details["protein"] == 100
+    assert tw.player.medical.nutrition.properties["protein"] == 100
 
 
 @pytest.mark.asyncio
@@ -29,7 +29,7 @@ async def test_make_drinks():
     r = await tw.execute("drink ipa")
     assert isinstance(r, reply.Success)
     assert len(tw.player.holding) == 0
-    assert tw.player.details["alcohol"] == 100
+    assert tw.player.medical.nutrition.properties["alcohol"] == 100
 
 
 @pytest.mark.asyncio

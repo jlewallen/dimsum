@@ -7,11 +7,16 @@ import base64
 from context import *
 from reply import *
 from game import *
+from things import *
+from living import *
+from animals import *
+from events import *
 from world import *
 
 import props
 import hooks
 import movement
+import health
 import reply
 
 MemoryAreaKey = "m:area"
@@ -540,7 +545,10 @@ class ModifyField(PersonAction):
         self.value = value
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        self.item.details.set(self.field, self.value)
+        if self.field in health.NutritionFields:
+            self.item.nutrition.properties[self.field] = self.value
+        else:
+            self.item.details.set(self.field, self.value)
         return Success("done")
 
 

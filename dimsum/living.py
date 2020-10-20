@@ -24,14 +24,12 @@ class HoldingActivity(Activity):
         return str(self)
 
 
-class LivingCreature(
+class Alive(
     entity.Entity,
     occupyable.Living,
     carryable.CarryingMixin,
-    apparel.ApparelMixin,
     mechanics.VisibilityMixin,
     mechanics.MemoryMixin,
-    health.HealthMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -47,9 +45,6 @@ class LivingCreature(
         for e in self.holding:
             if e.describes(q):
                 return e
-        for e in self.wearing:
-            if e.describes(q):
-                return e
         return None
 
     def __str__(self):
@@ -57,17 +52,3 @@ class LivingCreature(
 
     def __repr__(self):
         return str(self)
-
-
-class Animal(LivingCreature):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.animal(self)
-
-
-class Person(LivingCreature):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.person(self)
-
-
-class Player(Person):
-    pass

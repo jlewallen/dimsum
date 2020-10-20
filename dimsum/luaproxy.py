@@ -3,11 +3,15 @@ from typing import Sequence
 import logging
 import lupa
 
+import props
 import entity
 import game
+import things
+import envo
 import world
+import living
+import animals
 import actions
-import props
 
 log = logging.getLogger("dimsum")
 
@@ -29,13 +33,13 @@ class LupaContext:
             return {key: self.wrap(value) for key, value in thing.items()}
         if isinstance(thing, world.World):
             return LupaWorld(self, thing)
-        if isinstance(thing, game.Person):
+        if isinstance(thing, animals.Person):
             return LupaPerson(self, thing)
-        if isinstance(thing, game.Animal):
+        if isinstance(thing, animals.Animal):
             return LupaAnimal(self, thing)
-        if isinstance(thing, game.Area):
+        if isinstance(thing, envo.Area):
             return LupaArea(self, thing)
-        if isinstance(thing, game.Item):
+        if isinstance(thing, things.Item):
             return LupaItem(self, thing)
         if isinstance(thing, entity.Entity):
             raise Exception(
@@ -78,7 +82,7 @@ class LupaEntity:
             return getattr(self.entity, key)
         return None
 
-    def make_item_from_table(self, table, **kwargs) -> game.Item:
+    def make_item_from_table(self, table, **kwargs) -> things.Item:
         log.info(
             "area:make: %s",
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
@@ -96,7 +100,7 @@ class LupaEntity:
         for key, value in table.items():
             details.map[key] = value
 
-        item = game.Item(details=details, quantity=quantity, kind=kind, **kwargs)
+        item = things.Item(details=details, quantity=quantity, kind=kind, **kwargs)
 
         return item
 
@@ -110,8 +114,8 @@ class LupaWorld(LupaEntity):
 
 class LupaArea(LupaEntity):
     @property
-    def area(self) -> game.Area:
-        assert isinstance(self.entity, game.Area)
+    def area(self) -> envo.Area:
+        assert isinstance(self.entity, envo.Area)
         return self.entity
 
     def number(self, of):
@@ -126,8 +130,8 @@ class LupaArea(LupaEntity):
 
 class LupaItem(LupaEntity):
     @property
-    def item(self) -> game.Item:
-        assert isinstance(self.entity, game.Item)
+    def item(self) -> things.Item:
+        assert isinstance(self.entity, things.Item)
         return self.entity
 
     def kind(self, name: str) -> entity.Kind:
@@ -154,13 +158,13 @@ class LupaLivingCreature(LupaEntity):
 
 class LupaPerson(LupaLivingCreature):
     @property
-    def person(self) -> game.Person:
-        assert isinstance(self.entity, game.Person)
+    def person(self) -> animals.Person:
+        assert isinstance(self.entity, animals.Person)
         return self.entity
 
 
 class LupaAnimal(LupaLivingCreature):
     @property
-    def animal(self) -> game.Animal:
-        assert isinstance(self.entity, game.Animal)
+    def animal(self) -> animals.Animal:
+        assert isinstance(self.entity, animals.Animal)
         return self.entity
