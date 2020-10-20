@@ -19,8 +19,8 @@ scripting = behavior.ScriptEngine()
 
 
 class World(entity.Entity, entity.Registrar):
-    def __init__(self, bus: bus.EventBus, context_factory):
-        super().__init__()
+    def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
+        super().__init__(**kwargs)
         self.details = props.Details("World", desc="Ya know, everything")
         self.key = "world"
         self.bus = bus

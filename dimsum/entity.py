@@ -133,8 +133,8 @@ class Entity(Finder):
 
 
 class Registrar:
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.entities: Dict[str, entity.Entity] = {}
         self.garbage: Dict[str, entity.Entity] = {}
 
