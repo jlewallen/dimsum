@@ -49,7 +49,7 @@ class SqliteDatabase:
             "private": entity.identity.private,
             "signature": entity.identity.signature,
         }
-        log.info("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
+        log.debug("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
         self.dbc.execute(
             "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
             [
@@ -104,14 +104,13 @@ class SqliteDatabase:
 
         cached: Dict[str, entity.Entity] = {}
         for key in rows.keys():
-            log.info("restoring: key=%s %s", key, rows[key][1])
+            log.debug("restoring: key=%s %s", key, rows[key][1])
             e = serializing.deserialize(rows[key][3], reference)
             assert isinstance(e, entity.Entity)
             world.register(e)
             cached[key] = e
 
         for key, baby_entity in refs.items():
-            log.info("resolve: %s", key)
             baby_entity.update(cached[key].__dict__)
 
         self.db.commit()

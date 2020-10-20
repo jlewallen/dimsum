@@ -52,7 +52,7 @@ class ContainingMixin:
         self.holding.remove(e)
         return e
 
-    def add_item(self, item: CarryableMixin) -> CarryableMixin:
+    def add_item(self, item: CarryableMixin, **kwargs) -> CarryableMixin:
         for h in self.holding:
             if item.kind.same(h.kind):
                 h.quantity += item.quantity

@@ -6,6 +6,8 @@ import occupyable
 import movement
 import mechanics
 
+log = logging.getLogger("dimsum")
+
 
 class Area(
     entity.Entity,

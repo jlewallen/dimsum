@@ -65,21 +65,22 @@ class World(entity.Entity, entity.Registrar):
     def resolve(self, keys):
         return [self.entities[key] for key in keys]
 
-    def add_area(self, area: envo.Area):
+    def add_area(self, area: envo.Area, depth=0):
         if area.key in self.entities:
+            log.debug("add-area:%d %s %s skip", depth, area.key, area)
             return
+        log.debug("add-area:%d %s %s", depth, area.key, area)
         self.register(area)
         for entity in area.entities():
             self.register(entity)
         for item in area.items:
             for linked in item.adjacent():
-                if False:
-                    log.info("linked: %s", linked)
-                self.add_area(cast(envo.Area, linked))
+                log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
+                self.add_area(cast(envo.Area, linked), depth=depth + 1)
         for linked in area.adjacent():
-            if False:
-                log.info("linked: %s", linked)
-            self.add_area(cast(envo.Area, linked))
+            log.debug("linked-adj[%d]: %s", depth, linked)
+            self.add_area(cast(envo.Area, linked), depth=depth + 1)
+        log.debug("area-done:%d %s", depth, area.key)
 
     def build_new_area(
         self,
