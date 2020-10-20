@@ -3,6 +3,7 @@ from typing import Optional, Dict, List, Sequence, cast
 import time
 import logging
 import entity
+import context
 import props
 import game
 import bus
@@ -116,7 +117,7 @@ class World(entity.Entity, entity.Registrar):
 
     async def perform(self, action, person: Optional[game.Person]):
         area = self.find_player_area(person) if person else None
-        ctx = Ctx(self.context_factory, world=self, person=person, area=area)
+        ctx = WorldCtx(self.context_factory, world=self, person=person, area=area)
         return await action.perform(ctx, self, person)
 
     async def tick(self, now: Optional[float] = None):
@@ -132,7 +133,7 @@ class World(entity.Entity, entity.Registrar):
             if len(behaviors) > 0:
                 log.info("tick: %s", entity)
                 area = self.find_entity_area(entity)
-                ctx = Ctx(
+                ctx = WorldCtx(
                     self.context_factory, world=self, area=area, entity=entity, **kwargs
                 )
                 await ctx.hook(name)
@@ -144,7 +145,7 @@ class World(entity.Entity, entity.Registrar):
         return "$world"
 
 
-class Ctx:
+class WorldCtx(context.Ctx):
     # This should eventually get worked out. Just return Ctx from this function?
     def __init__(
         self, context_factory, world: World = None, person: game.Person = None, **kwargs
@@ -157,7 +158,7 @@ class Ctx:
         self.person = person
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
 
-    def extend(self, **kwargs) -> "Ctx":
+    def extend(self, **kwargs) -> "WorldCtx":
         self.scope = self.scope.extend(**kwargs)
         return self
 
@@ -173,6 +174,12 @@ class Ctx:
             return []
 
         return get_entities_inside(self.scope.values())
+
+    def registry(self) -> entity.Registrar:
+        raise NotImplementedError
+
+    async def publish(self, **kwargs):
+        raise NotImplementedError
 
     async def hook(self, name: str) -> None:
         found = {}

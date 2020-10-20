@@ -4,6 +4,7 @@ import os
 import hashlib
 import base64
 
+from context import *
 from reply import *
 from game import *
 from world import *
