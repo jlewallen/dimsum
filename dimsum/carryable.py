@@ -52,17 +52,20 @@ class ContainingMixin:
         self.holding.remove(e)
         return e
 
+    def hold(self, item: CarryableMixin, quantity: int = None, **kwargs):
+        return self.add_item(item, **kwargs)
+
     def add_item(self, item: CarryableMixin, **kwargs) -> CarryableMixin:
-        for h in self.holding:
-            if item.kind.same(h.kind):
-                h.quantity += item.quantity
+        for already in self.holding:
+            if item.kind.same(already.kind):
+                already.quantity += item.quantity
 
                 # We return, which skips the append to holding below,
                 # and that has the effect of obliterating the item we
                 # picked up, merging with the one in our hands.
-                return h
+                return already
 
-        self.holding.append(item)
+        self.holding.append(item.ref())
         return item
 
     def find(self, q: str) -> Optional[CarryableMixin]:
@@ -82,22 +85,6 @@ class ContainingMixin:
 
     def is_holding(self, item: CarryableMixin):
         return item in self.holding
-
-    def hold(self, item: CarryableMixin, quantity: int = None):
-        # See if there's a kind already in inventory.
-        for already in self.holding:
-            if item.kind.same(already.kind):
-                # This will probably need more protection haha
-                already.quantity += item.quantity
-                already.touch()
-
-                # We return, which skips the append to containing below,
-                # and that has the effect of obliterating the item we
-                # picked up, merging with the one in our hands.
-                return already
-        self.holding.append(item)
-        item.touch()
-        return item
 
     def drop_here(
         self,
