@@ -6,8 +6,21 @@ import logging
 import props
 import behavior
 import crypto
+import wrapt
 
 log = logging.getLogger("dimsum")
+
+
+class EntityRef(wrapt.ObjectProxy):
+    def __init__(self, targetOrKey: Union["Entity", str]):
+        # If we've been given a key, then we're deserializing and use
+        # a dummy target for the wrapped instance. Then, when we're
+        # all done we fix these up.
+        if isinstance(targetOrKey, str):
+            super().__init__(object())
+        else:
+            super().__init__(targetOrKey)
+
 
 # TODO Move this
 class EntityVisitor:

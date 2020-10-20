@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, cast
 import logging
 import props
 import entity
@@ -50,6 +50,14 @@ class Area(
         other_area = item.require_single_linked_area  # type: ignore
         other_area.add_item(copy)
         return self, other_area
+
+    def adjacent(self) -> List[movement.Area]:
+        # This is here instead of in movement because we access
+        # `self.holding` I think once we have a mechanism to
+        # optionally get associated entities this will be ok.
+        via_routes = super().adjacent()
+        via_items = [r.area for r in flatten([e.routes for e in self.holding])]
+        return [a for a in flatten([via_routes, via_items])]
 
     def __str__(self):
         return self.details.name

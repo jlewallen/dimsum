@@ -1,5 +1,6 @@
 from typing import Dict, Any
 import jsonpickle
+import wrapt
 import logging
 import crypto
 import entity
@@ -55,7 +56,7 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-class SecureUnpickler(jsonpickle.pickler.Pickler):
+class SecurePickler(jsonpickle.pickler.Pickler):
     def __init__(self, secure=False, **kwargs):
         super().__init__()
         self.secure = secure
@@ -99,7 +100,7 @@ def serialize(value, indent=None, unpicklable=True, secure=False):
     prepared = serialize_full(value)
     return jsonpickle.encode(
         prepared,
-        context=SecureUnpickler(secure=secure),
+        context=SecurePickler(secure=secure),
         indent=indent,
         unpicklable=unpicklable,
         make_refs=False,
@@ -133,19 +134,51 @@ def restore(world: world.World, rows: Dict[str, Any]):
     def reference(key):
         if key is None:
             return world
-        if key in refs:
-            return refs[key]
-        refs[key] = {"key": key}
+        if key not in refs:
+            refs[key] = entity.EntityRef(key)
         return refs[key]
 
-    cached: Dict[str, entity.Entity] = {}
+    entities: Dict[str, entity.Entity] = {}
     for key in rows.keys():
         e = deserialize(rows[key], reference)
         assert isinstance(e, entity.Entity)
         world.register(e)
-        cached[key] = e
+        entities[key] = e
 
     for key, baby_entity in refs.items():
-        baby_entity.update(cached[key].__dict__)
+        baby_entity.__wrapped__ = entities[key]  # type: ignore
 
-    return cached
+    return entities
+
+
+"""
+Graveyard for failed approaches. Keeping around just in case.
+
+@jsonpickle.handlers.register(entity.EntityRef)
+class EntityRefHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        log.info("entityref: restore")
+        return self.context.lookup(obj["key"])
+
+    def flatten(self, obj, data):
+        log.info("entityref: flatten")
+        data["key"] = obj.key
+        data["kind"] = obj.__class__.__name__
+        data["name"] = obj.details.name
+        return data
+
+https://docs.python.org/3/library/pickle.html#object.__reduce__
+https://www.slideshare.net/GrahamDumpleton/hear-no-evil-see-no-evil-patch-no-evil-or-how-to-monkeypatch-safely
+http://blog.dscpl.com.au/2018/01/the-pattern-versus-python-package.html
+https://readthedocs.org/projects/wrapt/downloads/pdf/latest/
+
+@wrapt.patch_function_wrapper("entity", "EntityRef.__reduce_ex__")
+def entity_ref_reduce_ex_wrapper(wrapped, instance, args, kwargs):
+    log.info("%s, %s %s %s", instance.key, instance, args, kwargs)
+
+    return (
+        entity.EntityRef,
+        (instance.key,),
+    )
+
+"""

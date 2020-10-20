@@ -65,7 +65,7 @@ class ContainingMixin:
                 # picked up, merging with the one in our hands.
                 return already
 
-        self.holding.append(item.ref())
+        self.holding.append(item)
         return item
 
     def find(self, q: str) -> Optional[CarryableMixin]:
