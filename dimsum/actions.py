@@ -291,11 +291,9 @@ class Eat(PersonAction):
             return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        world.unregister(self.item)
-        player.drop(self.item)
-        self.item.consumed(player)
-        await world.bus.publish(ItemEaten(player, area, self.item))
+        await player.consume(self.item, area=area, registrar=world, bus=world.bus)
         await ctx.extend(eat=self.item).hook("eat:after")
+
         return Success("you ate %s" % (self.item))
 
 
@@ -312,11 +310,9 @@ class Drink(PersonAction):
             return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        world.unregister(self.item)
-        player.drop(self.item)
-        self.item.consumed(player)
-        await world.bus.publish(ItemDrank(player, area, self.item))
-        await ctx.extend(drink=self.item).hook("drink:after")
+        await player.consume(self.item, area=area, registrar=world, bus=world.bus)
+        await ctx.extend(eat=self.item).hook("drink:after")
+
         return Success("you drank %s" % (self.item))
 
 

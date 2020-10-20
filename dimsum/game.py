@@ -11,7 +11,7 @@ import behavior
 import mechanics
 import occupyable
 import carryable
-import edible
+import health
 import movement
 import apparel
 
@@ -23,10 +23,6 @@ class Event:
     pass
 
 
-class Activity:
-    pass
-
-
 class Item(
     entity.Entity,
     apparel.Wearable,
@@ -34,7 +30,7 @@ class Item(
     mechanics.InteractableMixin,
     movement.MovementMixin,
     mechanics.VisibilityMixin,
-    edible.EdibleMixin,
+    health.EdibleMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -123,109 +119,13 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
         return visitor.recipe(self)
 
 
-class HoldingActivity(Activity):
-    def __init__(self, item: Item):
-        super().__init__()
-        self.item = item
-
-    def __str__(self):
-        return "holding %s" % (self.item,)
-
-    def __repr__(self):
-        return str(self)
-
-
-class LivingCreature(
-    entity.Entity,
-    occupyable.Living,
-    carryable.CarryingMixin,
-    apparel.ApparelMixin,
-    mechanics.VisibilityMixin,
-    mechanics.MemoryMixin,
-):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @property
-    def quantity(self):
-        return 1
-
-    def describes(self, q: str) -> bool:
-        return q.lower() in self.details.name.lower()
-
-    def find(self, q: str) -> Optional[carryable.CarryableMixin]:
-        for e in self.holding:
-            if e.describes(q):
-                return e
-        for e in self.wearing:
-            if e.describes(q):
-                return e
-        return None
-
-    def __str__(self):
-        return self.details.name
-
-    def __repr__(self):
-        return str(self)
-
-
-class Animal(LivingCreature):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.animal(self)
-
-
-class Person(LivingCreature):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.person(self)
-
-
-class Player(Person):
-    pass
-
-
-class Area(
-    entity.Entity,
-    carryable.ContainingMixin,
-    occupyable.OccupyableMixin,
-    movement.MovementMixin,
-    movement.Area,
-    mechanics.Memorable,
-):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @property
-    def items(self):
-        return self.holding
-
-    def entities(self) -> List[entity.Entity]:
-        return flatten([self.holding, self.occupied])
-
-    def entities_named(self, of: str):
-        return [e for e in self.entities() if e.describes(of)]
-
-    def entities_of_kind(self, kind: entity.Kind):
-        return [e for e in self.entities() if e.kind and e.kind.same(kind)]
-
-    def number_of_named(self, of: str) -> int:
-        return sum([e.quantity for e in self.entities_named(of)])
-
-    def number_of_kind(self, kind: entity.Kind) -> int:
-        return sum([e.quantity for e in self.entities_of_kind(kind)])
-
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.area(self)
-
-    def __str__(self):
-        return self.details.name
-
-    def __repr__(self):
-        return str(self)
-
-
 class Action:
     def __init__(self, **kwargs):
         super().__init__()
+
+
+from living import *
+from area import *
 
 
 class PlayerJoined(Event):
@@ -278,27 +178,6 @@ class ItemMade(Event):
         return "%s created %s out of thin air!" % (self.player, self.item)
 
 
-class ItemEaten(Event):
-    def __init__(self, player: Player, area: Area, item: Item):
-        super().__init__()
-        self.player = player
-        self.area = area
-        self.item = item
-
-    def __str__(self):
-        return "%s just ate %s!" % (self.player, self.item)
-
-
-class ItemDrank(Event):
-    def __init__(self, player: Player, area: Area, item: Item):
-        self.player = player
-        self.area = area
-        self.item = item
-
-    def __str__(self):
-        return "%s just drank %s!" % (self.player, self.item)
-
-
 class ItemsDropped(Event):
     def __init__(self, player: Player, area: Area, items: List[Item]):
         super().__init__()
@@ -319,10 +198,6 @@ class ItemObliterated(Event):
 
     def __str__(self):
         return "%s obliterated %s" % (self.player, self.item)
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]
 
 
 def remove_nones(l):
