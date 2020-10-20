@@ -3,6 +3,7 @@ from typing import List, Tuple, Dict, Sequence, Optional
 import logging
 import abc
 import entity
+import context
 
 log = logging.getLogger("dimsum")
 
@@ -32,7 +33,7 @@ class CarryableMixin:
         pass
 
     @abc.abstractmethod
-    def separate(self, quantity: int, registrar: entity.Registrar = None, **kwargs):
+    def separate(self, quantity: int, ctx: context.Ctx = None, **kwargs):
         pass
 
 
@@ -100,7 +101,7 @@ class ContainingMixin:
         area: "ContainingMixin",
         item: CarryableMixin = None,
         quantity: int = None,
-        registrar: entity.Registrar = None,
+        ctx: context.Ctx = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
@@ -114,10 +115,10 @@ class ContainingMixin:
             if quantity > item.quantity or quantity < 1:
                 return None, "you should check how many you have"
 
-            dropped = item.separate(quantity, registrar=registrar, **kwargs)
+            dropped = item.separate(quantity, ctx=ctx, **kwargs)
             if item.quantity == 0:
-                assert registrar
-                registrar.unregister(item)
+                assert ctx
+                ctx.registrar().unregister(item)
                 self.drop(item)
         else:
             if item:
@@ -128,8 +129,8 @@ class ContainingMixin:
         for item in dropped:
             after_add = area.add_item(item)
             if after_add != item:
-                assert registrar
-                registrar.unregister(item)
+                assert ctx
+                ctx.registrar().unregister(item)
 
         return dropped, None
 

@@ -5,11 +5,11 @@ import entity
 
 class Ctx:
     @abc.abstractmethod
-    def registry(self) -> entity.Registrar:
+    def registrar(self) -> entity.Registrar:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def publish(self, **kwargs):
+    async def publish(self, *args, **kwargs):
         raise NotImplementedError
 
     @abc.abstractmethod

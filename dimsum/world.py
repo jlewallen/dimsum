@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List, Sequence, cast
+from typing import Any, Optional, Dict, List, Sequence, cast
 
 import time
 import logging
@@ -175,11 +175,12 @@ class WorldCtx(context.Ctx):
 
         return get_entities_inside(self.scope.values())
 
-    def registry(self) -> entity.Registrar:
-        raise NotImplementedError
+    def registrar(self) -> entity.Registrar:
+        return self.world
 
-    async def publish(self, **kwargs):
-        raise NotImplementedError
+    async def publish(self, *args, **kwargs):
+        for arg in args:
+            await self.world.bus.publish(arg)
 
     async def hook(self, name: str) -> None:
         found = {}

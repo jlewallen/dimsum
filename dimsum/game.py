@@ -7,6 +7,7 @@ import abc
 import crypto
 import props
 import entity
+import context
 import behavior
 import mechanics
 import occupyable
@@ -44,9 +45,9 @@ class Item(
         return False
 
     def separate(
-        self, quantity: int, registrar: entity.Registrar = None, **kwargs
+        self, quantity: int, ctx: context.Ctx = None, **kwargs
     ) -> List["Item"]:
-        assert registrar
+        assert ctx
         self.decrease_quantity(quantity)
         item = Item(
             kind=self.kind,
@@ -56,7 +57,7 @@ class Item(
             **kwargs
         )
         # TODO Move to caller
-        registrar.register(item)
+        ctx.registrar().register(item)
         return [item]
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:

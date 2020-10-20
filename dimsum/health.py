@@ -48,12 +48,10 @@ class HealthMixin:
         super().__init__(**kwargs)  # type: ignore
         self.medical = medical if medical else Medical()
 
-    async def consume(
-        self, edible: EdibleMixin, area=None, registrar=None, bus=None, **kwargs
-    ):
+    async def consume(self, edible: EdibleMixin, area=None, ctx=None, **kwargs):
         self.medical.nutrition.include(edible.nutrition)
 
-        await bus.publish(ItemEaten(self, area, edible))
+        await ctx.publish(ItemEaten(self, area, edible))
 
 
 class ItemEaten:

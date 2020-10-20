@@ -292,7 +292,7 @@ class Eat(PersonAction):
             return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        await player.consume(self.item, area=area, registrar=world, bus=world.bus)
+        await player.consume(self.item, area=area, ctx=ctx)
         await ctx.extend(eat=self.item).hook("eat:after")
 
         return Success("you ate %s" % (self.item))
@@ -311,7 +311,7 @@ class Drink(PersonAction):
             return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        await player.consume(self.item, area=area, registrar=world, bus=world.bus)
+        await player.consume(self.item, area=area, ctx=ctx)
         await ctx.extend(eat=self.item).hook("drink:after")
 
         return Success("you drank %s" % (self.item))
@@ -379,7 +379,7 @@ class Drop(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         dropped, failure = player.drop_here(
-            area, self.item, quantity=self.quantity, registrar=world, creator=player
+            area, self.item, quantity=self.quantity, creator=player, ctx=ctx
         )
         if dropped:
             area = world.find_player_area(player)
@@ -404,7 +404,7 @@ class Hold(PersonAction):
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = self.item.separate(self.quantity, registrar=world, creator=player)
+            removed = self.item.separate(self.quantity, creator=player, ctx=ctx)
             if self.item.quantity == 0:
                 world.unregister(self.item)
                 area.remove(self.item)
