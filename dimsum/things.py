@@ -103,8 +103,7 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
         self.template = template.clone()
 
     def create_item(self, **kwargs) -> Item:
-        # TODO Also sign with the recipe
-        log.info("recipe:creating %s %s", self.template, kwargs)
+        log.info("recipe:creating %s %s (todo:sign)", self.template, kwargs)
         return self.template.clone(**kwargs)
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:

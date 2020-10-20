@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Sequence, Optional
+from typing import List, Tuple, Dict, Sequence, Optional, Union
 
 import logging
 import abc
@@ -35,6 +35,9 @@ class CarryableMixin:
     @abc.abstractmethod
     def separate(self, quantity: int, ctx: context.Ctx = None, **kwargs):
         pass
+
+
+CarryableType = Union[entity.Entity, CarryableMixin]
 
 
 class ContainingMixin:

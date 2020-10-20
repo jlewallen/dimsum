@@ -71,6 +71,8 @@ class TestWorld:
         tree = self.l.parse(command)
         log.info("parsed: %s" % (tree,))
         action = evaluator.create(self.world, self.player).transform(tree)
+        assert action
+        assert isinstance(action, game.Action)
         response = await self.world.perform(action, self.player)
         log.info("response: %s" % (response,))
         return response

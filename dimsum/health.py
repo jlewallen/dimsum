@@ -1,7 +1,9 @@
+from typing import cast
 import logging
 import props
 import envo
-
+import living
+import carryable
 
 log = logging.getLogger("dimsum")
 
@@ -34,13 +36,14 @@ class Nutrition:
 class Medical:
     def __init__(self, nutrition: Nutrition = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
-        self.nutrition = nutrition if nutrition else Nutrition()
+        self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
 class EdibleMixin:
-    def __init__(self, nutrition: Nutrition = None, **kwargs):
+    def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
         super().__init__(**kwargs)  # type: ignore
-        self.nutrition = nutrition if nutrition else Nutrition()
+        self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
+        self.servings: int = servings
 
 
 class HealthMixin:
@@ -48,10 +51,17 @@ class HealthMixin:
         super().__init__(**kwargs)  # type: ignore
         self.medical = medical if medical else Medical()
 
+    @property
+    def alive(self) -> living.Alive:
+        return cast(living.Alive, self)
+
     async def consume(self, edible: EdibleMixin, area=None, ctx=None, **kwargs):
         self.medical.nutrition.include(edible.nutrition)
+        edible.servings -= 1
+        if edible.servings == 0:
+            self.alive.drop(edible)  # type: ignore
+            edible.destroy()  # type:ignore
         await ctx.publish(ItemEaten(self, area, edible))
-        self.drop(edible)
 
 
 class ItemEaten:

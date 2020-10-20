@@ -1,5 +1,4 @@
 from typing import Sequence
-
 import logging
 import lupa
 

@@ -179,6 +179,17 @@ class Evaluate(lark.Transformer):
             return recipe.invoke(self.player)
         return game.Item(creator=self.player, details=game.Details(name))
 
+    def modify_servings(self, args):
+        area = self.world.find_player_area(self.player)
+        if len(self.player.holding) == 0:
+            if area.creator != self.player:
+                raise game.NotHoldingAnything(
+                    "you're not holding anything and you don't own this area"
+                )
+        else:
+            item = self.player.holding[0]
+        return actions.ModifyServings(item=item, number=args[0])
+
     def modify_field(self, args):
         area = self.world.find_player_area(self.player)
         item = area

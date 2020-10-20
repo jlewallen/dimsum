@@ -567,9 +567,14 @@ class ModifyActivity(PersonAction):
         return Success("done")
 
 
-class Tick(Action):
-    def __init__(self, time=None, **kwargs):
-        self.time = time
+class ModifyServings(PersonAction):
+    def __init__(self, item=None, number=None, **kwargs):
+        super().__init__(**kwargs)
+        self.item = item
+        self.number = number
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        return None
+        if False:
+            return Failure("nothing to modify")
+        self.item.servings = self.number
+        return Success("done")

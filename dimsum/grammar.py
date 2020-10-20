@@ -87,6 +87,7 @@ def create_parser():
 
         modify:            "modify" TEXT_FIELD text                -> modify_field
                          | "modify" NUMERIC_FIELD number           -> modify_field
+                         | "modify" "servings" number              -> modify_servings
                          | "modify" "when" "worn"                  -> when_worn
                          | "modify" "when" "opened"                -> when_opened
                          | "modify" "when" "eaten"                 -> when_eaten

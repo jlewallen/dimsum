@@ -18,8 +18,8 @@ class HealthyAndClothedAnimal(
         e = super().find(q)
         if e:
             return e
-        for e in self.wearing:
-            if e.describes(q):
+        for e in self.wearing:  # type: ignore
+            if e and e.describes(q):  # type: ignore
                 return e
         return None
 

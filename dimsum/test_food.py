@@ -53,12 +53,37 @@ async def test_try_drink():
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="todo")
 async def test_taking_multiple_bites():
-    pass
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Cake")
+    await tw.execute("modify when eaten")
+    await tw.execute("modify servings 2")
+    r = await tw.execute("eat cake")
+    assert isinstance(r, reply.Success)
+    assert len(tw.player.holding) == 1
+    r = await tw.execute("eat cake")
+    assert isinstance(r, reply.Success)
+    assert len(tw.player.holding) == 0
+
+
+@pytest.mark.asyncio
+async def test_taking_multiple_sips():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make IPA")
+    await tw.execute("modify when drank")
+    await tw.execute("modify alcohol 100")
+    await tw.execute("modify servings 2")
+    r = await tw.execute("drink ipa")
+    assert isinstance(r, reply.Success)
+    assert len(tw.player.holding) == 1
+    r = await tw.execute("drink ipa")
+    assert isinstance(r, reply.Success)
+    assert len(tw.player.holding) == 0
 
 
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="todo")
-async def test_taking_multiple_sips():
+async def test_modifying_servings_on_unedible_things():
     pass
