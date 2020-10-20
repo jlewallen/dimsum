@@ -98,6 +98,7 @@ async def test_look_empty():
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 0
+    assert len(r.routes) == 0
 
 
 @pytest.mark.asyncio

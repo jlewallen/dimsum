@@ -7,6 +7,7 @@ import things
 import envo
 import living
 import animals
+import movement
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -193,6 +194,8 @@ class EntitiesObservation(Observation):
 class AreaObservation(Observation):
     def __init__(self, area: envo.Area, person: animals.Person):
         super().__init__()
+        assert area
+        assert person
         self.who: ObservedPerson = ObservedPerson(person)
         self.where: envo.Area = area
         self.living: List[ObservedLiving] = flatten(
@@ -201,6 +204,7 @@ class AreaObservation(Observation):
         self.items: List[ObservedEntity] = flatten(
             [observe(e) for e in area.holding if e]
         )
+        self.routes: List[movement.AreaRoute] = area.routes
 
     @property
     def details(self):
