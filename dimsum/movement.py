@@ -80,7 +80,8 @@ class MovementMixin:
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
         self.routes.append(route)
-        log.info("new route: %s", self.routes)
+        if False:
+            log.info("new route: %s", self.routes)
         return route
 
     def move_with(self, area, person, builder: AreaBuilder, **kwargs):

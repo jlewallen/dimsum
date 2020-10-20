@@ -10,6 +10,7 @@ import props
 import game
 import bus
 import world
+import animals
 import reply
 import library
 import persistence
@@ -69,8 +70,8 @@ class EmbedObservationVisitor:
     def area_observation(self, obs):
         emd = obs.details.desc
         emd += "\n\n"
-        if len(obs.people) > 0:
-            emd += "Also here: " + p.join([str(x) for x in obs.people])
+        if len(obs.living) > 0:
+            emd += "Also here: " + p.join([str(x) for x in obs.living])
             emd += "\n"
         if len(obs.items) > 0:
             emd += "You can see " + p.join([str(x) for x in obs.items])
@@ -401,7 +402,7 @@ modify when eaten
                 raise Exception("no player")
             return player
 
-        player = game.Player(
+        player = animals.Player(
             key=key,
             creator=self.world,
             details=props.Details(author.name, desc="A discord user"),

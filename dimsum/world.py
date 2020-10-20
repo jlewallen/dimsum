@@ -66,13 +66,20 @@ class World(entity.Entity, entity.Registrar):
         return [self.entities[key] for key in keys]
 
     def add_area(self, area: envo.Area):
+        if area.key in self.entities:
+            return
         self.register(area)
         for entity in area.entities():
             self.register(entity)
         for item in area.items:
             for linked in item.adjacent():
-                log.info("linked: %s", linked)
+                if False:
+                    log.info("linked: %s", linked)
                 self.add_area(cast(envo.Area, linked))
+        for linked in area.adjacent():
+            if False:
+                log.info("linked: %s", linked)
+            self.add_area(cast(envo.Area, linked))
 
     def build_new_area(
         self,
