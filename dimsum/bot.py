@@ -19,6 +19,7 @@ import evaluator
 import actions
 import events
 import luaproxy
+import movement
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.discord")
