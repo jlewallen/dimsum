@@ -3,18 +3,18 @@ SHELL := /bin/bash
 default: checks test
 
 checks: env
-	env/bin/mypy *.py --ignore-missing-imports
+	env/bin/mypy dimsum/*.py --ignore-missing-imports
 
 clean:
 	rm -rf env
 	rm -rf web/node_modules
 
 run:
-	env/bin/python3 dimsum.py
+	env/bin/python3 dimsum/dimsum.py
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/python3 -m pytest test_*.py
+	env/bin/python3 -m pytest dimsum/test_*.py
 
 prettier: env
 	python3 -m black .
@@ -22,7 +22,9 @@ prettier: env
 env:
 	python3 -m venv env
 	source env/bin/activate && pip3 install -r requirements.txt
+	echo
 	echo remember to source env/bin/activate
+	echo
 
 freeze:
 	pip3 freeze > requirements.txt
