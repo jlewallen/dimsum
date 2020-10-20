@@ -372,7 +372,11 @@ class Look(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
             return reply.DetailedObservation(reply.ObservedItem(self.item))
-        return reply.AreaObservation(world.find_player_area(player), player)
+        log.info("person: %s %s", player.key, player)
+
+        area = world.find_player_area(player)
+        assert area
+        return reply.AreaObservation(area, player)
 
 
 class Drop(PersonAction):

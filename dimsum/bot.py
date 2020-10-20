@@ -79,6 +79,13 @@ class EmbedObservationVisitor:
         if len(obs.who.holding) > 0:
             emd += "You're holding " + p.join([str(x) for x in obs.who.holding])
             emd += "\n"
+        directional = [
+            e for e in obs.routes if isinstance(e, movement.DirectionalRoute)
+        ]
+        if len(directional) > 0:
+            directions = [d.direction for d in directional]
+            emd += "You can go " + p.join(directions)
+            emd += "\n"
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
     def item(self, item):
