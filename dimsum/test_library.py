@@ -21,6 +21,8 @@ async def test_library(caplog):
 
     tw.world.add_area(library.create_example_world(tw.world))
 
+    await tw.world.tick()
+
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
     await db.purge()
@@ -30,4 +32,4 @@ async def test_library(caplog):
     await db.load(empty)
     await db.save(empty)
 
-    assert await db.number_of_entities() == 21
+    assert await db.number_of_entities() == 28

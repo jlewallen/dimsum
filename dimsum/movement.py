@@ -72,6 +72,10 @@ class MovementMixin:
                 return r
         return None
 
+    @property
+    def require_single_linked_area(self):
+        return self.adjacent()[0]
+
     def adjacent(self) -> List[Area]:
         return [r.area for r in self.routes]
 

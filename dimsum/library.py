@@ -1,3 +1,4 @@
+import logging
 import props
 import game
 import world
@@ -6,6 +7,8 @@ import envo
 import animals
 import actions
 import movement
+
+log = logging.getLogger("dimsum")
 
 
 class Factory:
@@ -65,6 +68,38 @@ class MysteriousBox(Factory):
             "b:mystery:shake",
             lua="""
 function(s, world, area, item)
+end
+""",
+        )
+        return item
+
+
+class LargeSteepCliff(Factory):
+    def create(self, world: world.World):
+        item = things.Item(
+            creator=world,
+            details=props.Details(
+                "Large Steep Cliff",
+                desc="It's immense, with rocky outcroppings. It looks very climbable.",
+            ),
+        )
+        item.add_behavior(
+            "b:make:stone",
+            lua="""
+function(s, world, area, item)
+    if math.random() > 0.7 then
+        return area.make({
+            kind = item.kind("stone-1"),
+            name = "Heavy Stone",
+            quantity = 1,
+        })
+    end
+
+    return area.make({
+        kind = item.kind("pebble-1"),
+        name = "Pebble",
+        quantity = 3,
+    })
 end
 """,
         )
@@ -182,6 +217,22 @@ class MarbleSteps(Factory):
         return item
 
 
+class AddItemRoute:
+    def __init__(self, world=None, **kwargs):
+        assert world
+        self.world = world
+        self.kwargs = kwargs
+
+    def area(self, **kwargs):
+        self.area = envo.Area(creator=self.world, **kwargs)
+        return self
+
+    def via(self, **kwargs):
+        self.item = things.Item(creator=self.world, **kwargs)
+        self.item.link_area(self.area)
+        return self.item
+
+
 class WelcomeArea(Factory):
     def create(self, world: world.World):
         area = envo.Area(
@@ -193,17 +244,25 @@ class WelcomeArea(Factory):
         area.add_item(Hammer().create(world))
         area.add_item(MysteriousBox().create(world))
         area.add_item(Guitar().create(world))
+        area.add_item(LargeSteepCliff().create(world))
         area.add_living(TomorrowCat().create(world))
-
-        museum = Museum().create(world)
-        steps = MarbleSteps().create(world)
-        steps.link_area(museum)
-        area.add_item(steps)
 
         loft = ArtistsLoft().create(world)
         ladder = WoodenLadder().create(world)
         ladder.link_area(loft)
-        area.add_item(ladder)
+        area.add_item_and_link_back(ladder)
+
+        _, clearing = area.add_item_and_link_back(
+            AddItemRoute(world)
+            .area(details=props.Details("A small clearing."))
+            .via(details=props.Details("Worn Path"))
+        )
+
+        museum = Museum().create(world)
+        steps = MarbleSteps().create(world)
+        steps.link_area(museum)
+        clearing.add_item_and_link_back(steps)
+
         return area
 
 

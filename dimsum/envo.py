@@ -42,6 +42,15 @@ class Area(
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
+    def add_item_and_link_back(self, item: carryable.CarryableMixin):
+        self.add_item(item)
+        copy = item.clone(key=None, identity=None, routes=[])  # type: ignore
+        copy.link_area(self)
+        other_area = item.require_single_linked_area  # type: ignore
+        other_area.add_item(copy)
+        log.info("link-back")
+        return self, other_area
+
     def __str__(self):
         return self.details.name
 
