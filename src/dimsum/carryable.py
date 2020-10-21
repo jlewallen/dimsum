@@ -8,6 +8,18 @@ import context
 log = logging.getLogger("dimsum")
 
 
+class KeyMixin:
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        pass
+
+
+class LockableMixin:
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        pass
+
+
 class CarryableMixin:
     def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
@@ -40,7 +52,7 @@ class CarryableMixin:
 CarryableType = Union[entity.Entity, CarryableMixin]
 
 
-class ContainingMixin:
+class ContainingMixin(LockableMixin):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
         self.holding = holding if holding else []

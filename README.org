@@ -1,4 +1,9 @@
 * DimSum
+** TODO Pass mixin collection to Item/Entities for construction?
+
+   They would have access to things.Item?
+
+** TODO Depend on carryable for dropping worn items?
 ** TODO Distance effects.
 
    N-Hops aways, etc...
