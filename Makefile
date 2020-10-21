@@ -3,18 +3,18 @@ SHELL := /bin/bash
 default: checks test
 
 checks: env
-	env/bin/mypy dimsum/*.py --ignore-missing-imports
+	env/bin/mypy src/dimsum/*.py --ignore-missing-imports
 
 clean:
 	rm -rf env
-	rm -rf web/node_modules
+	rm -rf src/web/node_modules
 
 run:
-	env/bin/python3 dimsum/dimsum.py
+	env/bin/python3 src/dimsum/dimsum.py
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/python3 -m pytest dimsum/test_*.py
+	env/bin/python3 -m pytest src/dimsum/test_*.py
 
 prettier: env
 	python3 -m black .
@@ -29,14 +29,14 @@ env:
 freeze:
 	pip3 freeze > requirements.txt
 
-web/src/config:
+src/web/src/config:
 	cp web/src/config.ts.dev web/src/config.ts
 
-web/node_modules:
+src/web/node_modules:
 	cd web && yarn install
 
-web: web/node_modules web/src/config
-	cd web && yarn serve
+web: src/web/node_modules web/src/config
+	cd src/web && yarn serve
 
 image:
 	docker build -t jlewallen/dimsum .
@@ -45,7 +45,7 @@ image-test:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 jlewallen/dimsum
 
 prod-image:
-	cp web/src/config.ts.prod web/src/config.ts
+	cp src/web/src/config.ts.prod src/web/src/config.ts
 	docker build -t jlewallen/dimsum .
 
 prod-server:
