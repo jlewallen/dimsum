@@ -53,8 +53,8 @@ def create_parser():
                          | "hold" number unheld_noun               -> hold_quantity
 
         drop:              "drop"                                  -> drop
-                         | "drop" number noun                      -> drop_quantity
-                         | "drop" noun                             -> drop_item
+                         | "drop" number held_noun                 -> drop_quantity
+                         | "drop" held_noun                        -> drop_item
 
         named_route:       USEFUL_WORD
         DIRECTION:         "north" | "west" | "east" | "south"

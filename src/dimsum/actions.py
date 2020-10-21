@@ -107,7 +107,8 @@ class Make(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         item = self.item
         if self.template:
-            item = self.template.create_item(creator=player)
+            item = self.template.create_item(person=player, creator=player)
+            assert isinstance(item, things.Item)
         after_hold = player.hold(item)
         # We do this after because we may consolidate this Item and
         # this keeps us from having to unregister the item.
@@ -139,18 +140,6 @@ class Heal(PersonAction):
             return Failure("who?")
         await ctx.extend(heal=self.who).hook("heal:after")
         return Success("you healed %s" % (self.who))
-
-
-class Kick(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        await ctx.extend(kick=self.who).hook("kick:after")
-        return Success("you kicked %s" % (self.who))
 
 
 class Kiss(PersonAction):
@@ -190,9 +179,38 @@ class Poke(PersonAction):
         return Success("you poked %s" % (self.who))
 
 
-class Plant(PersonAction):
-    def __init__(self, item=None, **kwargs):
+class Hit(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("hit what?")
+        await ctx.extend(swing=item).hook("hit")
+        return Success("you hit %s" % (item))
+
+
+class Kick(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("what?")
+        await ctx.extend(kick=item).hook("kick:after")
+        return Success("you kicked %s" % (item))
+
+
+class Plant(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
@@ -204,122 +222,120 @@ class Plant(PersonAction):
 
 
 class Shake(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("shake what?")
-        # TODO Publish
-        await ctx.extend(shake=self.item).hook("shake")
-        return Success("you shook %s" % (self.item))
-
-
-class Hit(PersonAction):
-    def __init__(self, item=None, **kwargs):
-        super().__init__(**kwargs)
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
-            return Failure("hit what?")
-        # TODO Publish
-        await ctx.extend(swing=self.item).hook("hit")
-        return Success("you hit %s" % (self.item))
+        await ctx.extend(shake=item).hook("shake")
+        return Success("you shook %s" % (item))
 
 
 class Swing(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if self.item:
             return Failure("swing what?")
-        # TODO Publish
-        await ctx.extend(swing=self.item).hook("swing")
-        return Success("you swung %s" % (self.item))
+        await ctx.extend(swing=item).hook("swing")
+        return Success("you swung %s" % (item))
 
 
 class Wear(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("wear what?")
 
-        if not self.item.when_worn():
+        if not item.when_worn():
             return Failure("you can't wear that")
 
-        assert player.is_holding(self.item)
+        assert player.is_holding(item)
 
-        if player.wear(self.item):
-            player.drop(self.item)
+        if player.wear(item):
+            player.drop(item)
 
         # TODO Publish
-        await ctx.extend(wear=[self.item]).hook("wear:after")
-        return Success("you wore %s" % (self.item))
+        await ctx.extend(wear=[item]).hook("wear:after")
+        return Success("you wore %s" % (item))
 
 
 class Remove(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("remove what?")
-        if not player.is_wearing(self.item):
+
+        if not player.is_wearing(item):
             return Failure("you aren't wearing that")
 
-        assert player.is_wearing(self.item)
+        assert player.is_wearing(item)
 
-        if player.unwear(self.item):
-            player.hold(self.item)
+        if player.unwear(item):
+            player.hold(item)
 
-        await ctx.extend(remove=[self.item]).hook("remove:after")
-        return Success("you removed %s" % (self.item))
+        await ctx.extend(remove=[item]).hook("remove:after")
+        return Success("you removed %s" % (item))
 
 
 class Eat(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("dunno where that is")
 
-        if not self.item.when_eaten():
+        if not item.when_eaten():
             return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        await player.consume(self.item, area=area, ctx=ctx)
-        await ctx.extend(eat=self.item).hook("eat:after")
+        await player.consume(item, area=area, ctx=ctx)
+        await ctx.extend(eat=item).hook("eat:after")
 
-        return Success("you ate %s" % (self.item))
+        return Success("you ate %s" % (item))
 
 
 class Drink(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("dunno where that is")
 
-        if not self.item.when_drank():
+        if not item.when_drank():
             return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        await player.consume(self.item, area=area, ctx=ctx)
-        await ctx.extend(eat=self.item).hook("drink:after")
+        await player.consume(item, area=area, ctx=ctx)
+        await ctx.extend(eat=item).hook("drink:after")
 
-        return Success("you drank %s" % (self.item))
+        return Success("you drank %s" % (item))
 
 
 class Join(PersonAction):
@@ -336,7 +352,7 @@ class Join(PersonAction):
 
 
 class LookFor(PersonAction):
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, name: str = None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
 
@@ -380,15 +396,22 @@ class Look(PersonAction):
 
 
 class Drop(PersonAction):
-    def __init__(self, item=None, quantity=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, quantity: int = None, **kwargs):
         super().__init__(**kwargs)
         self.quantity = quantity if quantity else None
         self.item = item if item else None
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = None
+
+        if self.item:
+            item = world.apply_item_finder(player, self.item)
+            if not item:
+                return Failure("drop what?")
+
         area = world.find_player_area(player)
         dropped, failure = player.drop_here(
-            area, self.item, quantity=self.quantity, creator=player, ctx=ctx
+            area, item, quantity=self.quantity, creator=player, ctx=ctx
         )
         if dropped:
             area = world.find_player_area(player)
@@ -399,31 +422,33 @@ class Drop(PersonAction):
 
 
 class Hold(PersonAction):
-    def __init__(self, item=None, quantity=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, quantity: int = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
         self.quantity = quantity
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("sorry, hold what?")
 
-        if player.is_holding(self.item):
+        if player.is_holding(item):
             return Failure("you're already holding that")
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = self.item.separate(self.quantity, creator=player, ctx=ctx)
-            if self.item.quantity == 0:
-                world.unregister(self.item)
-                area.remove(self.item)
-            self.item = removed[0]
+            removed = item.separate(self.quantity, creator=player, ctx=ctx)
+            if item.quantity == 0:
+                world.unregister(item)
+                area.drop(item)
+            item = removed[0]
         else:
-            area.unhold(self.item)
+            area.unhold(item)
 
-        after_hold = player.hold(self.item)
-        if after_hold != self.item:
-            world.unregister(self.item)
+        after_hold = player.hold(item)
+        if after_hold != item:
+            world.unregister(item)
         await world.bus.publish(ItemHeld(player, area, after_hold))
         await ctx.extend(hold=[after_hold]).hook("hold:after")
         return Success("you picked up %s" % (after_hold,), item=after_hold)
@@ -556,22 +581,25 @@ class Obliterate(PersonAction):
 
 
 class CallThis(PersonAction):
-    def __init__(self, name=None, item=None, **kwargs):
+    def __init__(self, name: str = None, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
+        assert name
         self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("you don't have anything")
 
         # Copy all of the base details from the item. Exclude stamps.
-        template = self.item
+        template = item
         recipe = Recipe(
             creator=player,
-            details=self.item.details.clone(),
-            behaviors=self.item.behaviors,
-            kind=self.item.kind,
+            details=item.details.clone(),
+            behaviors=item.behaviors,
+            kind=item.kind,
             template=template,
         )
         world.register(recipe)
@@ -611,36 +639,50 @@ class ModifyField(PersonAction):
         self.value = value
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("of what?")
+
         if self.field in health.NutritionFields:
-            self.item.nutrition.properties[self.field] = self.value
+            item.nutrition.properties[self.field] = self.value
         else:
-            self.item.details.set(self.field, self.value)
+            item.details.set(self.field, self.value)
         return Success("done")
 
 
 class ModifyActivity(PersonAction):
-    def __init__(self, item=None, activity=None, value=None, **kwargs):
+    def __init__(
+        self, item: things.ItemFinder = None, activity=None, value=None, **kwargs
+    ):
         super().__init__(**kwargs)
+        assert item
         self.item = item
+        assert activity
         self.activity = activity
+        assert value
         self.value = value
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
-            return Failure("nothing to modify")
-        self.item.link_activity(self.activity, self.value)
-        self.item.details.set(self.activity, self.value)
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("of what?")
+
+        item.link_activity(self.activity, self.value)
+        item.details.set(self.activity, self.value)
         return Success("done")
 
 
 class ModifyServings(PersonAction):
-    def __init__(self, item=None, number=None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, number=None, **kwargs):
         super().__init__(**kwargs)
+        assert item
         self.item = item
+        assert number
         self.number = number
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if False:
+        item = world.apply_item_finder(player, self.item)
+        if not item:
             return Failure("nothing to modify")
-        self.item.servings = self.number
+        item.servings = self.number
         return Success("done")

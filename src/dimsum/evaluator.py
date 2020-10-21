@@ -89,14 +89,14 @@ class Evaluate(lark.Transformer):
     def heal(self, args):
         return actions.Heal(who=args[0])
 
-    def kick(self, args):
-        return actions.Kick(who=args[0])
-
     def kiss(self, args):
         return actions.Kiss(who=args[0])
 
     def tickle(self, args):
         return actions.Tickle(who=args[0])
+
+    def kick(self, args):
+        return actions.Kick(item=args[0])
 
     def plant(self, args):
         return actions.Plant(item=args[0])
@@ -150,13 +150,7 @@ class Evaluate(lark.Transformer):
         return actions.Make(template=things.MaybeQuantifiedItem(args[1], quantity))
 
     def makeable_noun(self, args):
-        q = str(args[0])
-
-        recipe = self.player.find_memory(q)
-        if recipe:
-            return things.RecipeItem(recipe)
-
-        return things.MaybeItem(q)
+        return finders.MaybeItemOrRecipe(str(args[0]))
 
     def held_noun(self, args):
         return finders.HeldItem(q=str(args[0]))
@@ -165,10 +159,10 @@ class Evaluate(lark.Transformer):
         return finders.ContainedItem(q=str(args[0]))
 
     def unheld_noun(self, args):
-        return self.world.search(self.player, str(args[0]), unheld=True)
+        return finders.UnheldItem(str(args[0]))
 
     def noun(self, args):
-        return self.world.search(self.player, str(args[0]))
+        return finders.AnyItem(str(args[0]))
 
     def direction(self, args):
         for d in movement.Direction:
@@ -183,58 +177,36 @@ class Evaluate(lark.Transformer):
         return movement.FindNamedRoute(str(args[0]))
 
     def this(self, args):
-        return self.get_item_held()
-
-    def item_recipe(self, args):
-        name = str(args[0])
-        recipe = self.player.find_recipe(name)
-        if recipe:
-            return recipe.invoke(self.player)
-        return game.Item(creator=self.player, details=game.Details(name))
+        return finders.SoloHeldItem()
 
     def modify_servings(self, args):
-        area = self.world.find_player_area(self.player)
-        if len(self.player.holding) == 0:
-            if area.creator != self.player:
-                raise game.NotHoldingAnything(
-                    "you're not holding anything and you don't own this area"
-                )
-        else:
-            item = self.player.holding[0]
-        return actions.ModifyServings(item=item, number=args[0])
+        return actions.ModifyServings(item=finders.SoloHeldItem(), number=args[0])
 
     def modify_field(self, args):
-        area = self.world.find_player_area(self.player)
-        item = area
-        if len(self.player.holding) == 0:
-            if area.creator != self.player:
-                raise game.NotHoldingAnything(
-                    "you're not holding anything and you don't own this area"
-                )
-        else:
-            item = self.player.holding[0]
         field = str(args[0])
         value = args[1]
-        return actions.ModifyField(item=item, field=field, value=value)
+        return actions.ModifyField(
+            item=finders.SoloHeldItem(), field=field, value=value
+        )
 
     def when_worn(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity=props.Worn, value=True
+            item=finders.SoloHeldItem(), activity=props.Worn, value=True
         )
 
     def when_opened(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity=props.Opened, value=True
+            item=finders.SoloHeldItem(), activity=props.Opened, value=True
         )
 
     def when_eaten(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity=props.Eaten, value=True
+            item=finders.SoloHeldItem(), activity=props.Eaten, value=True
         )
 
     def when_drank(self, args):
         return actions.ModifyActivity(
-            item=self.get_item_held(), activity=props.Drank, value=True
+            item=finders.SoloHeldItem(), activity=props.Drank, value=True
         )
 
     def remember(self, args):
@@ -248,13 +220,6 @@ class Evaluate(lark.Transformer):
 
     def number(self, args):
         return float(args[0])
-
-    # Tools
-
-    def get_item_held(self):
-        if len(self.player.holding) == 0:
-            return None
-        return self.player.holding[0]
 
 
 def create(world, player):

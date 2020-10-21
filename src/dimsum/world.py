@@ -44,31 +44,33 @@ class World(entity.Entity, entity.Registrar):
                 return e
         return None
 
-    def find_person_by_name(self, name):
+    def find_person_by_name(self, name) -> Optional[animals.Person]:
         for person in self.people():
             if person.details.name == name:
                 return person
         return None
 
-    def welcome_area(self):
+    def welcome_area(self) -> envo.Area:
         return self.areas()[0]
 
-    def find_entity_area(self, entity: entity.Entity):
+    def find_entity_area(self, entity: entity.Entity) -> Optional[envo.Area]:
         for area in self.areas():
             if area.contains(entity) or area.occupying(entity):
                 return area
         return None
 
-    def find_player_area(self, player: animals.Person):
-        return self.find_entity_area(player)
+    def find_player_area(self, player: animals.Person) -> envo.Area:
+        area = self.find_entity_area(player)
+        assert area
+        return area
 
-    def contains(self, key):
+    def contains(self, key) -> bool:
         return key in self.entities
 
-    def find(self, key):
+    def find(self, key) -> entity.Entity:
         return self.entities[key]
 
-    def resolve(self, keys):
+    def resolve(self, keys) -> Sequence[entity.Entity]:
         return [self.entities[key] for key in keys]
 
     def add_area(self, area: envo.Area, depth=0):
@@ -111,36 +113,17 @@ class World(entity.Entity, entity.Registrar):
         self.add_area(area)
         return area
 
-    def search_hands(self, person: animals.Person, whereQ: str):
-        return person.find(whereQ)
-
-    def search_floor(self, person: animals.Person, whereQ: str):
-        area = self.find_player_area(person)
-        return area.find(whereQ)
-
     def apply_item_finder(
         self, person: animals.Person, finder: things.ItemFinder
     ) -> Optional[things.Item]:
+        assert person
+        assert finder
         area = self.find_player_area(person)
+        log.info("applying finder:%s", finder)
         return finder.find_item(area=area, person=person)
 
-    def search(self, person: animals.Person, whereQ: str, unheld=None, **kwargs):
-        area = self.find_player_area(person)
-
-        order = [person.find, area.find]
-
-        if unheld:
-            order = [area.find, person.find]
-
-        for fn in order:
-            item = fn(whereQ)
-            if item:
-                return item
-
-        return None
-
     async def perform(self, action, person: Optional[animals.Person]):
-        area = self.find_player_area(person) if person else None
+        area = self.find_entity_area(person) if person else None
         with WorldCtx(
             self.context_factory, world=self, person=person, area=area
         ) as ctx:

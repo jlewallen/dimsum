@@ -75,6 +75,7 @@ class ContainingMixin:
         return item
 
     def find(self, q: str) -> Optional[CarryableMixin]:
+        log.debug("%s find: '%s' holding=%s", self, q, self.holding)
         for e in self.holding:
             if e.describes(q):
                 return e
