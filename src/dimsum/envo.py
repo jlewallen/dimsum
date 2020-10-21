@@ -6,6 +6,7 @@ import carryable
 import occupyable
 import movement
 import mechanics
+import things
 
 log = logging.getLogger("dimsum")
 
@@ -21,12 +22,8 @@ class Area(
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    @property
-    def items(self):
-        return self.holding
-
-    def entities(self) -> List[entity.Entity]:
-        return flatten([self.holding, self.occupied])
+    def entities(self) -> List[things.Item]:
+        return [cast(things.Item, e) for e in flatten([self.holding, self.occupied])]
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(of)]

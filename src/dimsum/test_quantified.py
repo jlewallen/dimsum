@@ -6,6 +6,8 @@ import game
 import reply
 import test
 
+log = logging.getLogger("dimsum")
+
 
 @pytest.mark.asyncio
 async def test_quantified_drop_partial_and_hold():
@@ -14,32 +16,32 @@ async def test_quantified_drop_partial_and_hold():
     await tw.initialize()
     await tw.execute("make 20 Coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     assert tw.player.holding[0].quantity == 15
-    assert tw.area.items[0].quantity == 5
+    assert tw.area.entities()[0].quantity == 5
     assert tw.player.holding[0].key in tw.world.entities  # Meh
     assert len(tw.world.items()) == 2
 
     await tw.execute("hold coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     assert len(tw.world.items()) == 2
 
     await tw.execute("drop 5 coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     assert tw.player.holding[0].quantity == 10
-    assert tw.area.items[0].quantity == 10
+    assert tw.area.entities()[0].quantity == 10
     assert len(tw.world.items()) == 2
 
 
@@ -51,10 +53,10 @@ async def test_quantified_hold_number():
     await tw.execute("make 20 Coin")
     await tw.execute("drop 20 coin")
     assert len(tw.player.holding) == 0
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     await tw.execute("hold 10 coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
 
 
 @pytest.mark.asyncio
@@ -64,12 +66,12 @@ async def test_quantified_drop_all():
     await tw.initialize()
     await tw.execute("make 20 Coin")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
     await tw.execute("drop 20 coin")
     assert len(tw.player.holding) == 0
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     assert tw.area.holding[0].quantity == 20
     assert len(tw.world.items()) == 1
 
@@ -84,10 +86,10 @@ async def test_quantified_drop_inflected():
     await tw.execute("make 20 Coin")
     assert len(tw.player.holding) == 1
 
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
     await tw.execute("drop 10 coins")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
 
 
 @pytest.mark.asyncio
@@ -102,7 +104,7 @@ async def test_quantified_from_recipe_holding_template(caplog):
     assert isinstance(r, reply.Success)
     assert r.item.quantity == 5
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
 
     await tw.execute("look down")
     assert tw.player.holding[0].quantity == 5
@@ -124,11 +126,11 @@ async def test_quantified_from_recipe(caplog):
 
     await tw.execute("make 20 cash")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
 
     await tw.execute("make 20 cash")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
 
     await tw.execute("look down")
     assert tw.player.holding[0].quantity == 40

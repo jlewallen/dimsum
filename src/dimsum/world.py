@@ -81,10 +81,11 @@ class World(entity.Entity, entity.Registrar):
         self.register(area)
         for entity in area.entities():
             self.register(entity)
-        for item in area.items:
-            for linked in item.adjacent():
-                log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                self.add_area(cast(envo.Area, linked), depth=depth + 1)
+        for item in area.entities():
+            if isinstance(item, things.Item):
+                for linked in item.adjacent():
+                    log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
+                    self.add_area(cast(envo.Area, linked), depth=depth + 1)
         for linked in area.adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
             self.add_area(cast(envo.Area, linked), depth=depth + 1)

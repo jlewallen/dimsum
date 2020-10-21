@@ -1,7 +1,6 @@
-from typing import cast
+from typing import Any, cast
 import logging
 import props
-import envo
 import living
 import carryable
 
@@ -65,7 +64,7 @@ class HealthMixin:
 
 
 class ItemEaten:
-    def __init__(self, player, area: envo.Area, item: EdibleMixin):
+    def __init__(self, player, area: Any, item: EdibleMixin):
         super().__init__()
         self.player = player
         self.area = area
@@ -76,7 +75,7 @@ class ItemEaten:
 
 
 class ItemDrank:
-    def __init__(self, player, area: envo.Area, item: EdibleMixin):
+    def __init__(self, player, area: Any, item: EdibleMixin):
         self.player = player
         self.area = area
         self.item = item

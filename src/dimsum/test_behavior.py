@@ -165,12 +165,12 @@ end
     await tw.execute("look")
     await tw.execute("hold box")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 0
+    assert len(tw.area.entities()) == 1
     await tw.execute("shake box")
     assert len(tw.player.holding) == 1
-    assert len(tw.area.items) == 1
-    assert tw.area.items[0].creator == box
-    assert tw.area.items[0].quantity == 10
+    assert len(tw.area.entities()) == 2
+    assert tw.area.entities()[0].creator == box
+    assert tw.area.entities()[0].quantity == 10
     await tw.execute("look")
 
 
@@ -203,11 +203,11 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
-    assert len(tw.area.items) == 2
+    assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
 
     await tw.world.tick(1)
-    assert len(tw.area.items) == 3
+    assert len(tw.area.entities()) == 4
     assert len(tw.world.items()) == 3
 
 
@@ -235,13 +235,13 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
-    assert len(tw.area.items) == 2
+    assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
     await tw.world.tick(1)
-    assert len(tw.area.items) == 2
+    assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
     await tw.world.tick(2)
-    assert len(tw.area.items) == 2
+    assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
 
 
@@ -299,9 +299,9 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
-    assert len(tw.area.items) == 2
+    assert len(tw.area.entities()) == 3
     await tw.world.tick(1)
-    assert len(tw.area.items) == 3
+    assert len(tw.area.entities()) == 4
 
 
 @pytest.mark.asyncio
@@ -330,6 +330,6 @@ end
 
     await tw.initialize()
     await tw.world.tick(0)
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
     await tw.world.tick(1)
-    assert len(tw.area.items) == 1
+    assert len(tw.area.entities()) == 2
