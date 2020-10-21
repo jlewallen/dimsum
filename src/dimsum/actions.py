@@ -4,6 +4,10 @@ import os
 import hashlib
 import base64
 
+import props
+import movement
+import health
+
 from context import *
 from reply import *
 from game import *
@@ -14,11 +18,6 @@ from animals import *
 from events import *
 from world import *
 
-import props
-import hooks
-import movement
-import health
-import reply
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
@@ -355,7 +354,7 @@ class LookFor(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
         await ctx.extend(holding=player.holding).extend(name=self.name).hook("look-for")
-        return reply.PersonalObservation(player)
+        return PersonalObservation(player)
 
 
 class LookMyself(PersonAction):
@@ -364,7 +363,7 @@ class LookMyself(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-myself")
-        return reply.PersonalObservation(player)
+        return PersonalObservation(player)
 
 
 class LookDown(PersonAction):
@@ -373,7 +372,7 @@ class LookDown(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-down")
-        return reply.EntitiesObservation(player.holding)
+        return EntitiesObservation(player.holding)
 
 
 class Look(PersonAction):
@@ -383,12 +382,12 @@ class Look(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.item:
-            return reply.DetailedObservation(reply.ObservedItem(self.item))
+            return DetailedObservation(ObservedItem(self.item))
         log.info("person: %s %s", player.key, player)
 
         area = world.find_player_area(player)
         assert area
-        return reply.AreaObservation(area, player)
+        return AreaObservation(area, player)
 
 
 class Drop(PersonAction):
@@ -546,7 +545,7 @@ class MovingAction(PersonAction):
         await destination.entered(world.bus, player)
         await ctx.extend(area=destination).hook("entered:after")
 
-        return reply.AreaObservation(world.find_player_area(player), player)
+        return AreaObservation(world.find_player_area(player), player)
 
 
 class Climb(MovingAction):
