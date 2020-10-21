@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import copy
 import jsonpickle
 import wrapt
 import logging
@@ -91,8 +92,11 @@ def serialize_full(value):
     if isinstance(value, dict):
         value = {key: serialize_full(value) for key, value in value.items()}
     if value.__class__ in classes:
+        attrs = copy.copy(value.__dict__)
+        if "hooks" in attrs:
+            del attrs["hooks"]
         klass = classes[value.__class__]
-        return klass(**value.__dict__)
+        return klass(**attrs)
     return value
 
 
