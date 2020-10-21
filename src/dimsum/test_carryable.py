@@ -15,6 +15,39 @@ log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
+async def test_hold_missing_item():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("hold hammer")
+    assert len(tw.player.holding) == 0
+
+
+@pytest.mark.asyncio
+async def test_make_hold_drop():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Hammer")
+    assert len(tw.player.holding) == 1
+    await tw.execute("drop")
+    assert len(tw.player.holding) == 0
+    await tw.execute("hold hammer")
+    assert len(tw.player.holding) == 1
+
+
+@pytest.mark.asyncio
+async def test_make_hold_drop_specific():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Hammer")
+    await tw.execute("make Ball")
+    assert len(tw.player.holding) == 2
+    await tw.execute("drop ball")
+    assert len(tw.player.holding) == 1
+    await tw.execute("hold ball")
+    assert len(tw.player.holding) == 2
+
+
+@pytest.mark.asyncio
 async def test_put_coin_inside_box_and_then_take_out(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()

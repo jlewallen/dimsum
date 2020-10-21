@@ -140,3 +140,69 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert one in two.adjacent()
 
     assert len(after.entities.items()) == 4
+
+
+@pytest.mark.asyncio
+async def test_serialize():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    tree = tw.add_item(
+        things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
+    )
+    clearing = tw.add_simple_area_here("Door", "Clearing")
+    tree.get_kind("petals")
+    tree.link_area(clearing)
+    tree.add_behavior(
+        "b:test:tick",
+        lua="""
+function(s, world, area, item)
+    debug("ok", area, item, time)
+    return area.make({
+        kind = item.kind("petals"),
+        name = "Flower Petal",
+        quantity = 10,
+        color = "red",
+    })
+end
+""",
+    )
+
+    db = persistence.SqliteDatabase()
+    await db.open("test.sqlite3")
+    await db.save(tw.world)
+
+    empty = world.World(tw.bus, context_factory=None)
+    await db.load(empty)
+
+    logging.info("%s", empty.entities)
+
+
+@pytest.mark.asyncio
+async def test_unregister_destroys(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    db = persistence.SqliteDatabase()
+    await db.open("test.sqlite3")
+    await db.purge()
+
+    assert await db.number_of_entities() == 0
+
+    await tw.initialize()
+    await tw.execute("make Box")
+    box = tw.player.holding[0]
+    assert box.destroyed == False
+    await db.save(tw.world)
+
+    assert await db.number_of_entities() == 3
+
+    await tw.execute("obliterate")
+    assert box.destroyed == True
+    await db.save(tw.world)
+
+    assert await db.number_of_entities() == 2
+
+    empty = world.World(tw.bus, context_factory=None)
+    await db.load(empty)
