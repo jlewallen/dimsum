@@ -17,12 +17,12 @@ class ApparelMixin:
     def is_wearing(self, item: Wearable) -> bool:
         return item in self.wearing
 
-    def wear(self, item: Wearable):
+    def wear(self, item: Wearable) -> bool:
         self.wearing.append(item)
         item.touch()
         return True
 
-    def unwear(self, item: Wearable, **kwargs):
+    def unwear(self, item: Wearable, **kwargs) -> bool:
         self.wearing.remove(item)
         item.touch()
         return True

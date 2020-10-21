@@ -2,19 +2,21 @@ from typing import Any
 import logging
 
 
+log = logging.getLogger("dimsum")
+
+
 class Event:
     def __init__(self, **kwargs):
         super().__init__()
         self.kwargs = kwargs
-        self.log = logging.getLogger("dimsum")
 
     async def accept(self, visitor: Any):
         if not hasattr(visitor, self.name):
-            self.log.warning("handler-missing: %s", self.name)
+            log.warning("handler-missing: %s", self.name)
             return None
 
         fn = getattr(visitor, self.name)
-        self.log.debug("handler-invoke: %s", self.name)
+        log.debug("handler-invoke: %s", self.name)
         return await fn(**self.kwargs)
 
     @property
