@@ -15,6 +15,7 @@ import evaluator
 import luaproxy
 import bus
 import messages
+import handlers
 
 log = logging.getLogger("dimsum")
 
@@ -25,7 +26,7 @@ def create_empty_world():
 
 class TestWorld:
     def __init__(self):
-        self.bus = messages.TextBus()
+        self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
         self.world = world.World(self.bus, luaproxy.context_factory)
         self.jacob = animals.Player(
             creator=self.world,

@@ -2,6 +2,16 @@ import logging
 import bus
 import events
 
+from context import *
+from reply import *
+from game import *
+from things import *
+from envo import *
+from living import *
+from animals import *
+from events import *
+from world import *
+
 log = logging.getLogger("dimsum")
 
 
@@ -12,6 +22,7 @@ class TextBus(bus.EventBus):
     async def publish(self, event: events.Event, **kwargs):
         assert event
         log.info("publish:%s", event)
+        self.invoke_handlers(event)
         message = await event.accept(self)
         log.info("text:%s", message)
         return None
@@ -25,8 +36,8 @@ class TextBus(bus.EventBus):
     async def LivingLeftArea(self, person=None, area=None, **kwargs):
         return "%s left %s" % (person, area)
 
-    async def PlayerJoined(self, person=None, area=None, **kwargs):
-        return "%s joined!" % (person)
+    async def PlayerJoined(self, player: Player=None, area=None, **kwargs):
+        return "%s joined!" % (player)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):
         return "%s held %s" % (person, items)
