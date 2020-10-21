@@ -118,6 +118,12 @@ class World(entity.Entity, entity.Registrar):
         area = self.find_player_area(person)
         return area.find(whereQ)
 
+    def apply_item_finder(
+        self, person: animals.Person, finder: things.ItemFinder
+    ) -> Optional[things.Item]:
+        area = self.find_player_area(person)
+        return finder.find_item(area=area, person=person)
+
     def search(self, person: animals.Person, whereQ: str, unheld=None, **kwargs):
         area = self.find_player_area(person)
 

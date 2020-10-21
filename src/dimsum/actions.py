@@ -429,6 +429,68 @@ class Hold(PersonAction):
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
+class PutInside(PersonAction):
+    def __init__(
+        self,
+        container: things.ItemFinder = None,
+        item: things.ItemFinder = None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        assert container
+        self.container = container
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        area = world.find_player_area(player)
+
+        container = world.apply_item_finder(player, self.container)
+        if not container:
+            return Failure("what?")
+
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("what?")
+
+        if container.place_inside(item):
+            player.drop(item)
+
+        return Success("inside, done")
+
+
+class TakeOut(PersonAction):
+    def __init__(
+        self,
+        container: things.ItemFinder = None,
+        item: things.ItemFinder = None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        assert container
+        self.container = container
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        area = world.find_player_area(player)
+
+        container = world.apply_item_finder(player, self.container)
+        if not container:
+            return Failure("what?")
+
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("what?")
+
+        if container.take_out(item):
+            player.hold(item)
+        else:
+            return Failure("doesn't seem like you can")
+
+        return Success("inside, done")
+
+
 class MovingAction(PersonAction):
     def __init__(self, area: Area = None, finder: movement.FindsRoute = None, **kwargs):
         super().__init__(**kwargs)

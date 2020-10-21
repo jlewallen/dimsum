@@ -5,6 +5,7 @@ import game
 import movement
 import things
 import actions
+import finders
 
 log = logging.getLogger("dimsum")
 
@@ -39,6 +40,12 @@ class Evaluate(lark.Transformer):
 
     def home(self, args):
         return actions.Home()
+
+    def put_inside(self, args):
+        return actions.PutInside(container=args[1], item=args[0])
+
+    def take_out(self, args):
+        return actions.TakeOut(container=args[1], item=args[0])
 
     def hold(self, args):
         return actions.Hold(item=args[0])
@@ -150,6 +157,12 @@ class Evaluate(lark.Transformer):
             return things.RecipeItem(recipe)
 
         return things.MaybeItem(q)
+
+    def held_noun(self, args):
+        return finders.HeldItem(q=str(args[0]))
+
+    def contained_noun(self, args):
+        return finders.ContainedItem(q=str(args[0]))
 
     def unheld_noun(self, args):
         return self.world.search(self.player, str(args[0]), unheld=True)

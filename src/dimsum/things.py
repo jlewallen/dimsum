@@ -20,6 +20,7 @@ class Item(
     entity.Entity,
     apparel.Wearable,
     carryable.CarryableMixin,
+    carryable.ContainingMixin,
     mechanics.InteractableMixin,
     movement.MovementMixin,
     mechanics.VisibilityMixin,
@@ -67,6 +68,11 @@ class Item(
 
     def __repr__(self):
         return str(self)
+
+
+class ItemFinder:
+    def find_item(self, **kwargs) -> Optional[Item]:
+        raise NotImplementedError
 
 
 class ItemFactory:

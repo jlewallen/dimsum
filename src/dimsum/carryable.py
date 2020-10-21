@@ -52,6 +52,12 @@ class ContainingMixin:
         self.holding.remove(e)
         return e
 
+    def place_inside(self, item: CarryableMixin, **kwargs):
+        return self.hold(item, **kwargs)
+
+    def take_out(self, item: CarryableMixin, **kwargs):
+        return self.unhold(item, **kwargs)
+
     def hold(self, item: CarryableMixin, quantity: int = None, **kwargs):
         return self.add_item(item, **kwargs)
 

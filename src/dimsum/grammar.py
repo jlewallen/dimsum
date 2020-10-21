@@ -6,7 +6,7 @@ def create_parser():
         """
         start: verbs | verb
 
-        verbs.2:           look | obliterate | drop | hold | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
+        verbs.2:           look | obliterate | drop | hold | put | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
                          | go | climb | walk | run
                          | eat | drink | home | hit
                          | call | forget | think | give | take
@@ -14,10 +14,12 @@ def create_parser():
 
         verb.1:            WORD (this | that | noun)?
 
-        USEFUL_WORD:      /(?!(on|with|over)\b)[a-zA-Z][a-zA-Z0-9]*/i
+        USEFUL_WORD:      /(?!(on|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
 
         makeable_noun:     TEXT
+        contained_noun:    USEFUL_WORD+
         unheld_noun:       USEFUL_WORD+
+        held_noun:         USEFUL_WORD+
         noun:              USEFUL_WORD+
 
         this:              "this"
@@ -43,6 +45,9 @@ def create_parser():
         take:              "take"                                  -> take
                          | "take" "bite" "of" noun                 -> take_bite
                          | "take" "sip" "of" noun                  -> take_sip
+                         | "take" contained_noun "out" "of" held_noun -> take_out
+
+        put:               "put" held_noun ("in") held_noun        -> put_inside
 
         hold:              "hold" unheld_noun                      -> hold
                          | "hold" number unheld_noun               -> hold_quantity
