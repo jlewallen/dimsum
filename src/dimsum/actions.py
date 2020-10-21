@@ -109,7 +109,7 @@ class Make(PersonAction):
         # this keeps us from having to unregister the item.
         world.register(after_hold)
         area = world.find_player_area(player)
-        await world.bus.publish(ItemMade(person=player, area=area, made=[after_hold]))
+        await world.bus.publish(ItemsMade(person=player, area=area, items=[after_hold]))
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
@@ -211,7 +211,6 @@ class Plant(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if not self.item:
             return Failure("plant what?")
-        # TODO Publish
         await ctx.extend(plant=self.item).hook("plant")
         return Success("you planted %s" % (self.item))
 

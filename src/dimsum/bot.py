@@ -20,20 +20,23 @@ import actions
 import events
 import luaproxy
 import movement
+import messages
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.discord")
 
 
-class DiscordEventBus(bus.EventBus):
-    def __init__(self, bot):
+class DiscordEventBus(messages.TextBus):
+    def __init__(self, bot, **kwargs):
+        super().__init__(**kwargs)
         self.bot = bot
 
-    async def publish(self, event: events.Event):
+    async def publish(self, event: events.Event, **kwargs):
         log.info("publish:%s", event)
         for channel in self.bot.get_all_channels():
             if channel.name == "IGNORED":
                 await channel.send(str(event))
+        return event.accept(self)
 
 
 class BotPlayer:
@@ -364,7 +367,7 @@ modify when eaten
         self.bot.logout()
 
     async def initialize(self):
-        self.bus = DiscordEventBus(self.bot)
+        self.bus = discord_events.Bus(self.bot)
         self.world = world.World(self.bus, luaproxy.context_factory)
 
         db = persistence.SqliteDatabase()
