@@ -1,5 +1,6 @@
 from typing import Any, cast
 import logging
+import events
 import props
 import living
 import carryable
@@ -54,31 +55,24 @@ class HealthMixin:
     def alive(self) -> living.Alive:
         return cast(living.Alive, self)
 
-    async def consume(self, edible: EdibleMixin, area=None, ctx=None, **kwargs):
+    async def consume(
+        self, edible: EdibleMixin, drink=True, area=None, ctx=None, **kwargs
+    ):
         self.medical.nutrition.include(edible.nutrition)
         edible.servings -= 1
         if edible.servings == 0:
             self.alive.drop(edible)  # type: ignore
             edible.destroy()  # type:ignore
-        await ctx.publish(ItemEaten(self, area, edible))
+
+        if drink:
+            await ctx.publish(ItemDrank(animal=self, area=area, item=edible))
+        else:
+            await ctx.publish(ItemEaten(animal=self, area=area, item=edible))
 
 
-class ItemEaten:
-    def __init__(self, player, area: Any, item: EdibleMixin):
-        super().__init__()
-        self.player = player
-        self.area = area
-        self.item = item
-
-    def __str__(self):
-        return "%s just ate %s!" % (self.player, self.item)
+class ItemEaten(events.Event):
+    pass
 
 
-class ItemDrank:
-    def __init__(self, player, area: Any, item: EdibleMixin):
-        self.player = player
-        self.area = area
-        self.item = item
-
-    def __str__(self):
-        return "%s just drank %s!" % (self.player, self.item)
+class ItemDrank(events.Event):
+    pass

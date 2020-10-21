@@ -2,6 +2,7 @@ from typing import List, Any
 
 import abc
 import bus
+import events
 
 
 class Living:
@@ -22,28 +23,16 @@ class OccupyableMixin:
 
     async def entered(self, bus: bus.EventBus, player: Living):
         self.occupied.append(player)
-        await bus.publish(LivingEnteredArea(player, self))
+        await bus.publish(LivingEnteredArea(living=player, area=self))
 
     async def left(self, bus: bus.EventBus, player: Living):
         self.occupied.remove(player)
-        await bus.publish(LivingLeftArea(player, self))
+        await bus.publish(LivingLeftArea(living=player, area=self))
 
 
-class LivingEnteredArea:
-    def __init__(self, living, area):
-        super().__init__()
-        self.living = living
-        self.area = area
-
-    def __str__(self):
-        return "%s entered %s" % (self.living, self.area)
+class LivingEnteredArea(events.Event):
+    pass
 
 
-class LivingLeftArea:
-    def __init__(self, living, area):
-        super().__init__()
-        self.living = living
-        self.area = area
-
-    def __str__(self):
-        return "%s left %s" % (self.living, self.area)
+class LivingLeftArea(events.Event):
+    pass

@@ -8,6 +8,7 @@ from context import *
 from reply import *
 from game import *
 from things import *
+from envo import *
 from living import *
 from animals import *
 from events import *
@@ -82,18 +83,13 @@ class AddItemArea(PersonAction):
         # this keeps us from having to unregister the item.
         world.register(after_add)
 
-        await world.bus.publish(ItemsAppeared(self.area, [self.item]))
+        await world.bus.publish(ItemsAppeared(area=self.area, items=[self.item]))
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
 
 
 class ItemsAppeared(Event):
-    def __init__(self, area: Area, items: Sequence[Item]):
-        self.area = area
-        self.items = items
-
-    def __str__(self):
-        return "%s appeared" % (p.join(self.items),)
+    pass
 
 
 class Make(PersonAction):
@@ -114,7 +110,7 @@ class Make(PersonAction):
         # this keeps us from having to unregister the item.
         world.register(after_hold)
         area = world.find_player_area(player)
-        await world.bus.publish(ItemMade(player, area, after_hold))
+        await world.bus.publish(ItemMade(person=player, area=area, made=[after_hold]))
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
@@ -344,7 +340,7 @@ class Join(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         world.register(player)
-        await world.bus.publish(PlayerJoined(player))
+        await world.bus.publish(PlayerJoined(player=player))
         await ctx.hook("entered:before")
         await world.welcome_area().entered(world.bus, player)
         await ctx.hook("entered:after")
@@ -415,7 +411,9 @@ class Drop(PersonAction):
         )
         if dropped:
             area = world.find_player_area(player)
-            await world.bus.publish(ItemsDropped(player, area, dropped))
+            await world.bus.publish(
+                ItemsDropped(person=player, area=area, dropped=dropped)
+            )
             await ctx.extend(dropped=dropped).hook("drop:after")
             return Success("you dropped %s" % (p.join(dropped),))
         return Failure(failure)
@@ -449,7 +447,7 @@ class Hold(PersonAction):
         after_hold = player.hold(item)
         if after_hold != item:
             world.unregister(item)
-        await world.bus.publish(ItemHeld(player, area, after_hold))
+        await world.bus.publish(ItemHeld(person=player, area=area, hold=[after_hold]))
         await ctx.extend(hold=[after_hold]).hook("hold:after")
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
@@ -517,7 +515,9 @@ class TakeOut(PersonAction):
 
 
 class MovingAction(PersonAction):
-    def __init__(self, area: Area = None, finder: movement.FindsRoute = None, **kwargs):
+    def __init__(
+        self, area: envo.Area = None, finder: movement.FindsRoute = None, **kwargs
+    ):
         super().__init__(**kwargs)
         self.area = area
         self.finder = finder
@@ -573,7 +573,9 @@ class Obliterate(PersonAction):
         item: Any = None  # TODO CarryableMixin to Entity
         for item in items:
             world.unregister(item)
-            await world.bus.publish(ItemObliterated(player, area, item))
+            await world.bus.publish(
+                ItemObliterated(person=player, area=area, item=item)
+            )
 
         await ctx.extend(obliterate=items).hook("obliterate:after")
 
