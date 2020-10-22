@@ -11,27 +11,33 @@ log = logging.getLogger("dimsum")
 
 
 class KeyMixin:
-    def __init__(self, patterns=None, **kwargs):
+    def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.patterns = patterns if patterns else {}
+        log.info("key:ctor %s", patterns)
 
     def has_pattern(self, pattern: crypto.Identity):
         return pattern.public in self.patterns
 
 
 class Lockable:
-    def __init__(self, pattern=None, locked=None, **kwargs):
+    def __init__(self, pattern: crypto.Identity = None, locked=None, **kwargs):
         super().__init__(*kwargs)
         self.pattern = pattern if pattern else None
-        self.locked = locked if locked else None
+        self.locked = locked if locked else False
 
     def lock(self, key: KeyMixin = None, identity=None, **kwargs):
+        assert identity
+        assert not self.locked
+
         if not key:
             # Only way this works is if we don't have a secret yet.
             if self.pattern:
                 raise Exception("already have a secret, need key")
+
             self.pattern = crypto.generate_identity()
             self.locked = True
+
             patterns = {}
             patterns[self.pattern.public] = self.pattern
             key = cast(
@@ -40,8 +46,10 @@ class Lockable:
                     details=props.Details("Key"), patterns=patterns, **kwargs
                 ),
             )
-            log.info("new key:%s", key)
+            log.info("new key:%s %s", key, patterns)
             return key
+
+        assert self.pattern
 
         # Key should fit us.
         if not key.has_pattern(self.pattern):
@@ -54,15 +62,21 @@ class Lockable:
 
     def unlock(self, key: KeyMixin = None, **kwargs):
         assert key
-        assert isinstance(key, KeyMixin)
+        assert isinstance(key, KeyMixin)  # This is usually true, anyway.
+        assert self.locked
 
         if not self.pattern:
             raise Exception("no pattern, not locked")
 
         if not key.has_pattern(self.pattern):
+            log.info("wrong key: %s vs %s", key.patterns, self.pattern)
             return False
 
-        return None
+        self.locked = False
+
+        log.info("unlcoked")
+
+        return True
 
 
 class LockableMixin:

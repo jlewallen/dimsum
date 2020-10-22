@@ -490,11 +490,12 @@ class Unlock(PersonAction):
         if not item:
             return Failure("unlock what?")
 
+        log.info("finding key %s", self.key)
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
+        log.info("maybe key: %s", maybe_key)
         if item.unlock(key=maybe_key, **kwargs):
-            player.drop(item)
-
-        return Success("done")
+            return Success("done")
+        return Failure("nope")
 
 
 class PutInside(PersonAction):

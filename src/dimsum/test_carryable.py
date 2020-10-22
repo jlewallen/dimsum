@@ -70,7 +70,6 @@ async def test_lock_with_new_key(caplog):
     tw = test.TestWorld()
     await tw.initialize()
     await tw.execute("make Box")
-    assert len(tw.player.holding) == 1
     r = await tw.execute("lock box")
     assert isinstance(r, reply.Success)
     assert len(tw.player.holding) == 2
@@ -82,3 +81,21 @@ async def test_lock_with_new_key(caplog):
     assert len(tw.player.holding) == 2
     await tw.execute("unlock box")
     assert len(tw.player.holding) == 2
+
+
+@pytest.mark.asyncio
+async def test_try_unlock_wrong_key(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.execute("make Box")
+    await tw.execute("lock box")
+    assert len(tw.player.holding) == 2
+    await tw.execute("drop key")
+    assert len(tw.player.holding) == 1
+
+    await tw.execute("make Chest")
+    await tw.execute("lock chest")
+    await tw.execute("drop chest")
+    r = await tw.execute("unlock box with key")
+    assert isinstance(r, reply.Failure)
