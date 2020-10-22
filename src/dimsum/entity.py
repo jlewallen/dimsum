@@ -1,12 +1,12 @@
 from typing import Type, List, Union, Any, Dict
 
 import abc
-import copy
 import logging
+import copy
+import wrapt
 import props
 import behavior
 import crypto
-import wrapt
 
 log = logging.getLogger("dimsum")
 

@@ -7,6 +7,11 @@ import envo
 log = logging.getLogger("dimsum")
 
 
+class FindNone(things.ItemFinder):
+    def find_item(self, **kwargs) -> Optional[things.Item]:
+        return None
+
+
 class AnyItem(things.ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
@@ -53,7 +58,7 @@ class UnheldItem(things.ItemFinder):
         return None
 
 
-class SoloHeldItem(things.ItemFinder):
+class AnyHeldItem(things.ItemFinder):
     def find_item(
         self, person: animals.Person = None, **kwargs
     ) -> Optional[things.Item]:

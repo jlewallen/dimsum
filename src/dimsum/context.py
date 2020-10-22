@@ -21,6 +21,10 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
+    def create_item(self, **kwargs) -> entity.Entity:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def extend(self, **kwargs) -> "Ctx":
         raise NotImplementedError
 

@@ -6,11 +6,16 @@ def create_parser():
         """
         start: verbs | verb
 
-        verbs.2:           look | obliterate | drop | hold | put | make | go | remember | modify | plant | shake | wear | remove | swing | water | pour
-                         | go | climb | walk | run
-                         | eat | drink | home | hit
-                         | call | forget | think | give | take
-                         | hug | kiss | kick | tickle | poke | heal | auth | say | tell
+        verbs.2:           look
+                         | drop | hold | put | take | lock | unlock | give | wear | remove
+                         | make | call | modify | obliterate
+                         | eat | drink | hit | kick
+                         | go | climb | walk | run | home
+                         | plant | pour | water
+                         | shake | swing
+                         | hug | kiss | tickle | poke | heal | say | tell
+                         | remember | forget | think
+                         | auth
 
         verb.1:            WORD (this | that | noun)?
 
@@ -36,8 +41,6 @@ def create_parser():
         tell:              "tell" TEXT
 
         give:              "give"
-        home:              "home"
-
 
         eat:               "eat" noun
         drink:             "drink" noun
@@ -48,6 +51,12 @@ def create_parser():
                          | "take" contained_noun "out" "of" held_noun -> take_out
 
         put:               "put" held_noun ("in") held_noun        -> put_inside
+
+        lock:              "lock" held_noun "with" held_noun       -> lock_with
+                         | "lock" held_noun                        -> lock_new
+
+        unlock:            "unlock" held_noun "with" held_noun     -> unlock_with
+                         | "unlock" held_noun                      -> unlock
 
         hold:              "hold" unheld_noun                      -> hold
                          | "hold" number unheld_noun               -> hold_quantity
@@ -60,6 +69,7 @@ def create_parser():
         DIRECTION:         "north" | "west" | "east" | "south"
         direction:         DIRECTION
         route:             direction | named_route
+        home:              "home"
         go:                "go" route
         climb:             "climb" route
         walk:              "walk" route

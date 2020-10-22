@@ -21,6 +21,7 @@ class Item(
     apparel.Wearable,
     carryable.CarryableMixin,
     carryable.ContainingMixin,
+    carryable.KeyMixin,
     mechanics.InteractableMixin,
     movement.MovementMixin,
     mechanics.VisibilityMixin,

@@ -115,13 +115,13 @@ class World(entity.Entity, entity.Registrar):
         return area
 
     def apply_item_finder(
-        self, person: animals.Person, finder: things.ItemFinder
+        self, person: animals.Person, finder: things.ItemFinder, **kwargs
     ) -> Optional[things.Item]:
         assert person
         assert finder
         area = self.find_player_area(person)
-        log.info("applying finder:%s", finder)
-        return finder.find_item(area=area, person=person)
+        log.info("applying finder:%s %s", finder, kwargs)
+        return finder.find_item(area=area, person=person, **kwargs)
 
     async def perform(self, action, person: Optional[animals.Person]):
         area = self.find_entity_area(person) if person else None
@@ -233,6 +233,9 @@ class WorldCtx(context.Ctx):
                     for action in actions:
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
+
+    def create_item(self, **kwargs) -> things.Item:
+        return things.Item(**kwargs)
 
 
 def flatten(l):

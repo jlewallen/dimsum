@@ -1,7 +1,9 @@
-from typing import List, Tuple, Dict, Sequence, Optional, Union
+from typing import List, Tuple, Dict, Sequence, Optional, Union, cast
 
 import logging
 import abc
+import props
+import crypto
 import entity
 import context
 
@@ -9,15 +11,85 @@ log = logging.getLogger("dimsum")
 
 
 class KeyMixin:
-    def __init__(self, **kwargs):
+    def __init__(self, patterns=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
-        pass
+        self.patterns = patterns if patterns else {}
+
+    def has_pattern(self, pattern: crypto.Identity):
+        return pattern.public in self.patterns
+
+
+class Lockable:
+    def __init__(self, pattern=None, locked=None, **kwargs):
+        super().__init__(*kwargs)
+        self.pattern = pattern if pattern else None
+        self.locked = locked if locked else None
+
+    def lock(self, key: KeyMixin = None, identity=None, **kwargs):
+        if not key:
+            # Only way this works is if we don't have a secret yet.
+            if self.pattern:
+                raise Exception("already have a secret, need key")
+            self.pattern = crypto.generate_identity()
+            self.locked = True
+            patterns = {}
+            patterns[self.pattern.public] = self.pattern
+            key = cast(
+                KeyMixin,
+                context.get().create_item(
+                    details=props.Details("Key"), patterns=patterns, **kwargs
+                ),
+            )
+            log.info("new key:%s", key)
+            return key
+
+        # Key should fit us.
+        if not key.has_pattern(self.pattern):
+            log.info("wrong pattern on held held key:%s", key)
+            return False
+
+        self.locked = True
+
+        return key
+
+    def unlock(self, key: KeyMixin = None, **kwargs):
+        assert key
+        assert isinstance(key, KeyMixin)
+
+        if not self.pattern:
+            raise Exception("no pattern, not locked")
+
+        if not key.has_pattern(self.pattern):
+            return False
+
+        return None
 
 
 class LockableMixin:
-    def __init__(self, **kwargs):
+    def __init__(self, lockable=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
-        pass
+        self.lockable = lockable if lockable else Lockable()
+
+    def lock(self, **kwargs):
+        return self.lockable.lock(identity=self.identity, **kwargs)
+
+    def unlock(self, **kwargs):
+        return self.lockable.unlock(**kwargs)
+
+    def is_locked(self):
+        return self.lockable.us_locked()
+
+
+class OpenableMixin(LockableMixin):
+    def __init__(self, openenable=None, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        self.openable = {}
+
+    def open(self, **kwargs):
+        return True
+
+    def close(self, **kwargs):
+        return False
 
 
 class CarryableMixin:
@@ -45,14 +117,14 @@ class CarryableMixin:
         pass
 
     @abc.abstractmethod
-    def separate(self, quantity: int, ctx: context.Ctx = None, **kwargs):
+    def separate(self, quantity: int, **kwargs):
         pass
 
 
 CarryableType = Union[entity.Entity, CarryableMixin]
 
 
-class ContainingMixin(LockableMixin):
+class ContainingMixin(OpenableMixin):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
         self.holding = holding if holding else []
@@ -110,7 +182,6 @@ class ContainingMixin(LockableMixin):
         area: "ContainingMixin",
         item: CarryableMixin = None,
         quantity: int = None,
-        ctx: context.Ctx = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
@@ -124,10 +195,9 @@ class ContainingMixin(LockableMixin):
             if quantity > item.quantity or quantity < 1:
                 return None, "you should check how many you have"
 
-            dropped = item.separate(quantity, ctx=ctx, **kwargs)
+            dropped = item.separate(quantity, **kwargs)
             if item.quantity == 0:
-                assert ctx
-                ctx.registrar().unregister(item)
+                context.get().registrar().unregister(item)
                 self.drop(item)
         else:
             if item:
@@ -138,8 +208,7 @@ class ContainingMixin(LockableMixin):
         for item in dropped:
             after_add = area.add_item(item)
             if after_add != item:
-                assert ctx
-                ctx.registrar().unregister(item)
+                context.get().registrar().unregister(item)
 
         return dropped, None
 

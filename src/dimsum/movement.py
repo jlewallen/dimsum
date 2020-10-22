@@ -62,7 +62,7 @@ class DirectionalRoute(AreaRoute):
 
 class MovementMixin:
     def __init__(self, routes=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.routes: List[AreaRoute] = routes if routes else []
 
     def find_route(self, **kwargs) -> Optional[AreaRoute]:

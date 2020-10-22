@@ -47,6 +47,18 @@ class Evaluate(lark.Transformer):
     def take_out(self, args):
         return actions.TakeOut(container=args[1], item=args[0])
 
+    def lock_new(self, args):
+        return actions.Lock(item=args[0], key=finders.FindNone())
+
+    def lock_with(self, args):
+        return actions.Lock(item=args[0], key=args[1])
+
+    def unlock(self, args):
+        return actions.Unlock(item=args[0], key=finders.AnyHeldItem())
+
+    def unlock_with(self, args):
+        return actions.Unlock(item=args[0], key=args[1])
+
     def hold(self, args):
         return actions.Hold(item=args[0])
 
@@ -177,36 +189,34 @@ class Evaluate(lark.Transformer):
         return movement.FindNamedRoute(str(args[0]))
 
     def this(self, args):
-        return finders.SoloHeldItem()
+        return finders.AnyHeldItem()
 
     def modify_servings(self, args):
-        return actions.ModifyServings(item=finders.SoloHeldItem(), number=args[0])
+        return actions.ModifyServings(item=finders.AnyHeldItem(), number=args[0])
 
     def modify_field(self, args):
         field = str(args[0])
         value = args[1]
-        return actions.ModifyField(
-            item=finders.SoloHeldItem(), field=field, value=value
-        )
+        return actions.ModifyField(item=finders.AnyHeldItem(), field=field, value=value)
 
     def when_worn(self, args):
         return actions.ModifyActivity(
-            item=finders.SoloHeldItem(), activity=props.Worn, value=True
+            item=finders.AnyHeldItem(), activity=props.Worn, value=True
         )
 
     def when_opened(self, args):
         return actions.ModifyActivity(
-            item=finders.SoloHeldItem(), activity=props.Opened, value=True
+            item=finders.AnyHeldItem(), activity=props.Opened, value=True
         )
 
     def when_eaten(self, args):
         return actions.ModifyActivity(
-            item=finders.SoloHeldItem(), activity=props.Eaten, value=True
+            item=finders.AnyHeldItem(), activity=props.Eaten, value=True
         )
 
     def when_drank(self, args):
         return actions.ModifyActivity(
-            item=finders.SoloHeldItem(), activity=props.Drank, value=True
+            item=finders.AnyHeldItem(), activity=props.Drank, value=True
         )
 
     def remember(self, args):

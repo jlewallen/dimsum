@@ -87,10 +87,6 @@ class AddItemArea(PersonAction):
         return Success("%s appeared" % (p.join([self.item]),))
 
 
-class ItemsAppeared(Event):
-    pass
-
-
 class Make(PersonAction):
     def __init__(self, template=None, item=None, **kwargs):
         super().__init__(**kwargs)
@@ -450,6 +446,57 @@ class Hold(PersonAction):
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
+class Lock(PersonAction):
+    def __init__(
+        self, item: things.ItemFinder = None, key: things.ItemFinder = None, **kwargs
+    ):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+        assert key
+        self.key = key
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        area = world.find_player_area(player)
+
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("what?")
+
+        maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
+        locked_with = item.lock(key=maybe_key, creator=player, **kwargs)
+        if not locked_with:
+            return Failure("can't seem to lock that")
+
+        player.hold(locked_with)
+
+        return Success("done")
+
+
+class Unlock(PersonAction):
+    def __init__(
+        self, item: things.ItemFinder = None, key: things.ItemFinder = None, **kwargs
+    ):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+        assert key
+        self.key = key
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        area = world.find_player_area(player)
+
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("unlock what?")
+
+        maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
+        if item.unlock(key=maybe_key, **kwargs):
+            player.drop(item)
+
+        return Success("done")
+
+
 class PutInside(PersonAction):
     def __init__(
         self,
@@ -686,3 +733,7 @@ class ModifyServings(PersonAction):
             return Failure("nothing to modify")
         item.servings = self.number
         return Success("done")
+
+
+class ItemsAppeared(Event):
+    pass
