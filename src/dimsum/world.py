@@ -67,7 +67,7 @@ class World(entity.Entity, entity.Registrar):
     def contains(self, key) -> bool:
         return key in self.entities
 
-    def find(self, key) -> entity.Entity:
+    def find_by_key(self, key) -> entity.Entity:
         return self.entities[key]
 
     def resolve(self, keys) -> Sequence[entity.Entity]:

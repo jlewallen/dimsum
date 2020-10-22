@@ -158,12 +158,8 @@ class ContainingMixin(OpenableMixin):
         self.holding.append(item)
         return item
 
-    def find(self, q: str) -> Optional[CarryableMixin]:
-        log.debug("%s find: '%s' holding=%s", self, q, self.holding)
-        for e in self.holding:
-            if e.describes(q):
-                return e
-        return None
+    def find_item_under(self, **kwargs) -> Optional[CarryableMixin]:
+        return find_item_under(candidates=self.holding, **kwargs)
 
     def drop_all(self) -> List[CarryableMixin]:
         dropped = []
@@ -222,3 +218,18 @@ class ContainingMixin(OpenableMixin):
 
 class CarryingMixin(ContainingMixin):
     pass
+
+
+def find_item_under(
+    q: str = None, candidates=None, exclude=None, **kwargs
+) -> Optional[CarryableMixin]:
+    log.info("find-item-under: '%s' candidates=%s exclude=%s", q, candidates, exclude)
+    for e in candidates:
+        if not exclude or e not in exclude:
+            if q:
+                if e.describes(q):
+                    return e
+            else:
+                return e
+
+    return None

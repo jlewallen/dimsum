@@ -41,12 +41,6 @@ class Alive(
     def describes(self, q: str) -> bool:
         return q.lower() in self.details.name.lower()
 
-    def find(self, q: str) -> Optional[carryable.CarryableMixin]:
-        for e in self.holding:
-            if e.describes(q):
-                return e
-        return None
-
     def __str__(self):
         return self.details.name
 

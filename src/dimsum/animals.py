@@ -14,14 +14,10 @@ class HealthyAndClothedAnimal(
     apparel.ApparelMixin,
     health.HealthMixin,
 ):
-    def find(self, q: str) -> Optional[carryable.CarryableMixin]:
-        e = super().find(q)
-        if e:
-            return e
-        for e in self.wearing:  # type: ignore
-            if e and e.describes(q):  # type: ignore
-                return e
-        return None
+    def find_item_under(self, **kwargs) -> Optional[carryable.CarryableMixin]:
+        return carryable.find_item_under(
+            candidates=self.holding + self.wearing, **kwargs
+        )
 
 
 class Mammal(HealthyAndClothedAnimal):

@@ -16,12 +16,12 @@ class Direction(enum.Enum):
 
 class Area:
     @abc.abstractmethod
-    def find(self, q: str):
-        pass
+    def find_item_under(self, **kwargs):
+        raise NotImplementedError
 
     @abc.abstractmethod
     def find_route(self, **kwargs):
-        pass
+        raise NotImplementedError
 
 
 class AreaBuilder:
@@ -98,7 +98,7 @@ class MovementMixin:
 
 
 class FindsRoute:
-    async def find(self, area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(self, area, person, **kwargs) -> Optional[AreaRoute]:
         raise NotImplementedError
 
 
@@ -107,12 +107,12 @@ class FindNamedRoute(FindsRoute):
         super().__init__()
         self.name = name
 
-    async def find(
+    async def find_route(
         self, area: Area, person, builder=None, **kwargs
     ) -> Optional[AreaRoute]:
-        item = area.find(self.name)
+        item = area.find_item_under(q=self.name, **kwargs)
         if not item:
-            item = person.find(self.name)
+            item = person.find_item_under(q=self.name, **kwargs)
             if not item:
                 log.info("no named route: %s", self.name)
                 return None
@@ -126,5 +126,5 @@ class FindDirectionalRoute(FindsRoute):
         super().__init__()
         self.direction = direction
 
-    async def find(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
         return area.find_route(direction=self.direction)

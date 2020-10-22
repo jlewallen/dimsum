@@ -21,20 +21,6 @@ def get_public_from_private_bytes(encoded_private):
     return base64.b64encode(public_bytes).decode("utf-8")
 
 
-def generate_identity():
-    private_key = Ed25519PrivateKey.generate()
-    private_bytes = private_key.private_bytes(
-        encoding=serialization.Encoding.Raw,
-        format=serialization.PrivateFormat.Raw,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-    encoded_private = base64.b64encode(private_bytes).decode("utf-8")
-
-    encoded_public = get_public_from_private_bytes(encoded_private)
-
-    return Identity(public=encoded_public, private=encoded_private)
-
-
 class Identity:
     def __init__(self, public=None, private=None, signature=None, **kwargs):
         self.private = private
@@ -55,6 +41,20 @@ class Identity:
 
     def __repr__(self):
         return str(self)
+
+
+def generate_identity() -> Identity:
+    private_key = Ed25519PrivateKey.generate()
+    private_bytes = private_key.private_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PrivateFormat.Raw,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    encoded_private = base64.b64encode(private_bytes).decode("utf-8")
+
+    encoded_public = get_public_from_private_bytes(encoded_private)
+
+    return Identity(public=encoded_public, private=encoded_private)
 
 
 def generate_identity_from(other: Identity):

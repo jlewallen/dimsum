@@ -1,7 +1,8 @@
-from typing import Any, Optional, cast
+from typing import Any, List, Optional, cast
 import logging
 import things
 import animals
+import carryable
 import envo
 
 log = logging.getLogger("dimsum")
@@ -24,11 +25,11 @@ class AnyItem(things.ItemFinder):
         assert person
         assert area
 
-        item = person.find(self.q)
+        item = person.find_item_under(q=self.q, **kwargs)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
-        item = area.find(self.q)
+        item = area.find_item_under(q=self.q, **kwargs)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
@@ -47,11 +48,11 @@ class UnheldItem(things.ItemFinder):
         assert person
         assert area
 
-        item = area.find(self.q)
+        item = area.find_item_under(q=self.q)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
-        item = person.find(self.q)
+        item = person.find_item_under(q=self.q)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
@@ -63,13 +64,14 @@ class AnyHeldItem(things.ItemFinder):
         self, person: animals.Person = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
-        if len(person.holding) == 0:
-            return None
-        return person.holding[0]
+        return cast(things.Item, person.find_item_under(**kwargs))
 
 
 class HeldItem(things.ItemFinder):
-    def __init__(self, q: str = ""):
+    def __init__(
+        self,
+        q: str = "",
+    ):
         super().__init__()
         assert q
         self.q = q
@@ -78,7 +80,7 @@ class HeldItem(things.ItemFinder):
         self, person: animals.Person = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
-        item = person.find(self.q)
+        item = person.find_item_under(q=self.q, **kwargs)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
