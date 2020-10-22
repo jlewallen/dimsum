@@ -36,7 +36,7 @@ class DiscordEventBus(messages.TextBus):
         for channel in self.bot.get_all_channels():
             if channel.name == "IGNORED":
                 await channel.send(str(event))
-        return event.accept(self)
+        return await event.accept(self)
 
 
 class BotPlayer:
@@ -367,7 +367,7 @@ modify when eaten
         self.bot.logout()
 
     async def initialize(self):
-        self.bus = discord_events.Bus(self.bot)
+        self.bus = DiscordEventBus(self.bot)
         self.world = world.World(self.bus, luaproxy.context_factory)
 
         db = persistence.SqliteDatabase()

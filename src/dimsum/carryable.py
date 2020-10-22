@@ -14,7 +14,6 @@ class KeyMixin:
     def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.patterns = patterns if patterns else {}
-        log.info("key:ctor %s", patterns)
 
     def has_pattern(self, pattern: crypto.Identity):
         return pattern.public in self.patterns
