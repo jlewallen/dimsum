@@ -25,6 +25,9 @@ class Lockable:
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
 
+    def is_locked(self) -> bool:
+        return self.locked
+
     def lock(self, key: KeyMixin = None, identity=None, **kwargs):
         assert identity
         assert not self.locked
@@ -133,7 +136,12 @@ class OpenableMixin(LockableMixin):
         super().__init__(**kwargs)  # type: ignore
         self.openable = openable if openable else UnknownOpenClose()
 
+    def is_open(self):
+        return self.openable.is_open()
+
     def open(self, **kwargs):
+        if self.is_locked():
+            return False
         if self.openable.is_open():
             return False
         self.openable = self.openable.open()
@@ -191,10 +199,15 @@ class ContainingMixin(OpenableMixin):
         return e
 
     def place_inside(self, item: CarryableMixin, **kwargs):
-        return self.hold(item, **kwargs)
+        if self.is_open():
+            return self.hold(item, **kwargs)
+        return False
 
     def take_out(self, item: CarryableMixin, **kwargs):
-        return self.unhold(item, **kwargs)
+        log.info("open: %s", self.is_open())
+        if self.is_open():
+            return self.unhold(item, **kwargs)
+        return False
 
     def hold(self, item: CarryableMixin, quantity: int = None, **kwargs):
         return self.add_item(item, **kwargs)

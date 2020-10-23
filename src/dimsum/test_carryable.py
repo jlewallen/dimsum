@@ -55,10 +55,15 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     await tw.success("make Coin")
     await tw.success("make Box")
     assert len(tw.player.holding) == 2
+    await tw.failure("put coin in box")
+    await tw.success("open box")
     await tw.success("put coin in box")
     assert len(tw.player.holding) == 1
     await tw.success("look down")
     assert len(tw.world.find_entity_by_name("Box").holding) == 1
+    await tw.success("close box")
+    await tw.failure("take coin out of box")
+    await tw.success("open box")
     await tw.success("take coin out of box")
     assert len(tw.world.find_entity_by_name("Box").holding) == 0
     assert len(tw.player.holding) == 2
@@ -72,7 +77,9 @@ async def test_lock_with_new_key(caplog):
     await tw.success("make Box")
     await tw.success("lock box")
     assert len(tw.player.holding) == 2
+    await tw.failure("open box")
     await tw.success("unlock box")
+    await tw.success("open box")
     assert len(tw.player.holding) == 2
     await tw.success("lock box with key")
     assert len(tw.player.holding) == 2

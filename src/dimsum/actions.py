@@ -558,8 +558,9 @@ class PutInside(PersonAction):
 
         if container.place_inside(item):
             player.drop(item)
+            return Success("inside, done")
 
-        return Success("inside, done")
+        return Failure("you can't do that")
 
 
 class TakeOut(PersonAction):
@@ -588,10 +589,9 @@ class TakeOut(PersonAction):
 
         if container.take_out(item):
             player.hold(item)
-        else:
-            return Failure("doesn't seem like you can")
+            return Success("done, you're holding that now")
 
-        return Success("inside, done")
+        return Failure("doesn't seem like you can")
 
 
 class MovingAction(PersonAction):
