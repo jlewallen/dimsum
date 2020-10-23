@@ -4,6 +4,7 @@
    They would have access to things.Item?
 
 ** TODO Depend on carryable for dropping worn items?
+** TODO SSB Storage Backend?
 ** TODO Distance effects.
 
    N-Hops aways, etc...
