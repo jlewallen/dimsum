@@ -446,6 +446,40 @@ class Hold(PersonAction):
         return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
+class Open(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("open what?")
+
+        if not item.open():
+            return Failure("you can't open that")
+
+        return Success("opened")
+
+
+class Close(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("close what?")
+
+        if not item.close():
+            return Failure("you can't close that")
+
+        return Success("closed")
+
+
 class Lock(PersonAction):
     def __init__(
         self, item: things.ItemFinder = None, key: things.ItemFinder = None, **kwargs

@@ -99,3 +99,15 @@ async def test_try_unlock_wrong_key(caplog):
     await tw.execute("drop chest")
     r = await tw.execute("unlock box with key")
     assert isinstance(r, reply.Failure)
+
+
+@pytest.mark.asyncio
+async def test_make_and_open_container(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Box")
+    await tw.failure("close box")
+    await tw.success("open box")
+    await tw.success("close box")
+    await tw.success("open box")
+    await tw.success("close box")

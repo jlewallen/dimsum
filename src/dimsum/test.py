@@ -16,6 +16,7 @@ import luaproxy
 import bus
 import messages
 import handlers
+import reply
 
 log = logging.getLogger("dimsum")
 
@@ -82,3 +83,13 @@ class TestWorld:
         response = await self.world.perform(action, self.player)
         log.info("response: %s" % (response,))
         return response
+
+    async def success(self, command: str):
+        r = await self.execute(command)
+        assert isinstance(r, reply.Success)
+        return r
+
+    async def failure(self, command: str):
+        r = await self.execute(command)
+        assert isinstance(r, reply.Failure)
+        return r

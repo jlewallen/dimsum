@@ -7,7 +7,7 @@ def create_parser():
         start: verbs | verb
 
         verbs.2:           look
-                         | drop | hold | put | take | lock | unlock | give | wear | remove
+                         | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
                          | make | call | modify | obliterate
                          | eat | drink | hit | kick
                          | go | climb | walk | run | home
@@ -51,6 +51,9 @@ def create_parser():
                          | "take" contained_noun "out" "of" held_noun -> take_out
 
         put:               "put" held_noun ("in") held_noun        -> put_inside
+
+        open:              "open" held_noun                        -> open_hands
+        close:             "close" held_noun                       -> close_hands
 
         lock:              "lock" held_noun "with" held_noun       -> lock_with
                          | "lock" held_noun                        -> lock_new

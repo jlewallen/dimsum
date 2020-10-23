@@ -93,15 +93,56 @@ class LockableMixin:
         return self.lockable.us_locked()
 
 
+class OpenClose:
+    def is_open(self):
+        raise NotImplementedError
+
+    def open(self):
+        raise NotImplementedError
+
+    def close(self):
+        raise NotImplementedError
+
+
+class Closed(OpenClose):
+    def is_open(self):
+        return False
+
+    def open(self):
+        return Opened()
+
+
+class Opened(OpenClose):
+    def is_open(self):
+        return True
+
+    def close(self):
+        return Closed()
+
+
+class UnknownOpenClose(OpenClose):
+    def is_open(self):
+        return False
+
+    def open(self):
+        return Opened()
+
+
 class OpenableMixin(LockableMixin):
-    def __init__(self, openenable=None, **kwargs):
+    def __init__(self, openable: OpenClose = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
-        self.openable = {}
+        self.openable = openable if openable else UnknownOpenClose()
 
     def open(self, **kwargs):
+        if self.openable.is_open():
+            return False
+        self.openable = self.openable.open()
         return True
 
     def close(self, **kwargs):
+        if self.openable.is_open():
+            self.openable = self.openable.close()
+            return True
         return False
 
 

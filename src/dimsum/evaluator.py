@@ -47,6 +47,12 @@ class Evaluate(lark.Transformer):
     def take_out(self, args):
         return actions.TakeOut(container=args[1], item=args[0])
 
+    def open_hands(self, args):
+        return actions.Open(item=args[0])
+
+    def close_hands(self, args):
+        return actions.Close(item=args[0])
+
     def lock_new(self, args):
         return actions.Lock(item=args[0], key=finders.FindNone())
 
