@@ -33,6 +33,40 @@ class BeerKeg(Factory):
         return item
 
 
+class LargeMapleTree(Factory):
+    def create(self, world: world.World):
+        item = things.Item(
+            creator=world,
+            details=props.Details("Large Maple Tree", desc="It's heavy."),
+        )
+        item.add_behavior(
+            "b:drop-leaf:tick",
+            lua="""
+function(s, world, area, item)
+    return area.make({
+        kind = item.kind("leaf-1"),
+        name = "Maple Leaf",
+        quantity = 1,
+        color = "red",
+    })
+end
+""",
+        )
+        item.add_behavior(
+            "b:drop-branch:tick",
+            lua="""
+function(s, world, area, item)
+    return area.make({
+        kind = item.kind("branch-1"),
+        name = "Maple Branch",
+        quantity = 1,
+    })
+end
+""",
+        )
+        return item
+
+
 class LargeOakTree(Factory):
     def create(self, world: world.World):
         item = things.Item(
@@ -40,7 +74,7 @@ class LargeOakTree(Factory):
             details=props.Details("Large Oak Tree", desc="It's heavy."),
         )
         item.add_behavior(
-            "b:growing:tick",
+            "b:drop-leaf:tick",
             lua="""
 function(s, world, area, item)
     return area.make({
@@ -48,6 +82,18 @@ function(s, world, area, item)
         name = "Oak Leaf",
         quantity = 1,
         color = "red",
+    })
+end
+""",
+        )
+        item.add_behavior(
+            "b:drop-branch:tick",
+            lua="""
+function(s, world, area, item)
+    return area.make({
+        kind = item.kind("branch-1"),
+        name = "Oak Branch",
+        quantity = 1,
     })
 end
 """,
@@ -259,6 +305,8 @@ class WelcomeArea(Factory):
             .area(details=props.Details("A small clearing."))
             .via(details=props.Details("Worn Path"))
         )
+
+        clearing.add_item(LargeMapleTree().create(world))
 
         museum = Museum().create(world)
         steps = MarbleSteps().create(world)
