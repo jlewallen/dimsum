@@ -18,14 +18,14 @@ log = logging.getLogger("dimsum")
 async def test_look_for():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("look for keys")
+    await tw.success("look for keys")
 
 
 @pytest.mark.asyncio
 async def test_look_empty():
     tw = test.TestWorld()
     await tw.initialize()
-    r = await tw.execute("look")
+    r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 0
@@ -36,9 +36,9 @@ async def test_look_empty():
 async def test_look_items():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make IPA")
-    await tw.execute("drop")
-    r = await tw.execute("look")
+    await tw.success("make IPA")
+    await tw.success("drop")
+    r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 1
     assert len(r.living) == 0
@@ -49,7 +49,7 @@ async def test_look_living():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.add_carla()
-    r = await tw.execute("look")
+    r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 1
@@ -63,7 +63,7 @@ async def test_look_people_invisible():
     await tw.add_carla()
     tw.carla.make_invisible()
 
-    r = await tw.execute("look")
+    r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 1
@@ -74,4 +74,4 @@ async def test_think():
     tw = test.TestWorld()
     await tw.initialize()
 
-    await tw.execute("think")
+    await tw.success("think")

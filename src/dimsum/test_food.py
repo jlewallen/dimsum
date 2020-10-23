@@ -10,11 +10,10 @@ import test
 async def test_make_food():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make Steak")
-    await tw.execute("modify when eaten")
-    await tw.execute("modify protein 100")
-    r = await tw.execute("eat steak")
-    assert isinstance(r, reply.Success)
+    await tw.success("make Steak")
+    await tw.success("modify when eaten")
+    await tw.success("modify protein 100")
+    await tw.success("eat steak")
     assert len(tw.player.holding) == 0
     assert tw.player.medical.nutrition.properties["protein"] == 100
 
@@ -23,11 +22,10 @@ async def test_make_food():
 async def test_make_drinks():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make IPA")
-    await tw.execute("modify when drank")
-    await tw.execute("modify alcohol 100")
-    r = await tw.execute("drink ipa")
-    assert isinstance(r, reply.Success)
+    await tw.success("make IPA")
+    await tw.success("modify when drank")
+    await tw.success("modify alcohol 100")
+    await tw.success("drink ipa")
     assert len(tw.player.holding) == 0
     assert tw.player.medical.nutrition.properties["alcohol"] == 100
 
@@ -36,9 +34,8 @@ async def test_make_drinks():
 async def test_try_eat():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make IPA")
-    r = await tw.execute("drink ipa")
-    assert isinstance(r, reply.Failure)
+    await tw.success("make IPA")
+    await tw.failure("drink ipa")
     assert len(tw.player.holding) == 1
 
 
@@ -46,9 +43,8 @@ async def test_try_eat():
 async def test_try_drink():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make IPA")
-    r = await tw.execute("drink ipa")
-    assert isinstance(r, reply.Failure)
+    await tw.success("make IPA")
+    await tw.failure("drink ipa")
     assert len(tw.player.holding) == 1
 
 
@@ -56,14 +52,12 @@ async def test_try_drink():
 async def test_taking_multiple_bites():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make Cake")
-    await tw.execute("modify when eaten")
-    await tw.execute("modify servings 2")
-    r = await tw.execute("eat cake")
-    assert isinstance(r, reply.Success)
+    await tw.success("make Cake")
+    await tw.success("modify when eaten")
+    await tw.success("modify servings 2")
+    await tw.success("eat cake")
     assert len(tw.player.holding) == 1
-    r = await tw.execute("eat cake")
-    assert isinstance(r, reply.Success)
+    await tw.success("eat cake")
     assert len(tw.player.holding) == 0
 
 
@@ -71,15 +65,13 @@ async def test_taking_multiple_bites():
 async def test_taking_multiple_sips():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.execute("make IPA")
-    await tw.execute("modify when drank")
-    await tw.execute("modify alcohol 100")
-    await tw.execute("modify servings 2")
-    r = await tw.execute("drink ipa")
-    assert isinstance(r, reply.Success)
+    await tw.success("make IPA")
+    await tw.success("modify when drank")
+    await tw.success("modify alcohol 100")
+    await tw.success("modify servings 2")
+    await tw.success("drink ipa")
     assert len(tw.player.holding) == 1
-    r = await tw.execute("drink ipa")
-    assert isinstance(r, reply.Success)
+    await tw.success("drink ipa")
     assert len(tw.player.holding) == 0
 
 

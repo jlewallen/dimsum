@@ -33,13 +33,13 @@ end
     )
 
     await tw.initialize()
-    await tw.execute("look")
-    await tw.execute("hold hammer")
-    await tw.execute("drop")
-    await tw.execute("hold hammer")
-    await tw.execute("drop")
-    await tw.execute("hold hammer")
-    await tw.execute("drop")
+    await tw.success("look")
+    await tw.success("hold hammer")
+    await tw.success("drop")
+    await tw.success("hold hammer")
+    await tw.success("drop")
+    await tw.success("hold hammer")
+    await tw.success("drop")
 
     assert tw.jacob.details["gold"]["total"] == 2
 
@@ -70,13 +70,13 @@ end
     )
 
     await tw.initialize()
-    await tw.execute("look")
-    await tw.execute("hold cape")
-    await tw.execute("wear cape")
+    await tw.success("look")
+    await tw.success("hold cape")
+    await tw.success("wear cape")
     assert tw.jacob.is_invisible
-    await tw.execute("remove cape")
+    await tw.success("remove cape")
     assert not tw.jacob.is_invisible
-    await tw.execute("drop")
+    await tw.success("drop")
 
 
 @pytest.mark.asyncio
@@ -100,10 +100,10 @@ end
     )
 
     await tw.initialize()
-    await tw.execute("look")
-    await tw.execute("hold cape")
-    await tw.execute("wear cape")
-    await tw.execute("look")
+    await tw.success("look")
+    await tw.success("hold cape")
+    await tw.success("wear cape")
+    await tw.success("look")
 
     assert tw.world.find_player_area(tw.player) == mystery_area
 
@@ -130,13 +130,13 @@ end
     )
 
     await tw.initialize()
-    await tw.execute("look")
-    await tw.execute("hold box")
+    await tw.success("look")
+    await tw.success("hold box")
     assert len(tw.player.holding) == 1
-    await tw.execute("shake box")
+    await tw.success("shake box")
     assert len(tw.player.holding) == 2
     assert tw.player.holding[1].creator == tw.player
-    await tw.execute("look")
+    await tw.success("look")
 
 
 @pytest.mark.asyncio
@@ -162,16 +162,16 @@ end
     )
 
     await tw.initialize()
-    await tw.execute("look")
-    await tw.execute("hold box")
+    await tw.success("look")
+    await tw.success("hold box")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
-    await tw.execute("shake box")
+    await tw.success("shake box")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
     assert tw.area.entities()[0].creator == box
     assert tw.area.entities()[0].quantity == 10
-    await tw.execute("look")
+    await tw.success("look")
 
 
 @pytest.mark.asyncio

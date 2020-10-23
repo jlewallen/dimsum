@@ -15,7 +15,7 @@ async def test_go_unknown():
     await tw.initialize()
 
     area_before = tw.world.find_player_area(tw.player)
-    await tw.execute("go door")
+    await tw.failure("go door")
     area_after = tw.world.find_player_area(tw.player)
     assert area_before == area_after
 
@@ -28,7 +28,7 @@ async def test_go_adjacent():
     await tw.initialize()
 
     area_before = tw.world.find_player_area(tw.player)
-    await tw.execute("go door")
+    await tw.success("go door")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
     assert area_after == door_room
@@ -40,17 +40,17 @@ async def test_make_door_and_go_and_get_the_fuck_back():
 
     await tw.initialize()
 
-    await tw.execute("make Door")
+    await tw.success("make Door")
 
     area_before = tw.world.find_player_area(tw.player)
 
-    await tw.execute("go Door")
+    await tw.success("go Door")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
 
-    await tw.execute("look down")
+    await tw.success("look down")
 
-    await tw.execute("go Door")
+    await tw.success("go Door")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after == area_before
 
@@ -62,17 +62,17 @@ async def test_climb_wall(caplog):
 
     await tw.initialize()
 
-    await tw.execute("make Wall")
+    await tw.success("make Wall")
 
     area_before = tw.world.find_player_area(tw.player)
 
-    await tw.execute("climb wall")
+    await tw.success("climb wall")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
 
-    await tw.execute("look")
+    await tw.success("look")
 
-    await tw.execute("climb wall")
+    await tw.success("climb wall")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after == area_before
 
@@ -84,7 +84,7 @@ async def test_directional_moving_nowhere():
     await tw.initialize()
 
     area_before = tw.world.find_player_area(tw.player)
-    await tw.execute("go north")
+    await tw.failure("go north")
     area_after = tw.world.find_player_area(tw.player)
     assert area_before == area_after
 
@@ -95,7 +95,7 @@ async def test_directional_moving():
 
     await tw.initialize()
 
-    obs = await tw.execute("look")
+    obs = await tw.success("look")
     assert obs
 
     park = envo.Area(details=props.Details("North Park"))
@@ -106,7 +106,7 @@ async def test_directional_moving():
     )
 
     area_before = tw.world.find_player_area(tw.player)
-    await tw.execute("go north")
+    await tw.success("go north")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
     assert area_after == park

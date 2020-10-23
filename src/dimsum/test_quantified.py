@@ -14,12 +14,12 @@ async def test_quantified_drop_partial_and_hold():
     tw = test.TestWorld()
 
     await tw.initialize()
-    await tw.execute("make 20 Coin")
+    await tw.success("make 20 Coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
-    await tw.execute("drop 5 coin")
+    await tw.success("drop 5 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
     assert tw.player.holding[0].quantity == 15
@@ -27,17 +27,17 @@ async def test_quantified_drop_partial_and_hold():
     assert tw.player.holding[0].key in tw.world.entities  # Meh
     assert len(tw.world.items()) == 2
 
-    await tw.execute("hold coin")
+    await tw.success("hold coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
-    await tw.execute("drop 5 coin")
+    await tw.success("drop 5 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
     assert len(tw.world.items()) == 2
 
-    await tw.execute("drop 5 coin")
+    await tw.success("drop 5 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
     assert tw.player.holding[0].quantity == 10
@@ -50,11 +50,11 @@ async def test_quantified_hold_number():
     tw = test.TestWorld()
 
     await tw.initialize()
-    await tw.execute("make 20 Coin")
-    await tw.execute("drop 20 coin")
+    await tw.success("make 20 Coin")
+    await tw.success("drop 20 coin")
     assert len(tw.player.holding) == 0
     assert len(tw.area.entities()) == 2
-    await tw.execute("hold 10 coin")
+    await tw.success("hold 10 coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
 
@@ -64,12 +64,12 @@ async def test_quantified_drop_all():
     tw = test.TestWorld()
 
     await tw.initialize()
-    await tw.execute("make 20 Coin")
+    await tw.success("make 20 Coin")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
     assert len(tw.world.items()) == 1
 
-    await tw.execute("drop 20 coin")
+    await tw.success("drop 20 coin")
     assert len(tw.player.holding) == 0
     assert len(tw.area.entities()) == 2
     assert tw.area.holding[0].quantity == 20
@@ -83,11 +83,11 @@ async def test_quantified_drop_inflected():
     await tw.initialize()
 
     assert len(tw.player.holding) == 0
-    await tw.execute("make 20 Coin")
+    await tw.success("make 20 Coin")
     assert len(tw.player.holding) == 1
 
     assert len(tw.area.entities()) == 1
-    await tw.execute("drop 10 coins")
+    await tw.success("drop 10 coins")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 2
 
@@ -98,15 +98,14 @@ async def test_quantified_from_recipe_holding_template(caplog):
     tw = test.TestWorld()
 
     await tw.initialize()
-    await tw.execute("make Gold Coin")
-    await tw.execute("call this cash")
-    r = await tw.execute("make 4 cash")
-    assert isinstance(r, reply.Success)
+    await tw.success("make Gold Coin")
+    await tw.success("call this cash")
+    r = await tw.success("make 4 cash")
     assert r.item.quantity == 5
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
 
-    await tw.execute("look down")
+    await tw.success("look down")
     assert tw.player.holding[0].quantity == 5
 
 
@@ -116,21 +115,21 @@ async def test_quantified_from_recipe(caplog):
     tw = test.TestWorld()
 
     await tw.initialize()
-    await tw.execute("make Gold Coin")
-    await tw.execute("call this cash")
+    await tw.success("make Gold Coin")
+    await tw.success("call this cash")
     item = tw.player.holding[0]
     assert item
 
-    await tw.execute("obliterate")
+    await tw.success("obliterate")
     assert item.destroyed
 
-    await tw.execute("make 20 cash")
+    await tw.success("make 20 cash")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
 
-    await tw.execute("make 20 cash")
+    await tw.success("make 20 cash")
     assert len(tw.player.holding) == 1
     assert len(tw.area.entities()) == 1
 
-    await tw.execute("look down")
+    await tw.success("look down")
     assert tw.player.holding[0].quantity == 40
