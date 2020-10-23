@@ -16,7 +16,7 @@ class HealthyAndClothedAnimal(
 ):
     def find_item_under(self, **kwargs) -> Optional[carryable.CarryableMixin]:
         return carryable.find_item_under(
-            candidates=self.holding + self.wearing, **kwargs
+            candidates=self.holding + carryable.expected(self.wearing), **kwargs
         )
 
 

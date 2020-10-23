@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Sequence, Optional, Union, cast
+from typing import Any, List, Tuple, Dict, Sequence, Optional, Union, cast
 
 import logging
 import abc
@@ -90,7 +90,7 @@ class LockableMixin:
         return self.lockable.unlock(**kwargs)
 
     def is_locked(self):
-        return self.lockable.us_locked()
+        return self.lockable.is_locked()
 
 
 class OpenClose:
@@ -181,7 +181,7 @@ CarryableType = Union[entity.Entity, CarryableMixin]
 class ContainingMixin(OpenableMixin):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
-        self.holding = holding if holding else []
+        self.holding: List[CarryableMixin] = holding if holding else []
 
     def contains(self, e: CarryableMixin) -> bool:
         return e in self.holding
@@ -287,3 +287,7 @@ def find_item_under(
                 return e
 
     return None
+
+
+def expected(maybes: List[Any]) -> List[CarryableMixin]:
+    return [cast(CarryableMixin, e) for e in maybes]

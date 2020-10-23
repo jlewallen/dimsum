@@ -367,7 +367,7 @@ class LookDown(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         await ctx.hook("look-down")
-        return EntitiesObservation(player.holding)
+        return EntitiesObservation(things.expected(player.holding))
 
 
 class Look(PersonAction):

@@ -97,8 +97,8 @@ class ContainedItem(things.ItemFinder):
         self, person: animals.Person = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
-        for item in person.holding:
-            for contained in item.holding:
+        for item in things.expected(person.holding):
+            for contained in things.expected(item.holding):
                 if contained.describes(self.q):
                     return contained
         return None

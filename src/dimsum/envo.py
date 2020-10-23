@@ -53,7 +53,9 @@ class Area(
         # `self.holding` I think once we have a mechanism to
         # optionally get associated entities this will be ok.
         via_routes = super().adjacent()
-        via_items = [r.area for r in flatten([e.routes for e in self.holding])]
+        via_items = [
+            r.area for r in flatten([e.routes for e in things.expected(self.holding)])
+        ]
         return [a for a in flatten([via_routes, via_items])]
 
     def __str__(self):

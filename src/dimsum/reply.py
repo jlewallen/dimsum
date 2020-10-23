@@ -73,7 +73,7 @@ class ObservedLiving(ObservedEntity):
         super().__init__()
         self.alive = alive
         self.activities: Sequence[living.Activity] = [
-            living.HoldingActivity(e) for e in alive.holding
+            living.HoldingActivity(e) for e in things.expected(alive.holding)
         ]
 
     @property
@@ -180,7 +180,7 @@ class DetailedObservation(Observation):
 
 
 class EntitiesObservation(Observation):
-    def __init__(self, entities: List[entity.Entity]):
+    def __init__(self, entities: Sequence[entity.Entity]):
         super().__init__()
         self.entities = entities
 

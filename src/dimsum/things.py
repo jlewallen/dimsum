@@ -1,4 +1,4 @@
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Sequence, cast
 import logging
 import copy
 import inflect
@@ -121,3 +121,7 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:
         return visitor.recipe(self)
+
+
+def expected(maybes: Sequence[Any]) -> Sequence[Item]:
+    return [cast(Item, e) for e in maybes]
