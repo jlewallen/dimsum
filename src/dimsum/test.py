@@ -86,7 +86,7 @@ class TestWorld:
 
     async def success(self, command: str):
         r = await self.execute(command)
-        assert isinstance(r, reply.Success)
+        assert not isinstance(r, reply.Failure)
         return r
 
     async def failure(self, command: str):
