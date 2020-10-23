@@ -70,6 +70,25 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
 
 
 @pytest.mark.asyncio
+async def test_put_coin_inside_box_and_then_look_inside(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Coin")
+    await tw.success("make Box")
+    assert len(tw.player.holding) == 2
+    coin = tw.player.holding[0]
+    assert "Coin" in coin.details.name
+    await tw.failure("put coin in box")
+    await tw.success("open box")
+    await tw.success("put coin in box")
+    assert len(tw.player.holding) == 1
+    r = await tw.execute("look in box")
+    assert isinstance(r, reply.EntitiesObservation)
+    assert coin in r.entities
+
+
+@pytest.mark.asyncio
 async def test_lock_with_new_key(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()

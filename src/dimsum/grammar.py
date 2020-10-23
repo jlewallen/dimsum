@@ -35,6 +35,7 @@ def create_parser():
                          | "look" ("at" "myself")                  -> look_myself
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
+                         | "look" ("in" held_noun)                 -> look_inside
         call:              "call" this NAME
 
         say:               "say" TEXT

@@ -143,6 +143,9 @@ class Evaluate(lark.Transformer):
     def look_for(self, args):
         return actions.LookFor(name=str(args[0]))
 
+    def look_inside(self, args):
+        return actions.LookInside(item=args[0])
+
     def say(self, args):
         return actions.Unknown()
 

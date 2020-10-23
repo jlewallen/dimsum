@@ -341,6 +341,23 @@ class Join(PersonAction):
         return Success("welcome!")
 
 
+class LookInside(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("inside what?")
+
+        if not item.is_open():
+            return Failure("you can't do that")
+
+        return EntitiesObservation(things.expected(item.holding))
+
+
 class LookFor(PersonAction):
     def __init__(self, name: str = None, **kwargs):
         super().__init__(**kwargs)
