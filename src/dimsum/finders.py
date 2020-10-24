@@ -13,6 +13,15 @@ class FindNone(things.ItemFinder):
         return None
 
 
+class StaticItem(things.ItemFinder):
+    def __init__(self, item: things.Item = None, **kwargs):
+        super().__init__()
+        self.item = item
+
+    def find_item(self, **kwargs) -> Optional[things.Item]:
+        return self.item
+
+
 class AnyItem(things.ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
@@ -110,9 +119,9 @@ class MaybeItemOrRecipe:
         assert q
         self.q = q
 
-    def create_item(self, person=None, **kwargs) -> things.Item:
+    def create_item(self, person: animals.Person = None, **kwargs) -> things.Item:
         assert person
-        recipe = person.find_memory(self.q)
+        recipe = cast(things.Recipe, person.find_memory(self.q))
         if recipe:
             return things.RecipeItem(recipe).create_item(person=person, **kwargs)
         return things.MaybeItem(self.q).create_item(person=person, **kwargs)

@@ -7,6 +7,7 @@ import base64
 import props
 import movement
 import health
+import finders
 
 from context import *
 from reply import *
@@ -88,18 +89,28 @@ class AddItemArea(PersonAction):
 
 
 class Make(PersonAction):
-    def __init__(self, template=None, item=None, **kwargs):
+    def __init__(
+        self,
+        template: finders.MaybeItemOrRecipe = None,
+        item: things.ItemFinder = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
-        self.item = None
-        self.template = None
         self.template = template
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        item = self.item
+        item: Optional[things.Item] = None
+        if self.item:
+            item = world.apply_item_finder(player, self.item)
+
         if self.template:
             item = self.template.create_item(person=player, creator=player)
             assert isinstance(item, things.Item)
+
+        if not item:
+            return Failure("make what now?")
+
         after_hold = player.hold(item)
         # We do this after because we may consolidate this Item and
         # this keeps us from having to unregister the item.

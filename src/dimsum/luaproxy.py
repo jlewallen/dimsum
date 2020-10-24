@@ -11,6 +11,7 @@ import world
 import living
 import animals
 import actions
+import finders
 
 log = logging.getLogger("dimsum")
 
@@ -152,7 +153,7 @@ class LupaLivingCreature(LupaEntity):
 
     def make(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.entity)
-        return [actions.Make(item=item)]
+        return [actions.Make(item=finders.StaticItem(item=item))]
 
 
 class LupaPerson(LupaLivingCreature):
