@@ -474,8 +474,11 @@ class Open(PersonAction):
         if not item:
             return Failure("open what?")
 
-        if not item.open():
+        if not item.can_hold():
             return Failure("you can't open that")
+
+        if not item.open():
+            return Failure("huh, won't open")
 
         return Success("opened")
 
@@ -491,8 +494,11 @@ class Close(PersonAction):
         if not item:
             return Failure("close what?")
 
+        if not item.can_hold():
+            return Failure("you can't open that")
+
         if not item.close():
-            return Failure("you can't close that")
+            return Failure("it's got other plans")
 
         return Success("closed")
 
@@ -569,6 +575,9 @@ class PutInside(PersonAction):
         if not container:
             return Failure("what?")
 
+        if not container.can_hold():
+            return Failure("inside... that?")
+
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("what?")
@@ -599,6 +608,9 @@ class TakeOut(PersonAction):
         container = world.apply_item_finder(player, self.container)
         if not container:
             return Failure("what?")
+
+        if not container.can_hold():
+            return Failure("outside of... that?")
 
         item = world.apply_item_finder(player, self.item)
         if not item:
@@ -784,6 +796,22 @@ class ModifyServings(PersonAction):
         if not item:
             return Failure("nothing to modify")
         item.servings = self.number
+        return Success("done")
+
+
+class ModifyCapacity(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, capacity=None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+        assert capacity
+        self.capacity = capacity
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("nothing to modify")
+        item.capacity = self.capacity
         return Success("done")
 
 

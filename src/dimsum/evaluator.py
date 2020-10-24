@@ -203,6 +203,9 @@ class Evaluate(lark.Transformer):
     def modify_servings(self, args):
         return actions.ModifyServings(item=finders.AnyHeldItem(), number=args[0])
 
+    def modify_capacity(self, args):
+        return actions.ModifyCapacity(item=finders.AnyHeldItem(), capacity=args[0])
+
     def modify_field(self, args):
         field = str(args[0])
         value = args[1]

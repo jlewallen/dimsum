@@ -187,9 +187,15 @@ CarryableType = Union[entity.Entity, CarryableMixin]
 
 
 class ContainingMixin(OpenableMixin):
-    def __init__(self, holding=None, **kwargs):
+    def __init__(self, holding=None, capacity=None, **kwargs):
         super().__init__(**kwargs)
         self.holding: List[CarryableMixin] = holding if holding else []
+        self.capacity = capacity if capacity else None
+
+    def can_hold(self) -> bool:
+        if self.capacity is None:
+            return False
+        return True
 
     def contains(self, e: CarryableMixin) -> bool:
         return e in self.holding

@@ -107,6 +107,7 @@ def create_parser():
         modify:            "modify" TEXT_FIELD text                -> modify_field
                          | "modify" NUMERIC_FIELD number           -> modify_field
                          | "modify" "servings" number              -> modify_servings
+                         | "modify" "capacity" number              -> modify_capacity
                          | "modify" "when" "worn"                  -> when_worn
                          | "modify" "when" "opened"                -> when_opened
                          | "modify" "when" "eaten"                 -> when_eaten
@@ -118,7 +119,7 @@ def create_parser():
         auth:              "auth" TEXT
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
-        NUMERIC_FIELD:     "capacity" | "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
+        NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
         TEXT_FIELD:        "name" | "desc" | "presence"
 
         TEXT_INNER:   (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#")

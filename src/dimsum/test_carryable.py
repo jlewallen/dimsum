@@ -56,6 +56,10 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     await tw.success("make Box")
     assert len(tw.player.holding) == 2
     await tw.failure("put coin in box")
+    await tw.failure("open box")
+    await tw.success("drop coin")
+    await tw.success("modify capacity 1")
+    await tw.success("hold coin")
     await tw.success("open box")
     await tw.success("put coin in box")
     assert len(tw.player.holding) == 1
@@ -74,10 +78,11 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.success("make Coin")
     await tw.success("make Box")
+    await tw.success("modify capacity 1")
+    await tw.success("make Coin")
     assert len(tw.player.holding) == 2
-    coin = tw.player.holding[0]
+    coin = tw.player.holding[1]
     assert "Coin" in coin.details.name
     await tw.failure("put coin in box")
     await tw.success("open box")
@@ -94,6 +99,7 @@ async def test_lock_with_new_key(caplog):
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Box")
+    await tw.success("modify capacity 1")
     await tw.success("lock box")
     assert len(tw.player.holding) == 2
     await tw.failure("open box")
@@ -128,6 +134,7 @@ async def test_make_and_open_container(caplog):
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Box")
+    await tw.success("modify capacity 1")
     await tw.failure("close box")
     await tw.success("open box")
     await tw.success("close box")
