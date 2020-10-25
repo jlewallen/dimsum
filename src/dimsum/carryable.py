@@ -156,7 +156,11 @@ class OpenableMixin(LockableMixin):
 
 class CarryableMixin:
     def __init__(
-        self, kind: entity.Kind = None, quantity: int = None, loose=False, **kwargs
+        self,
+        kind: entity.Kind = None,
+        quantity: int = None,
+        loose: bool = False,
+        **kwargs,
     ):
         super().__init__(**kwargs)  # type: ignore
         self.kind = kind if kind else entity.Kind()

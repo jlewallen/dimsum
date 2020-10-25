@@ -27,15 +27,6 @@
    You're holding a recipe.
    .call this NAME
 
-** TODO Entities that have to be carried.
-
-   Water, for example.
-
-** TODO Entities that produce others.
-
-   I'm thinking of a water fountain that can produce water. Rock face
-   that produces rocks/boulders.
-
 ** TODO Escape Room Mode
 
    Everybody is thrown into a randomly generated world and has to
@@ -65,6 +56,15 @@
    Present good options for b:key:verb:when
 
 ** TODO CLI mode for testing.
+** DONE Entities that have to be carried.
+
+   Water, for example.
+
+** DONE Entities that produce others.
+
+   I'm thinking of a water fountain that can produce water. Rock face
+   that produces rocks/boulders.
+
 ** DONE Lua Customization
 
    Per-Behavior Hooks

@@ -874,7 +874,7 @@ class PourProducer(carryable.Producer):
         self.template: finders.MaybeItemOrRecipe = template
 
     def produce_item(self, **kwargs) -> carryable.CarryableMixin:
-        return self.template.create_item(verb=PourVerb, **kwargs)
+        return self.template.create_item(verb=PourVerb, loose=True, **kwargs)
 
 
 class ModifyPours(PersonAction):

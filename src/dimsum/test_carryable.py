@@ -160,3 +160,4 @@ async def test_loose_item_factory(caplog):
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].details.name
+    assert r.entities[0].loose
