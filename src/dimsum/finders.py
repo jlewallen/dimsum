@@ -96,6 +96,18 @@ class HeldItem(things.ItemFinder):
         return None
 
 
+class FindHeldContainer(things.ItemFinder):
+    def find_item(
+        self, person: animals.Person = None, **kwargs
+    ) -> Optional[things.Item]:
+        assert person
+        item = person.find_item_under(**kwargs)
+        if item:
+            assert isinstance(item, things.Item)
+            return cast(things.Item, item)
+        return None
+
+
 class ContainedItem(things.ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()

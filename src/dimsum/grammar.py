@@ -19,7 +19,7 @@ def create_parser():
 
         verb.1:            WORD (this | that | noun)?
 
-        USEFUL_WORD:      /(?!(on|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
+        USEFUL_WORD:      /(?!(on|from|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
 
         makeable_noun:     TEXT
         contained_noun:    USEFUL_WORD+
@@ -102,12 +102,15 @@ def create_parser():
         hit:               "hit" noun ("with" noun)?
 
         water:             "water" noun ("with" noun)?
-        pour:              "pour" noun (("on"|"over") noun)?
+
+        pour:              "pour" "from" noun                      -> pour_from
+                         | "pour" noun ("from"|"on"|"over") noun   -> pour
 
         modify:            "modify" TEXT_FIELD text                -> modify_field
                          | "modify" NUMERIC_FIELD number           -> modify_field
                          | "modify" "servings" number              -> modify_servings
                          | "modify" "capacity" number              -> modify_capacity
+                         | "modify" "pours" makeable_noun          -> when_pours
                          | "modify" "when" "worn"                  -> when_worn
                          | "modify" "when" "opened"                -> when_opened
                          | "modify" "when" "eaten"                 -> when_eaten

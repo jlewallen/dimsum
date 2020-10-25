@@ -101,6 +101,17 @@ class Evaluate(lark.Transformer):
     def call(self, args):
         return actions.CallThis(item=args[0], name=str(args[1]))
 
+    def plant(self, args):
+        return actions.Plant(item=args[0])
+
+    def pour(self, args):
+        return actions.Pour(
+            item=args[0], source=args[1], destination=finders.FindHeldContainer()
+        )
+
+    def pour_from(self, args):
+        return actions.Pour(source=args[0], destination=finders.FindHeldContainer())
+
     def hug(self, args):
         return actions.Hug(who=args[0])
 
@@ -115,9 +126,6 @@ class Evaluate(lark.Transformer):
 
     def kick(self, args):
         return actions.Kick(item=args[0])
-
-    def plant(self, args):
-        return actions.Plant(item=args[0])
 
     def shake(self, args):
         return actions.Shake(item=args[0])
@@ -199,6 +207,9 @@ class Evaluate(lark.Transformer):
 
     def this(self, args):
         return finders.AnyHeldItem()
+
+    def when_pours(self, args):
+        return actions.ModifyPours(item=finders.AnyHeldItem(), produces=args[0])
 
     def modify_servings(self, args):
         return actions.ModifyServings(item=finders.AnyHeldItem(), number=args[0])

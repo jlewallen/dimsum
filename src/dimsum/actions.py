@@ -822,7 +822,82 @@ class ModifyCapacity(PersonAction):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
-        item.capacity = self.capacity
+        if item.adjust_capacity(self.capacity):
+            return Success("done")
+        return Failure("no way")
+
+
+PourVerb = "pour"
+
+
+class Pour(PersonAction):
+    def __init__(
+        self,
+        item: things.ItemFinder = None,
+        source: things.ItemFinder = None,
+        destination: things.ItemFinder = None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.item = item
+        assert source
+        self.source = source
+        assert destination
+        self.destination = destination
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        source = world.apply_item_finder(player, self.source)
+        if not source:
+            return Failure("from what?")
+
+        destination = world.apply_item_finder(
+            player, self.destination, exclude=[source]
+        )
+        if not destination:
+            return Failure("into what?")
+
+        if not PourVerb in source.produces:
+            return Failure("you can't pour from that")
+
+        if not source.produce_into(
+            PourVerb, destination, person=player, creator=player
+        ):
+            return Failure("oh no")
+
+        return Success("done")
+
+
+class PourProducer(carryable.Producer):
+    def __init__(self, template: finders.MaybeItemOrRecipe = None, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        assert template
+        self.template: finders.MaybeItemOrRecipe = template
+
+    def produce_item(self, **kwargs) -> carryable.CarryableMixin:
+        return self.template.create_item(verb=PourVerb, **kwargs)
+
+
+class ModifyPours(PersonAction):
+    def __init__(
+        self,
+        item: things.ItemFinder = None,
+        produces: finders.MaybeItemOrRecipe = None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+        assert produces
+        self.produces = produces
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("nothing to modify")
+
+        log.info("modifying %s to produce %s", item, self.produces)
+        item.produces_when(PourVerb, PourProducer(template=self.produces))
+
         return Success("done")
 
 

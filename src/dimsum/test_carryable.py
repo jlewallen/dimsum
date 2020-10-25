@@ -60,7 +60,7 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     await tw.success("drop coin")
     await tw.success("modify capacity 1")
     await tw.success("hold coin")
-    await tw.success("open box")
+    # await tw.success("open box")
     await tw.success("put coin in box")
     assert len(tw.player.holding) == 1
     await tw.success("look down")
@@ -80,6 +80,7 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
     await tw.initialize()
     await tw.success("make Box")
     await tw.success("modify capacity 1")
+    await tw.success("close box")
     await tw.success("make Coin")
     assert len(tw.player.holding) == 2
     coin = tw.player.holding[1]
@@ -104,7 +105,7 @@ async def test_lock_with_new_key(caplog):
     assert len(tw.player.holding) == 2
     await tw.failure("open box")
     await tw.success("unlock box")
-    await tw.success("open box")
+    # await tw.success("open box")
     assert len(tw.player.holding) == 2
     await tw.success("lock box with key")
     assert len(tw.player.holding) == 2
@@ -114,7 +115,6 @@ async def test_lock_with_new_key(caplog):
 
 @pytest.mark.asyncio
 async def test_try_unlock_wrong_key(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Box")
@@ -135,8 +135,28 @@ async def test_make_and_open_container(caplog):
     await tw.initialize()
     await tw.success("make Box")
     await tw.success("modify capacity 1")
-    await tw.failure("close box")
-    await tw.success("open box")
+    await tw.failure("open box")
     await tw.success("close box")
     await tw.success("open box")
     await tw.success("close box")
+
+
+@pytest.mark.asyncio
+async def test_loose_item_factory(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Beer Keg")
+    await tw.success("modify capacity 100")
+    await tw.failure("pour from Keg")
+    await tw.success("modify pours Jai Alai IPA")
+    await tw.failure("pour from Keg")
+    await tw.success("drop keg")  # TODO modify <noun>
+    # This could eventually pour on the floor.
+    await tw.success("make Mug")
+    await tw.success("modify capacity 10")
+    await tw.success("hold keg")
+    await tw.success("pour from Keg")
+    r = await tw.success("look in mug")
+    assert len(r.entities) == 1
+    assert "Alai" in r.entities[0].details.name

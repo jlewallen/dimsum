@@ -155,10 +155,13 @@ class OpenableMixin(LockableMixin):
 
 
 class CarryableMixin:
-    def __init__(self, kind: entity.Kind = None, quantity: int = None, **kwargs):
+    def __init__(
+        self, kind: entity.Kind = None, quantity: int = None, loose=False, **kwargs
+    ):
         super().__init__(**kwargs)  # type: ignore
         self.kind = kind if kind else entity.Kind()
         self.quantity = quantity if quantity else 1
+        self.loose = loose
 
     def increase_quantity(self, q: int):
         self.quantity += q
@@ -186,11 +189,44 @@ class CarryableMixin:
 CarryableType = Union[entity.Entity, CarryableMixin]
 
 
-class ContainingMixin(OpenableMixin):
+class Producer:
+    def produce_item(self, **kwargs) -> CarryableMixin:
+        raise NotImplementedError
+
+
+class ProducesMixin:
+    def __init__(self, produces=None, **kwargs):
+        super().__init__(**kwargs)
+        self.produces: Dict[str, Producer] = produces if produces else {}
+
+    def produces_when(self, verb: str, item: Producer):
+        self.produces[verb] = item
+
+    def produce_into(self, verb: str, container: "ContainingMixin", **kwargs):
+        if not container.is_open():
+            log.info("produce_into: unopened")
+            return False
+        if verb not in self.produces:
+            log.info("produce_into: nothing for %s", verb)
+            return False
+        producer = self.produces[verb]
+        log.info("%s produces %s", self, producer)
+        item = producer.produce_item(**kwargs)
+        return container.hold(item)
+
+
+class ContainingMixin(OpenableMixin, ProducesMixin):
     def __init__(self, holding=None, capacity=None, **kwargs):
         super().__init__(**kwargs)
         self.holding: List[CarryableMixin] = holding if holding else []
         self.capacity = capacity if capacity else None
+
+    def adjust_capacity(self, capacity):
+        self.capacity = capacity
+        log.info("opening %s", self)
+        self.open()
+        log.info("opening %s", self.is_open())
+        return True
 
     def can_hold(self) -> bool:
         if self.capacity is None:
