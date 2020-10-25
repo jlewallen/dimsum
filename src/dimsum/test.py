@@ -1,3 +1,5 @@
+from typing import List
+
 import asyncio
 import logging
 import sys
@@ -84,12 +86,13 @@ class TestWorld:
         log.info("response: %s" % (response,))
         return response
 
-    async def success(self, command: str):
-        r = await self.execute(command)
-        if not isinstance(r, reply.Failure):
-            return r
-        log.error("reply: %s", r)
-        assert not isinstance(r, reply.Failure)
+    async def success(self, *commands: str):
+        for command in commands:
+            r = await self.execute(command)
+            if not isinstance(r, reply.Failure):
+                return r
+            log.error("reply: %s", r)
+            assert not isinstance(r, reply.Failure)
 
     async def failure(self, command: str):
         r = await self.execute(command)

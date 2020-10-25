@@ -142,7 +142,7 @@ async def test_make_and_open_container(caplog):
 
 
 @pytest.mark.asyncio
-async def test_loose_item_factory(caplog):
+async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
@@ -161,3 +161,20 @@ async def test_loose_item_factory(caplog):
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].details.name
     assert r.entities[0].loose
+
+
+@pytest.mark.asyncio
+async def test_unable_to_hold_loose_item(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Beer Keg")
+    await tw.success("modify capacity 100")
+    await tw.success("modify pours Jai Alai IPA")
+    await tw.success("drop keg")  # TODO modify <noun>
+    # This could eventually pour on the floor.
+    await tw.success("make Mug")
+    await tw.success("modify capacity 10")
+    await tw.success("hold keg")
+    await tw.success("pour from Keg")
+    await tw.failure("take Alai out of keg")

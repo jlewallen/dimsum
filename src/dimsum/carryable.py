@@ -250,9 +250,9 @@ class ContainingMixin(OpenableMixin, ProducesMixin):
         return False
 
     def take_out(self, item: CarryableMixin, **kwargs):
-        log.info("open: %s", self.is_open())
         if self.is_open():
-            return self.unhold(item, **kwargs)
+            if item in self.holding:
+                return self.unhold(item, **kwargs)
         return False
 
     def hold(self, item: CarryableMixin, quantity: int = None, **kwargs):
