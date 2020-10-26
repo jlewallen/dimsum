@@ -178,3 +178,4 @@ async def test_unable_to_hold_loose_item(caplog):
     await tw.success("hold keg")
     await tw.success("pour from Keg")
     await tw.failure("take Alai out of keg")
+    await tw.success("drink Alai")

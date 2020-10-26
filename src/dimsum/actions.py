@@ -874,7 +874,10 @@ class PourProducer(carryable.Producer):
         self.template: finders.MaybeItemOrRecipe = template
 
     def produce_item(self, **kwargs) -> carryable.CarryableMixin:
-        return self.template.create_item(verb=PourVerb, loose=True, **kwargs)
+        interactions = {props.Drank: True}
+        return self.template.create_item(
+            verb=PourVerb, loose=True, interactions=interactions, **kwargs
+        )
 
 
 class ModifyPours(PersonAction):
@@ -896,6 +899,7 @@ class ModifyPours(PersonAction):
             return Failure("nothing to modify")
 
         log.info("modifying %s to produce %s", item, self.produces)
+
         item.produces_when(PourVerb, PourProducer(template=self.produces))
 
         return Success("done")

@@ -1,7 +1,9 @@
 from typing import Dict, Any, Optional
-
+import logging
 import abc
 import props
+
+log = logging.getLogger("dimsum")
 
 
 class InteractableMixin:
@@ -20,9 +22,6 @@ class InteractableMixin:
 
     def when_eaten(self) -> bool:
         return self.when_activity(props.Eaten)
-
-    def when_opened(self) -> bool:
-        return self.when_activity(props.Opened)
 
     def when_drank(self) -> bool:
         return self.when_activity(props.Drank)
