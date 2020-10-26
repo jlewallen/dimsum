@@ -1,19 +1,14 @@
 * DimSum
-** TODO Pass mixin collection to Item/Entities for construction?
-
-   They would have access to things.Item?
-
-** TODO Depend on carryable for dropping worn items?
-** TODO SSB Storage Backend?
-** TODO Distance effects.
+** TODO SSB Storage Backend
+** TODO Distance Effects.
 
    N-Hops aways, etc...
 
-** TODO Make maze.
+** TODO Make Maze.
 
    Just randomly generates a maze that gets populated with stuff.
 
-** TODO Rain/weather.
+** TODO Weather.
 
    Set logical zip code for an area, weather changes to reflect that.
 
@@ -56,6 +51,9 @@
    Present good options for b:key:verb:when
 
 ** TODO CLI mode for testing.
+
+   This should just be a telnet server, maybe.
+
 ** DONE Entities that have to be carried.
 
    Water, for example.
@@ -96,6 +94,14 @@
    give NUMBER noun to noun
 
    Recipes have a kind identity. This same kind identity is used for QuantifiedItems to group them.
+
+** DONE Pass mixin collection to Item/Entities for construction?
+
+   They would have access to things.Item? Do we need this?
+
+** DONE Depend on carryable for dropping worn items?
+
+   No real benefit now. Keep the idea round, though.
 
 **  Example Session
 
