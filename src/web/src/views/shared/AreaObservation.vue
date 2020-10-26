@@ -4,6 +4,14 @@
             <div class="card-body">
                 <h4 class="card-title">{{ where.entity.details.name }}</h4>
                 <h6 class="card-subtitle">{{ where.entity.details.desc }}</h6>
+                <div class="routes">
+                    <div v-for="(route, index) in reply.routes" v-bind:key="index" class="route">
+                        <div>{{ route.direction.compass }} of here there is</div>
+                        <WithEntity :entityKey="route.area.key" :force="true" v-slot="withEntity">
+                            <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
+                        </WithEntity>
+                    </div>
+                </div>
                 <div class="people">
                     <div v-for="observed in reply.living" v-bind:key="observed.alive.key">
                         <WithEntity :entityKey="observed.alive.key" :force="true" v-slot="withEntity">
@@ -53,6 +61,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.routes {
+    display: flex;
+}
+.routes .route {
+    display: flex;
+    align-items: flex-end;
+}
 .people {
     display: flex;
 }

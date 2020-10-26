@@ -11,6 +11,7 @@ import things
 import living
 import animals
 import world
+import movement
 
 log = logging.getLogger("dimsum")
 
@@ -37,6 +38,21 @@ class WorldHandler(jsonpickle.handlers.BaseHandler):
 
     def flatten(self, obj, data):
         data["key"] = "world"
+        return data
+
+
+@jsonpickle.handlers.register(movement.Direction)
+class DirectionHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        if "compass" in obj:
+            name = obj["compass"].lower()
+            for d in movement.Direction:
+                if name == d.name.lower():
+                    return d
+        return None
+
+    def flatten(self, obj, data):
+        data["compass"] = obj.name
         return data
 
 

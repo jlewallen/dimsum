@@ -20,10 +20,20 @@ export interface ObservedPerson {
     alive: EntityRef;
 }
 
+export interface Direction {
+    compass: string;
+}
+
+export interface AreaRoute {
+    area: EntityRef;
+    direction?: Direction;
+}
+
 export interface AreaObservation {
     where: EntityRef;
     people: ObservedPerson[];
     items: ObservedItem[];
+    routes: AreaRoute[];
 }
 
 export interface DetailedObservation {
@@ -78,8 +88,6 @@ export interface Behavior {
 }
 
 export type Behaviors = { [index: string]: Behavior };
-
-export type AreaRoute = any;
 
 export interface Entity {
     key: string;
