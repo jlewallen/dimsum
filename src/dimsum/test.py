@@ -98,3 +98,6 @@ class TestWorld:
         r = await self.execute(command)
         assert isinstance(r, reply.Failure)
         return r
+
+    async def realize(self):
+        pass

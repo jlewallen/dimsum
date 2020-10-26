@@ -206,3 +206,26 @@ async def test_unregister_destroys(caplog):
 
     empty = world.World(tw.bus, context_factory=None)
     await db.load(empty)
+
+
+@pytest.mark.asyncio
+async def test_transients_preserved(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Beer Keg")
+    await tw.success("modify capacity 100")
+    await tw.failure("pour from Keg")
+    await tw.success("modify pours Jai Alai IPA")
+    await tw.failure("pour from Keg")
+    await tw.success("drop keg")  # TODO modify <noun>
+    # This could eventually pour on the floor.
+    await tw.success("make Mug")
+    await tw.success("modify capacity 10")
+    await tw.success("hold keg")
+    await tw.realize()
+    await tw.success("pour from Keg")
+    r = await tw.success("look in mug")
+    assert len(r.entities) == 1
+    assert "Alai" in r.entities[0].details.name
+    assert r.entities[0].loose
