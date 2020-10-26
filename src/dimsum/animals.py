@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List, Sequence, Any, cast
 import logging
 import entity
+import context
 import living
 import apparel
 import health
@@ -10,14 +11,13 @@ log = logging.getLogger("dimsum")
 
 
 class HealthyAndClothedAnimal(
+    context.FindItemMixin,
     living.Alive,
     apparel.ApparelMixin,
     health.HealthMixin,
 ):
-    def find_item_under(self, **kwargs) -> Optional[carryable.CarryableMixin]:
-        return carryable.find_item_under(
-            candidates=self.holding + carryable.expected(self.wearing), **kwargs
-        )
+    def gather_entities_under(self) -> List[entity.Entity]:
+        return entity.entities(self.holding) + entity.entities(self.wearing)
 
 
 class Mammal(HealthyAndClothedAnimal):

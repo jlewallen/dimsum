@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, List, Any
 import logging
 import abc
 import entity
@@ -28,6 +28,10 @@ class Ctx:
     def extend(self, **kwargs) -> "Ctx":
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def find_item(self, **kwargs) -> Optional[entity.Entity]:
+        raise NotImplementedError
+
 
 def get():
     return worldCtx.get()
@@ -35,3 +39,12 @@ def get():
 
 def set(ctx: Ctx):
     worldCtx.set(ctx)
+
+
+class FindItemMixin:
+    def find_item_under(self, **kwargs) -> Optional[entity.Entity]:
+        return get().find_item(candidates=self.gather_entities_under(), **kwargs)
+
+    @abc.abstractmethod
+    def gather_entities_under(self) -> List[entity.Entity]:
+        raise NotImplementedError

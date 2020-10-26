@@ -237,6 +237,20 @@ class WorldCtx(context.Ctx):
     def create_item(self, **kwargs) -> things.Item:
         return things.Item(**kwargs)
 
+    def find_item(
+        self, q: str = None, candidates=None, exclude=None, **kwargs
+    ) -> Optional[entity.Entity]:
+        log.info("find-item: '%s' candidates=%s exclude=%s", q, candidates, exclude)
+        for e in candidates:
+            if not exclude or e not in exclude:
+                if q:
+                    if e.describes(q):
+                        return e
+                else:
+                    return e
+
+        return None
+
 
 def flatten(l):
     return [item for sl in l for item in sl]

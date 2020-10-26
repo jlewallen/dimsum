@@ -1,4 +1,4 @@
-from typing import Type, List, Union, Any, Dict
+from typing import Optional, Type, List, Union, Any, Dict, Sequence, cast
 
 import abc
 import logging
@@ -110,6 +110,14 @@ class Entity(Finder):
         self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
         self.related: Dict[str, Kind] = related if related else {}
 
+    @abc.abstractmethod
+    def gather_entities_under(self) -> List["Entity"]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def find_item_under(self, **kwargs) -> Optional["Entity"]:
+        raise NotImplementedError
+
     def get_kind(self, name: str) -> Kind:
         if not name in self.related:
             self.related[name] = Kind()
@@ -157,3 +165,7 @@ class Registrar:
 
     def all_of_type(self, klass: Type) -> List[Entity]:
         return [e for e in self.entities.values() if isinstance(e, klass)]
+
+
+def entities(maybes: List[Any]) -> List[Entity]:
+    return [cast(Entity, e) for e in maybes]

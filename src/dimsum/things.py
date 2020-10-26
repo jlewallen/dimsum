@@ -17,6 +17,7 @@ p = inflect.engine()
 
 
 class Item(
+    context.FindItemMixin,
     entity.Entity,
     apparel.Wearable,
     carryable.CarryableMixin,
@@ -37,6 +38,9 @@ class Item(
         if q.lower() in str(self).lower():
             return True
         return False
+
+    def gather_entities_under(self) -> List[entity.Entity]:
+        return entity.entities(self.holding)
 
     def separate(
         self, quantity: int, ctx: context.Ctx = None, **kwargs

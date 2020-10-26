@@ -1,7 +1,8 @@
-from typing import List, cast
+from typing import Optional, List, cast
 import logging
 import props
 import entity
+import context
 import carryable
 import occupyable
 import movement
@@ -12,6 +13,7 @@ log = logging.getLogger("dimsum")
 
 
 class Area(
+    context.FindItemMixin,
     entity.Entity,
     carryable.ContainingMixin,
     occupyable.OccupyableMixin,
@@ -22,7 +24,10 @@ class Area(
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def entities(self) -> List[things.Item]:
+    def gather_entities_under(self) -> List[entity.Entity]:
+        return self.entities()
+
+    def entities(self) -> List[entity.Entity]:
         return [cast(things.Item, e) for e in flatten([self.holding, self.occupied])]
 
     def entities_named(self, of: str):
