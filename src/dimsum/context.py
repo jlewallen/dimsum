@@ -43,8 +43,8 @@ def set(ctx: Ctx):
 
 class FindItemMixin:
     def find_item_under(self, **kwargs) -> Optional[entity.Entity]:
-        return get().find_item(candidates=self.gather_entities_under(), **kwargs)
+        return get().find_item(candidates=self.gather_entities(), **kwargs)
 
     @abc.abstractmethod
-    def gather_entities_under(self) -> List[entity.Entity]:
+    def gather_entities(self) -> List[entity.Entity]:
         raise NotImplementedError

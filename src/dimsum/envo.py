@@ -24,7 +24,8 @@ class Area(
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def gather_entities_under(self) -> List[entity.Entity]:
+    def gather_entities(self) -> List[entity.Entity]:
+        log.debug("area-gather-entities: %s", self)
         return self.entities()
 
     def entities(self) -> List[entity.Entity]:

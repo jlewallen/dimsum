@@ -38,11 +38,16 @@ class AnyItem(things.ItemFinder):
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
+
         item = area.find_item_under(q=self.q, **kwargs)
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
         return None
+
+
+class AnyConsumableItem(AnyItem):
+    pass
 
 
 class UnheldItem(things.ItemFinder):

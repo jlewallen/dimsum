@@ -16,8 +16,13 @@ class HealthyAndClothedAnimal(
     apparel.ApparelMixin,
     health.HealthMixin,
 ):
-    def gather_entities_under(self) -> List[entity.Entity]:
-        return entity.entities(self.holding) + entity.entities(self.wearing)
+    def gather_entities(self) -> List[entity.Entity]:
+        log.debug("animal-gather-entities: %s", self)
+        return (
+            entity.entities(self.holding)
+            + flatten([e.gather_entities() for e in entity.entities(self.holding)])
+            + entity.entities(self.wearing)
+        )
 
 
 class Mammal(HealthyAndClothedAnimal):
@@ -36,3 +41,7 @@ class Person(Mammal):
 
 class Player(Person):
     pass
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]

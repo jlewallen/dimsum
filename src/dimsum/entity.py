@@ -111,7 +111,7 @@ class Entity(Finder):
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod
-    def gather_entities_under(self) -> List["Entity"]:
+    def gather_entities(self) -> List["Entity"]:
         raise NotImplementedError
 
     @abc.abstractmethod

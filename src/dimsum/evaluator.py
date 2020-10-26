@@ -181,6 +181,9 @@ class Evaluate(lark.Transformer):
     def makeable_noun(self, args):
         return finders.MaybeItemOrRecipe(str(args[0]))
 
+    def consumable_noun(self, args):
+        return finders.AnyConsumableItem(q=str(args[0]))
+
     def held_noun(self, args):
         return finders.HeldItem(q=str(args[0]))
 

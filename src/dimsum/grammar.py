@@ -25,6 +25,7 @@ def create_parser():
         contained_noun:    USEFUL_WORD+
         unheld_noun:       USEFUL_WORD+
         held_noun:         USEFUL_WORD+
+        consumable_noun:   USEFUL_WORD+
         noun:              USEFUL_WORD+
 
         this:              "this"
@@ -43,8 +44,8 @@ def create_parser():
 
         give:              "give"
 
-        eat:               "eat" noun
-        drink:             "drink" noun
+        eat:               "eat" consumable_noun
+        drink:             "drink" consumable_noun
 
         take:              "take"                                  -> take
                          | "take" "bite" "of" noun                 -> take_bite

@@ -39,8 +39,11 @@ class Item(
             return True
         return False
 
-    def gather_entities_under(self) -> List[entity.Entity]:
-        return entity.entities(self.holding)
+    def gather_entities(self) -> List[entity.Entity]:
+        log.debug("item-gather-entities: %s", self)
+        return entity.entities(self.holding) + flatten(
+            [e.gather_entities() for e in entity.entities(self.holding)]
+        )
 
     def separate(
         self, quantity: int, ctx: context.Ctx = None, **kwargs
@@ -129,3 +132,7 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
 
 def expected(maybes: Sequence[Any]) -> Sequence[Item]:
     return [cast(Item, e) for e in maybes]
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]
