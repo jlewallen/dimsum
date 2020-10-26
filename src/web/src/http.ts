@@ -12,12 +12,12 @@ export interface ReplPayload {
 }
 
 export interface ObservedItem {
-    entity: EntityRef;
+    item: EntityRef;
 }
 
 export interface ObservedPerson {
     activities: never[];
-    person: EntityRef;
+    alive: EntityRef;
 }
 
 export interface AreaObservation {

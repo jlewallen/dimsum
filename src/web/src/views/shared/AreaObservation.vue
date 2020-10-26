@@ -5,8 +5,8 @@
                 <h4 class="card-title">{{ where.entity.details.name }}</h4>
                 <h6 class="card-subtitle">{{ where.entity.details.desc }}</h6>
                 <div class="people">
-                    <div v-for="observed in reply.living" v-bind:key="observed.living.key">
-                        <WithEntity :entityKey="observed.living.key" :force="true" v-slot="withEntity">
+                    <div v-for="observed in reply.living" v-bind:key="observed.alive.key">
+                        <WithEntity :entityKey="observed.alive.key" :force="true" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>
