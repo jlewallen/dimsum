@@ -78,7 +78,7 @@ def create(state):
         log.info("key: %s" % (key,))
 
         if world.contains(key):
-            entity = world.find(key)
+            entity = world.find_by_key(key)
             return serializing.serialize({"entity": entity})
 
         return {"entity": None}
@@ -98,7 +98,7 @@ def create(state):
 
             del form["key"]
 
-            entity = world.find(key)
+            entity = world.find_by_key(key)
             entity.details.update(form)
             entity.touch()
             await state.save()
@@ -120,7 +120,7 @@ def create(state):
             form = await quart.request.get_json()
             log.info("form: %s" % (form,))
 
-            entity = world.find(key)
+            entity = world.find_by_key(key)
             entity.behaviors.replace(form)
             entity.touch()
             await state.save()
@@ -146,7 +146,7 @@ def create(state):
             return evaluator.transform(tree)
 
         person_key = token["key"]
-        player = world.find(person_key)
+        player = world.find_by_key(person_key)
         action = parse_as(evaluator.create(world, player), command)
         reply = await world.perform(action, player)
         await state.save()

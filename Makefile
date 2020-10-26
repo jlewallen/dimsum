@@ -30,12 +30,12 @@ freeze:
 	pip3 freeze > requirements.txt
 
 src/web/src/config:
-	cp web/src/config.ts.dev web/src/config.ts
+	cp src/web/src/config.ts.dev src/web/src/config.ts
 
 src/web/node_modules:
-	cd web && yarn install
+	cd src/web && yarn install
 
-web: src/web/node_modules web/src/config
+web: src/web/node_modules src/web/src/config
 	cd src/web && yarn serve
 
 image:
