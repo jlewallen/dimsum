@@ -7,6 +7,7 @@ import envo
 import animals
 import actions
 import movement
+import mechanics
 
 log = logging.getLogger("dimsum")
 
@@ -101,6 +102,19 @@ end
         return item
 
 
+class SmallCrevice(Factory):
+    def create(self, world: world.World):
+        item = things.Item(
+            creator=world,
+            visible=mechanics.Visible(hard_to_see=True),
+            details=props.Details(
+                "Small Crevice",
+                desc="Whoa, how'd you even find this!?",
+            ),
+        )
+        return item
+
+
 class MysteriousBox(Factory):
     def create(self, world: world.World):
         item = things.Item(
@@ -188,6 +202,37 @@ class TomorrowCat(Factory):
             ),
         )
         return animal
+
+
+class CavernEntrance(Factory):
+    def create(self, world: world.World):
+        area = envo.Area(
+            creator=world,
+            details=props.Details(
+                "Entrance to a Dark Cavern",
+                desc="It's dark, the cavern that is.",
+            ),
+        )
+        return area
+
+
+class DarkCavern(Factory):
+    def create(self, world: world.World):
+        area = envo.Area(
+            creator=world,
+            details=props.Details(
+                "Dark Cavern",
+                desc="It's dark",
+            ),
+        )
+
+        entrance = CavernEntrance().create(world)
+
+        area.add_route(
+            movement.DirectionalRoute(direction=movement.Direction.NORTH, area=entrance)
+        )
+
+        return area
 
 
 class ArtistsLoft(Factory):
@@ -307,6 +352,11 @@ class WelcomeArea(Factory):
         )
 
         clearing.add_item(LargeMapleTree().create(world))
+
+        cavern = DarkCavern().create(world)
+        crevice = SmallCrevice().create(world)
+        crevice.link_area(cavern)
+        clearing.add_item(crevice)
 
         museum = Museum().create(world)
         steps = MarbleSteps().create(world)

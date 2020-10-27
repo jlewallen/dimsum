@@ -88,7 +88,7 @@ class EmbedObservationVisitor:
         ]
         if len(directional) > 0:
             directions = [d.direction for d in directional]
-            emd += "You can go " + p.join(directions)
+            emd += "You can go " + p.join([str(d) for d in directions])
             emd += "\n"
         return {"embed": discord.Embed(title=obs.details.name, description=emd)}
 
@@ -407,7 +407,7 @@ modify when eaten
             return player
 
         if self.world.contains(key):
-            player = self.world.find(key)
+            player = self.world.find_by_key(key)
             self.players[key] = BotPlayer(player, channel)
             if not player:
                 raise Exception("no player")
