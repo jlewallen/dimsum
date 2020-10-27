@@ -24,8 +24,8 @@ class Item(
     carryable.ContainingMixin,
     carryable.KeyMixin,
     mechanics.InteractableMixin,
-    movement.MovementMixin,
     mechanics.VisibilityMixin,
+    movement.MovementMixin,
     health.EdibleMixin,
 ):
     def __init__(self, **kwargs):

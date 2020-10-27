@@ -34,7 +34,7 @@ class Visible:
 
 class VisibilityMixin:
     def __init__(self, visible: Visible = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)  # type: ignore
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):
@@ -52,6 +52,18 @@ class Memorable:
     @abc.abstractmethod
     def describes(self, q: str) -> bool:
         pass
+
+
+class Physics:
+    def __init__(self, mass=None, **kwargs):
+        super().__init__()
+        self.mass = mass
+
+
+class PhysicsMixin:
+    def __init__(self, physics: Physics = None, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        self.physics = physics if physics else Physics()
 
 
 class MemoryMixin:
