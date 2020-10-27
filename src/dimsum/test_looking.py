@@ -1,6 +1,6 @@
 import pytest
 import logging
-
+import freezegun
 import props
 import entity
 import game
@@ -15,10 +15,10 @@ log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
-async def test_look_for():
+async def test_look_for_no_such_thing():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.success("look for keys")
+    await tw.failure("look for keys")
 
 
 @pytest.mark.asyncio
@@ -75,3 +75,45 @@ async def test_think():
     await tw.initialize()
 
     await tw.success("think")
+
+
+@pytest.mark.asyncio
+async def test_making_item_hard_to_see(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.add_carla()
+    await tw.success("make Box")
+    await tw.success("drop")
+    assert len(tw.area.holding) == 1
+    r = await tw.success("look")
+    assert len(r.items) == 1
+
+    await tw.success("make Orb")
+    assert len(tw.player.holding) == 1
+    await tw.success("modify hard to see")
+    await tw.success("drop")
+    assert len(tw.area.holding) == 2
+    r = await tw.success("look")
+    assert len(r.items) == 1
+
+    orb = None
+
+    with freezegun.freeze_time("2000-01-01 00:00:00"):
+        r = await tw.success("look for orb")
+        assert len(r.items) == 1
+        orb = r.items[0]
+
+        r = await tw.success("look")
+        assert len(r.items) == 2
+
+    with freezegun.freeze_time("2000-01-01 00:20:00"):
+        r = await tw.success("look")
+        assert len(r.items) == 2
+
+    with freezegun.freeze_time("2000-01-01 01:01:00"):
+        r = await tw.success("look")
+
+        log.info(tw.dumps(orb))
+
+        assert len(r.items) == 1

@@ -156,6 +156,10 @@ class EntitiesObservation(Observation):
         super().__init__()
         self.entities = entities
 
+    @property
+    def items(self):
+        return self.entities
+
     def accept(self, visitor):
         return visitor.entities_observation(self)
 
@@ -174,7 +178,11 @@ class AreaObservation(Observation):
             [observe(e) for e in area.occupied if e != person]
         )
         self.items: List[ObservedEntity] = flatten(
-            [observe(e) for e in area.holding if e]
+            [
+                observe(e)
+                for e in things.expected(area.holding)
+                if e.can_see(person.identity)
+            ]
         )
         self.routes: List[movement.AreaRoute] = area.routes
 

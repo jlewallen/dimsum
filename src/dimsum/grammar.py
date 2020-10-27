@@ -122,6 +122,8 @@ def create_parser():
                          | "modify" "when" "activated"             -> when_activated
                          | "modify" "when" "triggered"             -> when_triggered
                          | "modify" "when" "closed"                -> when_closed
+                         | "modify" "hard" "to" "see"              -> modify_hard_to_see
+                         | "modify" "easy" "to" "see"              -> modify_easy_to_see
 
         auth:              "auth" TEXT
 

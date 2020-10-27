@@ -1,6 +1,8 @@
-from typing import Dict, Any, Optional
+from typing import List, Dict, Any, Optional
 import logging
+import datetime
 import abc
+import crypto
 import props
 
 log = logging.getLogger("dimsum")
@@ -27,9 +29,53 @@ class InteractableMixin:
         return self.when_activity(props.Drank)
 
 
+def get_now() -> datetime.datetime:
+    return datetime.datetime.now()
+
+
+class Observation:
+    def __init__(self, time=None, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        self.time = time if time else get_now()
+
+    def memorable(self) -> bool:
+        age = get_now() - self.time
+        return age.total_seconds() < 60 * 60
+
+
 class Visible:
-    def __init__(self):
-        self.hidden = False
+    def __init__(
+        self,
+        hidden=None,
+        hard_to_see=False,
+        observations: Dict[str, List[Observation]] = None,
+        **kwargs
+    ):
+        super().__init__()
+        self.hidden = hidden
+        self.hard_to_see = hard_to_see
+        self.observations = observations if observations else {}
+
+    def add_observation(self, identity: crypto.Identity):
+        if identity.public not in self.observations:
+            self.observations[identity.public] = []
+        self.observations[identity.public].append(Observation())
+
+    def can_see(self, identity: crypto.Identity) -> bool:
+        if not self.hard_to_see:
+            return True
+
+        if not identity.public in self.observations:
+            return False
+
+        obs = self.observations[identity.public]
+        if not obs:
+            return False
+
+        log.info("%s", obs)
+        log.info("%s", obs[-1])
+
+        return obs[-1].memorable()
 
 
 class VisibilityMixin:
@@ -42,6 +88,18 @@ class VisibilityMixin:
 
     def make_invisible(self):
         self.visible.hidden = True
+
+    def can_see(self, identity: crypto.Identity) -> bool:
+        return self.visible.can_see(identity)
+
+    def make_easy_to_see(self):
+        self.visible.hard_to_see = False
+
+    def make_hard_to_see(self):
+        self.visible.hard_to_see = True
+
+    def add_observation(self, identity: crypto.Identity):
+        return self.visible.add_observation(identity)
 
     @property
     def is_invisible(self) -> bool:

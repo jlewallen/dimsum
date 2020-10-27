@@ -370,14 +370,20 @@ class LookInside(PersonAction):
 
 
 class LookFor(PersonAction):
-    def __init__(self, name: str = None, **kwargs):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
-        self.name = name
+        assert item
+        self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        area = world.find_player_area(player)
-        await ctx.extend(holding=player.holding).extend(name=self.name).hook("look-for")
-        return PersonalObservation(player)
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("i can't seem to find that")
+
+        item.add_observation(player.identity)
+
+        await ctx.extend(holding=player.holding, item=item).hook("look-for")
+        return EntitiesObservation([item])
 
 
 class LookMyself(PersonAction):
@@ -757,6 +763,28 @@ class Remember(PersonAction):
         area = world.find_player_area(player)
         player.memory[MemoryAreaKey] = area
         return Success("you'll be able to remember this place, oh yeah")
+
+
+class ModifyHardToSee(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, hard_to_see=False, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+        self.hard_to_see = hard_to_see
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("of what?")
+
+        item.try_modify()
+
+        if self.hard_to_see:
+            item.make_hard_to_see()
+        else:
+            item.make_easy_to_see()
+
+        return Success("done")
 
 
 class ModifyField(PersonAction):

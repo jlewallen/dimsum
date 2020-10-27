@@ -155,7 +155,7 @@ class Evaluate(lark.Transformer):
         return actions.Look(item=args[0])
 
     def look_for(self, args):
-        return actions.LookFor(name=str(args[0]))
+        return actions.LookFor(item=args[0])
 
     def look_inside(self, args):
         return actions.LookInside(item=args[0])
@@ -219,6 +219,12 @@ class Evaluate(lark.Transformer):
 
     def when_pours(self, args):
         return actions.ModifyPours(item=finders.AnyHeldItem(), produces=args[0])
+
+    def modify_hard_to_see(self, args):
+        return actions.ModifyHardToSee(item=finders.AnyHeldItem(), hard_to_see=True)
+
+    def modify_easy_to_see(self, args):
+        return actions.ModifyHardToSee(item=finders.AnyHeldItem(), hard_to_see=False)
 
     def modify_servings(self, args):
         return actions.ModifyServings(item=finders.AnyHeldItem(), number=args[0])
