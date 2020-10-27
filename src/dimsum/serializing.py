@@ -85,7 +85,7 @@ class CustomUnpickler(jsonpickle.unpickler.Unpickler):
         self.lookup = lookup
 
 
-def deriveFrom(klass):
+def derive_from(klass):
     name = klass.__name__
     return type("Root" + name, (klass,), {})
 
@@ -98,7 +98,7 @@ allowed = [
     animals.Person,
     animals.Player,
 ]
-classes = {k: deriveFrom(k) for k in allowed}
+classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
 
 
@@ -143,8 +143,7 @@ def deserialize(encoded, lookup):
 
 def all(world: world.World):
     return {
-        key: serialize(entity, secure=True, indent=4)
-        for key, entity in world.entities.items()
+        key: serialize(entity, secure=True) for key, entity in world.entities.items()
     }
 
 

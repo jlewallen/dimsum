@@ -19,6 +19,7 @@ import bus
 import messages
 import handlers
 import reply
+import serializing
 
 log = logging.getLogger("dimsum")
 
@@ -74,6 +75,9 @@ class TestWorld:
         self.world.register(item)
         self.get_default_area().add_item(item)
         return item
+
+    def dumps(self, item) -> str:
+        return serializing.serialize(item, indent=4)
 
     async def execute(self, command: str, person=None, **kwargs):
         if not person:

@@ -44,7 +44,7 @@ class SqliteDatabase:
 
     async def update(self, entity: entity.Entity):
         klass = entity.__class__.__name__
-        props = serializing.serialize(entity, secure=True, indent=4)
+        props = serializing.serialize(entity, secure=True)
         identity_field = {
             "private": entity.identity.private,
             "signature": entity.identity.signature,
