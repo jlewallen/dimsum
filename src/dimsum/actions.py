@@ -686,11 +686,15 @@ class Obliterate(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
-        items = player.drop_all()
+        items = things.expected(player.drop_all())
         if len(items) == 0:
             return Failure("you're not holding anything")
 
         item: Any = None  # TODO CarryableMixin to Entity
+
+        for item in items:
+            item.try_modify()
+
         for item in items:
             world.unregister(item)
             await world.bus.publish(
@@ -714,6 +718,8 @@ class CallThis(PersonAction):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("you don't have anything")
+
+        item.try_modify()
 
         # Copy all of the base details from the item. Exclude stamps.
         template = item
@@ -765,6 +771,8 @@ class ModifyField(PersonAction):
         if not item:
             return Failure("of what?")
 
+        item.try_modify()
+
         if self.field in health.NutritionFields:
             item.nutrition.properties[self.field] = self.value
         else:
@@ -789,6 +797,7 @@ class ModifyActivity(PersonAction):
         if not item:
             return Failure("of what?")
 
+        item.try_modify()
         item.link_activity(self.activity, self.value)
         item.details.set(self.activity, self.value)
         return Success("done")
@@ -806,6 +815,7 @@ class ModifyServings(PersonAction):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
+        item.try_modify()
         item.servings = self.number
         return Success("done")
 
@@ -822,6 +832,7 @@ class ModifyCapacity(PersonAction):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
+        item.try_modify()
         if item.adjust_capacity(self.capacity):
             return Success("done")
         return Failure("no way")
@@ -900,6 +911,7 @@ class ModifyPours(PersonAction):
 
         log.info("modifying %s to produce %s", item, self.produces)
 
+        item.try_modify()
         item.produces_when(PourVerb, PourProducer(template=self.produces))
 
         return Success("done")
@@ -907,3 +919,43 @@ class ModifyPours(PersonAction):
 
 class ItemsAppeared(Event):
     pass
+
+
+class Freeze(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("freeze what?")
+
+        if not item.can_modify():
+            return Failure("already frozen, pal")
+
+        if not item.freeze(player.identity):
+            return Failure("you can't do that!")
+
+        return Success("frozen")
+
+
+class Unfreeze(PersonAction):
+    def __init__(self, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("unfreeze what?")
+
+        if item.can_modify():
+            return Failure("why do that?")
+
+        if not item.unfreeze(player.identity):
+            return Failure("you can't do that! is that yours?")
+
+        return Success("unfrozen")

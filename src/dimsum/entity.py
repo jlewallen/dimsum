@@ -88,7 +88,7 @@ class Entity(Finder):
         self.kind = kind if kind else Kind()
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
-        self.frozen: Any = frozen if frozen else {}
+        self.frozen: Any = frozen if frozen else None
         self.destroyed: bool = destroyed if destroyed else False
 
         if identity:
@@ -129,6 +129,28 @@ class Entity(Finder):
     def destroy(self) -> None:
         self.destroyed = True
 
+    def try_modify(self) -> None:
+        if self.can_modify():
+            return
+        raise ItemFrozen()
+
+    def can_modify(self) -> bool:
+        return self.frozen is None
+
+    def freeze(self, identity: crypto.Identity) -> bool:
+        if self.frozen:
+            raise Exception("already frozen")
+        self.frozen = identity
+        return True
+
+    def unfreeze(self, identity: crypto.Identity) -> bool:
+        if not self.frozen:
+            raise Exception("already unfrozen")
+        if self.frozen.public != identity.public:
+            return False
+        self.frozen = None
+        return True
+
     def validate(self) -> None:
         assert self.creator
         assert self.details
@@ -165,6 +187,10 @@ class Registrar:
 
     def all_of_type(self, klass: Type) -> List[Entity]:
         return [e for e in self.entities.values() if isinstance(e, klass)]
+
+
+class ItemFrozen(Exception):
+    pass
 
 
 def entities(maybes: List[Any]) -> List[Entity]:

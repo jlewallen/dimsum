@@ -1,5 +1,4 @@
 from typing import Any, Optional, Dict, List, Sequence, cast
-
 import time
 import logging
 import entity
@@ -123,12 +122,15 @@ class World(entity.Entity, entity.Registrar):
         log.info("applying finder:%s %s", finder, kwargs)
         return finder.find_item(area=area, person=person, **kwargs)
 
-    async def perform(self, action, person: Optional[animals.Person]):
+    async def perform(self, action, person: Optional[animals.Person]) -> game.Reply:
         area = self.find_entity_area(person) if person else None
         with WorldCtx(
             self.context_factory, world=self, person=person, area=area
         ) as ctx:
-            return await action.perform(ctx, self, person)
+            try:
+                return await action.perform(ctx, self, person)
+            except entity.ItemFrozen:
+                return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
         if now is None:

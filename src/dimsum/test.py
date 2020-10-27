@@ -75,28 +75,30 @@ class TestWorld:
         self.get_default_area().add_item(item)
         return item
 
-    async def execute(self, command: str):
+    async def execute(self, command: str, person=None, **kwargs):
+        if not person:
+            person = self.player
         log.info("executing: %s" % (command,))
         tree = self.l.parse(command)
         log.info("parsed: %s" % (tree,))
-        action = evaluator.create(self.world, self.player).transform(tree)
+        action = evaluator.create(self.world, person).transform(tree)
         assert action
         assert isinstance(action, game.Action)
-        response = await self.world.perform(action, self.player)
+        response = await self.world.perform(action, person)
         log.info("response: %s" % (response,))
         return response
 
-    async def success(self, *commands: str):
+    async def success(self, *commands: str, **kwargs):
         for command in commands:
-            r = await self.execute(command)
-            if not isinstance(r, reply.Failure):
+            r = await self.execute(command, **kwargs)
+            if not isinstance(r, game.Failure):
                 return r
             log.error("reply: %s", r)
-            assert not isinstance(r, reply.Failure)
+            assert not isinstance(r, game.Failure)
 
-    async def failure(self, command: str):
-        r = await self.execute(command)
-        assert isinstance(r, reply.Failure)
+    async def failure(self, command: str, **kwargs):
+        r = await self.execute(command, **kwargs)
+        assert isinstance(r, game.Failure)
         return r
 
     async def realize(self):

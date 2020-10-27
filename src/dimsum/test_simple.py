@@ -48,3 +48,31 @@ async def test_recipe_simple():
 
     await tw.success("make fancy")
     assert len(tw.player.holding) == 1
+
+
+@pytest.mark.asyncio
+async def test_freezing_simple():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Box")
+    assert len(tw.player.holding) == 1
+    await tw.failure("unfreeze box")
+    await tw.success("freeze box")
+    await tw.failure("modify name Ignored Box")
+    await tw.success("unfreeze box")
+    await tw.success("modify name New Box")
+
+
+@pytest.mark.asyncio
+async def test_freezing_others_unable_unfreeze():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.add_carla()
+    await tw.success("make Box")
+    assert len(tw.player.holding) == 1
+    await tw.failure("unfreeze box")
+    await tw.success("freeze box")
+    await tw.success("drop")
+    await tw.success("hold box", person=tw.carla)
+    await tw.failure("modify name Ignored Box")
+    await tw.failure("unfreeze box")

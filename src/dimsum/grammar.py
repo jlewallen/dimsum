@@ -8,7 +8,7 @@ def create_parser():
 
         verbs.2:           look
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
-                         | make | call | modify | obliterate
+                         | make | call | modify | obliterate | freeze | unfreeze
                          | eat | drink | hit | kick
                          | go | climb | walk | run | home
                          | plant | pour | water
@@ -56,6 +56,9 @@ def create_parser():
 
         open:              "open" held_noun                        -> open_hands
         close:             "close" held_noun                       -> close_hands
+
+        freeze:            "freeze" held_noun                      -> freeze
+        unfreeze:          "unfreeze" held_noun                    -> unfreeze
 
         lock:              "lock" held_noun "with" held_noun       -> lock_with
                          | "lock" held_noun                        -> lock_new

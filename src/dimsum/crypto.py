@@ -30,7 +30,7 @@ class Identity:
     def private_key(self):
         return get_private_key(self.private)
 
-    def sign(self, other: "Identity"):
+    def sign(self, other: "Identity") -> "Identity":
         private_key = self.private_key()
         signature_bytes = private_key.sign(other.public.encode("utf-8"))
         signature = base64.b64encode(signature_bytes).decode("utf-8")
