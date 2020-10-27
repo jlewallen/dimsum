@@ -4,15 +4,16 @@
 
    N-Hops aways, etc...
 
-** TODO Make Maze.
+** TODO Weather esp Wind
+
+   Set logical zip code for an area, weather changes to reflect
+   that. Wind can blow light items from one area to another.
+
+** TODO Mode: Make Maze.
 
    Just randomly generates a maze that gets populated with stuff.
 
-** TODO Weather.
-
-   Set logical zip code for an area, weather changes to reflect that.
-
-** TODO Animal Crossing mode.
+** TODO Mode: Animal Crossing
 
    I think that eventually this will become a thing, but the idea is
    that we can forage for supplies/resources and then use those to
@@ -22,28 +23,23 @@
    You're holding a recipe.
    .call this NAME
 
-** TODO Escape Room Mode
+** TODO Mode: Escape Room
 
    Everybody is thrown into a randomly generated world and has to
    capture a flag or do something? See who can gather the most X in
    whatever time? People can also create their own scenarios, in a
    DnD-esque way and see if their friends can find their way out.
 
-** TODO Lock/freeze items.
+** TODO Look for <obscured_item>
 
-   In order to create scarcity and value for items, maybe locking them
-   so they can't be cloned or modified.
-
-   Part of this should be making something immobile, to solve moving
-   entrances problem.
-
-** TODO Allow some items to only be held/interacted with after being seen.
+   Allow some items to only be held/interacted with after being seen.
 
    We can use a property for this.
 
-** TODO Optimize persistence: delete and only update modified.
-
-   Remember which entities are modified in which Actions, only save those.
+** TODO Optimize Persistence
+   Remember which entities are modified in which Actions, only save
+   those. This should also integrate with entity.touch() so we can
+   perform optimistic locking or something similar.
 
 ** TODO Web tool for drawing connected areas.
 ** TODO Behavior Name Picker
@@ -53,6 +49,14 @@
 ** TODO CLI mode for testing.
 
    This should just be a telnet server, maybe.
+
+** DONE Lock/freeze items.
+
+   In order to create scarcity and value for items, maybe locking them
+   so they can't be cloned or modified.
+
+   Part of this should be making something immobile, to solve moving
+   entrances problem.
 
 ** DONE Entities that have to be carried.
 
@@ -102,7 +106,3 @@
 ** DONE Depend on carryable for dropping worn items?
 
    No real benefit now. Keep the idea round, though.
-
-**  Example Session
-
-	[[./docs/areas.png]]
