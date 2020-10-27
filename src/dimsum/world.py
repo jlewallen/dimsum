@@ -240,11 +240,13 @@ class WorldCtx(context.Ctx):
         return things.Item(**kwargs)
 
     def find_item(
-        self, q: str = None, candidates=None, exclude=None, **kwargs
+        self, q: str = None, candidates=None, exclude=None, things_only=True, **kwargs
     ) -> Optional[entity.Entity]:
         log.info("find-item: '%s' candidates=%s exclude=%s", q, candidates, exclude)
         for e in candidates:
             if not exclude or e not in exclude:
+                if things_only and not isinstance(e, things.Item):
+                    continue
                 if q:
                     if e.describes(q):
                         return e
