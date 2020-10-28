@@ -75,7 +75,7 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
 
 class SecurePickler(jsonpickle.pickler.Pickler):
     def __init__(self, secure=False, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.secure = secure
 
 
@@ -102,11 +102,15 @@ classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
 
 
-def serialize_full(value):
+def serialize_full(value, depth=0):
     if isinstance(value, list):
-        value = [serialize_full(item) for item in value]
+        value = [serialize_full(item, depth=depth + 1) for item in value]
+
     if isinstance(value, dict):
-        value = {key: serialize_full(value) for key, value in value.items()}
+        value = {
+            key: serialize_full(value, depth=depth + 1) for key, value in value.items()
+        }
+
     if value.__class__ in classes:
         attrs = copy.copy(value.__dict__)
         if "hooks" in attrs:
@@ -120,10 +124,10 @@ def serialize(value, indent=None, unpicklable=True, secure=False):
     prepared = serialize_full(value)
     return jsonpickle.encode(
         prepared,
-        context=SecurePickler(secure=secure),
         indent=indent,
         unpicklable=unpicklable,
         make_refs=False,
+        context=SecurePickler(secure=secure, unpicklable=unpicklable, make_refs=False),
     )
 
 

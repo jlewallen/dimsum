@@ -50,7 +50,7 @@ def create(state):
     @app.route("/api")
     def main_index():
         authenticate()
-        return serializing.serialize()
+        return serializing.serialize({})
 
     @app.route("/api/areas")
     def areas_index():
@@ -58,7 +58,7 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"areas": world.areas()})
+        return serializing.serialize({"areas": world.areas()}, unpicklable=False)
 
     @app.route("/api/people")
     def people_index():
@@ -66,7 +66,7 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"people": world.people()})
+        return serializing.serialize({"people": world.people()}, unpicklable=False)
 
     @app.route("/api/entities/<string:ukey>")
     def get_entity(ukey: str):

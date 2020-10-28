@@ -229,3 +229,18 @@ async def test_transients_preserved(caplog):
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].details.name
     assert r.entities[0].loose
+
+
+@pytest.mark.asyncio
+async def test_serialize_library(caplog):
+    caplog.set_level(logging.INFO)
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    tw.world.add_area(library.create_example_world(tw.world))
+
+    json = serializing.serialize(
+        {"aras": tw.world.areas()}, unpicklable=False, indent=4
+    )
+
+    assert "py/id" not in json

@@ -5,6 +5,16 @@
             <Entities :entityRefs="adjacent" @selected="entitySelected" />
         </div>
 
+        <div class="routes" v-if="entity.routes.length > 0">
+            <h4>Routes:</h4>
+            <div v-for="route in entity.routes" v-bind:key="route.direction.compass" class="route">
+                <div>{{ route.direction.compass }} of here there is</div>
+                <WithEntity :entityKey="route.area.key" v-slot="withEntity">
+                    <EntityPanel :entity="withEntity.entity" @selected="(e) => entitySelected(e)" />
+                </WithEntity>
+            </div>
+        </div>
+
         <div v-if="entity.occupied.length > 0">
             <h4>Also Here:</h4>
             <Entities :entityRefs="entity.occupied" @selected="entitySelected" />
@@ -22,11 +32,13 @@ import _ from "lodash";
 import { defineComponent } from "vue";
 import { Area, Item, AreaRoute, Entity, EntityRef } from "@/http";
 import Entities from "./Entities.vue";
+import WithEntity from "./WithEntity.vue";
+import EntityPanel from "./EntityPanel.vue";
 import store from "@/store";
 
 export default defineComponent({
     name: "AreaEditor",
-    components: { Entities },
+    components: { Entities, WithEntity, EntityPanel },
     props: {
         entity: {
             type: Object as () => Area,
