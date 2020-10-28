@@ -380,7 +380,7 @@ class LookFor(PersonAction):
         if not item:
             return Failure("i can't seem to find that")
 
-        item.add_observation(player.identity)
+        player.add_observation(item.identity)
 
         await ctx.extend(holding=player.holding, item=item).hook("look-for")
         return EntitiesObservation([item])

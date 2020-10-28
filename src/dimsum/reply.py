@@ -181,7 +181,7 @@ class AreaObservation(Observation):
             [
                 observe(e)
                 for e in things.expected(area.holding)
-                if e.can_see(person.identity)
+                if not e.visible.hard_to_see or person.can_see(e.identity)
             ]
         )
         self.routes: List[movement.AreaRoute] = area.routes

@@ -43,6 +43,12 @@ class Observation:
         return age.total_seconds() < 60 * 60
 
 
+class Observer:
+    @abc.abstractmethod
+    def observe(self, identity: crypto.Identity):
+        raise NotImplementedError
+
+
 class Visible:
     def __init__(
         self,
@@ -62,18 +68,12 @@ class Visible:
         self.observations[identity.public].append(Observation())
 
     def can_see(self, identity: crypto.Identity) -> bool:
-        if not self.hard_to_see:
-            return True
-
         if not identity.public in self.observations:
             return False
 
         obs = self.observations[identity.public]
         if not obs:
             return False
-
-        log.info("%s", obs)
-        log.info("%s", obs[-1])
 
         return obs[-1].memorable()
 
