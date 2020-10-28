@@ -78,7 +78,7 @@ export type EntityKey = string;
 
 export interface EntityRef {
     key: string;
-    kind: string;
+    klass: string;
     name: string;
 }
 
@@ -91,8 +91,8 @@ export type Behaviors = { [index: string]: Behavior };
 
 export interface Entity {
     key: string;
-    kind: string;
     url: string;
+    klass: string;
     creator: EntityRef;
     details: Details;
     behaviors: Behaviors;

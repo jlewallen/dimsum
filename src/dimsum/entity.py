@@ -81,6 +81,7 @@ class Entity(Finder):
         kind: Kind = None,
         related: Dict[str, Kind] = None,
         frozen: Any = None,
+        klass: str = None,
         destroyed=None,
         **kwargs
     ):
@@ -90,6 +91,7 @@ class Entity(Finder):
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.frozen: Any = frozen if frozen else None
         self.destroyed: bool = destroyed if destroyed else False
+        self.klass = klass if klass else self.__class__.__name__
 
         if identity:
             self.identity = identity

@@ -30,12 +30,6 @@
    whatever time? People can also create their own scenarios, in a
    DnD-esque way and see if their friends can find their way out.
 
-** TODO Look for <obscured_item>
-
-   Allow some items to only be held/interacted with after being seen.
-
-   We can use a property for this.
-
 ** TODO Optimize Persistence
    Remember which entities are modified in which Actions, only save
    those. This should also integrate with entity.touch() so we can
@@ -49,6 +43,13 @@
 ** TODO CLI mode for testing.
 
    This should just be a telnet server, maybe.
+
+** TODO Reorder responses in Repl in nav?
+** DONE Look for <obscured_item>
+
+   Allow some items to only be held/interacted with after being seen.
+
+   We can use a property for this.
 
 ** DONE Lock/freeze items.
 

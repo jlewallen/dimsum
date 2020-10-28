@@ -38,7 +38,7 @@ export default defineComponent({
             if (this.entities.length == 0) {
                 return null;
             }
-            return this.entities.map((e) => e.kind).join(", ");
+            return this.entities.map((e) => e.klass).join(", ");
         },
     },
     methods: {

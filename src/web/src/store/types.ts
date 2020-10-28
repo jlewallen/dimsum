@@ -86,7 +86,7 @@ export class AuthenticatedAction {
 }
 
 export function entityToKind(entity: Entity): string {
-    return (entity as any)["py/object"].replace("serializing.Root", "");
+    return entity.klass.replace("serializing.Root", "");
 }
 
 export function entityToClass(entity: Entity): string {

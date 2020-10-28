@@ -68,7 +68,7 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
 
     def flatten(self, obj, data):
         data["key"] = obj.key
-        data["kind"] = obj.__class__.__name__
+        data["klass"] = obj.__class__.__name__
         data["name"] = obj.details.name
         return data
 
@@ -122,6 +122,7 @@ def serialize_full(value, depth=0):
 
 def serialize(value, indent=None, unpicklable=True, secure=False):
     prepared = serialize_full(value)
+
     return jsonpickle.encode(
         prepared,
         indent=indent,
