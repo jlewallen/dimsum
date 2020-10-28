@@ -90,5 +90,9 @@ export function entityToKind(entity: Entity): string {
 }
 
 export function entityToClass(entity: Entity): string {
-    return entityToKind(entity).toLowerCase();
+    const classes: string[] = [entityToKind(entity).toLowerCase()];
+    if (entity.visible && entity.visible.hard_to_see) {
+        classes.push("hard-to-see");
+    }
+    return classes.join(" ");
 }

@@ -99,6 +99,11 @@ export interface Entity {
     holding?: EntityRef[];
     occuped?: EntityRef[];
     routes?: AreaRoute[];
+    visible?: {
+        hard_to_see: boolean;
+        hidden: never;
+        observations: never;
+    };
     memory?: { [index: string]: EntityRef };
 }
 

@@ -98,4 +98,7 @@ export default defineComponent({
 .entity .desc {
     margin-bottom: 1em;
 }
+.hard-to-see {
+    opacity: 0.6;
+}
 </style>
