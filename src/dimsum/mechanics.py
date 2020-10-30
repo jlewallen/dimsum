@@ -4,6 +4,7 @@ import datetime
 import abc
 import crypto
 import props
+import behavior
 
 log = logging.getLogger("dimsum")
 
@@ -126,7 +127,7 @@ class PhysicsMixin:
 
 class MemoryMixin:
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)  # type: ignore
         self.memory = memory if memory else {}
 
     def find_memory(self, q: str) -> Optional[Memorable]:
@@ -153,8 +154,12 @@ class Weather:
 
 class WeatherMixin:
     def __init__(self, weather: Weather = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)  # type: ignore
         self.weather = weather if weather else Weather()
 
     def add_weather(self, weather: Weather):
         self.weather = weather
+
+    @abc.abstractmethod
+    def add_behaviors(self, *behaviors):
+        raise NotImplementedError

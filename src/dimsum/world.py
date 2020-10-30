@@ -53,6 +53,8 @@ class World(entity.Entity, entity.Registrar):
         return self.areas()[0]
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[envo.Area]:
+        if isinstance(entity, envo.Area):  # HACK
+            return entity
         for area in self.areas():
             if area.contains(entity) or area.occupying(entity):
                 return area
@@ -135,7 +137,9 @@ class World(entity.Entity, entity.Registrar):
     async def tick(self, now: Optional[float] = None):
         if now is None:
             now = time.time()
-        return await self.everywhere("tick", time=now)
+        await self.everywhere("tick", time=now)
+        await self.everywhere("wind", time=now)
+        return now
 
     async def everywhere(self, name: str, **kwargs):
         log.info("everywhere:%s %s", name, kwargs)
@@ -143,9 +147,13 @@ class World(entity.Entity, entity.Registrar):
         for entity in everything:
             behaviors = entity.get_behaviors(name)
             if len(behaviors) > 0:
-                log.info("tick: %s", entity)
+                log.info("everywhere: %s", entity)
                 area = self.find_entity_area(entity)
                 assert area
+                if (
+                    area == entity
+                ):  # HACK I think the default here should actually be entity.
+                    entity = None
                 with WorldCtx(
                     self.context_factory, world=self, area=area, entity=entity, **kwargs
                 ) as ctx:

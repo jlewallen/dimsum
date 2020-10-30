@@ -20,6 +20,7 @@ import messages
 import handlers
 import reply
 import serializing
+import sugar
 
 log = logging.getLogger("dimsum")
 

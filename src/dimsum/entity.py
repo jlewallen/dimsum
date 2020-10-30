@@ -65,18 +65,12 @@ class Criteria:
         self.kwargs = kwargs
 
 
-class Finder:
-    def find_things(self, criteria: Criteria) -> List["Entity"]:
-        return []
-
-
-class Entity(Finder):
+class Entity(behavior.BehaviorMixin):
     def __init__(
         self,
         key: str = None,
         identity: crypto.Identity = None,
         details: props.Details = None,
-        behaviors: behavior.BehaviorMap = None,
         creator: "Entity" = None,
         kind: Kind = None,
         related: Dict[str, Kind] = None,
@@ -109,7 +103,6 @@ class Entity(Finder):
             self.key = key
 
         self.details = details if details else props.Details("Unknown")
-        self.behaviors = behaviors if behaviors else behavior.BehaviorMap()
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod
@@ -156,12 +149,6 @@ class Entity(Finder):
     def validate(self) -> None:
         assert self.creator
         assert self.details
-
-    def get_behaviors(self, name):
-        return self.behaviors.get_all(name)
-
-    def add_behavior(self, name, **kwargs):
-        return self.behaviors.add(name, **kwargs)
 
     def describes(self, q: str) -> bool:
         return False

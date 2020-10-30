@@ -21,6 +21,7 @@ import events
 import luaproxy
 import movement
 import messages
+import sugar
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.discord")

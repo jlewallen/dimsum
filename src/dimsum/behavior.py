@@ -1,5 +1,5 @@
 from typing import List, Sequence, Dict
-
+import abc
 import sys
 import logging
 import datetime
@@ -10,6 +10,33 @@ import lupa
 import props
 
 log = logging.getLogger("dimsum")
+
+
+class ConditionalBehavior:
+    def __init__(self, **kwargs):
+        super().__init__()
+
+    @property
+    @abc.abstractmethod
+    def name(self) -> str:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def enabled(self, **kwargs) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def lua(self, **kwargs) -> str:
+        raise NotImplementedError
+
+
+registered_conditional_behaviors: List[ConditionalBehavior] = []
+
+
+def conditional(klass):
+    log.info("registered conditional behavior: %s", klass)
+    registered_conditional_behaviors.append(klass())
+    return klass
 
 
 class Scope:
@@ -150,3 +177,28 @@ class BehaviorMap(props.PropertyMap):
         for key, value in typed.items():
             value.check()
         return super().replace(**typed)
+
+
+class BehaviorMixin:
+    def __init__(self, behaviors: BehaviorMap = None, **kwargs):
+        super().__init__(**kwargs)  # type: ignore
+        self.behaviors = behaviors if behaviors else BehaviorMap()
+
+    def get_behaviors(self, name):
+        existing = self.behaviors.get_all(name)
+        if len(existing):
+            return existing
+
+        ephemeral = []
+        for cb in registered_conditional_behaviors:
+            if cb.name == name:
+                if cb.enabled(entity=self):
+                    ephemeral.append(Behavior(lua=cb.lua, logs=[]))
+        return ephemeral
+
+    def add_behavior(self, name, **kwargs):
+        return self.behaviors.add(name, **kwargs)
+
+    def add_behaviors(self, *behaviors: ConditionalBehavior, **kwargs):
+        for fb in behaviors:
+            pass  # self.add_behavior(fb.name, lua=fb.lua)

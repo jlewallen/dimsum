@@ -45,6 +45,17 @@
    This should just be a telnet server, maybe.
 
 ** TODO Reorder responses in Repl in nav?
+** TODO Lua Ideas
+
+   What if hooks could call other hooks, and give them custom
+   information. What I'm thinking of is being able to define custom
+   weather hooks in Lua.
+
+   Can we use more decorators to insinuate ourselves into operations
+   with a proper context? For example after an action runs.
+
+   Can these be chained? So one is fired when another is?
+
 ** DONE Look for <obscured_item>
 
    Allow some items to only be held/interacted with after being seen.
