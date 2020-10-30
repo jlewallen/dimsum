@@ -324,6 +324,28 @@ class AddItemRoute:
         return self.item
 
 
+class NarrowCanyon:
+    def create(self, world: world.World):
+        area = envo.Area(
+            creator=world,
+            details=props.Details(
+                "Narrow Canyon",
+                desc="It's barely wide enough to walk two by two down. The narrow walls really funnel the wind, creating powerful gusts.",
+            ),
+        )
+        area.add_weather(mechanics.Weather(wind=mechanics.Wind(magnitude=50)))
+        return area
+
+
+class RockyPath:
+    def create(self, world: world.World):
+        item = things.Item(
+            creator=world,
+            details=props.Details("Rocky Path", desc="Looks easy enough"),
+        )
+        return item
+
+
 class WelcomeArea(Factory):
     def create(self, world: world.World):
         area = envo.Area(
@@ -344,6 +366,11 @@ class WelcomeArea(Factory):
         ladder = WoodenLadder().create(world)
         ladder.link_area(loft)
         area.add_item_and_link_back(ladder)
+
+        canyon = NarrowCanyon().create(world)
+        rocky_path = RockyPath().create(world)
+        rocky_path.link_area(canyon)
+        area.add_item_and_link_back(rocky_path)
 
         _, clearing = area.add_item_and_link_back(
             AddItemRoute(world)

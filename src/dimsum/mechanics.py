@@ -137,3 +137,24 @@ class MemoryMixin:
             if entity.describes(q):
                 return entity
         return None
+
+
+class Wind:
+    def __init__(self, magnitude: float = 0.0, **kwargs):
+        super().__init__()
+        self.magnitude = magnitude
+
+
+class Weather:
+    def __init__(self, wind: Wind = None, **kwargs):
+        super().__init__()
+        self.wind = wind
+
+
+class WeatherMixin:
+    def __init__(self, weather: Weather = None, **kwargs):
+        super().__init__()
+        self.weather = weather if weather else Weather()
+
+    def add_weather(self, weather: Weather):
+        self.weather = weather
