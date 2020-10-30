@@ -37,8 +37,6 @@ class TestWorld:
             details=props.Details("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.area = envo.Area(creator=self.player, details=props.Details("Living room"))
-        self.world.register(self.area)
         self.l = grammar.create_parser()
 
     def add_simple_area_here(self, door, name):
@@ -64,7 +62,13 @@ class TestWorld:
         )
         return await self.world.perform(actions.Join(), self.tomi)
 
-    async def initialize(self):
+    async def initialize(self, area=None, **kwargs):
+        self.area = area
+        if not self.area:
+            self.area = envo.Area(
+                creator=self.player, details=props.Details("Living room")
+            )
+            self.world.register(self.area)
         self.world.add_area(self.area)
         await self.world.perform(actions.Join(), self.jacob)
 

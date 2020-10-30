@@ -13,6 +13,7 @@ import test
 @pytest.mark.asyncio
 async def test_drop_hammer_funny_gold(caplog):
     tw = test.TestWorld()
+    await tw.initialize()
 
     hammer = tw.add_item(things.Item(creator=tw.jacob, details=props.Details("Hammer")))
     hammer.add_behavior(
@@ -32,7 +33,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.success("look")
     await tw.success("hold hammer")
     await tw.success("drop")
@@ -48,6 +48,7 @@ end
 async def test_wear_cape(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     cape = tw.add_item(things.Item(creator=tw.jacob, details=props.Details("Cape")))
     cape.link_activity("worn")
@@ -69,7 +70,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.success("look")
     await tw.success("hold cape")
     await tw.success("wear cape")
@@ -83,6 +83,7 @@ end
 async def test_behavior_move(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     mystery_area = envo.Area(creator=tw.player, details=props.Details("A Mystery Area"))
     tw.world.register(mystery_area)
@@ -99,7 +100,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.success("look")
     await tw.success("hold cape")
     await tw.success("wear cape")
@@ -112,6 +112,7 @@ end
 async def test_behavior_create_item(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     box = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
@@ -129,7 +130,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.success("look")
     await tw.success("hold box")
     assert len(tw.player.holding) == 1
@@ -143,6 +143,7 @@ end
 async def test_behavior_create_quantified_item(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     box = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Colorful Box"))
@@ -161,7 +162,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.success("look")
     await tw.success("hold box")
     assert len(tw.player.holding) == 1
@@ -183,6 +183,7 @@ async def test_behavior_create_area(caplog):
 async def test_behavior_time_passing(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     tree = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
@@ -201,7 +202,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
@@ -215,6 +215,7 @@ end
 async def test_behavior_create_kind(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     tree = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
@@ -233,7 +234,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.entities()) == 3
     assert len(tw.world.items()) == 2
@@ -249,6 +249,7 @@ end
 async def test_behavior_random(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     tree = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
@@ -262,7 +263,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.world.tick(0)
 
 
@@ -270,6 +270,7 @@ end
 async def test_behavior_numbering_by_kind(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     tree = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
@@ -297,7 +298,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.entities()) == 3
     await tw.world.tick(1)
@@ -308,6 +308,7 @@ end
 async def test_behavior_numbering_person_by_name(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
+    await tw.initialize()
 
     tree = tw.add_item(
         things.Item(creator=tw.jacob, details=props.Details("A Lovely Tree"))
@@ -328,7 +329,6 @@ end
 """,
     )
 
-    await tw.initialize()
     await tw.world.tick(0)
     assert len(tw.area.entities()) == 2
     await tw.world.tick(1)

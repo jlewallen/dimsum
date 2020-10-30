@@ -11,7 +11,6 @@ import test
 @pytest.mark.asyncio
 async def test_go_unknown():
     tw = test.TestWorld()
-
     await tw.initialize()
 
     area_before = tw.world.find_player_area(tw.player)
@@ -23,9 +22,9 @@ async def test_go_unknown():
 @pytest.mark.asyncio
 async def test_go_adjacent():
     tw = test.TestWorld()
-    door_room = tw.add_simple_area_here("Door", "Door Room")
-
     await tw.initialize()
+
+    door_room = tw.add_simple_area_here("Door", "Door Room")
 
     area_before = tw.world.find_player_area(tw.player)
     await tw.success("go door")
@@ -37,7 +36,6 @@ async def test_go_adjacent():
 @pytest.mark.asyncio
 async def test_make_door_and_go_and_get_the_fuck_back():
     tw = test.TestWorld()
-
     await tw.initialize()
 
     await tw.success("make Door")
@@ -57,9 +55,7 @@ async def test_make_door_and_go_and_get_the_fuck_back():
 
 @pytest.mark.asyncio
 async def test_climb_wall(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
-
     await tw.initialize()
 
     await tw.success("make Wall")
@@ -80,7 +76,6 @@ async def test_climb_wall(caplog):
 @pytest.mark.asyncio
 async def test_directional_moving_nowhere():
     tw = test.TestWorld()
-
     await tw.initialize()
 
     area_before = tw.world.find_player_area(tw.player)
@@ -92,7 +87,6 @@ async def test_directional_moving_nowhere():
 @pytest.mark.asyncio
 async def test_directional_moving():
     tw = test.TestWorld()
-
     await tw.initialize()
 
     obs = await tw.success("look")
