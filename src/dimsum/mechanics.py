@@ -159,7 +159,3 @@ class WeatherMixin:
 
     def add_weather(self, weather: Weather):
         self.weather = weather
-
-    @abc.abstractmethod
-    def add_behaviors(self, *behaviors):
-        raise NotImplementedError

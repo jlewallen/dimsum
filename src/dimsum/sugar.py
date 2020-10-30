@@ -4,11 +4,12 @@ import behavior
 import entity
 import things
 import envo
+import world
 
 log = logging.getLogger("dimsum")
 
 
-@behavior.conditional
+@behavior.conditional(world.WindHook)
 class WindBehavior(behavior.ConditionalBehavior):
     def enabled(self, entity: entity.Entity = None, **kwargs):
         if not isinstance(entity, envo.Area):  # HACK
@@ -16,10 +17,6 @@ class WindBehavior(behavior.ConditionalBehavior):
         if entity.weather.wind is None:
             return False
         return True
-
-    @property
-    def name(self):
-        return "wind"
 
     @property
     def lua(self):

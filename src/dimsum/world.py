@@ -13,6 +13,8 @@ import living
 import animals
 
 DefaultMoveVerb = "walk"
+TickHook = "tick"
+WindHook = "wind"
 log = logging.getLogger("dimsum")
 scripting = behavior.ScriptEngine()
 
@@ -137,8 +139,8 @@ class World(entity.Entity, entity.Registrar):
     async def tick(self, now: Optional[float] = None):
         if now is None:
             now = time.time()
-        await self.everywhere("tick", time=now)
-        await self.everywhere("wind", time=now)
+        await self.everywhere(TickHook, time=now)
+        await self.everywhere(WindHook, time=now)
         return now
 
     async def everywhere(self, name: str, **kwargs):

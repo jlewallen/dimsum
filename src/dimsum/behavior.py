@@ -16,11 +16,6 @@ class ConditionalBehavior:
     def __init__(self, **kwargs):
         super().__init__()
 
-    @property
-    @abc.abstractmethod
-    def name(self) -> str:
-        raise NotImplementedError
-
     @abc.abstractmethod
     def enabled(self, **kwargs) -> bool:
         raise NotImplementedError
@@ -30,13 +25,22 @@ class ConditionalBehavior:
         raise NotImplementedError
 
 
-registered_conditional_behaviors: List[ConditionalBehavior] = []
+class RegisteredBehavior:
+    def __init__(self, name: str, behavior: ConditionalBehavior):
+        super().__init__()
+        self.name = name
+        self.behavior = behavior
 
 
-def conditional(klass):
-    log.info("registered conditional behavior: %s", klass)
-    registered_conditional_behaviors.append(klass())
-    return klass
+registered_behaviors: List[RegisteredBehavior] = []
+
+
+def conditional(name):
+    def wrap(klass):
+        log.info("registered behavior: %s %s", name, klass)
+        registered_behaviors.append(RegisteredBehavior(name, klass()))
+
+    return wrap
 
 
 class Scope:
@@ -190,15 +194,11 @@ class BehaviorMixin:
             return existing
 
         ephemeral = []
-        for cb in registered_conditional_behaviors:
-            if cb.name == name:
-                if cb.enabled(entity=self):
-                    ephemeral.append(Behavior(lua=cb.lua, logs=[]))
+        for rb in registered_behaviors:
+            if rb.name == name:
+                if rb.behavior.enabled(entity=self):
+                    ephemeral.append(Behavior(lua=rb.behavior.lua, logs=[]))
         return ephemeral
 
     def add_behavior(self, name, **kwargs):
         return self.behaviors.add(name, **kwargs)
-
-    def add_behaviors(self, *behaviors: ConditionalBehavior, **kwargs):
-        for fb in behaviors:
-            pass  # self.add_behavior(fb.name, lua=fb.lua)
