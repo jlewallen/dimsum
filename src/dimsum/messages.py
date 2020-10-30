@@ -1,6 +1,7 @@
 import logging
 import bus
 import events
+import inflect
 
 from context import *
 from reply import *
@@ -13,6 +14,7 @@ from events import *
 from world import *
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 class TextBus(bus.EventBus):
@@ -40,13 +42,28 @@ class TextBus(bus.EventBus):
         return "%s joined!" % (player)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):
-        return "%s held %s" % (person, items)
+        return "%s held %s" % (
+            person,
+            p.join(
+                items,
+            ),
+        )
 
     async def ItemsDropped(self, person=None, area=None, items=None, **kwargs):
-        return "%s dropped %s" % (person, items)
+        return "%s dropped %s" % (
+            person,
+            p.join(
+                items,
+            ),
+        )
 
     async def ItemObliterated(self, person=None, area=None, items=None, **kwargs):
-        return "%s obliterated %s" % (person, items)
+        return "%s obliterated %s" % (
+            person,
+            p.join(
+                items,
+            ),
+        )
 
     async def ItemDrank(self, person=None, area=None, item=None, **kwargs):
         return "%s drank %s" % (person, item)
@@ -54,8 +71,8 @@ class TextBus(bus.EventBus):
     async def ItemEaten(self, person=None, area=None, item=None, **kwargs):
         return "%s ae %s" % (person, item)
 
-    async def ItemsAppeared(self, area=None, item=None, **kwargs):
-        return "%s suddenly appeared!" % (item)
+    async def ItemsAppeared(self, area=None, items=None, **kwargs):
+        return "%s suddenly appeared!" % (p.join(items),)
 
 
 class EmbedObservationVisitor:

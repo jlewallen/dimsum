@@ -23,8 +23,8 @@ import movement
 import messages
 import sugar
 
-p = inflect.engine()
 log = logging.getLogger("dimsum.discord")
+p = inflect.engine()
 
 
 class DiscordEventBus(messages.TextBus):
