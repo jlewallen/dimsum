@@ -8,7 +8,7 @@ import os
 
 import web
 import bot
-
+import sshd
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -20,4 +20,5 @@ if __name__ == "__main__":
     gb.bot.loop.create_task(
         webApp.run_task("0.0.0.0", 5000, shutdown_trigger=shutdown_event.wait)
     )
+    gb.bot.loop.create_task(sshd.start_server(gb))
     gb.run()

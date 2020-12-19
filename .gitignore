@@ -7,3 +7,5 @@ web/dist
 web/node_modules
 web/src/config.ts
 static
+ssh_host_key
+ssh_host_key.pub
