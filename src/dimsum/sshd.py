@@ -92,6 +92,10 @@ class ShellSession:
 
         name = self.process.get_extra_info("username")
 
+        if self.process.env:
+            for key, value in self.process.env.items():
+                self.process.stdout.write("%s=%s\n" % (key, value))
+
         log.info("%s: connected: %s (%d x %d)" % (name, term_type, width, height))
 
         if not self.state.world:
