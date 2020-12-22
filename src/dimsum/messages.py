@@ -36,7 +36,7 @@ class TextBus(bus.EventBus):
     async def LivingLeftArea(self, person=None, area=None, **kwargs):
         return "%s left %s" % (person, area)
 
-    async def PlayerJoined(self, player: Player=None, area=None, **kwargs):
+    async def PlayerJoined(self, player: Player = None, area=None, **kwargs):
         return "%s joined!" % (player)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):
@@ -56,3 +56,76 @@ class TextBus(bus.EventBus):
 
     async def ItemsAppeared(self, area=None, item=None, **kwargs):
         return "%s suddenly appeared!" % (item)
+
+
+class EmbedObservationVisitor:
+    def personal_observation(self, obs):
+        emd = obs.details.desc
+        emd += "\n"
+
+        emd += "Properties:\n"
+        for key, value in obs.properties.items():
+            emd += key + "=" + str(value) + "\n"
+        emd += "\n"
+
+        emd += "Memory:\n"
+        for key, value in obs.memory.items():
+            emd += key + "=" + str(value) + "\n"
+        emd += "\n"
+
+        return {"title": obs.details.name, "description": emd}
+
+    def detailed_observation(self, obs):
+        emd = obs.details.desc
+        emd += "\n"
+        for key, value in obs.properties.items():
+            emd += "\n" + key + "=" + str(value)
+        for key, value in obs.what.behaviors.items():
+            emd += "\n" + key + "=" + value.lua
+        return {"title": obs.details.name, "description": emd}
+
+    def area_observation(self, obs):
+        emd = obs.details.desc
+        emd += "\n\n"
+        if len(obs.living) > 0:
+            emd += "Also here: " + p.join([str(x) for x in obs.living])
+            emd += "\n"
+        if len(obs.items) > 0:
+            emd += "You can see " + p.join([str(x) for x in obs.items])
+            emd += "\n"
+        if len(obs.who.holding) > 0:
+            emd += "You're holding " + p.join([str(x) for x in obs.who.holding])
+            emd += "\n"
+        directional = [
+            e for e in obs.routes if isinstance(e, movement.DirectionalRoute)
+        ]
+        if len(directional) > 0:
+            directions = [d.direction for d in directional]
+            emd += "You can go " + p.join([str(d) for d in directions])
+            emd += "\n"
+        return {"title": obs.details.name, "description": emd}
+
+    def item(self, item):
+        return str(item)
+
+    def observed_person(self, observed):
+        return observed.person.accept(self)
+
+    def observed_entity(self, observed):
+        return observed.entity.accept(self)
+
+    def observed_entities(self, observed):
+        return [e.accept(self) for e in observed.entities]
+
+    def entities_observation(self, obs):
+        if len(obs.entities) == 0:
+            return {"text": "nothing"}
+        return {"text": p.join([str(x) for x in obs.entities])}
+
+
+class ReplyVisitor(EmbedObservationVisitor):
+    def failure(self, reply):
+        return {"text": reply.message}
+
+    def success(self, reply):
+        return {"text": reply.message}
