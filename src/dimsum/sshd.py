@@ -55,6 +55,9 @@ class ShellSession:
         while True:
             command = await self.read_command()
 
+            if not command:
+                break
+
             world = self.state.world
             player = await self.get_player()
             action = parse_as(evaluator.create(world, player), command)
