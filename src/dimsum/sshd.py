@@ -131,8 +131,9 @@ class ShellSession:
     def write_everyone_else(self, msg: str):
         for other in self.others:
             if other != self:
+                other.write("\r")
                 other.write(msg)
-                other.write("\n")
+                other.write("\33[2K\n")
                 other.write(self.prompt())
 
 
