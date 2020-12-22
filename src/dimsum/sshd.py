@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 import asyncio
 import asyncssh
@@ -20,7 +20,7 @@ passwords = {
 
 
 class ShellSession:
-    others = []
+    others: List["ShellSession"] = []
 
     def __init__(self, state, process):
         super().__init__()
