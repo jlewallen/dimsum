@@ -11,12 +11,26 @@ import actions
 import props
 import evaluator
 import messages
+import rich
+import rich.console
 
 log = logging.getLogger("dimsum.sshd")
 
 passwords = {
     "jlewallen": "",
 }
+
+
+class WrapStandardOut:
+    def __init__(self, writer):
+        super().__init__()
+        self.writer = writer
+
+    def write(self, data):
+        return self.writer.write(data)
+
+    def flush(self):
+        pass
 
 
 class ShellSession:
@@ -55,8 +69,11 @@ class ShellSession:
         while True:
             command = await self.read_command()
 
-            if not command:
+            if command is None:
                 break
+
+            if command == "":
+                continue
 
             world = self.state.world
             player = await self.get_player()
@@ -70,27 +87,34 @@ class ShellSession:
                 "%s" % (visual),
             )
 
-            self.write("\n")
+            self.write("\n", end="")
 
             if "title" in visual:
-                self.write(visual["title"])
-                self.write("\n")
+                self.write(visual["title"], end="")
+                self.write("\n", end="")
 
             if "text" in visual:
-                self.write(visual["text"])
-                self.write("\n")
+                self.write(visual["text"], end="")
+                self.write("\n", end="")
 
             if "description" in visual:
-                self.write("\n")
-                self.write(visual["description"])
+                self.write("\n", end="")
+                self.write(visual["description"], end="")
 
-            self.write("\n")
+            self.write("\n", end="")
 
     async def run(self):
         term_type = self.process.get_terminal_type()
         width, height, pixwidth, pixheight = self.process.get_terminal_size()
 
         name = self.process.get_extra_info("username")
+
+        self.console = rich.console.Console(
+            file=WrapStandardOut(self.process.stdout),
+            force_terminal=True,
+            width=width,
+            height=height,
+        )
 
         if self.process.env:
             for key, value in self.process.env.items():
@@ -99,18 +123,19 @@ class ShellSession:
         log.info("%s: connected: %s (%d x %d)" % (name, term_type, width, height))
 
         if not self.state.world:
-            self.write("\ninitializing...\n\n")
+            self.print("\ninitializing...\n")
             self.process.exit(0)
             return
 
         player = await self.get_player()
 
-        self.write("Welcome to the party, %s!\n" % (name,))
-        self.write("%d other users are connected.\n\n" % len(self.others))
-
-        self.write_everyone_else("*** %s has joined\n" % name)
-
         self.others.append(self)
+
+        self.print("Welcome to the party, %s!" % (name,))
+        self.print("%d other users are connected." % len(self.others))
+        self.print("\n", end="")
+
+        self.write_everyone_else("*** %s has joined" % name)
 
         try:
             await self.repl()
@@ -119,7 +144,7 @@ class ShellSession:
 
         log.info("%s: disconnected" % (name,))
 
-        self.write_everyone_else("*** %s has left\n" % name)
+        self.write_everyone_else("*** %s has left" % name)
 
         self.others.remove(self)
         self.process.exit(0)
@@ -128,20 +153,30 @@ class ShellSession:
         return " > "
 
     async def read_command(self) -> str:
-        self.write(self.prompt())
-        line = await self.process.stdin.readline()
-        return line.strip()
-
-    def write(self, msg: str):
-        self.process.stdout.write(msg)
+        line = await self.console.input(prompt=self.prompt(), stream=self.process.stdin)
+        if isinstance(line, str):
+            if len(line) == 0:
+                return None
+            return line.strip()
+        return None
 
     def write_everyone_else(self, msg: str):
         for other in self.others:
             if other != self:
-                other.write("\r")
+                other.control("\r\033[2K")
                 other.write(msg)
-                other.write("\33[2K\n")
-                other.write(self.prompt())
+                other.control("\033[2K")
+                other.write("\n", end="")
+                other.write(self.prompt(), end="")
+
+    def control(self, msg: str, **kwargs):
+        self.console.control(msg, **kwargs)
+
+    def print(self, msg: str, **kwargs):
+        self.console.print(msg, **kwargs)
+
+    def write(self, msg: str, **kwargs):
+        self.console.out(msg, **kwargs)
 
 
 class Server(asyncssh.SSHServer):
