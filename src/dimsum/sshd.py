@@ -121,7 +121,7 @@ class ShellSession:
     def recreate_console(self):
         term_type = self.process.get_terminal_type()
         width, height, width_pixels, height_pixels = self.process.get_terminal_size()
-        print("%s: recreating (%d x %d)" % (self.name, width, height))
+        log.info("%s: recreating (%d x %d)" % (self.name, width, height))
         self.console = rich.console.Console(
             file=WrapStandardOut(self.process.stdout),
             force_terminal=True,
