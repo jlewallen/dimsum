@@ -51,4 +51,8 @@ prod-image:
 prod-server:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
 
+graph:
+	env/bin/python3 src/dimsum/dump.py
+	dot -T png world.dot > world.png
+
 .PHONY: web

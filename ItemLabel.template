@@ -1,0 +1,15 @@
+<tr>
+	<td>quantity = {{ entity.quantity }}</td>
+</tr>
+{% if entity.visible.hard_to_see -%}
+<tr><td bgcolor="tomato">hard-to-see</td></tr>
+{% endif -%}
+{% if entity.visible.hidden -%}
+<tr><td bgcolor="tomato">hidden</td></tr>
+{% endif -%}
+{% if entity.loose -%}
+<tr><td bgcolor="white">loose</td></tr>
+{% endif -%}
+{% for key, interaction in entity.interactions.items() -%}
+<tr><td bgcolor="tan">{{ key }}</td></tr>
+{% endfor -%}

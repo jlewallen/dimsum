@@ -1,0 +1,33 @@
+<table border="0" cellborder="1" cellpadding="4">
+  <tr>
+     <td bgcolor="{{ get_color(entity) }}">{{ entity.details.name }}</td>
+  </tr>
+  <tr>
+     <td bgcolor="{{ get_color(entity) }}">{{ entity.klass }}</td>
+  </tr>
+  {%- for key, value in entity.details.map.items() -%}
+  {%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' -%}
+  {%- if key != 's:password' and value %}
+  <tr>
+     <td bgcolor="white"> {{ key }} = {{ value }}</td>
+  </tr>
+  {%- else -%}
+  <tr>
+     <td bgcolor="white"> {{ key }} </td>
+  </tr>
+  {%- endif -%}
+  {%- endif -%}
+  {%- endfor -%}
+
+  {% for key, behavior in entity.behaviors.items() -%}
+  <tr>
+     <td bgcolor="lightcyan"> {{ key }} </td>
+  </tr>
+  {%- endfor %}
+  {% for verb, item in entity.produces.items() -%}
+  <tr>
+     <td bgcolor="lightpink"> {{ verb }} </td>
+  </tr>
+  {%- endfor %}
+  {% include entity.klass + 'Label.template' %}
+</table>

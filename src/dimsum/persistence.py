@@ -97,3 +97,13 @@ class SqliteDatabase:
         entities = serializing.restore(world, rows)
 
         self.db.commit()
+
+    async def write(self, fn: str):
+        with open(fn, "w") as file:
+            file.write("[\n")
+            prefix = ""
+            for row in self.dbc.execute("SELECT key, serialized FROM entities"):
+                file.write(prefix)
+                file.write(row[1])
+                prefix = ","
+            file.write("]\n")

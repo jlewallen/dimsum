@@ -171,8 +171,11 @@ class Registrar:
         del self.entities[entity.key]
         self.garbage[entity.key] = entity
 
-    def empty(self):
+    def empty(self) -> bool:
         return len(self.entities.keys()) == 0
+
+    def everything(self) -> List[Entity]:
+        return list(self.entities.values())
 
     def all_of_type(self, klass: Type) -> List[Entity]:
         return [e for e in self.entities.values() if isinstance(e, klass)]

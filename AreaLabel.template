@@ -1,0 +1,5 @@
+{%- if entity.weather.wind -%}
+<tr>
+	<td bgcolor="yellowgreen">wind = {{ entity.weather.wind.magnitude }}</td>
+</tr>
+{%- endif -%}

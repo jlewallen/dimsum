@@ -1,0 +1,80 @@
+digraph world {
+
+{% for entity in world.everything() %}
+
+/*
+name: {{ entity.details.name }}
+key: {{ entity.key }}
+identity: {{ entity.identity }}
+details: {{ entity.details }}
+creator: {{ entity.creator }}
+kind: {{ entity.kind }}
+related: {{ entity.related }}
+frozen: {{ entity.frozen }}
+klass: {{ entity.klass }}
+destroyed: {{ entity.destroyed }}
+*/
+
+"{{ entity.key }}" [label=<{% include 'Label.template' %}> shape=plaintext]
+
+	{%- if entity.creator.key != "world" -%}
+		"{{ entity.key }}" -> "{{ entity.creator.key }}" [ label="creator" ]
+	{%- endif -%}
+
+	{%- if entity.klass == "Area" -%}
+		/* Area */
+
+		{% for route in entity.routes -%}
+		/* route {{ route }} */
+		"{{ entity.key }}" -> "{{ route.area.key }}" [ label="{{ route.name() }}" ]
+		{% endfor -%}
+
+		{% for other in entity.occupied -%}
+		/* occupied {{ other }} */
+		"{{ entity.key }}" -> "{{ other.key }}" [ label="occupied" ]
+		{% endfor -%}
+
+	{%- endif -%}
+
+	{% if entity.klass == "Item" -%}
+		/* Item */
+
+		{% for route in entity.routes -%}
+		/* route {{ route }} */
+		"{{ entity.key }}" -> "{{ route.area.key }}" [ label="{{ route.name() }}" ]
+		{% endfor -%}
+
+	{%- endif -%}
+
+	{%- if entity.klass == "Animal" -%}
+		/* Animal */
+
+		{% for wearable in entity.wearing -%}
+			/* wearing {{ wearable }} */
+			"{{ entity.key }}" -> "{{ wearable.key }}" [ label="wearing" ]
+		{% endfor -%}
+
+	{%- endif %}
+
+	{%- if entity.klass == "Player" -%}
+		/* Player */
+
+		{% for wearable in entity.wearing -%}
+			/* wearing {{ wearable }} */
+			"{{ entity.key }}" -> "{{ wearable.key }}" [ label="wearing" ]
+		{% endfor -%}
+
+	{%- endif %}
+
+	{% for other in entity.holding -%}
+		/* holding {{ other }} */
+		{%- if other.quantity > 1 %}
+			"{{ entity.key }}" -> "{{ other.key }}" [ label="holding {{ other.quantity }}" ]
+		{% else -%}
+			"{{ entity.key }}" -> "{{ other.key }}" [ label="holding" ]
+		{% endif -%}
+	{% endfor -%}
+
+{% endfor %}
+
+}
