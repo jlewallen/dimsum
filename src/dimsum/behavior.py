@@ -189,16 +189,12 @@ class BehaviorMixin:
         self.behaviors = behaviors if behaviors else BehaviorMap()
 
     def get_behaviors(self, name):
-        existing = self.behaviors.get_all(name)
-        if len(existing):
-            return existing
-
-        ephemeral = []
+        returning = self.behaviors.get_all(name)
         for rb in registered_behaviors:
             if rb.name == name:
                 if rb.behavior.enabled(entity=self):
-                    ephemeral.append(Behavior(lua=rb.behavior.lua, logs=[]))
-        return ephemeral
+                    returning.append(Behavior(lua=rb.behavior.lua, logs=[]))
+        return returning
 
     def add_behavior(self, name, **kwargs):
         return self.behaviors.add(name, **kwargs)
