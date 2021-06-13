@@ -26,5 +26,5 @@ class WhateverHandlers:
         super().__init__()
 
         @bus.handler(PlayerJoined)
-        def handle_player_joined(player: Player=None, **kwargs):
+        def handle_player_joined(player: Player = None, **kwargs):
             log.info("player joined handler: %s %s", player, kwargs)

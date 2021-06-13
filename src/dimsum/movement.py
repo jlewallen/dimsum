@@ -74,16 +74,20 @@ class MovementMixin:
         super().__init__(**kwargs)  # type: ignore
         self.routes: List[AreaRoute] = routes if routes else []
 
+    @property
+    def available_routes(self) -> List[AreaRoute]:
+        return self.routes
+
+    @property
+    def require_single_linked_area(self):
+        return self.adjacent()[0]
+
     def find_route(self, **kwargs) -> Optional[AreaRoute]:
         log.debug("%s find-route: %s %s", self, self.routes, kwargs)
         for r in self.routes:
             if r.satisfies(**kwargs):
                 return r
         return None
-
-    @property
-    def require_single_linked_area(self):
-        return self.adjacent()[0]
 
     def adjacent(self) -> List[Area]:
         return [r.area for r in self.routes]

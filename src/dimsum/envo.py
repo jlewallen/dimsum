@@ -61,7 +61,10 @@ class Area(
         # optionally get associated entities this will be ok.
         via_routes = super().adjacent()
         via_items = [
-            r.area for r in flatten([e.routes for e in things.expected(self.holding)])
+            r.area
+            for r in flatten(
+                [e.available_routes for e in things.expected(self.holding)]
+            )
         ]
         return [a for a in flatten([via_routes, via_items])]
 

@@ -737,7 +737,7 @@ class CallThis(PersonAction):
             template=template,
         )
         world.register(recipe)
-        player.memory["r:" + self.name] = recipe
+        player.memorize("r:" + self.name, recipe)
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )
@@ -750,7 +750,7 @@ class Forget(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         if self.name in player.memory:
-            del player.memory[self.name]
+            player.forget(self.name)
             return Success("oh wait, was that important?")
         return Failure("huh, seems i already have forgotten that!")
 
@@ -761,7 +761,7 @@ class Remember(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
-        player.memory[MemoryAreaKey] = area
+        player.memorize(MemoryAreaKey, area)
         return Success("you'll be able to remember this place, oh yeah")
 
 
@@ -844,7 +844,7 @@ class ModifyServings(PersonAction):
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        item.servings = self.number
+        item.modify_servings(self.number)
         return Success("done")
 
 

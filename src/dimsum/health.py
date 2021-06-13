@@ -45,6 +45,9 @@ class EdibleMixin:
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
         self.servings: int = servings
 
+    def modify_servings(self, s: int):
+        self.servings = s
+
 
 class HealthMixin:
     def __init__(self, medical=None, **kwargs):

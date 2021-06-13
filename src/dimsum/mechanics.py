@@ -10,7 +10,7 @@ log = logging.getLogger("dimsum")
 
 
 class InteractableMixin:
-    def __init__(self, interactions: Dict[str, Any] = None, **kwargs):
+    def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.interactions = interactions if interactions else {}
 
@@ -53,8 +53,8 @@ class Observer:
 class Visible:
     def __init__(
         self,
-        hidden=None,
-        hard_to_see=False,
+        hidden: bool=False,
+        hard_to_see: bool=False,
         observations: Dict[str, List[Observation]] = None,
         **kwargs
     ):
@@ -129,6 +129,12 @@ class MemoryMixin:
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.memory = memory if memory else {}
+
+    def memorize(self, q: str, thing: Memorable):
+        self.memory[q] = thing
+
+    def forget(self, q: str):
+        del self.memory[q]
 
     def find_memory(self, q: str) -> Optional[Memorable]:
         for name, entity in self.memory.items():
