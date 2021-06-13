@@ -39,6 +39,9 @@ class AreaRoute:
     def satisfies(self, **kwargs) -> bool:
         return False
 
+    def name(self) -> str:
+        raise NotImplementedError
+
 
 class VerbRoute(AreaRoute):
     def __init__(self, verb: str = None, **kwargs):
@@ -49,6 +52,9 @@ class VerbRoute(AreaRoute):
     def satisfies(self, verb=None, **kwargs) -> bool:
         return verb and verb == self.verb
 
+    def name(self) -> str:
+        return self.verb
+
 
 class DirectionalRoute(AreaRoute):
     def __init__(self, direction: Direction = None, **kwargs):
@@ -58,6 +64,9 @@ class DirectionalRoute(AreaRoute):
 
     def satisfies(self, direction: Direction = None, **kwargs) -> bool:
         return self.direction == direction
+
+    def name(self) -> str:
+        return str(self.direction).split(".")[1]
 
 
 class MovementMixin:
