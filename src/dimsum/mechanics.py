@@ -53,8 +53,8 @@ class Observer:
 class Visible:
     def __init__(
         self,
-        hidden: bool=False,
-        hard_to_see: bool=False,
+        hidden: bool = False,
+        hard_to_see: bool = False,
         observations: Dict[str, List[Observation]] = None,
         **kwargs
     ):

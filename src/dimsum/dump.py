@@ -24,6 +24,7 @@ def get_color(e: entity.Entity) -> str:
     }
     return map[e.klass]
 
+
 async def graph(fn: str, world: world.World):
     template_loader = jinja2.FileSystemLoader(searchpath="./")
     template_env = jinja2.Environment(loader=template_loader)

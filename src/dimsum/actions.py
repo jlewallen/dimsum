@@ -898,7 +898,9 @@ class Pour(PersonAction):
         if not PourVerb in source.produces:
             return Failure("you can't pour from that")
 
-        produced = source.produce_into(PourVerb, destination, person=player, creator=player)
+        produced = source.produce_into(
+            PourVerb, destination, person=player, creator=player
+        )
         if not produced:
             return Failure("oh no")
 
