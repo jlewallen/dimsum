@@ -161,6 +161,7 @@ async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].details.name
     assert r.entities[0].loose
+    assert tw.world.find_by_key(r.entities[0].key)
 
 
 @pytest.mark.asyncio

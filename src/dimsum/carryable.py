@@ -216,6 +216,7 @@ class ProducesMixin:
         producer = self.produces[verb]
         log.info("%s produces %s", self, producer)
         item = producer.produce_item(**kwargs)
+        context.get().registrar().register(item)
         return container.hold(item)
 
 
