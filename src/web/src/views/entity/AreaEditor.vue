@@ -9,7 +9,7 @@
             <h4>Routes:</h4>
             <div v-for="route in entity.routes" v-bind:key="route.direction.compass" class="route">
                 <div>{{ route.direction.compass }} of here there is</div>
-                <WithEntity :entityKey="route.area.key" v-slot="withEntity">
+                <WithEntity :entityKey="route.area.key" v-slot="withEntity" v-if="route.area.key">
                     <EntityPanel :entity="withEntity.entity" @selected="(e) => entitySelected(e)" />
                 </WithEntity>
             </div>

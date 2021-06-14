@@ -27,6 +27,7 @@ export * from "./types";
 type ActionParameters = ActionContext<RootState, RootState>;
 
 function base64ToHex(key: string): string {
+    if (!key) throw new Error("key is required");
     let hex = "";
     const bytes = atob(key);
     for (let i = 0; i < bytes.length; ++i) {
@@ -119,6 +120,10 @@ export default createStore<RootState>({
         },
         [ActionTypes.NEED_ENTITY]: ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
             return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
+                if (!data.entity) {
+                    console.warn("commit-null-entity", data);
+                    return;
+                }
                 commit(MutationTypes.ENTITY, data.entity);
             });
         },
