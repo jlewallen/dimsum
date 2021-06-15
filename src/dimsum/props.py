@@ -36,6 +36,15 @@ def merge_dictionaries(left, right, fields):
     return merged
 
 
+class Property:
+    def __init__(self, value=None, **kwargs):
+        self.__dict__ = kwargs
+        self.value = value
+
+    def set(self, value):
+        self.value = value
+
+
 class PropertyMap:
     def __init__(self, **kwargs):
         self.__dict__ = kwargs
@@ -51,8 +60,14 @@ class PropertyMap:
     def keys_matching(self, pattern: str):
         return [k for k in self.__dict__.keys() if re.match(pattern, k)]
 
-    def set(self, key, value):
-        self.__dict__[key] = value
+    def set(self, key: str, value):
+        if key in self.__dict__:
+            self.__dict__[key].set(value)
+        else:
+            if isinstance(value, Property):
+                self.__dict__[key] = value
+            else:
+                self.__dict__[key] = Property(value)
 
     def update(self, changes):
         self.__dict__.update(changes)
@@ -64,48 +79,44 @@ class PropertyMap:
         return key in self.__dict__
 
     def __getitem__(self, key):
-        return self.__dict__[key]
+        if key in self.__dict__:
+            return self.__dict__[key].value
+        return None
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
 
     def clone(self):
         return PropertyMap(self.map)
 
     def __str__(self):
-        return str(self.map)
+        return "properties<{0}>".format(self.map)
 
     def __repr__(self):
         return str(self)
 
 
+Name = "name"
+Desc = "desc"
+Created = "created"
+Touched = "touched"
+
+
 class Details(PropertyMap):
-    def __init__(self, name: str = "", **kwargs):
+    def __init__(self, name: str = "", desc: str = None, **kwargs):
         super().__init__(**kwargs)
-        self.name = name
-        self.desc = kwargs[Desc] if Desc in kwargs else name
-        self.presence = ""
-        self.created = time.time()
-        self.touched = time.time()
+        self.set(Name, name)
+        self.set(Desc, desc if desc else name)
+        self.set(Created, time.time())
+        self.set(Touched, time.time())
 
-    @staticmethod
-    def from_base(base):
-        details = Details()
-        details.__dict__ = base
-        details.created = time.time()
-        details.touched = time.time()
-        return details
+    @property
+    def name(self) -> str:
+        return self[Name]
 
-    @staticmethod
-    def from_map(map):
-        details = Details()
-        details.__dict__ = map
-        return details
-
-    def to_base(self):
-        base = self.map.copy()
-        if Created in base:
-            del base[Created]
-        if Touched in base:
-            del base[Touched]
-        return base
+    @name.setter
+    def name(self, value: str):
+        self.set(Name, value)
 
     def clone(self):
         return Details(self.name, desc=self.desc)

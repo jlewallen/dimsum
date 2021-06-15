@@ -23,14 +23,16 @@ class StaticItem(things.ItemFinder):
     def find_item(self, **kwargs) -> Optional[things.Item]:
         return self.item
 
+
 class ObjectNumber(things.ItemFinder):
     def __init__(self, number: int, **kwargs):
         super().__init__()
         self.number = number
 
-    def find_item(self, world: world.World=None, **kwargs) -> Optional[things.Item]:
+    def find_item(self, world: world.World = None, **kwargs) -> Optional[things.Item]:
         assert world
         return cast(things.Item, world.find_by_number(self.number))
+
 
 class AnyItem(things.ItemFinder):
     def __init__(self, q: str = ""):

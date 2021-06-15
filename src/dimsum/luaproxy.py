@@ -70,12 +70,12 @@ class LupaEntity:
             "entity:entity s: %s %s=%s (%s)"
             % (str(self), str(key), str(value), lupa.lua_type(value))
         )
-        self.entity.details.map[key] = self.unlua(value)
+        self.entity.details[key] = self.unlua(value)
 
     def __getitem__(self, key: str):
         log.info("entity:entity g: %s %s" % (str(self), str(key)))
-        if key in self.entity.details.map:
-            return self.entity.details.map[key]
+        if key in self.entity.details:
+            return self.entity.details[key]
         if hasattr(self, key):
             return getattr(self, key)
         if hasattr(self.entity, key):

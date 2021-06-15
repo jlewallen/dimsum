@@ -77,6 +77,7 @@ async def test_freezing_others_unable_unfreeze():
     await tw.failure("modify name Ignored Box")
     await tw.failure("unfreeze box")
 
+
 @pytest.mark.asyncio
 async def test_lookup_by_object_number():
     tw = test.TestWorld()
