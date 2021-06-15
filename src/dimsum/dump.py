@@ -5,6 +5,7 @@ import logging
 import asyncio
 import jinja2
 import json
+import os
 
 import luaproxy
 import handlers
@@ -39,10 +40,12 @@ async def main():
     bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
     the_world = world.World(bus, luaproxy.context_factory)
     db = persistence.SqliteDatabase()
-    await db.open("world.sqlite3")
-    await db.load(the_world)
-    await db.write("world.json")
-    await graph("world.dot", the_world)
+    for name in sys.argv[1:]:
+        await db.open(name)
+        name = os.path.splitext(name)[0]
+        await db.load(the_world)
+        await db.write("{0}.json".format(name))
+        await graph("{0}.dot".format(name), the_world)
 
 
 if __name__ == "__main__":

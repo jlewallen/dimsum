@@ -52,8 +52,11 @@ prod-server:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
 
 graph:
-	env/bin/python3 src/dimsum/dump.py
+	env/bin/python3 src/dimsum/dump.py world.sqlite3
 	jq . world.json > world-pretty.json && mv world-pretty.json world.json
 	dot -T png world.dot > world.png
+	env/bin/python3 src/dimsum/dump.py test.sqlite3
+	jq . test.json > test-pretty.json && mv test-pretty.json test.json
+	dot -T png test.dot > test.png
 
 .PHONY: web

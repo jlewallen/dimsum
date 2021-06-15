@@ -12,3 +12,6 @@ ssh_host_key.pub
 world.dot
 world.json
 world.png
+test.dot
+test.json
+test.png
