@@ -26,7 +26,14 @@ def create_parser():
         unheld_noun:       USEFUL_WORD+
         held_noun:         USEFUL_WORD+
         consumable_noun:   USEFUL_WORD+
-        noun:              USEFUL_WORD+
+        general_noun:      USEFUL_WORD+
+
+        makeable:          makeable_noun
+        contained:         object_by_number | contained_noun
+        consumable:        object_by_number | consumable_noun
+        unheld:            object_by_number | unheld_noun
+        held:              object_by_number | held_noun
+        noun:              object_by_number | general_noun
 
         this:              "this"
         that:              "that"
@@ -36,7 +43,7 @@ def create_parser():
                          | "look" ("at" "myself")                  -> look_myself
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
-                         | "look" ("in" held_noun)                 -> look_inside
+                         | "look" ("in" held)                      -> look_inside
         call:              "call" this NAME
 
         say:               "say" TEXT
@@ -44,34 +51,34 @@ def create_parser():
 
         give:              "give"
 
-        eat:               "eat" consumable_noun
-        drink:             "drink" consumable_noun
+        eat:               "eat" consumable
+        drink:             "drink" consumable
 
         take:              "take"                                  -> take
                          | "take" "bite" "of" noun                 -> take_bite
                          | "take" "sip" "of" noun                  -> take_sip
-                         | "take" contained_noun "out" "of" held_noun -> take_out
+                         | "take" contained "out" "of" held        -> take_out
 
-        put:               "put" held_noun ("in") held_noun        -> put_inside
+        put:               "put" held ("in") held                  -> put_inside
 
-        open:              "open" held_noun                        -> open_hands
-        close:             "close" held_noun                       -> close_hands
+        open:              "open" held                             -> open_hands
+        close:             "close" held                            -> close_hands
 
-        freeze:            "freeze" held_noun                      -> freeze
-        unfreeze:          "unfreeze" held_noun                    -> unfreeze
+        freeze:            "freeze" held                           -> freeze
+        unfreeze:          "unfreeze" held                         -> unfreeze
 
-        lock:              "lock" held_noun "with" held_noun       -> lock_with
-                         | "lock" held_noun                        -> lock_new
+        lock:              "lock" held "with" held                 -> lock_with
+                         | "lock" held                             -> lock_new
 
-        unlock:            "unlock" held_noun "with" held_noun     -> unlock_with
-                         | "unlock" held_noun                      -> unlock
+        unlock:            "unlock" held "with" held               -> unlock_with
+                         | "unlock" held                           -> unlock
 
-        hold:              "hold" unheld_noun                      -> hold
-                         | "hold" number unheld_noun               -> hold_quantity
+        hold:              "hold" unheld                           -> hold
+                         | "hold" number unheld                    -> hold_quantity
 
         drop:              "drop"                                  -> drop
-                         | "drop" number held_noun                 -> drop_quantity
-                         | "drop" held_noun                        -> drop_item
+                         | "drop" number held                      -> drop_quantity
+                         | "drop" held                             -> drop_item
 
         named_route:       USEFUL_WORD
         DIRECTION:         "north" | "west" | "east" | "south"
@@ -84,8 +91,8 @@ def create_parser():
         run:               "run" route
 
         obliterate:        "obliterate"
-        make:              "make" makeable_noun                    -> make
-                         | "make" number makeable_noun             -> make_quantified
+        make:              "make" makeable                         -> make
+                         | "make" number makeable                  -> make_quantified
 
         think:             "think"
         forget:            "forget" noun
@@ -126,6 +133,8 @@ def create_parser():
                          | "modify" "easy" "to" "see"              -> modify_easy_to_see
 
         auth:              "auth" TEXT
+
+        object_by_number:  "#"NUMBER
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS

@@ -21,12 +21,12 @@ async def test_serialize_empty_world(caplog):
     before = test.create_empty_world()
     json = serializing.all(before)
 
-    assert len(json.items()) == 0
+    assert len(json.items()) == 1
 
     after = test.create_empty_world()
     serializing.restore(after, json)
 
-    assert len(after.entities.items()) == 0
+    assert len(after.entities.items()) == 1
 
 
 @pytest.mark.asyncio
@@ -36,12 +36,12 @@ async def test_serialize_world_one_area(caplog):
 
     json = serializing.all(world)
 
-    assert len(json.items()) == 1
+    assert len(json.items()) == 2
 
     after = test.create_empty_world()
     serializing.restore(after, json)
 
-    assert len(after.entities.items()) == 1
+    assert len(after.entities.items()) == 2
 
 
 @pytest.mark.asyncio
@@ -56,7 +56,7 @@ async def test_serialize_world_one_item(caplog):
 
     json = serializing.all(world)
 
-    assert len(json.items()) == 2
+    assert len(json.items()) == 3
 
     after = test.create_empty_world()
     serializing.restore(after, json)
@@ -67,7 +67,7 @@ async def test_serialize_world_one_item(caplog):
     assert len(after.find_entity_by_name("Area").holding) == 1
     assert isinstance(after.find_entity_by_name("Area").holding[0], things.Item)
 
-    assert len(after.entities.items()) == 2
+    assert len(after.entities.items()) == 3
 
 
 @pytest.mark.asyncio
@@ -87,7 +87,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
     json = serializing.all(world)
 
-    assert len(json.items()) == 2
+    assert len(json.items()) == 3
 
     after = test.create_empty_world()
     entities = serializing.restore(after, json)
@@ -101,7 +101,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     assert two in one.adjacent()
     assert one in two.adjacent()
 
-    assert len(after.entities.items()) == 2
+    assert len(after.entities.items()) == 3
 
 
 @pytest.mark.asyncio
@@ -119,7 +119,7 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
 
     json = serializing.all(world)
 
-    assert len(json.items()) == 4
+    assert len(json.items()) == 5
 
     after = test.create_empty_world()
     entities = serializing.restore(after, json)
@@ -139,7 +139,7 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert two in one.adjacent()
     assert one in two.adjacent()
 
-    assert len(after.entities.items()) == 4
+    assert len(after.entities.items()) == 5
 
 
 @pytest.mark.asyncio
@@ -196,13 +196,13 @@ async def test_unregister_destroys(caplog):
     assert box.destroyed == False
     await db.save(tw.world)
 
-    assert await db.number_of_entities() == 4
+    assert await db.number_of_entities() == 5
 
     await tw.execute("obliterate")
     assert box.destroyed == True
     await db.save(tw.world)
 
-    assert await db.number_of_entities() == 3
+    assert await db.number_of_entities() == 4
 
     empty = world.World(tw.bus, context_factory=None)
     await db.load(empty)

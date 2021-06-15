@@ -76,3 +76,11 @@ async def test_freezing_others_unable_unfreeze():
     await tw.success("hold box", person=tw.carla)
     await tw.failure("modify name Ignored Box")
     await tw.failure("unfreeze box")
+
+@pytest.mark.asyncio
+async def test_lookup_by_object_number():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.failure("freeze #3")
+    await tw.success("make Box")
+    await tw.success("freeze #3")

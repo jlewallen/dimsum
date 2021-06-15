@@ -1,3 +1,8 @@
+{% for verb, item in entity.produces.items() -%}
+<tr>
+	<td bgcolor="lightpink"> {{ verb }} </td>
+</tr>
+{%- endfor %}
 <tr>
 	<td>quantity = {{ entity.quantity }}</td>
 </tr>

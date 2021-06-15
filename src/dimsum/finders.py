@@ -3,7 +3,9 @@ import logging
 import things
 import animals
 import carryable
+import context
 import envo
+import world
 
 log = logging.getLogger("dimsum")
 
@@ -21,6 +23,14 @@ class StaticItem(things.ItemFinder):
     def find_item(self, **kwargs) -> Optional[things.Item]:
         return self.item
 
+class ObjectNumber(things.ItemFinder):
+    def __init__(self, number: int, **kwargs):
+        super().__init__()
+        self.number = number
+
+    def find_item(self, world: world.World=None, **kwargs) -> Optional[things.Item]:
+        assert world
+        return cast(things.Item, world.find_by_number(self.number))
 
 class AnyItem(things.ItemFinder):
     def __init__(self, q: str = ""):
@@ -66,6 +76,7 @@ class UnheldItem(things.ItemFinder):
         if item:
             assert isinstance(item, things.Item)
             return cast(things.Item, item)
+
         item = person.find_item_under(q=self.q)
         if item:
             assert isinstance(item, things.Item)

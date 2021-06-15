@@ -102,6 +102,8 @@ class Entity(behavior.BehaviorMixin):
         if key:
             self.key = key
 
+        assert self.key
+
         self.details = details if details else props.Details("Unknown")
         self.related: Dict[str, Kind] = related if related else {}
 
@@ -162,9 +164,31 @@ class Registrar:
         super().__init__(**kwargs)
         self.entities: Dict[str, entity.Entity] = {}
         self.garbage: Dict[str, entity.Entity] = {}
+        self.numbered: Dict[int, entity.Entity] = {}
+        self.key_to_number: Dict[str, int] = {}
+        self.number: int = 0
 
     def register(self, entity: Union[Entity, Any]):
-        self.entities[entity.key] = entity
+        if entity.key in self.entities:
+            log.info(
+                "register:noop {0} ({1}) #{2}".format(
+                    entity.key, entity, self.key_to_number[entity.key]
+                )
+            )
+        else:
+            log.info(
+                "register:new {0} ({1}) #{2}".format(entity.key, entity, self.number)
+            )
+            self.entities[entity.key] = entity
+            self.numbered[self.number] = entity
+            self.key_to_number[entity.key] = self.number
+            self.number += 1
+
+    def find_by_number(self, number: int) -> Optional[Entity]:
+        if number in self.numbered:
+            return self.numbered[number]
+        log.info("register:miss {0}".format(number))
+        return None
 
     def unregister(self, entity: Union[Entity, Any]):
         entity.destroy()
@@ -172,7 +196,7 @@ class Registrar:
         self.garbage[entity.key] = entity
 
     def empty(self) -> bool:
-        return len(self.entities.keys()) == 0
+        return len(self.entities.keys()) == 1
 
     def everything(self) -> List[Entity]:
         return list(self.entities.values())

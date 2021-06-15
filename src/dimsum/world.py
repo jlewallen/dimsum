@@ -21,11 +21,14 @@ scripting = behavior.ScriptEngine()
 
 class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
-        super().__init__(**kwargs)
-        self.details = props.Details("World", desc="Ya know, everything")
-        self.key = "world"
+        super().__init__(
+            key="world",
+            details=props.Details("World", desc="Ya know, everything"),
+            **kwargs
+        )
         self.bus = bus
         self.context_factory = context_factory
+        self.register(self)
 
     def items(self):
         return self.all_of_type(things.Item)
@@ -124,7 +127,7 @@ class World(entity.Entity, entity.Registrar):
         assert finder
         area = self.find_player_area(person)
         log.info("applying finder:%s %s", finder, kwargs)
-        return finder.find_item(area=area, person=person, **kwargs)
+        return finder.find_item(area=area, person=person, world=self, **kwargs)
 
     async def perform(self, action, person: Optional[animals.Person]) -> game.Reply:
         area = self.find_entity_area(person) if person else None

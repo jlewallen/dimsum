@@ -16,6 +16,7 @@ import entity
 
 def get_color(e: entity.Entity) -> str:
     map = {
+        "World": "white",
         "Animal": "darkseagreen",
         "Player": "coral",
         "Item": "khaki",

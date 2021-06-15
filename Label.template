@@ -24,10 +24,5 @@
      <td bgcolor="lightcyan"> {{ key }} </td>
   </tr>
   {%- endfor %}
-  {% for verb, item in entity.produces.items() -%}
-  <tr>
-     <td bgcolor="lightpink"> {{ verb }} </td>
-  </tr>
-  {%- endfor %}
-  {% include entity.klass + 'Label.template' %}
+  {% include entity.klass + 'Label.template' ignore missing %}
 </table>

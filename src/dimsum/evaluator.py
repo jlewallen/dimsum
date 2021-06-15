@@ -199,8 +199,29 @@ class Evaluate(lark.Transformer):
     def unheld_noun(self, args):
         return finders.UnheldItem(str(args[0]))
 
-    def noun(self, args):
+    def general_noun(self, args):
         return finders.AnyItem(str(args[0]))
+
+    def object_by_number(self, args):
+        return finders.ObjectNumber(int(args[0]))
+
+    def makeable(self, args):
+        return args[0]
+
+    def contained(self, args):
+        return args[0]
+
+    def consumable(self, args):
+        return args[0]
+
+    def held(self, args):
+        return args[0]
+
+    def unheld(self, args):
+        return args[0]
+
+    def noun(self, args):
+        return args[0]
 
     def direction(self, args):
         for d in movement.Direction:
