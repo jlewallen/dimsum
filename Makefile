@@ -53,6 +53,7 @@ prod-server:
 
 graph:
 	env/bin/python3 src/dimsum/dump.py
+	jq . world.json > world-pretty.json && mv world-pretty.json world.json
 	dot -T png world.dot > world.png
 
 .PHONY: web
