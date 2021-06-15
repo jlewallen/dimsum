@@ -4,7 +4,6 @@ import logging
 import sqlite3
 import json
 
-import props
 import entity
 import crypto
 import game

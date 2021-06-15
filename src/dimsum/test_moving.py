@@ -4,7 +4,7 @@ import pytest
 import game
 import envo
 import movement
-import props
+import properties
 import test
 
 
@@ -92,7 +92,7 @@ async def test_directional_moving():
     obs = await tw.success("look")
     assert obs
 
-    park = envo.Area(details=props.Details("North Park"))
+    park = envo.Area(details=properties.Details("North Park"))
 
     tw.world.add_area(park)
     tw.area.add_route(

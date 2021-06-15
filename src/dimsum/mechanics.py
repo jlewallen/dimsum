@@ -3,7 +3,7 @@ import logging
 import datetime
 import abc
 import crypto
-import props
+import properties
 import behavior
 
 log = logging.getLogger("dimsum")
@@ -21,13 +21,13 @@ class InteractableMixin:
         return self.interactions[name] if name in self.interactions else False
 
     def when_worn(self) -> bool:
-        return self.when_activity(props.Worn)
+        return self.when_activity(properties.Worn)
 
     def when_eaten(self) -> bool:
-        return self.when_activity(props.Eaten)
+        return self.when_activity(properties.Eaten)
 
     def when_drank(self) -> bool:
-        return self.when_activity(props.Drank)
+        return self.when_activity(properties.Drank)
 
 
 def get_now() -> datetime.datetime:

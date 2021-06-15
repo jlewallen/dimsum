@@ -1,7 +1,6 @@
 import pytest
 
 import game
-import props
 import test
 
 

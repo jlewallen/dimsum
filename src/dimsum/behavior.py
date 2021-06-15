@@ -7,7 +7,7 @@ import time
 import asyncio
 import lupa
 
-import props
+import properties
 
 log = logging.getLogger("dimsum")
 
@@ -163,7 +163,7 @@ class ScriptEngine:
 # Behavior keys are of the form:
 # b:<key>:<behavior>
 # The <key> allows multiple customizations, and will be run in order sorted by key.
-class BehaviorMap(props.PropertyMap):
+class BehaviorMap(properties.PropertyMap):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
         return [self.map[key] for key in self.keys_matching(pattern)]

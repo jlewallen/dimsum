@@ -2,7 +2,7 @@ from typing import Sequence
 import logging
 import lupa
 
-import props
+import properties
 import entity
 import game
 import things
@@ -94,7 +94,7 @@ class LupaEntity:
         quantity = table["quantity"] if "quantity" in table else 1
         del table["quantity"]
 
-        details = props.Details(name=table.name)
+        details = properties.Details(name=table.name)
         del table["name"]
 
         for key, value in table.items():

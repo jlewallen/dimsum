@@ -1,5 +1,5 @@
 import logging
-import props
+import properties
 import game
 import world
 import things
@@ -21,7 +21,7 @@ class Hammer(Factory):
     def create(self, world: world.World):
         return things.Item(
             creator=world,
-            details=props.Details("Hammer", desc="It's heavy."),
+            details=properties.Details("Hammer", desc="It's heavy."),
         )
 
 
@@ -29,7 +29,7 @@ class BeerKeg(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Beer Keg", desc="It's heavy."),
+            details=properties.Details("Beer Keg", desc="It's heavy."),
         )
         return item
 
@@ -38,7 +38,7 @@ class LargeMapleTree(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Large Maple Tree", desc="It's heavy."),
+            details=properties.Details("Large Maple Tree", desc="It's heavy."),
         )
         item.add_behavior(
             "b:drop-leaf:tick",
@@ -72,7 +72,7 @@ class LargeOakTree(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Large Oak Tree", desc="It's heavy."),
+            details=properties.Details("Large Oak Tree", desc="It's heavy."),
         )
         item.add_behavior(
             "b:drop-leaf:tick",
@@ -107,7 +107,7 @@ class SmallCrevice(Factory):
         item = things.Item(
             creator=world,
             visible=mechanics.Visible(hard_to_see=True),
-            details=props.Details(
+            details=properties.Details(
                 "Small Crevice",
                 desc="Whoa, how'd you even find this!?",
             ),
@@ -119,7 +119,7 @@ class MysteriousBox(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Mysterious Box",
                 desc="It looks like some weird antique your grandmother would have. Why would anyone carry this thing around?",
             ),
@@ -138,7 +138,7 @@ class LargeSteepCliff(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Large Steep Cliff",
                 desc="It's immense, with rocky outcroppings. It looks very climbable.",
             ),
@@ -170,7 +170,7 @@ class Guitar(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Acoustic Guitar", desc="Seems to be well travelled."
             ),
         )
@@ -188,7 +188,7 @@ class WoodenLadder(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Wooden Ladder", desc="Seems sturdy enough."),
+            details=properties.Details("Wooden Ladder", desc="Seems sturdy enough."),
         )
         return item
 
@@ -197,7 +197,7 @@ class TomorrowCat(Factory):
     def create(self, world: world.World):
         animal = animals.Animal(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Tomorrow", desc="She's a Maine Coon, and very elegant and pretty."
             ),
         )
@@ -208,7 +208,7 @@ class CavernEntrance(Factory):
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Entrance to a Dark Cavern",
                 desc="It's dark, the cavern that is.",
             ),
@@ -220,7 +220,7 @@ class DarkCavern(Factory):
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Dark Cavern",
                 desc="It's dark",
             ),
@@ -239,7 +239,7 @@ class ArtistsLoft(Factory):
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Artist's Loft",
                 desc="Everything is very colorful, because everything has got paint on it.",
             ),
@@ -257,7 +257,7 @@ class RoomGrid(Factory):
         name = "Grid Room %d x %x" % (x, y)
         return envo.Area(
             creator=world,
-            details=props.Details(name, desc=name),
+            details=properties.Details(name, desc=name),
         )
 
     def create(self, world: world.World):
@@ -303,7 +303,7 @@ class MarbleSteps(Factory):
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Marble Steps", desc="Marble"),
+            details=properties.Details("Marble Steps", desc="Marble"),
         )
         return item
 
@@ -328,7 +328,7 @@ class NarrowCanyon:
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Narrow Canyon",
                 desc="It's barely wide enough to walk two by two down. The narrow walls really funnel the wind, creating powerful gusts.",
             ),
@@ -341,7 +341,7 @@ class RockyPath:
     def create(self, world: world.World):
         item = things.Item(
             creator=world,
-            details=props.Details("Rocky Path", desc="Looks easy enough"),
+            details=properties.Details("Rocky Path", desc="Looks easy enough"),
         )
         return item
 
@@ -350,7 +350,7 @@ class WelcomeArea(Factory):
     def create(self, world: world.World):
         area = envo.Area(
             creator=world,
-            details=props.Details(
+            details=properties.Details(
                 "Town Courtyard.", desc="There's a ton going on here."
             ),
         )
@@ -374,8 +374,8 @@ class WelcomeArea(Factory):
 
         _, clearing = area.add_item_and_link_back(
             AddItemRoute(world)
-            .area(details=props.Details("A small clearing."))
-            .via(details=props.Details("Worn Path"))
+            .area(details=properties.Details("A small clearing."))
+            .via(details=properties.Details("Worn Path"))
         )
 
         clearing.add_item(LargeMapleTree().create(world))

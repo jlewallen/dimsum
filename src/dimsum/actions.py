@@ -4,7 +4,7 @@ import os
 import hashlib
 import base64
 
-import props
+import properties
 import movement
 import health
 import finders
@@ -915,7 +915,7 @@ class PourProducer(carryable.Producer):
         self.template: finders.MaybeItemOrRecipe = template
 
     def produce_item(self, **kwargs) -> carryable.CarryableMixin:
-        interactions = {props.Drank: True}
+        interactions = {properties.Drank: True}
         return self.template.create_item(
             verb=PourVerb, loose=True, interactions=interactions, **kwargs
         )

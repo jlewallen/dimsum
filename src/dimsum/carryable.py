@@ -2,7 +2,7 @@ from typing import Any, List, Tuple, Dict, Sequence, Optional, Union, cast
 
 import logging
 import abc
-import props
+import properties
 import crypto
 import entity
 import context
@@ -45,7 +45,7 @@ class Lockable:
             key = cast(
                 KeyMixin,
                 context.get().create_item(
-                    details=props.Details("Key"), patterns=patterns, **kwargs
+                    details=properties.Details("Key"), patterns=patterns, **kwargs
                 ),
             )
             log.info("new key:%s %s", key, patterns)

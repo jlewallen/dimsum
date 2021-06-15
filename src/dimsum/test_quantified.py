@@ -1,7 +1,6 @@
 import logging
 import pytest
 
-import props
 import game
 import reply
 import test

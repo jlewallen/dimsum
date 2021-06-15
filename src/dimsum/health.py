@@ -1,7 +1,7 @@
 from typing import Any, cast
 import logging
 import events
-import props
+import properties
 import living
 import carryable
 
@@ -19,7 +19,7 @@ NutritionFields = [
     "vitamins",
 ]
 
-Fields = [props.SumFields(name) for name in NutritionFields]
+Fields = [properties.SumFields(name) for name in NutritionFields]
 
 
 class Nutrition:
@@ -28,7 +28,7 @@ class Nutrition:
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):
-        changes = props.merge_dictionaries(self.properties, other.properties, Fields)
+        changes = properties.merge_dictionaries(self.properties, other.properties, Fields)
         log.info("merged %s" % (changes,))
         self.properties.update(changes)
 

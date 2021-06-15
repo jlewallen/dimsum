@@ -9,7 +9,7 @@ import logging
 import grammar
 import animals
 import actions
-import props
+import properties
 import evaluator
 import messages
 import rich
@@ -57,7 +57,7 @@ class ShellSession:
         player = animals.Player(
             key=key,
             creator=world,
-            details=props.Details(self.name, desc="A ssh user"),
+            details=properties.Details(self.name, desc="A ssh user"),
         )
         await world.perform(actions.Join(), player)
         await self.state.save()

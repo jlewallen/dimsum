@@ -3,7 +3,7 @@ import time
 import logging
 import entity
 import context
-import props
+import properties
 import game
 import bus
 import behavior
@@ -23,7 +23,7 @@ class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
         super().__init__(
             key="world",
-            details=props.Details("World", desc="Ya know, everything"),
+            details=properties.Details("World", desc="Ya know, everything"),
             **kwargs
         )
         self.bus = bus
@@ -111,7 +111,7 @@ class World(entity.Entity, entity.Registrar):
 
         area = envo.Area(
             creator=person,
-            details=props.Details(
+            details=properties.Details(
                 "A pristine, new place.",
                 desc="Nothing seems to be here, maybe you should decorate?",
             ),

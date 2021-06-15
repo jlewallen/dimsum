@@ -4,7 +4,6 @@ import os
 import hashlib
 import base64
 
-import props
 import movement
 import health
 

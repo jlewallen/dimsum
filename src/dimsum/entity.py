@@ -4,7 +4,7 @@ import abc
 import logging
 import copy
 import wrapt
-import props
+import properties
 import behavior
 import crypto
 
@@ -70,7 +70,7 @@ class Entity(behavior.BehaviorMixin):
         self,
         key: str = None,
         identity: crypto.Identity = None,
-        details: props.Details = None,
+        details: properties.Details = None,
         creator: "Entity" = None,
         owner: "Entity" = None,
         kind: Kind = None,
@@ -106,7 +106,7 @@ class Entity(behavior.BehaviorMixin):
 
         assert self.key
 
-        self.details = details if details else props.Details("Unknown")
+        self.details = details if details else properties.Details("Unknown")
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod

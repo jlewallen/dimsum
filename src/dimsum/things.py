@@ -2,7 +2,7 @@ from typing import List, Optional, Any, Sequence, cast
 import logging
 import copy
 import inflect
-import props
+import properties
 import crypto
 import entity
 import context
@@ -94,7 +94,7 @@ class MaybeItem(ItemFactory):
         self.name = name
 
     def create_item(self, **kwargs) -> Item:
-        return Item(details=props.Details(self.name), **kwargs)
+        return Item(details=properties.Details(self.name), **kwargs)
 
 
 class RecipeItem(ItemFactory):

@@ -1,6 +1,6 @@
 import logging
 import lark
-import props
+import properties
 import game
 import movement
 import things
@@ -260,22 +260,22 @@ class Evaluate(lark.Transformer):
 
     def when_worn(self, args):
         return actions.ModifyActivity(
-            item=finders.AnyHeldItem(), activity=props.Worn, value=True
+            item=finders.AnyHeldItem(), activity=properties.Worn, value=True
         )
 
     def when_opened(self, args):
         return actions.ModifyActivity(
-            item=finders.AnyHeldItem(), activity=props.Opened, value=True
+            item=finders.AnyHeldItem(), activity=properties.Opened, value=True
         )
 
     def when_eaten(self, args):
         return actions.ModifyActivity(
-            item=finders.AnyHeldItem(), activity=props.Eaten, value=True
+            item=finders.AnyHeldItem(), activity=properties.Eaten, value=True
         )
 
     def when_drank(self, args):
         return actions.ModifyActivity(
-            item=finders.AnyHeldItem(), activity=props.Drank, value=True
+            item=finders.AnyHeldItem(), activity=properties.Drank, value=True
         )
 
     def remember(self, args):

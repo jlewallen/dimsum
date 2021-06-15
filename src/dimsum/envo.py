@@ -1,6 +1,5 @@
 from typing import Optional, List, cast
 import logging
-import props
 import entity
 import context
 import carryable

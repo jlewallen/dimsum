@@ -6,7 +6,7 @@ import logging
 import inflect
 import lark
 
-import props
+import properties
 import game
 import bus
 import world
@@ -417,7 +417,7 @@ modify when eaten
         player = animals.Player(
             key=key,
             creator=self.world,
-            details=props.Details(author.name, desc="A discord user"),
+            details=properties.Details(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
         await self.world.perform(actions.Join(), player)
