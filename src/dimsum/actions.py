@@ -105,7 +105,9 @@ class Make(PersonAction):
             item = world.apply_item_finder(player, self.item)
 
         if self.template:
-            item = self.template.create_item(person=player, creator=player, owner=player)
+            item = self.template.create_item(
+                person=player, creator=player, owner=player
+            )
             assert isinstance(item, things.Item)
 
         if not item:
@@ -464,7 +466,9 @@ class Hold(PersonAction):
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = item.separate(self.quantity, creator=player, owner=player, ctx=ctx)
+            removed = item.separate(
+                self.quantity, creator=player, owner=player, ctx=ctx
+            )
             if item.quantity == 0:
                 world.unregister(item)
                 area.drop(item)

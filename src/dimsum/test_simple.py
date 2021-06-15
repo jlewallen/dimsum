@@ -24,6 +24,12 @@ async def test_simple_action_verbs():
 
 
 @pytest.mark.asyncio
+async def test_world_owns_itself(caplog):
+    whatever = test.create_empty_world()
+    assert isinstance(whatever.props.owner, world.World)
+
+
+@pytest.mark.asyncio
 async def test_obliterate():
     tw = test.TestWorld()
     await tw.initialize()

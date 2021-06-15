@@ -244,3 +244,21 @@ async def test_serialize_library(caplog):
     )
 
     assert "py/id" not in json
+
+
+@pytest.mark.asyncio
+async def test_serialize_preserves_owner_reference(caplog):
+    world = test.create_empty_world()
+    world.add_area(envo.Area(creator=world, props=properties.Common("Area")))
+
+    json = serializing.all(world)
+
+    assert len(json.items()) == 2
+
+    after = test.create_empty_world()
+    serializing.restore(after, json)
+
+    assert len(after.entities.items()) == 2
+
+    for key, e in after.entities.items():
+        assert isinstance(e.props.owner, entity.Entity)

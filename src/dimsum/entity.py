@@ -72,7 +72,6 @@ class Entity(behavior.BehaviorMixin):
         identity: crypto.Identity = None,
         props: properties.Common = None,
         creator: "Entity" = None,
-        owner: "Entity" = None,
         kind: Kind = None,
         related: Dict[str, Kind] = None,
         frozen: Any = None,
@@ -84,7 +83,6 @@ class Entity(behavior.BehaviorMixin):
         self.kind = kind if kind else Kind()
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
-        self.owner: "Entity" = owner if owner else self
         self.frozen: Any = frozen if frozen else None
         self.destroyed: bool = destroyed if destroyed else False
         self.klass = klass if klass else self.__class__.__name__
@@ -107,6 +105,7 @@ class Entity(behavior.BehaviorMixin):
         assert self.key
 
         self.props = props if props else properties.Common("Unknown")
+        self.props.owner = self.creator if self.creator else self
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod
@@ -152,7 +151,6 @@ class Entity(behavior.BehaviorMixin):
 
     def validate(self) -> None:
         assert self.creator
-        assert self.owner
         assert self.props
 
     def describes(self, q: str) -> bool:

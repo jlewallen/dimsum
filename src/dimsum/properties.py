@@ -100,6 +100,7 @@ Name = "name"
 Desc = "desc"
 Created = "created"
 Touched = "touched"
+Owner = "owner"
 
 
 class Common(PropertyMap):
@@ -109,6 +110,7 @@ class Common(PropertyMap):
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
         self.set(Touched, time.time())
+        self.set(Owner, None)
 
     @property
     def name(self) -> str:
@@ -117,6 +119,14 @@ class Common(PropertyMap):
     @name.setter
     def name(self, value: str):
         self.set(Name, value)
+
+    @property
+    def owner(self):
+        return self[Owner]
+
+    @owner.setter
+    def owner(self, value):
+        self.set(Owner, value)
 
     def clone(self):
         return Common(self.name, desc=self.desc)

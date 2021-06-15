@@ -28,7 +28,9 @@ class Nutrition:
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):
-        changes = properties.merge_dictionaries(self.properties, other.properties, Fields)
+        changes = properties.merge_dictionaries(
+            self.properties, other.properties, Fields
+        )
         log.info("merged %s" % (changes,))
         self.properties.update(changes)
 

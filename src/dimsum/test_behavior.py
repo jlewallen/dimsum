@@ -15,7 +15,9 @@ async def test_drop_hammer_funny_gold(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Hammer")))
+    hammer = tw.add_item(
+        things.Item(creator=tw.jacob, props=properties.Common("Hammer"))
+    )
     hammer.add_behavior(
         "b:test:drop:after",
         lua="""
@@ -85,7 +87,9 @@ async def test_behavior_move(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    mystery_area = envo.Area(creator=tw.player, props=properties.Common("A Mystery Area"))
+    mystery_area = envo.Area(
+        creator=tw.player, props=properties.Common("A Mystery Area")
+    )
     tw.world.register(mystery_area)
 
     cape = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Cape")))
