@@ -102,7 +102,7 @@ Created = "created"
 Touched = "touched"
 
 
-class Details(PropertyMap):
+class Common(PropertyMap):
     def __init__(self, name: str = "", desc: str = None, **kwargs):
         super().__init__(**kwargs)
         self.set(Name, name)
@@ -119,7 +119,7 @@ class Details(PropertyMap):
         self.set(Name, value)
 
     def clone(self):
-        return Details(self.name, desc=self.desc)
+        return Common(self.name, desc=self.desc)
 
     def touch(self):
         self.touched = time.time()

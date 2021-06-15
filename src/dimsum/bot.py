@@ -48,7 +48,7 @@ class BotPlayer:
 
 class EmbedObservationVisitor:
     def personal_observation(self, obs):
-        emd = obs.details.desc
+        emd = obs.props.desc
         emd += "\n"
 
         emd += "Properties:\n"
@@ -61,19 +61,19 @@ class EmbedObservationVisitor:
             emd += key + "=" + str(value) + "\n"
         emd += "\n"
 
-        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
+        return {"embed": discord.Embed(title=obs.props.name, description=emd)}
 
     def detailed_observation(self, obs):
-        emd = obs.details.desc
+        emd = obs.props.desc
         emd += "\n"
         for key, value in obs.properties.items():
             emd += "\n" + key + "=" + str(value)
         for key, value in obs.what.behaviors.items():
             emd += "\n" + key + "=" + value.lua
-        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
+        return {"embed": discord.Embed(title=obs.props.name, description=emd)}
 
     def area_observation(self, obs):
-        emd = obs.details.desc
+        emd = obs.props.desc
         emd += "\n\n"
         if len(obs.living) > 0:
             emd += "Also here: " + p.join([str(x) for x in obs.living])
@@ -91,7 +91,7 @@ class EmbedObservationVisitor:
             directions = [d.direction for d in directional]
             emd += "You can go " + p.join([str(d) for d in directions])
             emd += "\n"
-        return {"embed": discord.Embed(title=obs.details.name, description=emd)}
+        return {"embed": discord.Embed(title=obs.props.name, description=emd)}
 
     def item(self, item):
         return str(item)
@@ -417,7 +417,7 @@ modify when eaten
         player = animals.Player(
             key=key,
             creator=self.world,
-            details=properties.Details(author.name, desc="A discord user"),
+            props=properties.Common(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
         await self.world.perform(actions.Join(), player)

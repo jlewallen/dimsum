@@ -107,12 +107,12 @@ class PersonalObservation(Observation):
         self.who = ObservedPerson(who)
 
     @property
-    def details(self):
-        return self.who.person.details
+    def props(self):
+        return self.who.person.props
 
     @property
     def properties(self):
-        return self.details.map
+        return self.props.map
 
     @property
     def memory(self):
@@ -134,12 +134,12 @@ class DetailedObservation(Observation):
         self.item = item
 
     @property
-    def details(self):
-        return self.item.details
+    def props(self):
+        return self.item.props
 
     @property
     def properties(self):
-        return self.details.map
+        return self.props.map
 
     def accept(self, visitor):
         return visitor.detailed_observation(self)
@@ -187,8 +187,8 @@ class AreaObservation(Observation):
         self.routes: List[movement.AreaRoute] = area.available_routes
 
     @property
-    def details(self):
-        return self.where.details
+    def props(self):
+        return self.where.props
 
     def accept(self, visitor):
         return visitor.area_observation(self)
@@ -196,7 +196,7 @@ class AreaObservation(Observation):
     def __str__(self):
         return "%s observes %s, also here %s and visible is %s" % (
             self.who,
-            self.details,
+            self.props,
             self.living,
             self.items,
         )

@@ -45,7 +45,7 @@ class Lockable:
             key = cast(
                 KeyMixin,
                 context.get().create_item(
-                    details=properties.Details("Key"), patterns=patterns, **kwargs
+                    props=properties.Common("Key"), patterns=patterns, **kwargs
                 ),
             )
             log.info("new key:%s %s", key, patterns)

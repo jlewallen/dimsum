@@ -70,7 +70,7 @@ class Entity(behavior.BehaviorMixin):
         self,
         key: str = None,
         identity: crypto.Identity = None,
-        details: properties.Details = None,
+        props: properties.Common = None,
         creator: "Entity" = None,
         owner: "Entity" = None,
         kind: Kind = None,
@@ -106,7 +106,7 @@ class Entity(behavior.BehaviorMixin):
 
         assert self.key
 
-        self.details = details if details else properties.Details("Unknown")
+        self.props = props if props else properties.Common("Unknown")
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod
@@ -123,7 +123,7 @@ class Entity(behavior.BehaviorMixin):
         return self.related[name]
 
     def touch(self) -> None:
-        self.details.touch()
+        self.props.touch()
 
     def destroy(self) -> None:
         self.destroyed = True
@@ -153,7 +153,7 @@ class Entity(behavior.BehaviorMixin):
     def validate(self) -> None:
         assert self.creator
         assert self.owner
-        assert self.details
+        assert self.props
 
     def describes(self, q: str) -> bool:
         return False

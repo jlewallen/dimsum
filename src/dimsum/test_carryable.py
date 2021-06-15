@@ -83,7 +83,7 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
     await tw.success("make Coin")
     assert len(tw.player.holding) == 2
     coin = tw.player.holding[1]
-    assert "Coin" in coin.details.name
+    assert "Coin" in coin.props.name
     await tw.failure("put coin in box")
     await tw.success("open box")
     await tw.success("put coin in box")
@@ -158,7 +158,7 @@ async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     await tw.success("pour from Keg")
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
-    assert "Alai" in r.entities[0].details.name
+    assert "Alai" in r.entities[0].props.name
     assert r.entities[0].loose
     assert tw.world.find_by_key(r.entities[0].key)
 

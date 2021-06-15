@@ -70,12 +70,12 @@ class LupaEntity:
             "entity:entity s: %s %s=%s (%s)"
             % (str(self), str(key), str(value), lupa.lua_type(value))
         )
-        self.entity.details[key] = self.unlua(value)
+        self.entity.props[key] = self.unlua(value)
 
     def __getitem__(self, key: str):
         log.info("entity:entity g: %s %s" % (str(self), str(key)))
-        if key in self.entity.details:
-            return self.entity.details[key]
+        if key in self.entity.props:
+            return self.entity.props[key]
         if hasattr(self, key):
             return getattr(self, key)
         if hasattr(self.entity, key):
@@ -94,13 +94,13 @@ class LupaEntity:
         quantity = table["quantity"] if "quantity" in table else 1
         del table["quantity"]
 
-        details = properties.Details(name=table.name)
+        props = properties.Common(name=table.name)
         del table["name"]
 
         for key, value in table.items():
-            details.map[key] = value
+            props.map[key] = value
 
-        item = things.Item(details=details, quantity=quantity, kind=kind, **kwargs)
+        item = things.Item(props=props, quantity=quantity, kind=kind, **kwargs)
 
         return item
 

@@ -57,7 +57,7 @@ class ShellSession:
         player = animals.Player(
             key=key,
             creator=world,
-            details=properties.Details(self.name, desc="A ssh user"),
+            props=properties.Common(self.name, desc="A ssh user"),
         )
         await world.perform(actions.Join(), player)
         await self.state.save()

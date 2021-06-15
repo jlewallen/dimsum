@@ -92,7 +92,7 @@ async def test_directional_moving():
     obs = await tw.success("look")
     assert obs
 
-    park = envo.Area(details=properties.Details("North Park"))
+    park = envo.Area(props=properties.Common("North Park"))
 
     tw.world.add_area(park)
     tw.area.add_route(

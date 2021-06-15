@@ -68,7 +68,7 @@ class Area(
         return [a for a in flatten([via_routes, via_items])]
 
     def __str__(self):
-        return self.details.name
+        return self.props.name
 
     def __repr__(self):
         return str(self)

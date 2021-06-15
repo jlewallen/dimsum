@@ -35,14 +35,14 @@ class TestWorld:
         self.world = world.World(self.bus, luaproxy.context_factory)
         self.jacob = animals.Player(
             creator=self.world,
-            details=properties.Details("Jacob", desc="Curly haired bastard."),
+            props=properties.Common("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
         self.l = grammar.create_parser()
 
     def add_simple_area_here(self, door, name):
-        door = things.Item(creator=self.player, details=properties.Details(door))
-        area = envo.Area(creator=self.player, details=properties.Details(name))
+        door = things.Item(creator=self.player, props=properties.Common(door))
+        area = envo.Area(creator=self.player, props=properties.Common(name))
         door.link_area(area)
         self.area.add_item(door)
         self.world.register(door)
@@ -52,14 +52,14 @@ class TestWorld:
     async def add_carla(self):
         self.carla = animals.Player(
             creator=self.world,
-            details=properties.Details("Carla", desc="Chief Salad Officer."),
+            props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
         self.tomi = animals.Player(
             creator=self.world,
-            details=properties.Details("Tomi", desc="Chief Crying Officer."),
+            props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )
         return await self.world.perform(actions.Join(), self.tomi)
 
@@ -67,7 +67,7 @@ class TestWorld:
         self.area = area
         if not self.area:
             self.area = envo.Area(
-                creator=self.player, details=properties.Details("Living room")
+                creator=self.player, props=properties.Common("Living room")
             )
             self.world.register(self.area)
         self.world.add_area(self.area)

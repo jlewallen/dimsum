@@ -43,8 +43,8 @@ class Auth(PersonAction):
         self.password = password
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if "s:password" in player.details:
-            saltEncoded, keyEncoded = player.details["s:password"]
+        if "s:password" in player.props:
+            saltEncoded, keyEncoded = player.props["s:password"]
             salt = base64.b64decode(saltEncoded)
             key = base64.b64decode(keyEncoded)
             actual_key = hashlib.pbkdf2_hmac(
@@ -53,7 +53,7 @@ class Auth(PersonAction):
 
         salt = os.urandom(32)
         key = hashlib.pbkdf2_hmac("sha256", self.password.encode("utf-8"), salt, 100000)
-        player.details["s:password"] = [
+        player.props["s:password"] = [
             base64.b64encode(salt).decode("utf-8"),
             base64.b64encode(key).decode("utf-8"),
         ]
@@ -727,12 +727,12 @@ class CallThis(PersonAction):
 
         item.try_modify()
 
-        # Copy all of the base details from the item. Exclude stamps.
+        # Copy all of the base props from the item. Exclude stamps.
         template = item
         recipe = Recipe(
             creator=player,
             owner=player,
-            details=item.details.clone(),
+            props=item.props.clone(),
             behaviors=item.behaviors,
             kind=item.kind,
             template=template,
@@ -805,7 +805,7 @@ class ModifyField(PersonAction):
         if self.field in health.NutritionFields:
             item.nutrition.properties[self.field] = self.value
         else:
-            item.details.set(self.field, self.value)
+            item.props.set(self.field, self.value)
         return Success("done")
 
 
@@ -828,7 +828,7 @@ class ModifyActivity(PersonAction):
 
         item.try_modify()
         item.link_activity(self.activity, self.value)
-        item.details.set(self.activity, self.value)
+        item.props.set(self.activity, self.value)
         return Success("done")
 
 

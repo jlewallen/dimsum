@@ -32,7 +32,7 @@ async def test_serialize_empty_world(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_one_area(caplog):
     world = test.create_empty_world()
-    world.add_area(envo.Area(creator=world, details=properties.Details("Area")))
+    world.add_area(envo.Area(creator=world, props=properties.Common("Area")))
 
     json = serializing.all(world)
 
@@ -48,8 +48,8 @@ async def test_serialize_world_one_area(caplog):
 async def test_serialize_world_one_item(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
-    area = envo.Area(creator=world, details=properties.Details("Area"))
-    area.add_item(things.Item(creator=world, details=properties.Details("Item")))
+    area = envo.Area(creator=world, props=properties.Common("Area"))
+    area.add_item(things.Item(creator=world, props=properties.Common("Item")))
     world.add_area(area)
 
     assert isinstance(area.holding[0], things.Item)
@@ -75,8 +75,8 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
 
-    two = envo.Area(creator=world, details=properties.Details("Two"))
-    one = envo.Area(creator=world, details=properties.Details("One"))
+    two = envo.Area(creator=world, props=properties.Common("Two"))
+    one = envo.Area(creator=world, props=properties.Common("One"))
     one.add_route(
         movement.DirectionalRoute(direction=movement.Direction.NORTH, area=two)
     )
@@ -109,11 +109,11 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
 
-    other = envo.Area(creator=world, details=properties.Details("Two"))
-    door = things.Item(creator=world, details=properties.Details("Item"))
+    other = envo.Area(creator=world, props=properties.Common("Two"))
+    door = things.Item(creator=world, props=properties.Common("Item"))
     door.link_area(other)
 
-    area = envo.Area(creator=world, details=properties.Details("One"))
+    area = envo.Area(creator=world, props=properties.Common("One"))
     area.add_item_and_link_back(door)
     world.add_area(area)
 
@@ -148,7 +148,7 @@ async def test_serialize():
     await tw.initialize()
 
     tree = tw.add_item(
-        things.Item(creator=tw.jacob, details=properties.Details("A Lovely Tree"))
+        things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.get_kind("petals")
@@ -227,7 +227,7 @@ async def test_transients_preserved(caplog):
     await tw.success("pour from Keg")
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
-    assert "Alai" in r.entities[0].details.name
+    assert "Alai" in r.entities[0].props.name
     assert r.entities[0].loose
 
 

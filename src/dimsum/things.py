@@ -33,7 +33,7 @@ class Item(
         self.validate()
 
     def describes(self, q: str) -> bool:
-        if q.lower() in self.details.name.lower():
+        if q.lower() in self.props.name.lower():
             return True
         if q.lower() in str(self).lower():
             return True
@@ -52,7 +52,7 @@ class Item(
         self.decrease_quantity(quantity)
         item = Item(
             kind=self.kind,
-            details=self.details,
+            props=self.props,
             behaviors=self.behaviors,
             quantity=quantity,
             **kwargs
@@ -71,8 +71,8 @@ class Item(
 
     def __str__(self):
         if self.quantity > 1:
-            return "%d %s" % (self.quantity, p.plural(self.details.name, self.quantity))
-        return p.a(self.details.name)
+            return "%d %s" % (self.quantity, p.plural(self.props.name, self.quantity))
+        return p.a(self.props.name)
 
     def __repr__(self):
         return str(self)
@@ -94,7 +94,7 @@ class MaybeItem(ItemFactory):
         self.name = name
 
     def create_item(self, **kwargs) -> Item:
-        return Item(details=properties.Details(self.name), **kwargs)
+        return Item(props=properties.Common(self.name), **kwargs)
 
 
 class RecipeItem(ItemFactory):

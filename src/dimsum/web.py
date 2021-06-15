@@ -83,8 +83,8 @@ def create(state):
 
         return {"entity": None}
 
-    @app.route("/api/entities/<string:ukey>/details", methods=["POST"])
-    async def update_entity_details(ukey: str):
+    @app.route("/api/entities/<string:ukey>/props", methods=["POST"])
+    async def update_entity_props(ukey: str):
         world, token = authenticate()
         if world is None:
             return {"loading": True}
@@ -99,7 +99,7 @@ def create(state):
             del form["key"]
 
             entity = world.find_by_key(key)
-            entity.details.update(form)
+            entity.props.update(form)
             entity.touch()
             await state.save()
 
@@ -168,10 +168,10 @@ def create(state):
         if not person:
             raise Exception("no way")
 
-        if not "s:password" in person.details.map:
+        if not "s:password" in person.props:
             raise Exception("no way")
 
-        saltEncoded, keyEncoded = person.details.map["s:password"]
+        saltEncoded, keyEncoded = person.props["s:password"]
         salt = base64.b64decode(saltEncoded)
         key = base64.b64decode(keyEncoded)
         actual_key = hashlib.pbkdf2_hmac(

@@ -39,10 +39,10 @@ class Alive(
         return 1
 
     def describes(self, q: str) -> bool:
-        return q.lower() in self.details.name.lower()
+        return q.lower() in self.props.name.lower()
 
     def __str__(self):
-        return self.details.name
+        return self.props.name
 
     def __repr__(self):
         return str(self)

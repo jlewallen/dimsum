@@ -23,7 +23,7 @@ class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
         super().__init__(
             key="world",
-            details=properties.Details("World", desc="Ya know, everything"),
+            props=properties.Common("World", desc="Ya know, everything"),
             **kwargs
         )
         self.bus = bus
@@ -44,13 +44,13 @@ class World(entity.Entity, entity.Registrar):
 
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
-            if name in e.details.name:
+            if name in e.props.name:
                 return e
         return None
 
     def find_person_by_name(self, name) -> Optional[animals.Person]:
         for person in self.people():
-            if person.details.name == name:
+            if person.props.name == name:
                 return person
         return None
 
@@ -106,12 +106,12 @@ class World(entity.Entity, entity.Registrar):
         log.info("building new area")
 
         fromArea: envo.Area = self.find_player_area(person)
-        theWayBack = things.Item(creator=person, details=entry.details.clone())
+        theWayBack = things.Item(creator=person, props=entry.props.clone())
         theWayBack.link_area(fromArea, verb=verb)
 
         area = envo.Area(
             creator=person,
-            details=properties.Details(
+            props=properties.Common(
                 "A pristine, new place.",
                 desc="Nothing seems to be here, maybe you should decorate?",
             ),
