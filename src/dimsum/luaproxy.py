@@ -74,7 +74,7 @@ class LupaEntity:
 
     def __getitem__(self, key: str):
         log.info("entity:entity g: %s %s" % (str(self), str(key)))
-        if key in self.entity.props:
+        if key in self.entity.props.keys:
             return self.entity.props[key]
         if hasattr(self, key):
             return getattr(self, key)

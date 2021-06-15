@@ -256,9 +256,44 @@ async def test_serialize_preserves_owner_reference(caplog):
     assert len(json.items()) == 2
 
     after = test.create_empty_world()
+
     serializing.restore(after, json)
 
     assert len(after.entities.items()) == 2
 
     for key, e in after.entities.items():
         assert isinstance(e.props.owner, entity.Entity)
+
+
+@pytest.mark.asyncio
+async def test_serialize_properties_directly(caplog):
+    world = test.create_empty_world()
+
+    props = properties.Common("Area")
+
+    props.owner = world
+
+    json = serializing.serialize(props)
+
+    log.info(json)
+
+
+class Example:
+    def __init__(self, world: world.World = None):
+        self.one = envo.Area(creator=world, props=properties.Common("Area"))
+        self.two = self.one
+
+
+@pytest.mark.asyncio
+async def test_serialize_properties_on_entity(caplog):
+    world = test.create_empty_world()
+
+    area = envo.Area(creator=world, props=properties.Common("Area"))
+    area.owner = world
+    area.damn = world
+
+    ex = Example(world)
+
+    json = serializing.serialize(ex, indent=True)
+
+    log.info(json)

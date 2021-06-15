@@ -163,7 +163,7 @@ class ScriptEngine:
 # Behavior keys are of the form:
 # b:<key>:<behavior>
 # The <key> allows multiple customizations, and will be run in order sorted by key.
-class BehaviorMap(properties.PropertyMap):
+class BehaviorMap(properties.Map):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
         return [self.map[key] for key in self.keys_matching(pattern)]

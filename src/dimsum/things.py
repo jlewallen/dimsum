@@ -1,4 +1,5 @@
 from typing import List, Optional, Any, Sequence, cast
+
 import logging
 import copy
 import inflect
@@ -33,7 +34,7 @@ class Item(
         self.validate()
 
     def describes(self, q: str) -> bool:
-        if q.lower() in self.props.name.lower():
+        if q.lower() in self.props[properties.Name].lower():
             return True
         if q.lower() in str(self).lower():
             return True
@@ -71,8 +72,11 @@ class Item(
 
     def __str__(self):
         if self.quantity > 1:
-            return "%d %s" % (self.quantity, p.plural(self.props.name, self.quantity))
-        return p.a(self.props.name)
+            return "%d %s" % (
+                self.quantity,
+                p.plural(self.props[properties.Name], self.quantity),
+            )
+        return p.a(self.props[properties.Name])
 
     def __repr__(self):
         return str(self)

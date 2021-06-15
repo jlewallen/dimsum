@@ -2,6 +2,7 @@ from typing import Optional, Type, List, Union, Any, Dict, Sequence, cast
 
 import abc
 import logging
+import time
 import copy
 import wrapt
 import properties
@@ -105,7 +106,8 @@ class Entity(behavior.BehaviorMixin):
         assert self.key
 
         self.props = props if props else properties.Common("Unknown")
-        self.props.owner = self.creator if self.creator else self
+        if not self.props.owner:
+            self.props.owner = self.creator if self.creator else self
         self.related: Dict[str, Kind] = related if related else {}
 
     @abc.abstractmethod
@@ -122,7 +124,7 @@ class Entity(behavior.BehaviorMixin):
         return self.related[name]
 
     def touch(self) -> None:
-        self.props.touch()
+        self.props[properties.Touched] = time.time()
 
     def destroy(self) -> None:
         self.destroyed = True
@@ -150,6 +152,7 @@ class Entity(behavior.BehaviorMixin):
         return True
 
     def validate(self) -> None:
+        assert self.key
         assert self.creator
         assert self.props
 

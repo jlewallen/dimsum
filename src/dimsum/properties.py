@@ -1,5 +1,11 @@
+from typing import Dict
+
+import abc
+import logging
 import time
 import re
+
+log = logging.getLogger("dimsum")
 
 Created = "created"
 Touched = "touched"
@@ -45,52 +51,48 @@ class Property:
         self.value = value
 
 
-class PropertyMap:
-    def __init__(self, **kwargs):
-        self.__dict__ = kwargs
-
-    @property
-    def map(self):
-        return self.__dict__
-
-    @property
-    def keys(self):
-        return self.__dict__.keys()
-
-    def keys_matching(self, pattern: str):
-        return [k for k in self.__dict__.keys() if re.match(pattern, k)]
-
-    def set(self, key: str, value):
-        if key in self.__dict__:
-            self.__dict__[key].set(value)
-        else:
-            if isinstance(value, Property):
-                self.__dict__[key] = value
-            else:
-                self.__dict__[key] = Property(value)
-
-    def update(self, changes):
-        self.__dict__.update(changes)
-
-    def replace(self, **replacing):
-        self.__dict__ = replacing
+class Map:
+    def __init__(self, map: Dict[str, Property] = None):
+        self.map = map if map else {}
 
     def __contains__(self, key):
-        return key in self.__dict__
+        return key in self.map
 
     def __getitem__(self, key):
-        if key in self.__dict__:
-            return self.__dict__[key].value
-        return None
+        if key in self.map:
+            return self.map[key].value
+        raise KeyError("invalid property: {0}".format(key))
 
     def __setitem__(self, key, value):
         self.set(key, value)
 
+    @property
+    def keys(self):
+        return self.map.keys()
+
+    def keys_matching(self, pattern: str):
+        return [k for k in self.map.keys() if re.match(pattern, k)]
+
+    def set(self, key: str, value):
+        if key in self.map:
+            self.map[key].set(value)
+        else:
+            if isinstance(value, Property):
+                self.map[key] = value
+            else:
+                self.map[key] = Property(value)
+
+    def update(self, changes):
+        self.map.update(changes)
+
+    def replace(self, **replacing):
+        self.map = replacing
+
     def clone(self):
-        return PropertyMap(self.map)
+        return Map(self.map)
 
     def __str__(self):
-        return "properties<{0}>".format(self.map)
+        return "Map<{0}>".format(self.map)
 
     def __repr__(self):
         return str(self)
@@ -101,11 +103,12 @@ Desc = "desc"
 Created = "created"
 Touched = "touched"
 Owner = "owner"
+Password = "password"
 
 
-class Common(PropertyMap):
-    def __init__(self, name: str = "", desc: str = None, **kwargs):
-        super().__init__(**kwargs)
+class Common(Map):
+    def __init__(self, name: str = None, desc: str = None, **kwargs):
+        super().__init__(kwargs)
         self.set(Name, name)
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
@@ -121,15 +124,25 @@ class Common(PropertyMap):
         self.set(Name, value)
 
     @property
+    def desc(self) -> str:
+        return self[Desc]
+
+    @name.setter
+    def desc(self, value: str):
+        self.set(Desc, value)
+
+    @property
     def owner(self):
         return self[Owner]
 
     @owner.setter
     def owner(self, value):
+        assert value
+        log.info("change-owner {0}".format(value))
         self.set(Owner, value)
 
-    def clone(self):
-        return Common(self.name, desc=self.desc)
+    def clone(self) -> "Common":
+        return Common(**self.map)  # type: ignore
 
     def touch(self):
         self.touched = time.time()
