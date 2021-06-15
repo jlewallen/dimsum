@@ -105,7 +105,7 @@ class Make(PersonAction):
             item = world.apply_item_finder(player, self.item)
 
         if self.template:
-            item = self.template.create_item(person=player, creator=player)
+            item = self.template.create_item(person=player, creator=player, owner=player)
             assert isinstance(item, things.Item)
 
         if not item:
@@ -435,7 +435,7 @@ class Drop(PersonAction):
 
         area = world.find_player_area(player)
         dropped, failure = player.drop_here(
-            area, item, quantity=self.quantity, creator=player, ctx=ctx
+            area, item, quantity=self.quantity, creator=player, owner=player, ctx=ctx
         )
         if dropped:
             area = world.find_player_area(player)
@@ -464,7 +464,7 @@ class Hold(PersonAction):
 
         area = world.find_player_area(player)
         if self.quantity:
-            removed = item.separate(self.quantity, creator=player, ctx=ctx)
+            removed = item.separate(self.quantity, creator=player, owner=player, ctx=ctx)
             if item.quantity == 0:
                 world.unregister(item)
                 area.drop(item)
@@ -538,7 +538,7 @@ class Lock(PersonAction):
             return Failure("what?")
 
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
-        locked_with = item.lock(key=maybe_key, creator=player, **kwargs)
+        locked_with = item.lock(key=maybe_key, creator=player, owner=player, **kwargs)
         if not locked_with:
             return Failure("can't seem to lock that")
 
@@ -731,6 +731,7 @@ class CallThis(PersonAction):
         template = item
         recipe = Recipe(
             creator=player,
+            owner=player,
             details=item.details.clone(),
             behaviors=item.behaviors,
             kind=item.kind,
@@ -899,7 +900,7 @@ class Pour(PersonAction):
             return Failure("you can't pour from that")
 
         produced = source.produce_into(
-            PourVerb, destination, person=player, creator=player
+            PourVerb, destination, person=player, creator=player, owner=player
         )
         if not produced:
             return Failure("oh no")
