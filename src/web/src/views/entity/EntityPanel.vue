@@ -1,13 +1,13 @@
 <template>
     <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entityToClass(entity)">
         <div class="one">
-            <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.details.name }}</div>
-            <div class="name" v-else>{{ entity.details.name }}</div>
+            <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.props.name }}</div>
+            <div class="name" v-else>{{ entity.props.name }}</div>
             <div class="creator">
                 {{ entity.creator.name }}
             </div>
         </div>
-        <div class="desc">{{ entity.details.desc }}</div>
+        <div class="desc">{{ entity.props.desc }}</div>
         <div class="summary" v-if="summary">
             {{ summary }}
         </div>

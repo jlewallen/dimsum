@@ -57,7 +57,7 @@ export default defineComponent({
     },
     data(): { fields: Field[]; field: { name: string }; form: PropertyMap } {
         const readOnly = ["py/object", "created", "touched"];
-        const fields = _.map(this.entity.details, (value, key) => {
+        const fields = _.map(this.entity.props, (value, key) => {
             return {
                 name: key,
                 readOnly: readOnly.indexOf(key) >= 0,
@@ -73,7 +73,7 @@ export default defineComponent({
             },
             form: {
                 key: this.entity.key,
-                ...this.entity.details,
+                ...this.entity.props,
             },
         };
     },

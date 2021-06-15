@@ -1,9 +1,9 @@
 <template>
     <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entityToClass(entity)">
         <template v-if="entity.quantity == 1">
-            {{ entity.details.name }}
+            {{ entity.props.name }}
         </template>
-        <template v-else>{{ entity.quantity }} {{ entity.details.name }}</template>
+        <template v-else>{{ entity.quantity }} {{ entity.props.name }}</template>
     </div>
 </template>
 

@@ -3,10 +3,10 @@ digraph world {
 {% for entity in world.everything() %}
 
 /*
-name: {{ entity.details.name }}
+name: {{ entity.props.name }}
 key: {{ entity.key }}
 identity: {{ entity.identity }}
-details: {{ entity.details }}
+props: {{ entity.props }}
 creator: {{ entity.creator }}
 kind: {{ entity.kind }}
 related: {{ entity.related }}

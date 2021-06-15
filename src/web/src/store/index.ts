@@ -129,7 +129,7 @@ export default createStore<RootState>({
         },
         [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
             return http<EntityResponse>({
-                url: `/entities/${urlKey(payload.form.key)}/details`,
+                url: `/entities/${urlKey(payload.form.key)}/properties`,
                 method: "POST",
                 data: payload.form,
                 headers: state.headers,

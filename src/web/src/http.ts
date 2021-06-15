@@ -68,7 +68,7 @@ export async function http<T>(info: OurRequestInfo): Promise<T> {
     return await response.json();
 }
 
-export interface Details {
+export interface Properties {
     name: string;
     desc: string;
     presence: string;
@@ -94,7 +94,7 @@ export interface Entity {
     url: string;
     klass: string;
     creator: EntityRef;
-    details: Details;
+    props: Properties;
     behaviors: Behaviors;
     holding?: EntityRef[];
     occuped?: EntityRef[];

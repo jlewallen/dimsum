@@ -1,15 +1,15 @@
 <table border="0" cellborder="1" cellpadding="4">
   <tr>
-     <td bgcolor="{{ get_color(entity) }}">{{ entity.details.name }}</td>
+     <td bgcolor="{{ get_color(entity) }}">{{ entity.props.name }}</td>
   </tr>
   <tr>
      <td bgcolor="{{ get_color(entity) }}">{{ entity.klass }}</td>
   </tr>
-  {%- for key, value in entity.details.map.items() -%}
+  {%- for key, value in entity.props.map.items() -%}
   {%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' -%}
   {%- if key != 's:password' and value %}
   <tr>
-     <td bgcolor="white"> {{ key }} = {{ value }}</td>
+     <td bgcolor="white"> {{ key }} = {{ value.value }}</td>
   </tr>
   {%- else -%}
   <tr>

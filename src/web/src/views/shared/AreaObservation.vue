@@ -2,8 +2,8 @@
     <div class="response area-observation card">
         <WithEntity :entityKey="reply.where.key" :force="true" v-slot="where">
             <div class="card-body">
-                <h4 class="card-title">{{ where.entity.details.name }}</h4>
-                <h6 class="card-subtitle">{{ where.entity.details.desc }}</h6>
+                <h4 class="card-title">{{ where.entity.props.name }}</h4>
+                <h6 class="card-subtitle">{{ where.entity.props.desc }}</h6>
                 <div class="routes">
                     <div v-for="(route, index) in reply.routes" v-bind:key="index" class="route">
                         <div>{{ route.direction.compass }} of here there is</div>
