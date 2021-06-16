@@ -113,11 +113,13 @@ Password = "password"
 Frozen = "frozen"
 Destroyed = "destroyed"
 Related = "related"
+GlobalId = "gid"
 
 
 class Common(Map):
     def __init__(self, name: str = None, desc: str = None, **kwargs):
         super().__init__(kwargs)
+        self.set(GlobalId, -1)
         self.set(Name, name)
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
@@ -175,6 +177,14 @@ class Common(Map):
     @related.setter
     def related(self, value: Dict[str, kinds.Kind]):
         self.set(Related, value)
+
+    @property
+    def gid(self) -> int:
+        return self[GlobalId]
+
+    @gid.setter
+    def gid(self, value: int):
+        self.set(GlobalId, value)
 
     def clone(self) -> "Common":
         return Common(**self.map)  # type: ignore

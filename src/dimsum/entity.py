@@ -101,6 +101,17 @@ class Entity(behavior.BehaviorMixin):
         if self.klass != "World":
             assert self.creator
 
+    def registered(self, gid: int):
+        """
+        We return our own global id if we have one and the caller
+        will ensure uniquness. Otherwise we accept their proposed
+        gid.
+        """
+        if self.props.gid >= 0:
+            return self.props.gid
+        else:
+            return gid
+
     @abc.abstractmethod
     def gather_entities(self) -> List["Entity"]:
         raise NotImplementedError
@@ -167,13 +178,15 @@ class Registrar:
                 )
             )
         else:
+            assigned = entity.registered(self.number)
             log.info(
-                "register:new {0} ({1}) #{2}".format(entity.key, entity, self.number)
+                "register:new {0} ({1}) #{2}".format(entity.key, entity, assigned)
             )
+            assert assigned not in self.numbered
+            self.number = assigned + 1
             self.entities[entity.key] = entity
-            self.numbered[self.number] = entity
-            self.key_to_number[entity.key] = self.number
-            self.number += 1
+            self.numbered[assigned] = entity
+            self.key_to_number[entity.key] = assigned
 
     def find_by_number(self, number: int) -> Optional[Entity]:
         if number in self.numbered:
