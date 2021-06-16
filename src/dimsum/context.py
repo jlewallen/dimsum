@@ -6,6 +6,7 @@ import entity
 import contextvars
 
 worldCtx: Any = contextvars.ContextVar("diimsum:ctx")
+log = logging.getLogger("dimsum")
 
 
 class Ctx:
@@ -44,6 +45,7 @@ def set(ctx: Ctx):
 
 class FindItemMixin:
     def find_item_under(self, **kwargs) -> Optional[entity.Entity]:
+        log.info("finding {0}".format(kwargs))
         return get().find_item(candidates=self.gather_entities(), **kwargs)
 
     @abc.abstractmethod
