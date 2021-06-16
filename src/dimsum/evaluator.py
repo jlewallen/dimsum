@@ -32,6 +32,12 @@ class Evaluate(lark.Transformer):
     def dig(self, args):
         return actions.Dig(args[0], args[1])
 
+    def quoted_string(self, args):
+        return args[0][1:-1]
+
+    def string(self, args):
+        return args[0]
+
     def dig_direction(self, args):
         return actions.DigDirection(direction=args[0])
 

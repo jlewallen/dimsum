@@ -49,7 +49,7 @@ def create_parser():
         dig_arbitrary:     WORD
         dig_linkage:       dig_direction | dig_arbitrary
         dig_linkages:      dig_linkage ("|" dig_linkage)*
-        dig:               "dig" dig_linkages "to" STRING -> dig
+        dig:               "dig" dig_linkages "to" string -> dig
 
         call:              "call" this NAME
 
@@ -158,7 +158,8 @@ def create_parser():
 
         DOUBLE_QUOTED_STRING:  /"[^"]*"/
         SINGLE_QUOTED_STRING:  /'[^']*'/
-        STRING:                (SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING)
+        quoted_string:         SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING
+        string:                (WORD | quoted_string)
 
         %import common.WS
         %import common.WORD

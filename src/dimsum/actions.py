@@ -115,7 +115,7 @@ class Dig(PersonAction):
         assert linkage
         assert area_name
         self.linkage = linkage
-        self.area_name = area_name[1:-1]  # Remove quotes
+        self.area_name = area_name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
