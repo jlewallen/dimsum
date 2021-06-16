@@ -264,14 +264,13 @@ class WorldCtx(context.Ctx):
 
     def find_item(
         self,
-        q: str = None,
         inherits=None,
         candidates=None,
         exclude=None,
         things_only=True,
         **kwargs
     ) -> Optional[entity.Entity]:
-        log.info("find-item: '%s' candidates=%s exclude=%s", q, candidates, exclude)
+        log.info("find-item: candidates=%s exclude=%s kw=%s", candidates, exclude, kwargs)
 
         if len(candidates) == 0:
             return None
@@ -288,9 +287,8 @@ class WorldCtx(context.Ctx):
             if inherits and not isinstance(e, inherits):
                 continue
 
-            if q:
-                if e.describes(q=q):
-                    return e
+            if e.describes(**kwargs):
+                return e
             else:
                 found = e
 

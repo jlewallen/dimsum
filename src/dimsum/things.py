@@ -34,11 +34,11 @@ class Item(
         self.validate()
 
     def describes(self, q: str = None, **kwargs) -> bool:
-        assert q
-        if q.lower() in self.props[properties.Name].lower():
-            return True
-        if q.lower() in str(self).lower():
-            return True
+        if q:
+            if q.lower() in self.props[properties.Name].lower():
+                return True
+            if q.lower() in str(self).lower():
+                return True
         return False
 
     def gather_entities(self) -> List[entity.Entity]:
