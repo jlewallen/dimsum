@@ -6,13 +6,9 @@ digraph world {
 name: {{ entity.props.name }}
 key: {{ entity.key }}
 identity: {{ entity.identity }}
-props: {{ entity.props }}
 creator: {{ entity.creator }}
 kind: {{ entity.kind }}
-related: {{ entity.related }}
-frozen: {{ entity.frozen }}
 klass: {{ entity.klass }}
-destroyed: {{ entity.destroyed }}
 */
 
 "{{ entity.key }}" [label=<{% include 'Label.template' %}> shape=plaintext]
