@@ -71,6 +71,9 @@ class Exit(movement.Navigable, things.Item):
             self.props[properties.Navigable] = area
         assert self.props[properties.Navigable]
 
+    def accept(self, visitor: entity.EntityVisitor):
+        return visitor.exit(self)
+
 
 class Bidirectional:
     def __init__(self, there: Area = None, back: Area = None, **kwargs):

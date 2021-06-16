@@ -35,6 +35,9 @@ class EntityVisitor:
     def person(self, person):
         pass
 
+    def exit(self, exit):
+        pass
+
     def area(self, area):
         pass
 
