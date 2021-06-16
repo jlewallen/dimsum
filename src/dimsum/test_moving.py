@@ -77,13 +77,31 @@ async def test_directional_moving():
     assert area_after == park
 
 
+class Bidirectional:
+    def __init__(self, there: envo.Area = None, back: envo.Area = None, **kwargs):
+        assert there
+        assert back
+        goes_there = envo.Exit(
+            area=there,
+            props=properties.Common(name="Exit to {0}".format(there.props.name)),
+            **kwargs
+        )
+        comes_back = envo.Exit(
+            area=back,
+            props=properties.Common(name="Exit to {0}".format(back.props.name)),
+            **kwargs
+        )
+        back.add_item(goes_there)
+        there.add_item(comes_back)
+
+
 @pytest.mark.asyncio
 async def test_programmatic_basic_entrances_and_exits():
     tw = test.TestWorld()
 
     earth = envo.Area(creator=tw.jacob, props=properties.Common(name="Earth"))
     asteroid = envo.Area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
-    envo.Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
+    Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
 
     await tw.initialize(earth)
 

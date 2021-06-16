@@ -75,23 +75,5 @@ class Exit(movement.Navigable, things.Item):
         return visitor.exit(self)
 
 
-class Bidirectional:
-    def __init__(self, there: Area = None, back: Area = None, **kwargs):
-        assert there
-        assert back
-        goes_there = Exit(
-            area=there,
-            props=properties.Common(name="Exit to {0}".format(there.props.name)),
-            **kwargs
-        )
-        comes_back = Exit(
-            area=back,
-            props=properties.Common(name="Exit to {0}".format(back.props.name)),
-            **kwargs
-        )
-        back.add_item(goes_there)
-        there.add_item(comes_back)
-
-
 def flatten(l):
     return [item for sl in l for item in sl]
