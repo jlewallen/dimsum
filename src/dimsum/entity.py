@@ -154,7 +154,7 @@ class Entity(behavior.BehaviorMixin):
         self.props.frozen = None
         return True
 
-    def describes(self, q: str) -> bool:
+    def describes(self, **kwargs) -> bool:
         return False
 
     def accept(self, visitor: "EntityVisitor") -> Any:

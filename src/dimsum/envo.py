@@ -47,7 +47,7 @@ class Area(
         return [cast(things.Item, e) for e in flatten([self.holding, self.occupied])]
 
     def entities_named(self, of: str):
-        return [e for e in self.entities() if e.describes(of)]
+        return [e for e in self.entities() if e.describes(q=of)]
 
     def entities_of_kind(self, kind: kinds.Kind):
         return [e for e in self.entities() if e.kind and e.kind.same(kind)]

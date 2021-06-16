@@ -38,7 +38,8 @@ class Alive(
     def quantity(self):
         return 1
 
-    def describes(self, q: str) -> bool:
+    def describes(self, q: str = None, **kwargs) -> bool:
+        assert q
         return q.lower() in self.props.name.lower()
 
     def __str__(self):

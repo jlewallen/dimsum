@@ -138,7 +138,7 @@ class ContainedItem(things.ItemFinder):
         assert person
         for item in things.expected(person.holding):
             for contained in things.expected(item.holding):
-                if contained.describes(self.q):
+                if contained.describes(q=self.q):
                     return contained
         return None
 

@@ -109,7 +109,7 @@ class VisibilityMixin:
 
 class Memorable:
     @abc.abstractmethod
-    def describes(self, q: str) -> bool:
+    def describes(self, **kwargs) -> bool:
         pass
 
 
@@ -141,7 +141,7 @@ class MemoryMixin:
             if q.lower() in name.lower():
                 return entity
         for name, entity in self.memory.items():
-            if entity.describes(q):
+            if entity.describes(q=q):
                 return entity
         return None
 

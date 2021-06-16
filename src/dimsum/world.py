@@ -289,7 +289,7 @@ class WorldCtx(context.Ctx):
                 continue
 
             if q:
-                if e.describes(q):
+                if e.describes(q=q):
                     return e
             else:
                 found = e

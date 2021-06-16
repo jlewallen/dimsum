@@ -33,7 +33,8 @@ class Item(
         super().__init__(**kwargs)
         self.validate()
 
-    def describes(self, q: str) -> bool:
+    def describes(self, q: str = None, **kwargs) -> bool:
+        assert q
         if q.lower() in self.props[properties.Name].lower():
             return True
         if q.lower() in str(self).lower():
