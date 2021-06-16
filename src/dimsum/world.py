@@ -272,17 +272,29 @@ class WorldCtx(context.Ctx):
         **kwargs
     ) -> Optional[entity.Entity]:
         log.info("find-item: '%s' candidates=%s exclude=%s", q, candidates, exclude)
-        for e in candidates:
-            if not exclude or e not in exclude:
-                if things_only and not isinstance(e, things.Item):
-                    continue
-                if q:
-                    if e.describes(q):
-                        return e
-                else:
-                    return e
 
-        return None
+        if len(candidates) == 0:
+            return None
+
+        found: Optional[entity.Entity] = None
+
+        if things_only:
+            inherits = things.Item
+
+        for e in candidates:
+            if exclude and e in exclude:
+                continue
+
+            if inherits and not isinstance(e, inherits):
+                continue
+
+            if q:
+                if e.describes(q):
+                    return e
+            else:
+                found = e
+
+        return found
 
 
 def flatten(l):
