@@ -16,12 +16,11 @@ log = logging.getLogger("dimsum")
 async def test_library(caplog):
     caplog.set_level(logging.INFO)
     tw = test.TestWorld()
-    await tw.initialize()
 
     generics, area = library.create_example_world(tw.world)
     tw.world.add_entities(generics.all)
-    tw.world.add_area(area)
 
+    await tw.initialize(area=area)
     await tw.world.tick()
 
     db = persistence.SqliteDatabase()
@@ -38,4 +37,4 @@ async def test_library(caplog):
 
     await db.save(empty)
 
-    assert await db.number_of_entities() == 42
+    assert await db.number_of_entities() == 41
