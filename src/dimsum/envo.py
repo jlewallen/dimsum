@@ -1,5 +1,7 @@
 from typing import Optional, List, cast
 import logging
+import enum
+
 import kinds
 import entity
 import context
@@ -10,6 +12,18 @@ import mechanics
 import things
 
 log = logging.getLogger("dimsum")
+
+
+class NavigationAction(enum.Enum):
+    EXIT = 1
+    ENTER = 2
+
+
+class Navigable(things.Item):
+    def __init__(self, action: NavigationAction = None, **kwargs):
+        super().__init__(**kwargs)
+        assert action
+        self.action = action
 
 
 class Area(
@@ -73,6 +87,16 @@ class Area(
 
     def __repr__(self):
         return str(self)
+
+
+class Exit(Navigable):
+    def __init__(self, **kwargs):
+        super().__init__(action=NavigationAction.EXIT, **kwargs)
+
+
+class Entrance(Navigable):
+    def __init__(self, **kwargs):
+        super().__init__(action=NavigationAction.ENTER, **kwargs)
 
 
 def flatten(l):
