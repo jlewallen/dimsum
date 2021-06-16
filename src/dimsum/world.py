@@ -132,7 +132,12 @@ class World(entity.Entity, entity.Registrar):
         assert finder
         area = self.find_player_area(person)
         log.info("applying finder:%s %s", finder, kwargs)
-        return finder.find_item(area=area, person=person, world=self, **kwargs)
+        found = finder.find_item(area=area, person=person, world=self, **kwargs)
+        if found:
+            log.info("found: {0}".format(found))
+        else:
+            log.info("found: nada")
+        return found
 
     async def perform(self, action, person: Optional[animals.Person]) -> game.Reply:
         area = self.find_entity_area(person) if person else None
