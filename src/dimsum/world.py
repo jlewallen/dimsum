@@ -97,6 +97,11 @@ class World(entity.Entity, entity.Registrar):
             self.add_area(cast(envo.Area, linked), depth=depth + 1)
         log.debug("area-done:%d %s", depth, area.key)
 
+    def add_entities(self, entities: List[entity.Entity]):
+        for entity in entities:
+            log.debug("add-entity: %s %s", entity.key, entity)
+            self.register(entity)
+
     def build_new_area(
         self,
         person: animals.Person,

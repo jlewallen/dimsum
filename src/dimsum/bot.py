@@ -377,7 +377,9 @@ modify when eaten
 
         if self.world.empty():
             log.info("creating example world")
-            self.world.add_area(library.create_example_world(self.world))
+            generics, area = library.create_example_world(self.world)
+            self.world.add_entities(generics.all)
+            self.world.add_area(area)
             await db.save(self.world)
 
         return self.world

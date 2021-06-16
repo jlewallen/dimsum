@@ -70,22 +70,22 @@ class Entity(behavior.BehaviorMixin):
     def __init__(
         self,
         key: str = None,
+        kind: Kind = None,
+        creator: "Entity" = None,
+        parent: "Entity" = None,
+        klass: str = None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
-        creator: "Entity" = None,
-        kind: Kind = None,
         related: Dict[str, Kind] = None,
         frozen: Any = None,
-        klass: str = None,
-        destroyed=None,
+        destroyed: bool = None,
         **kwargs
     ):
         super().__init__(**kwargs)  # type: ignore
         self.kind = kind if kind else Kind()
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
-        self.frozen: Any = frozen if frozen else None
-        self.destroyed: bool = destroyed if destroyed else False
+        self.parent: "Entity" = parent if parent else None  # type: ignore
         self.klass = klass if klass else self.__class__.__name__
 
         if identity:
@@ -103,12 +103,26 @@ class Entity(behavior.BehaviorMixin):
         if key:
             self.key = key
 
-        assert self.key
-
-        self.props = props if props else properties.Common("Unknown")
-        if not self.props.owner:
-            self.props.owner = self.creator if self.creator else self
+        # TODO Move to props
+        self.frozen: Any = frozen if frozen else None
+        self.destroyed: bool = destroyed if destroyed else False
         self.related: Dict[str, Kind] = related if related else {}
+
+        assert props
+
+        self.props: properties.Common = props
+
+        initial_owner = self.creator if self.creator else self
+        self.props.owner = self.props.owner if self.props.owner else initial_owner
+
+        self.validate()
+
+    def validate(self) -> None:
+        assert self.key
+        assert self.props
+        # Ugly, keeping this around, though.
+        if self.klass != "World":
+            assert self.creator
 
     @abc.abstractmethod
     def gather_entities(self) -> List["Entity"]:
@@ -150,11 +164,6 @@ class Entity(behavior.BehaviorMixin):
             return False
         self.frozen = None
         return True
-
-    def validate(self) -> None:
-        assert self.key
-        assert self.creator
-        assert self.props
 
     def describes(self, q: str) -> bool:
         return False

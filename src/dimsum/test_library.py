@@ -18,7 +18,9 @@ async def test_library(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tw.world.add_area(library.create_example_world(tw.world))
+    generics, area = library.create_example_world(tw.world)
+    tw.world.add_entities(generics.all)
+    tw.world.add_area(area)
 
     await tw.world.tick()
 
@@ -36,4 +38,4 @@ async def test_library(caplog):
 
     await db.save(empty)
 
-    assert await db.number_of_entities() == 39
+    assert await db.number_of_entities() == 42

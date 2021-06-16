@@ -21,6 +21,14 @@ destroyed: {{ entity.destroyed }}
 		"{{ entity.key }}" -> "{{ entity.creator.key }}" [ label="creator" ]
 	{%- endif -%}
 
+	{%- if entity.props.owner and entity.props.owner.key != "world" -%}
+		"{{ entity.key }}" -> "{{ entity.props.owner.key }}" [ label="owner" ]
+	{%- endif -%}
+
+	{%- if entity.parent -%}
+		"{{ entity.key }}" -> "{{ entity.parent.key }}" [ label="parent" ]
+	{%- endif -%}
+
 	{%- if entity.klass == "Area" -%}
 		/* Area */
 

@@ -237,7 +237,8 @@ async def test_serialize_library(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tw.world.add_area(library.create_example_world(tw.world))
+    generics, area = library.create_example_world(tw.world)
+    tw.world.add_area(area)
 
     json = serializing.serialize(
         {"aras": tw.world.areas()}, unpicklable=False, indent=4
