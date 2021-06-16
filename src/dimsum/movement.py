@@ -17,7 +17,7 @@ class Direction(enum.Enum):
 class Area:
     @abc.abstractmethod
     def find_item_under(self, **kwargs):
-        raise NotImplementedError
+        raise NotImplementedError("FindItemMixin required")
 
     @abc.abstractmethod
     def find_route(self, **kwargs):

@@ -114,11 +114,11 @@ class Entity(behavior.BehaviorMixin):
 
     @abc.abstractmethod
     def gather_entities(self) -> List["Entity"]:
-        raise NotImplementedError
+        raise NotImplementedError("FindItemMixin required")
 
     @abc.abstractmethod
     def find_item_under(self, **kwargs) -> Optional["Entity"]:
-        raise NotImplementedError
+        raise NotImplementedError("FindItemMixin required")
 
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
@@ -179,9 +179,7 @@ class Registrar:
             )
         else:
             assigned = entity.registered(self.number)
-            log.info(
-                "register:new {0} ({1}) #{2}".format(entity.key, entity, assigned)
-            )
+            log.info("register:new {0} ({1}) #{2}".format(entity.key, entity, assigned))
             assert assigned not in self.numbered
             self.number = assigned + 1
             self.entities[entity.key] = entity
