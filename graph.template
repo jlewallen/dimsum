@@ -13,7 +13,7 @@ klass: {{ entity.klass }}
 
 "{{ entity.key }}" [label=<{% include 'Label.template' %}> shape=plaintext]
 
-	{%- if entity.creator.key != "world" -%}
+	{%- if entity.creator and entity.creator.key != "world" -%}
 		"{{ entity.key }}" -> "{{ entity.creator.key }}" [ label="creator" ]
 	{%- endif -%}
 
