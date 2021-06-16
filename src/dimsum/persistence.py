@@ -69,7 +69,7 @@ class SqliteDatabase:
 
         for key, entity in world.entities.items():
             try:
-                if entity.destroyed:
+                if entity.props.destroyed:
                     await self.destroy(entity)
                 else:
                     await self.update(entity)

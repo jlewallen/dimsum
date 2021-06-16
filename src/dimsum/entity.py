@@ -8,6 +8,7 @@ import wrapt
 import properties
 import behavior
 import crypto
+import kinds
 
 log = logging.getLogger("dimsum")
 
@@ -41,24 +42,6 @@ class EntityVisitor:
         pass
 
 
-class Kind:
-    def __init__(self, identity: crypto.Identity = None, **kwargs):
-        self.identity: crypto.Identity = (
-            identity if identity else crypto.generate_identity()
-        )
-
-    def same(self, other: "Kind") -> bool:
-        if other is None:
-            return False
-        return self.identity.public == other.identity.public
-
-    def __str__(self):
-        return "kind<%s>" % (self.identity,)
-
-    def __repr__(self):
-        return str(self)
-
-
 class Criteria:
     def __init__(self, name: str = None, **kwargs):
         super().__init__()
@@ -70,19 +53,16 @@ class Entity(behavior.BehaviorMixin):
     def __init__(
         self,
         key: str = None,
-        kind: Kind = None,
+        kind: kinds.Kind = None,
         creator: "Entity" = None,
         parent: "Entity" = None,
         klass: str = None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
-        related: Dict[str, Kind] = None,
-        frozen: Any = None,
-        destroyed: bool = None,
         **kwargs
     ):
         super().__init__(**kwargs)  # type: ignore
-        self.kind = kind if kind else Kind()
+        self.kind = kind if kind else kinds.Kind()
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
@@ -103,15 +83,12 @@ class Entity(behavior.BehaviorMixin):
         if key:
             self.key = key
 
-        # TODO Move to props
-        self.frozen: Any = frozen if frozen else None
-        self.destroyed: bool = destroyed if destroyed else False
-        self.related: Dict[str, Kind] = related if related else {}
-
         assert props
 
         self.props: properties.Common = props
 
+        # If we don't have an owner, we use the creator first and then
+        # just fall back on ourselves. Only use that if the prop is missing.
         initial_owner = self.creator if self.creator else self
         self.props.owner = self.props.owner if self.props.owner else initial_owner
 
@@ -132,16 +109,16 @@ class Entity(behavior.BehaviorMixin):
     def find_item_under(self, **kwargs) -> Optional["Entity"]:
         raise NotImplementedError
 
-    def get_kind(self, name: str) -> Kind:
-        if not name in self.related:
-            self.related[name] = Kind()
-        return self.related[name]
+    def get_kind(self, name: str) -> kinds.Kind:
+        if not name in self.props.related:
+            self.props.related[name] = kinds.Kind()
+        return self.props.related[name]
 
     def touch(self) -> None:
         self.props[properties.Touched] = time.time()
 
     def destroy(self) -> None:
-        self.destroyed = True
+        self.props.destroyed = self.identity
 
     def try_modify(self) -> None:
         if self.can_modify():
@@ -149,20 +126,21 @@ class Entity(behavior.BehaviorMixin):
         raise ItemFrozen()
 
     def can_modify(self) -> bool:
-        return self.frozen is None
+        log.info("frozen=%s", self.props.frozen)
+        return self.props.frozen is None
 
     def freeze(self, identity: crypto.Identity) -> bool:
-        if self.frozen:
+        if self.props.frozen:
             raise Exception("already frozen")
-        self.frozen = identity
+        self.props.frozen = identity
         return True
 
     def unfreeze(self, identity: crypto.Identity) -> bool:
-        if not self.frozen:
+        if not self.props.frozen:
             raise Exception("already unfrozen")
-        if self.frozen.public != identity.public:
+        if self.props.frozen.public != identity.public:
             return False
-        self.frozen = None
+        self.props.frozen = None
         return True
 
     def describes(self, q: str) -> bool:

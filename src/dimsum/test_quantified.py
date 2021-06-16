@@ -120,7 +120,7 @@ async def test_quantified_from_recipe(caplog):
     assert item
 
     await tw.success("obliterate")
-    assert item.destroyed
+    assert item.props.destroyed
 
     await tw.success("make 20 cash")
     assert len(tw.player.holding) == 1

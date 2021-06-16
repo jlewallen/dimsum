@@ -1,5 +1,6 @@
 from typing import Optional, List, cast
 import logging
+import kinds
 import entity
 import context
 import carryable
@@ -34,13 +35,13 @@ class Area(
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(of)]
 
-    def entities_of_kind(self, kind: entity.Kind):
+    def entities_of_kind(self, kind: kinds.Kind):
         return [e for e in self.entities() if e.kind and e.kind.same(kind)]
 
     def number_of_named(self, of: str) -> int:
         return sum([e.quantity for e in self.entities_named(of)])
 
-    def number_of_kind(self, kind: entity.Kind) -> int:
+    def number_of_kind(self, kind: kinds.Kind) -> int:
         return sum([e.quantity for e in self.entities_of_kind(kind)])
 
     def accept(self, visitor: entity.EntityVisitor):

@@ -193,13 +193,13 @@ async def test_unregister_destroys(caplog):
     await tw.initialize()
     await tw.execute("make Box")
     box = tw.player.holding[0]
-    assert box.destroyed == False
+    assert not box.props.destroyed
     await db.save(tw.world)
 
     assert await db.number_of_entities() == 5
 
     await tw.execute("obliterate")
-    assert box.destroyed == True
+    assert box.props.destroyed
     await db.save(tw.world)
 
     assert await db.number_of_entities() == 4

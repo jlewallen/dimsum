@@ -3,6 +3,7 @@ import logging
 import lupa
 
 import properties
+import kinds
 import entity
 import game
 import things
@@ -88,7 +89,7 @@ class LupaEntity:
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
         )
 
-        kind = table["kind"] if "kind" in table else entity.Kind()
+        kind = table["kind"] if "kind" in table else kinds.Kind()
         del table["kind"]
 
         quantity = table["quantity"] if "quantity" in table else 1
@@ -134,7 +135,7 @@ class LupaItem(LupaEntity):
         assert isinstance(self.entity, things.Item)
         return self.entity
 
-    def kind(self, name: str) -> entity.Kind:
+    def kind(self, name: str) -> kinds.Kind:
         return self.entity.get_kind(name)
 
 

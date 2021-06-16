@@ -4,6 +4,7 @@ import logging
 import abc
 import properties
 import crypto
+import kinds
 import entity
 import context
 
@@ -157,13 +158,13 @@ class OpenableMixin(LockableMixin):
 class CarryableMixin:
     def __init__(
         self,
-        kind: entity.Kind = None,
+        kind: kinds.Kind = None,
         quantity: int = None,
         loose: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)  # type: ignore
-        self.kind = kind if kind else entity.Kind()
+        self.kind = kind if kind else kinds.Kind()
         self.quantity = quantity if quantity else 1
         self.loose = loose
 

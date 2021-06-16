@@ -1,9 +1,12 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import abc
 import logging
 import time
 import re
+
+import crypto
+import kinds
 
 log = logging.getLogger("dimsum")
 
@@ -49,6 +52,9 @@ class Property:
 
     def set(self, value):
         self.value = value
+
+    def __repr__(self):
+        return "Property<{0}>".format(self.value)
 
 
 class Map:
@@ -104,6 +110,9 @@ Created = "created"
 Touched = "touched"
 Owner = "owner"
 Password = "password"
+Frozen = "frozen"
+Destroyed = "destroyed"
+Related = "related"
 
 
 class Common(Map):
@@ -114,6 +123,9 @@ class Common(Map):
         self.set(Created, time.time())
         self.set(Touched, time.time())
         self.set(Owner, None)
+        self.set(Frozen, None)
+        self.set(Destroyed, None)
+        self.set(Related, {})
 
     @property
     def name(self) -> str:
@@ -127,7 +139,7 @@ class Common(Map):
     def desc(self) -> str:
         return self[Desc]
 
-    @name.setter
+    @desc.setter
     def desc(self, value: str):
         self.set(Desc, value)
 
@@ -138,8 +150,31 @@ class Common(Map):
     @owner.setter
     def owner(self, value):
         assert value
-        log.info("change-owner {0}".format(value))
         self.set(Owner, value)
+
+    @property
+    def destroyed(self) -> Optional[crypto.Identity]:
+        return self[Destroyed]
+
+    @destroyed.setter
+    def destroyed(self, value: Optional[crypto.Identity]):
+        self.set(Destroyed, value)
+
+    @property
+    def frozen(self) -> Optional[crypto.Identity]:
+        return self[Frozen]
+
+    @frozen.setter
+    def frozen(self, value: Optional[crypto.Identity]):
+        self.set(Frozen, value)
+
+    @property
+    def related(self) -> Dict[str, kinds.Kind]:
+        return self[Related]
+
+    @related.setter
+    def related(self, value: Dict[str, kinds.Kind]):
+        self.set(Related, value)
 
     def clone(self) -> "Common":
         return Common(**self.map)  # type: ignore
