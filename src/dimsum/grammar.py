@@ -15,7 +15,7 @@ def create_parser():
                          | shake | swing
                          | hug | kiss | tickle | poke | heal | say | tell
                          | remember | forget | think
-                         | auth
+                         | auth | dig
 
         verb.1:            WORD (this | that | noun)?
 
@@ -44,6 +44,12 @@ def create_parser():
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
+
+        dig_direction:     direction 
+        dig_arbitrary:     WORD
+        dig_linkage:       dig_direction | dig_arbitrary
+        dig:               "dig" dig_linkage "to" STRING           -> dig
+
         call:              "call" this NAME
 
         say:               "say" TEXT
@@ -83,7 +89,8 @@ def create_parser():
         named_route:       USEFUL_WORD
         DIRECTION:         "north" | "west" | "east" | "south"
         direction:         DIRECTION
-        route:             direction | named_route
+        find_direction:    direction
+        route:             find_direction | named_route
         home:              "home"
         go:                "go" route
         climb:             "climb" route
@@ -146,6 +153,10 @@ def create_parser():
         number:       NUMBER
         text:         TEXT
         _WS:          WS
+
+        DOUBLE_QUOTED_STRING:  /"[^"]*"/
+        SINGLE_QUOTED_STRING:  /'[^']*'/
+        STRING:                (SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING)
 
         %import common.WS
         %import common.WORD

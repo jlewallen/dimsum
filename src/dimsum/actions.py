@@ -69,6 +69,58 @@ class Home(PersonAction):
         return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
 
+class DigDirection:
+    def __init__(self, arbitrary: str = None, direction: movement.Direction = None):
+        super().__init__()
+        self.arbitrary = arbitrary
+        self.direction = direction
+
+
+class DigLinkage:
+    def __init__(
+        self, there: Optional[DigDirection] = None, back: Optional[DigDirection] = None
+    ):
+        super().__init__()
+        self.there = there
+        self.back = back
+
+    def __repr__(self):
+        return "DigLinkage<there={0} back={1}>".format(self.there, self.back)
+
+
+class Dig(PersonAction):
+    def __init__(self, linkage: DigLinkage = None, area_name: str = None, **kwargs):
+        super().__init__(**kwargs)
+        assert linkage
+        assert area_name
+        self.linkage = linkage
+        self.area_name = area_name[1:-1]  # Remove quotes
+
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        area = world.find_player_area(player)
+
+        log.info(
+            "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
+        )
+
+        await ctx.extend().hook("dig:before")
+
+        digging = envo.Area(
+            creator=player,
+            props=properties.Common(name=self.area_name),
+        )
+
+        if self.linkage.there:
+            pass
+
+        if self.linkage.back:
+            pass
+
+        world.register(area)
+
+        return Success("dug and done", created=[area])
+
+
 class AddItemArea(PersonAction):
     def __init__(self, item=None, area=None, **kwargs):
         super().__init__(**kwargs)

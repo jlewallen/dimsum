@@ -29,6 +29,15 @@ class Evaluate(lark.Transformer):
     def look(self, args):
         return actions.Look()
 
+    def dig(self, args):
+        return actions.Dig(args[0], args[1])
+
+    def dig_direction(self, args):
+        return actions.DigDirection(direction=args[0])
+
+    def dig_linkage(self, args):
+        return actions.DigLinkage(there=args[0])
+
     def drop(self, args):
         return actions.Drop()
 
@@ -226,8 +235,11 @@ class Evaluate(lark.Transformer):
     def direction(self, args):
         for d in movement.Direction:
             if str(args[0]).lower() == d.name.lower():
-                return movement.FindDirectionalRoute(d)
-        raise Exception("unknown directional route")
+                return d
+        raise Exception("unknown movement.Direction")
+
+    def find_direction(self, args):
+        return movement.FindDirectionalRoute(args[0])
 
     def route(self, args):
         return args[0]

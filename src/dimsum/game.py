@@ -16,6 +16,10 @@ class SimpleReply(Reply):
 
 
 class Success(SimpleReply):
+    def __init__(self, message: str, created=None, **kwargs):
+        super().__init__(message, **kwargs)
+        self.created = created
+
     def accept(self, visitor):
         return visitor.success(self)
 
