@@ -45,18 +45,20 @@ class EntityVisitor:
         pass
 
 
-class Criteria:
-    def __init__(self, name: str = None, **kwargs):
-        super().__init__()
-        self.name = name
-        self.kwargs = kwargs
-
-
 class IgnoreExtraConstructorArguments:
+    """
+    This can be applied in the inheritance hierarchy to swallow unused
+    kwargs that may end up left over in some construction scenarios.
+    """
+
     def __init__(self, **kwargs):
         super().__init__()
         if len(kwargs) > 0:
             log.debug("ignored kwargs: {0}".format(kwargs))
+
+
+class EntityFrozen(Exception):
+    pass
 
 
 class Entity(behavior.BehaviorMixin):
@@ -113,11 +115,10 @@ class Entity(behavior.BehaviorMixin):
         if self.klass != "World":
             assert self.creator
 
-    def registered(self, gid: int):
+    def registered(self, gid: int) -> int:
         """
-        We return our own global id if we have one and the caller
-        will ensure uniquness. Otherwise we accept their proposed
-        gid.
+        We return our own global id if we have one and the caller will
+        ensure uniquness. Otherwise we accept the proposed gid.
         """
         if self.props.gid >= 0:
             return self.props.gid
@@ -147,21 +148,20 @@ class Entity(behavior.BehaviorMixin):
     def try_modify(self) -> None:
         if self.can_modify():
             return
-        raise ItemFrozen()
+        raise EntityFrozen()
 
     def can_modify(self) -> bool:
-        log.info("frozen=%s", self.props.frozen)
         return self.props.frozen is None
 
     def freeze(self, identity: crypto.Identity) -> bool:
         if self.props.frozen:
-            raise Exception("already frozen")
+            raise EntityFrozen()
         self.props.frozen = identity
         return True
 
     def unfreeze(self, identity: crypto.Identity) -> bool:
         if not self.props.frozen:
-            raise Exception("already unfrozen")
+            raise Exception("unfrozen")
         if self.props.frozen.public != identity.public:
             return False
         self.props.frozen = None
@@ -210,11 +210,6 @@ class Registrar:
         log.info("register:miss {0}".format(number))
         return None
 
-    def unregister(self, entity: Union[Entity, Any]):
-        entity.destroy()
-        del self.entities[entity.key]
-        self.garbage[entity.key] = entity
-
     def empty(self) -> bool:
         return len(self.entities.keys()) == 1
 
@@ -224,9 +219,10 @@ class Registrar:
     def all_of_type(self, klass: Type) -> List[Entity]:
         return [e for e in self.entities.values() if isinstance(e, klass)]
 
-
-class ItemFrozen(Exception):
-    pass
+    def unregister(self, entity: Union[Entity, Any]):
+        entity.destroy()
+        del self.entities[entity.key]
+        self.garbage[entity.key] = entity
 
 
 def entities(maybes: List[Any]) -> List[Entity]:

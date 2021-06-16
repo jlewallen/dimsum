@@ -137,7 +137,7 @@ class World(entity.Entity, entity.Registrar):
         ) as ctx:
             try:
                 return await action.perform(ctx, self, person)
-            except entity.ItemFrozen:
+            except entity.EntityFrozen:
                 return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):

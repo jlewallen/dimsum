@@ -72,17 +72,6 @@ class Scope:
         return prepared
 
 
-class Changes:
-    def __init__(self):
-        self.messages = []
-
-    def msg(self, m):
-        self.messages.append(m)
-
-    def __str__(self):
-        return str(self.messages)
-
-
 class Behavior:
     def __init__(self, lua=None, logs=None, **kwargs):
         self.lua = lua
@@ -160,9 +149,6 @@ class ScriptEngine:
         return None
 
 
-# Behavior keys are of the form:
-# b:<key>:<behavior>
-# The <key> allows multiple customizations, and will be run in order sorted by key.
 class BehaviorMap(properties.Map):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
