@@ -110,6 +110,7 @@ class Entity(behavior.BehaviorMixin):
         if self.props.gid >= 0:
             return self.props.gid
         else:
+            self.props.gid = gid
             return gid
 
     @abc.abstractmethod
@@ -179,8 +180,13 @@ class Registrar:
             )
         else:
             assigned = entity.registered(self.number)
-            log.info("register:new {0} ({1}) #{2}".format(entity.key, entity, assigned))
-            assert assigned not in self.numbered
+            log.info(
+                "register:new {0} ({1}) #{2} {3}".format(
+                    entity.key, entity, assigned, self.number
+                )
+            )
+            if assigned in self.numbered:
+                assert self.numbered[assigned] == entity
             self.number = assigned + 1
             self.entities[entity.key] = entity
             self.numbered[assigned] = entity

@@ -3,6 +3,7 @@ from typing import Dict, Optional
 import abc
 import logging
 import time
+import copy
 import re
 
 import crypto
@@ -187,7 +188,9 @@ class Common(Map):
         self.set(GlobalId, value)
 
     def clone(self) -> "Common":
-        return Common(**self.map)  # type: ignore
+        cloned = Common(**copy.deepcopy(self.map))  # type: ignore
+        cloned.set(GlobalId, -1)
+        return cloned
 
     def touch(self):
         self.touched = time.time()

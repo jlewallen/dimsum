@@ -170,12 +170,11 @@ end
 
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
+    await db.purge()
     await db.save(tw.world)
 
     empty = world.World(tw.bus, context_factory=None)
     await db.load(empty)
-
-    logging.info("%s", empty.entities)
 
 
 @pytest.mark.asyncio

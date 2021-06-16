@@ -54,7 +54,7 @@ class Item(
         self.decrease_quantity(quantity)
         item = Item(
             kind=self.kind,
-            props=self.props,
+            props=self.props.clone(),
             behaviors=self.behaviors,
             quantity=quantity,
             **kwargs
@@ -64,8 +64,8 @@ class Item(
         return [item]
 
     def clone(self, **kwargs):
-        updated = copy.copy(self.__dict__)
-        updated.update(**kwargs)
+        updated = copy.deepcopy(self.__dict__)
+        updated.update(props=self.props.clone(), **kwargs)
         return Item(**updated)
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:
