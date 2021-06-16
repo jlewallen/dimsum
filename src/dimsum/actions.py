@@ -34,6 +34,7 @@ class Unknown(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
+        log.warn("{0} performed".format(self))
         return Failure("sorry, i don't understand")
 
 
@@ -75,17 +76,37 @@ class DigDirection:
         self.arbitrary = arbitrary
         self.direction = direction
 
+    @property
+    def name(self):
+        if self.direction:
+            return self.direction.exiting
+        if self.arbitrary:
+            return self.arbitrary
+        raise Error("malformed dig")
+
 
 class DigLinkage:
     def __init__(
-        self, there: Optional[DigDirection] = None, back: Optional[DigDirection] = None
+        self,
+        directions: List[DigDirection] = None,
     ):
         super().__init__()
-        self.there = there
-        self.back = back
+        self.directions = directions
+
+    @property
+    def there(self):
+        if len(self.directions) >= 1:
+            return self.directions[0]
+        return None
+
+    @property
+    def back(self):
+        if len(self.directions) >= 2:
+            return self.directions[1]
+        return None
 
     def __repr__(self):
-        return "DigLinkage<there={0} back={1}>".format(self.there, self.back)
+        return "DigLinkage<{0}>".format(self.directions)
 
 
 class Dig(PersonAction):
@@ -103,20 +124,30 @@ class Dig(PersonAction):
             "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
         )
 
-        await ctx.extend().hook("dig:before")
-
         digging = envo.Area(
             creator=player,
             props=properties.Common(name=self.area_name),
         )
 
         if self.linkage.there:
-            pass
+            goes_there = envo.Exit(
+                digging,
+                creator=player,
+                props=properties.Common(name=self.linkage.there.name),
+            )
+            area.add_item(goes_there)
+            world.register(goes_there)
 
         if self.linkage.back:
-            pass
+            comes_back = envo.Exit(
+                area,
+                creator=player,
+                props=properties.Common(name=self.linkage.back.name),
+            )
+            digging.add_item(comes_back)
+            world.register(comes_back)
 
-        world.register(area)
+        world.register(digging)
 
         return Success("dug and done", created=[area])
 
@@ -710,9 +741,11 @@ class MovingAction(PersonAction):
         destination = self.area
 
         if self.finder:
-            log.info("finder: %s", self.finder)
+            log.info("finder: {0}".format(self.finder))
             area = world.find_player_area(player)
-            route = await self.finder.find_route(area, player, verb=verb, builder=world)
+            route = await self.finder.find_route(
+                area, player, world=world, verb=verb, builder=world
+            )
             if route:
                 routed: Any = route.area
                 destination = routed

@@ -21,6 +21,7 @@ def get_color(e: entity.Entity) -> str:
         "Animal": "darkseagreen",
         "Player": "coral",
         "Item": "khaki",
+        "Exit": "salmon",
         "Area": "skyblue",
         "Recipe": "thistle",
     }

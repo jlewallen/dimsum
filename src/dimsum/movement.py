@@ -13,6 +13,10 @@ class Direction(enum.Enum):
     WEST = 3
     EAST = 4
 
+    @property
+    def exiting(self) -> str:
+        return str(self).split(".")[1]
+
 
 class Area:
     @abc.abstractmethod
@@ -24,14 +28,8 @@ class Area:
         raise NotImplementedError
 
 
-class AreaBuilder:
-    @abc.abstractmethod
-    def build_new_area(self, person, item, **kwargs) -> Area:
-        pass
-
-
 class AreaRoute:
-    def __init__(self, area: Area = None, **kwargs):
+    def __init__(self, area: Area = None):
         super().__init__()
         assert area
         self.area = area
@@ -66,7 +64,19 @@ class DirectionalRoute(AreaRoute):
         return self.direction == direction
 
     def name(self) -> str:
-        return str(self.direction).split(".")[1]
+        return self.direction.exiting
+
+
+class NavigationAction(enum.Enum):
+    EXIT = 1
+    ENTER = 2
+
+
+class Navigable:
+    def __init__(self, action: NavigationAction = None, **kwargs):
+        super().__init__(**kwargs)  # type:ignore
+        assert action
+        self.action = action
 
 
 class MovementMixin:
@@ -83,7 +93,7 @@ class MovementMixin:
         return self.adjacent()[0]
 
     def find_route(self, **kwargs) -> Optional[AreaRoute]:
-        log.debug("%s find-route: %s %s", self, self.routes, kwargs)
+        log.debug("find-route: {0} {1} {2}".format(self, self.routes, kwargs))
         for r in self.routes:
             if r.satisfies(**kwargs):
                 return r
@@ -97,41 +107,28 @@ class MovementMixin:
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
         self.routes.append(route)
-        log.debug("%s new route: %s", self, self.routes)
-        return route
-
-    def move_with(self, area, person, builder: AreaBuilder, **kwargs):
-        if len(self.routes) == 0:
-            destination = builder.build_new_area(person, self, **kwargs)
-            self.link_area(destination, **kwargs)
-
-        route = self.find_route(**kwargs)
-        person.drop_here(area, item=self)
+        log.debug("new route: {0} {1}".format(self, self.routes))
         return route
 
 
 class FindsRoute:
-    async def find_route(self, area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
         raise NotImplementedError
 
 
 class FindNamedRoute(FindsRoute):
     def __init__(self, name: str):
         super().__init__()
+        assert name
         self.name = name
 
-    async def find_route(
-        self, area: Area, person, builder=None, **kwargs
-    ) -> Optional[AreaRoute]:
-        item = area.find_item_under(q=self.name, **kwargs)
-        if not item:
-            item = person.find_item_under(q=self.name, **kwargs)
-            if not item:
-                log.info("no named route: %s", self.name)
-                return None
-
-        log.info("named route: %s = %s", self.name, item)
-        return item.move_with(area, person, builder=builder, **kwargs)
+    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+        navigable = area.find_item_under(inherits=Navigable, q=self.name)
+        if navigable:
+            log.debug("navigable={0}".format(navigable))
+            assert navigable.props.navigable
+            return AreaRoute(area=navigable.props.navigable)
+        return None
 
 
 class FindDirectionalRoute(FindsRoute):
@@ -140,4 +137,21 @@ class FindDirectionalRoute(FindsRoute):
         self.direction = direction
 
     async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
-        return area.find_route(direction=self.direction)
+        navigable = area.find_item_under(inherits=Navigable, q=self.direction.exiting)
+        if navigable:
+            log.debug("navigable={0}".format(navigable))
+            assert navigable.props.navigable
+            return AreaRoute(area=navigable.props.navigable)
+        return None
+
+
+class FindNavigableItem(FindsRoute):
+    def __init__(self, finder):
+        super().__init__()
+        assert finder
+        self.finder = finder
+
+    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+        area = self.finder.find_item(**kwargs)
+        assert area
+        return AreaRoute(area=area)

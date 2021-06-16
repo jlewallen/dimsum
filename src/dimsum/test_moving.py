@@ -6,6 +6,7 @@ import envo
 import movement
 import properties
 import test
+import persistence
 
 
 @pytest.mark.asyncio
@@ -24,53 +25,19 @@ async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()
 
-    door_room = tw.add_simple_area_here("Door", "Door Room")
+    another_room = envo.Area(creator=tw.world, props=properties.Common("Another Room"))
+
+    tw.area.add_item(
+        envo.Exit(area=another_room, creator=tw.world, props=properties.Common("Door"))
+    )
+
+    tw.world.add_area(another_room)
 
     area_before = tw.world.find_player_area(tw.player)
     await tw.success("go door")
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
-    assert area_after == door_room
-
-
-@pytest.mark.asyncio
-async def test_make_door_and_go_and_get_the_fuck_back():
-    tw = test.TestWorld()
-    await tw.initialize()
-
-    await tw.success("make Door")
-
-    area_before = tw.world.find_player_area(tw.player)
-
-    await tw.success("go Door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-
-    await tw.success("look down")
-
-    await tw.success("go Door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after == area_before
-
-
-@pytest.mark.asyncio
-async def test_climb_wall(caplog):
-    tw = test.TestWorld()
-    await tw.initialize()
-
-    await tw.success("make Wall")
-
-    area_before = tw.world.find_player_area(tw.player)
-
-    await tw.success("climb wall")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-
-    await tw.success("look")
-
-    await tw.success("climb wall")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after == area_before
+    assert area_after == another_room
 
 
 @pytest.mark.asyncio
@@ -95,8 +62,12 @@ async def test_directional_moving():
     park = envo.Area(props=properties.Common("North Park"), creator=tw.jacob)
 
     tw.world.add_area(park)
-    tw.area.add_route(
-        movement.DirectionalRoute(direction=movement.Direction.NORTH, area=park)
+    tw.area.add_item(
+        envo.Exit(
+            area=park,
+            props=properties.Common(name=movement.Direction.NORTH.exiting),
+            creator=tw.jacob,
+        )
     )
 
     area_before = tw.world.find_player_area(tw.player)
@@ -104,3 +75,38 @@ async def test_directional_moving():
     area_after = tw.world.find_player_area(tw.player)
     assert area_after != area_before
     assert area_after == park
+
+
+@pytest.mark.asyncio
+async def test_programmatic_basic_entrances_and_exits():
+    tw = test.TestWorld()
+
+    earth = envo.Area(creator=tw.jacob, props=properties.Common(name="Earth"))
+    asteroid = envo.Area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
+    envo.Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
+
+    await tw.initialize(earth)
+
+    tw.world.add_area(asteroid)
+
+
+@pytest.mark.asyncio
+async def test_digging_basic():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.success("dig north to 'Kitchen'")
+    await tw.success("go #{0}".format(tw.area.props.gid))
+
+    await tw.save("test.sqlite3")
+
+
+@pytest.mark.asyncio
+async def test_digging_with_return():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.success("dig north|south to 'Kitchen'")
+    await tw.save("test.sqlite3")
+    await tw.success("go north")
+    await tw.success("go south")

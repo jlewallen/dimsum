@@ -5,7 +5,7 @@ import abc
 import entity
 import contextvars
 
-worldCtx: Any = contextvars.ContextVar("diimsum:ctx")
+worldCtx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
 
 

@@ -79,51 +79,42 @@ class World(entity.Entity, entity.Registrar):
     def resolve(self, keys) -> Sequence[entity.Entity]:
         return [self.entities[key] for key in keys]
 
-    def add_area(self, area: envo.Area, depth=0):
-        if area.key in self.entities:
-            log.debug("add-area:%d %s %s skip", depth, area.key, area)
+    def add_area(self, area: envo.Area, depth=0, seen: Dict[str, str] = None):
+        if seen is None:
+            seen = {}
+
+        if area.key in seen:
             return
+
+        seen[area.key] = area.key
+
         log.debug("add-area:%d %s %s", depth, area.key, area)
+
         self.register(area)
+
         for entity in area.entities():
             self.register(entity)
+
         for item in area.entities():
+            if item.props.navigable:
+                log.debug("linked-via-navigable[%s] %s", depth, item.props.navigable)
+                self.add_area(item.props.navigable, depth=depth + 1, seen=seen)
+
             if isinstance(item, things.Item):
                 for linked in item.adjacent():
                     log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                    self.add_area(cast(envo.Area, linked), depth=depth + 1)
+                    self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+
         for linked in area.adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
-            self.add_area(cast(envo.Area, linked), depth=depth + 1)
+            self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+
         log.debug("area-done:%d %s", depth, area.key)
 
     def add_entities(self, entities: List[entity.Entity]):
         for entity in entities:
             log.debug("add-entity: %s %s", entity.key, entity)
             self.register(entity)
-
-    def build_new_area(
-        self,
-        person: animals.Person,
-        entry: things.Item,
-        verb: str = DefaultMoveVerb,
-    ):
-        log.info("building new area")
-
-        fromArea: envo.Area = self.find_player_area(person)
-        theWayBack = things.Item(creator=person, props=entry.props.clone())
-        theWayBack.link_area(fromArea, verb=verb)
-
-        area = envo.Area(
-            creator=person,
-            props=properties.Common(
-                "A pristine, new place.",
-                desc="Nothing seems to be here, maybe you should decorate?",
-            ),
-        )
-        area.add_item(theWayBack)
-        self.add_area(area)
-        return area
 
     def apply_item_finder(
         self, person: animals.Person, finder: things.ItemFinder, **kwargs
@@ -263,14 +254,11 @@ class WorldCtx(context.Ctx):
         return things.Item(**kwargs)
 
     def find_item(
-        self,
-        inherits=None,
-        candidates=None,
-        exclude=None,
-        things_only=True,
-        **kwargs
+        self, inherits=None, candidates=None, exclude=None, things_only=True, **kwargs
     ) -> Optional[entity.Entity]:
-        log.info("find-item: candidates=%s exclude=%s kw=%s", candidates, exclude, kwargs)
+        log.info(
+            "find-item: candidates=%s exclude=%s kw=%s", candidates, exclude, kwargs
+        )
 
         if len(candidates) == 0:
             return None

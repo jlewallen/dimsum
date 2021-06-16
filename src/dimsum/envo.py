@@ -3,6 +3,7 @@ import logging
 import enum
 
 import kinds
+import properties
 import entity
 import context
 import carryable
@@ -12,18 +13,6 @@ import mechanics
 import things
 
 log = logging.getLogger("dimsum")
-
-
-class NavigationAction(enum.Enum):
-    EXIT = 1
-    ENTER = 2
-
-
-class Navigable(things.Item):
-    def __init__(self, action: NavigationAction = None, **kwargs):
-        super().__init__(**kwargs)
-        assert action
-        self.action = action
 
 
 class Area(
@@ -44,7 +33,7 @@ class Area(
         return self.entities()
 
     def entities(self) -> List[entity.Entity]:
-        return [cast(things.Item, e) for e in flatten([self.holding, self.occupied])]
+        return [e for e in flatten([self.holding, self.occupied])]
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(q=of)]
@@ -61,26 +50,12 @@ class Area(
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
-    def add_item_and_link_back(self, item: carryable.CarryableMixin):
-        self.add_item(item)
-        copy = item.clone(key=None, identity=None, routes=[])  # type: ignore
-        copy.link_area(self)
-        other_area = item.require_single_linked_area  # type: ignore
-        other_area.add_item(copy)
-        return self, other_area
-
     def adjacent(self) -> List[movement.Area]:
-        # This is here instead of in movement because we access
-        # `self.holding` I think once we have a mechanism to
-        # optionally get associated entities this will be ok.
-        via_routes = super().adjacent()
-        via_items = [
-            r.area
-            for r in flatten(
-                [e.available_routes for e in things.expected(self.holding)]
-            )
-        ]
-        return [a for a in flatten([via_routes, via_items])]
+        areas: List[movement.Area] = []
+        for e in self.entities():
+            if e.props.navigable:
+                areas.append(e.props.navigable)
+        return areas
 
     def __str__(self):
         return self.props.name
@@ -89,14 +64,30 @@ class Area(
         return str(self)
 
 
-class Exit(Navigable):
-    def __init__(self, **kwargs):
-        super().__init__(action=NavigationAction.EXIT, **kwargs)
+class Exit(movement.Navigable, things.Item):
+    def __init__(self, area: Area = None, **kwargs):
+        super().__init__(action=movement.NavigationAction.EXIT, **kwargs)
+        if area:
+            self.props[properties.Navigable] = area
+        assert self.props[properties.Navigable]
 
 
-class Entrance(Navigable):
-    def __init__(self, **kwargs):
-        super().__init__(action=NavigationAction.ENTER, **kwargs)
+class Bidirectional:
+    def __init__(self, there: Area = None, back: Area = None, **kwargs):
+        assert there
+        assert back
+        goes_there = Exit(
+            area=there,
+            props=properties.Common(name="Exit to {0}".format(there.props.name)),
+            **kwargs
+        )
+        comes_back = Exit(
+            area=back,
+            props=properties.Common(name="Exit to {0}".format(back.props.name)),
+            **kwargs
+        )
+        back.add_item(goes_there)
+        there.add_item(comes_back)
 
 
 def flatten(l):

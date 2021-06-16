@@ -14,7 +14,6 @@ log = logging.getLogger("dimsum")
 
 @pytest.mark.asyncio
 async def test_library(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     generics, area = library.create_example_world(tw.world)
@@ -37,4 +36,4 @@ async def test_library(caplog):
 
     await db.save(empty)
 
-    assert await db.number_of_entities() == 41
+    assert await db.number_of_entities() == 67

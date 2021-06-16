@@ -29,11 +29,11 @@ def create_parser():
         general_noun:      USEFUL_WORD+
 
         makeable:          makeable_noun
-        contained:         object_by_number | contained_noun
-        consumable:        object_by_number | consumable_noun
-        unheld:            object_by_number | unheld_noun
-        held:              object_by_number | held_noun
-        noun:              object_by_number | general_noun
+        contained:         object_by_gid | contained_noun
+        consumable:        object_by_gid | consumable_noun
+        unheld:            object_by_gid | unheld_noun
+        held:              object_by_gid | held_noun
+        noun:              object_by_gid | general_noun
 
         this:              "this"
         that:              "that"
@@ -45,10 +45,11 @@ def create_parser():
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
 
-        dig_direction:     direction 
+        dig_direction:     direction
         dig_arbitrary:     WORD
         dig_linkage:       dig_direction | dig_arbitrary
-        dig:               "dig" dig_linkage "to" STRING           -> dig
+        dig_linkages:      dig_linkage ("|" dig_linkage)*
+        dig:               "dig" dig_linkages "to" STRING -> dig
 
         call:              "call" this NAME
 
@@ -90,7 +91,8 @@ def create_parser():
         DIRECTION:         "north" | "west" | "east" | "south"
         direction:         DIRECTION
         find_direction:    direction
-        route:             find_direction | named_route
+        find_route_by_gid: object_by_gid
+        route:             find_route_by_gid | find_direction | named_route
         home:              "home"
         go:                "go" route
         climb:             "climb" route
@@ -141,7 +143,7 @@ def create_parser():
 
         auth:              "auth" TEXT
 
-        object_by_number:  "#"NUMBER
+        object_by_gid:     "#"NUMBER
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS

@@ -43,7 +43,7 @@ class Medical:
 
 class EdibleMixin:
     def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
-        super().__init__()  # type: ignore
+        super().__init__(**kwargs)  # type: ignore
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
         self.servings: int = servings
 

@@ -49,6 +49,13 @@ class Criteria:
         self.kwargs = kwargs
 
 
+class IgnoreExtraConstructorArguments:
+    def __init__(self, **kwargs):
+        super().__init__()
+        if len(kwargs) > 0:
+            log.debug("ignored kwargs: {0}".format(kwargs))
+
+
 class Entity(behavior.BehaviorMixin):
     def __init__(
         self,
@@ -93,6 +100,8 @@ class Entity(behavior.BehaviorMixin):
         self.props.owner = self.props.owner if self.props.owner else initial_owner
 
         self.validate()
+
+        log.debug("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
 
     def validate(self) -> None:
         assert self.key

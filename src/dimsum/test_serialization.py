@@ -77,45 +77,24 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
     two = envo.Area(creator=world, props=properties.Common("Two"))
     one = envo.Area(creator=world, props=properties.Common("One"))
-    one.add_route(
-        movement.DirectionalRoute(direction=movement.Direction.NORTH, area=two)
+
+    one.add_item(
+        envo.Exit(
+            area=two,
+            props=properties.Common(name=movement.Direction.NORTH.exiting),
+            creator=world,
+        )
     )
-    two.add_route(
-        movement.DirectionalRoute(direction=movement.Direction.SOUTH, area=one)
+
+    two.add_item(
+        envo.Exit(
+            area=one,
+            props=properties.Common(name=movement.Direction.SOUTH.exiting),
+            creator=world,
+        )
     )
+
     world.add_area(one)
-
-    json = serializing.all(world)
-
-    assert len(json.items()) == 3
-
-    after = test.create_empty_world()
-    entities = serializing.restore(after, json)
-
-    one = after.find_entity_by_name("One")
-    assert one
-
-    two = after.find_entity_by_name("Two")
-    assert two
-
-    assert two in one.adjacent()
-    assert one in two.adjacent()
-
-    assert len(after.entities.items()) == 3
-
-
-@pytest.mark.asyncio
-async def test_serialize_world_two_areas_linked_via_items(caplog):
-    caplog.set_level(logging.INFO)
-    world = test.create_empty_world()
-
-    other = envo.Area(creator=world, props=properties.Common("Two"))
-    door = things.Item(creator=world, props=properties.Common("Item"))
-    door.link_area(other)
-
-    area = envo.Area(creator=world, props=properties.Common("One"))
-    area.add_item_and_link_back(door)
-    world.add_area(area)
 
     json = serializing.all(world)
 
@@ -130,11 +109,40 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert len(one.holding[0].routes) == 1
-    assert len(two.holding[0].routes) == 1
+    assert two in one.adjacent()
+    assert one in two.adjacent()
 
-    assert isinstance(one.holding[0].routes[0].area, envo.Area)
-    assert isinstance(two.holding[0].routes[0].area, envo.Area)
+    assert len(after.entities.items()) == 5
+
+
+@pytest.mark.asyncio
+async def test_serialize_world_two_areas_linked_via_items(caplog):
+    caplog.set_level(logging.INFO)
+    world = test.create_empty_world()
+
+    one = envo.Area(creator=world, props=properties.Common("One"))
+    two = envo.Area(creator=world, props=properties.Common("Two"))
+
+    one.add_item(envo.Exit(area=two, creator=world, props=properties.Common("Item")))
+    two.add_item(envo.Exit(area=one, creator=world, props=properties.Common("Item")))
+
+    world.add_area(one)
+
+    json = serializing.all(world)
+
+    assert len(json.items()) == 5
+
+    after = test.create_empty_world()
+    entities = serializing.restore(after, json)
+
+    one = after.find_entity_by_name("One")
+    assert one
+
+    two = after.find_entity_by_name("Two")
+    assert two
+
+    assert isinstance(one.holding[0].props.navigable, envo.Area)
+    assert isinstance(two.holding[0].props.navigable, envo.Area)
 
     assert two in one.adjacent()
     assert one in two.adjacent()

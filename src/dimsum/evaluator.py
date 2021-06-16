@@ -35,8 +35,14 @@ class Evaluate(lark.Transformer):
     def dig_direction(self, args):
         return actions.DigDirection(direction=args[0])
 
+    def dig_arbitrary(self, args):
+        return actions.DigDirection(arbitrary=args[0])
+
     def dig_linkage(self, args):
-        return actions.DigLinkage(there=args[0])
+        return args[0]
+
+    def dig_linkages(self, args):
+        return actions.DigLinkage(args)
 
     def drop(self, args):
         return actions.Drop()
@@ -211,7 +217,7 @@ class Evaluate(lark.Transformer):
     def general_noun(self, args):
         return finders.AnyItem(str(args[0]))
 
-    def object_by_number(self, args):
+    def object_by_gid(self, args):
         return finders.ObjectNumber(int(args[0]))
 
     def makeable(self, args):
@@ -240,6 +246,9 @@ class Evaluate(lark.Transformer):
 
     def find_direction(self, args):
         return movement.FindDirectionalRoute(args[0])
+
+    def find_route_by_gid(self, args):
+        return movement.FindNavigableItem(args[0])
 
     def route(self, args):
         return args[0]

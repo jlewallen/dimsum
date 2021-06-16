@@ -20,7 +20,7 @@ p = inflect.engine()
 class Item(
     context.FindItemMixin,
     entity.Entity,
-    apparel.Wearable,
+    apparel.WearableMixin,
     carryable.CarryableMixin,
     carryable.ContainingMixin,
     carryable.KeyMixin,
@@ -28,6 +28,7 @@ class Item(
     mechanics.VisibilityMixin,
     movement.MovementMixin,
     health.EdibleMixin,
+    entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -99,6 +100,7 @@ class MaybeItem(ItemFactory):
         self.name = name
 
     def create_item(self, **kwargs) -> Item:
+        log.debug("create-item: {0}".format(kwargs))
         return Item(props=properties.Common(self.name), **kwargs)
 
 

@@ -31,7 +31,7 @@ class Generics:
 
     @property
     def all(self):
-        return [self.thing, self.area, self.player]
+        return [self.thing, self.player, self.area]
 
 
 class Factory:
@@ -128,9 +128,10 @@ end
         return item
 
 
-class SmallCrevice(Factory):
-    def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+class SmallCrevice:
+    def create(self, world: world.World, generics: Generics, area: envo.Area):
+        item = envo.Exit(
+            area=area,
             creator=world,
             parent=generics.thing,
             visible=mechanics.Visible(hard_to_see=True),
@@ -214,9 +215,10 @@ end
         return item
 
 
-class WoodenLadder(Factory):
-    def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+class WoodenLadder:
+    def create(self, world: world.World, generics: Generics, area: envo.Area):
+        item = envo.Exit(
+            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Wooden Ladder", desc="Seems sturdy enough."),
@@ -261,8 +263,13 @@ class DarkCavern(Factory):
 
         entrance = CavernEntrance().create(world, generics)
 
-        area.add_route(
-            movement.DirectionalRoute(direction=movement.Direction.NORTH, area=entrance)
+        area.add_item(
+            envo.Exit(
+                area=entrance,
+                creator=world,
+                parent=generics.thing,
+                props=properties.Common(name=movement.Direction.NORTH.exiting),
+            )
         )
 
         return area
@@ -302,8 +309,13 @@ class RoomGrid(Factory):
         ]
 
         def add_doorway(from_cell, to_cell, direction):
-            from_cell.add_route(
-                movement.DirectionalRoute(direction=direction, area=to_cell)
+            from_cell.add_item(
+                envo.Exit(
+                    area=to_cell,
+                    creator=world,
+                    parent=generics.thing,
+                    props=properties.Common(name=direction.exiting),
+                )
             )
 
         def link_cells(cell1, cell2, direction):
@@ -315,7 +327,6 @@ class RoomGrid(Factory):
             row = grid[y]
             if x < 0 or x >= len(row):
                 return
-            # print("linking (%d, %d) -> (%d, %d) %s" % (ox, oy, x, y, direction))
             from_cell = grid[ox][oy]
             to_cell = grid[x][y]
             add_doorway(from_cell, to_cell, direction)
@@ -335,33 +346,15 @@ class Museum(Factory):
         return RoomGrid(w=3, h=3).create(world, generics)
 
 
-class MarbleSteps(Factory):
-    def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+class MarbleSteps:
+    def create(self, world: world.World, generics: Generics, area: envo.Area):
+        item = envo.Exit(
+            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Marble Steps", desc="Marble"),
         )
         return item
-
-
-class AddItemRoute:
-    def __init__(self, world: world.World, generics: Generics, **kwargs):
-        assert world
-        self.world = world
-        self.generics = generics
-        self.kwargs = kwargs
-
-    def area(self, **kwargs):
-        self.area = envo.Area(creator=self.world, parent=self.generics.area, **kwargs)
-        return self
-
-    def via(self, **kwargs):
-        self.item = things.Item(
-            creator=self.world, parent=self.generics.thing, **kwargs
-        )
-        self.item.link_area(self.area)
-        return self.item
 
 
 class NarrowCanyon:
@@ -379,8 +372,9 @@ class NarrowCanyon:
 
 
 class RockyPath:
-    def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+    def create(self, world: world.World, generics: Generics, area: envo.Area):
+        item = envo.Exit(
+            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Rocky Path", desc="Looks easy enough"),
@@ -406,32 +400,44 @@ class WelcomeArea(Factory):
         area.add_living(TomorrowCat().create(world, generics))
 
         loft = ArtistsLoft().create(world, generics)
-        ladder = WoodenLadder().create(world, generics)
-        ladder.link_area(loft)
-        area.add_item_and_link_back(ladder)
+        area.add_item(WoodenLadder().create(world, generics, loft))
+        loft.add_item(WoodenLadder().create(world, generics, area))
 
         canyon = NarrowCanyon().create(world, generics)
-        rocky_path = RockyPath().create(world, generics)
-        rocky_path.link_area(canyon)
-        area.add_item_and_link_back(rocky_path)
+        area.add_item(RockyPath().create(world, generics, canyon))
+        canyon.add_item(RockyPath().create(world, generics, area))
 
-        _, clearing = area.add_item_and_link_back(
-            AddItemRoute(world, generics)
-            .area(props=properties.Common("A small clearing."))
-            .via(props=properties.Common("Worn Path"))
+        clearing = envo.Area(
+            creator=world,
+            parent=generics.area,
+            props=properties.Common("A small clearing."),
+        )
+        area.add_item(
+            envo.Exit(
+                area=clearing,
+                creator=world,
+                parent=generics.thing,
+                props=properties.Common("Worn Path"),
+            )
+        )
+        clearing.add_item(
+            envo.Exit(
+                area=area,
+                creator=world,
+                parent=generics.thing,
+                props=properties.Common("Worn Path"),
+            )
         )
 
         clearing.add_item(LargeMapleTree().create(world, generics))
 
         cavern = DarkCavern().create(world, generics)
-        crevice = SmallCrevice().create(world, generics)
-        crevice.link_area(cavern)
-        clearing.add_item(crevice)
+        clearing.add_item(SmallCrevice().create(world, generics, cavern))
+        cavern.add_item(SmallCrevice().create(world, generics, clearing))
 
         museum = Museum().create(world, generics)
-        steps = MarbleSteps().create(world, generics)
-        steps.link_area(museum)
-        clearing.add_item_and_link_back(steps)
+        clearing.add_item(MarbleSteps().create(world, generics, museum))
+        museum.add_item(MarbleSteps().create(world, generics, clearing))
 
         return area
 

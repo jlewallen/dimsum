@@ -20,6 +20,7 @@ import messages
 import handlers
 import reply
 import serializing
+import persistence
 import sugar
 
 log = logging.getLogger("dimsum")
@@ -112,3 +113,9 @@ class TestWorld:
 
     async def realize(self):
         pass
+
+    async def save(self, fn: str):
+        db = persistence.SqliteDatabase()
+        await db.open(fn)
+        await db.purge()
+        await db.save(self.world)

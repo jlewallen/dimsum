@@ -7,10 +7,16 @@
   </tr>
   {%- for key, value in entity.props.map.items() -%}
   {%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' and key != 'related' -%}
-  {%- if key != 's:password' and value %}
+  {%- if key != 'password' and value %}
+  {%- if key == 'navigable' -%}
+  <tr>
+     <td bgcolor="salmon"> {{ key }} = {{ value.value }}</td>
+  </tr>
+  {%- else -%}
   <tr>
      <td bgcolor="white"> {{ key }} = {{ value.value }}</td>
   </tr>
+  {%- endif -%}
   {%- else -%}
   <tr>
      <td bgcolor="white"> {{ key }} </td>

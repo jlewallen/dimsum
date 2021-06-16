@@ -11,9 +11,19 @@ import kinds
 
 log = logging.getLogger("dimsum")
 
+GlobalId = "gid"
+Name = "name"
+Desc = "desc"
 Created = "created"
 Touched = "touched"
-Desc = "desc"
+Owner = "owner"
+Password = "password"
+Frozen = "frozen"
+Destroyed = "destroyed"
+Related = "related"
+Navigable = "navigable"
+
+# TODO remove
 Worn = "worn"
 Opened = "opened"
 Eaten = "eaten"
@@ -105,18 +115,6 @@ class Map:
         return str(self)
 
 
-Name = "name"
-Desc = "desc"
-Created = "created"
-Touched = "touched"
-Owner = "owner"
-Password = "password"
-Frozen = "frozen"
-Destroyed = "destroyed"
-Related = "related"
-GlobalId = "gid"
-
-
 class Common(Map):
     def __init__(self, name: str = None, desc: str = None, **kwargs):
         super().__init__(kwargs)
@@ -129,6 +127,14 @@ class Common(Map):
         self.set(Frozen, None)
         self.set(Destroyed, None)
         self.set(Related, {})
+
+    @property
+    def gid(self) -> int:
+        return self[GlobalId]
+
+    @gid.setter
+    def gid(self, value: int):
+        self.set(GlobalId, value)
 
     @property
     def name(self) -> str:
@@ -180,12 +186,14 @@ class Common(Map):
         self.set(Related, value)
 
     @property
-    def gid(self) -> int:
-        return self[GlobalId]
+    def navigable(self):
+        if Navigable in self:
+            return self[Navigable]
+        return None
 
-    @gid.setter
-    def gid(self, value: int):
-        self.set(GlobalId, value)
+    @navigable.setter
+    def navigable(self, value):
+        self.set(Navigable, value)
 
     def clone(self) -> "Common":
         cloned = Common(**copy.deepcopy(self.map))  # type: ignore
