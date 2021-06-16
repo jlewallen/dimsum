@@ -2,27 +2,29 @@
   <tr>
      <td bgcolor="{{ get_color(entity) }}">{{ entity.props.name }}</td>
   </tr>
+  {%- if False -%}
   <tr>
      <td bgcolor="{{ get_color(entity) }}">{{ entity.klass }}</td>
   </tr>
+  {%- endif -%}
   {%- for key, value in entity.props.map.items() -%}
-  {%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' and key != 'related' -%}
-  {%- if key != 'password' and value %}
-  {%- if key == 'navigable' -%}
-  <tr>
-     <td bgcolor="salmon"> {{ key }} = {{ value.value }}</td>
-  </tr>
-  {%- else -%}
-  <tr>
-     <td bgcolor="white"> {{ key }} = {{ value.value }}</td>
-  </tr>
-  {%- endif -%}
-  {%- else -%}
-  <tr>
-     <td bgcolor="white"> {{ key }} </td>
-  </tr>
-  {%- endif -%}
-  {%- endif -%}
+	{%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' and key != 'related' -%}
+		{%- if key != 'password' and value %}
+			{%- if key == 'navigable' -%}
+				<tr>
+					<td bgcolor="salmon"> {{ key }} = {{ value.value }}</td>
+				</tr>
+			{%- elif value and value.value -%}
+				<tr>
+					<td bgcolor="white"> {{ key }} = {{ value.value }}</td>
+				</tr>
+			{%- endif -%}
+		{%- else -%}
+			<tr>
+				<td bgcolor="white"> {{ key }} </td>
+			</tr>
+		{%- endif -%}
+	{%- endif -%}
   {%- endfor -%}
 
   {% for key, behavior in entity.behaviors.items() -%}
