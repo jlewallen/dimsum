@@ -34,7 +34,7 @@ class Unknown(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        log.warn("{0} performed".format(self))
+        log.warning("{0} performed".format(self))
         return Failure("sorry, i don't understand")
 
 
