@@ -20,9 +20,6 @@ class HoldingActivity(Activity):
     def __str__(self):
         return "holding %s" % (self.item,)
 
-    def __repr__(self):
-        return str(self)
-
 
 class Alive(
     entity.Entity,
@@ -41,9 +38,3 @@ class Alive(
     def describes(self, q: str = None, **kwargs) -> bool:
         assert q
         return q.lower() in self.props.name.lower()
-
-    def __str__(self):
-        return self.props.name
-
-    def __repr__(self):
-        return str(self)

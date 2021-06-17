@@ -80,9 +80,6 @@ class Item(
             )
         return p.a(self.props[properties.Name])
 
-    def __repr__(self):
-        return str(self)
-
 
 class ItemFinder:
     def find_item(self, **kwargs) -> Optional[Item]:

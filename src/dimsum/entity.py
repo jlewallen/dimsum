@@ -106,7 +106,7 @@ class Entity(behavior.BehaviorMixin):
 
         self.validate()
 
-        log.debug("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
+        # log.debug("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
 
     def validate(self) -> None:
         assert self.key
@@ -172,6 +172,12 @@ class Entity(behavior.BehaviorMixin):
 
     def accept(self, visitor: "EntityVisitor") -> Any:
         raise NotImplementedError
+
+    def __str__(self):
+        return "{0} (#{1})".format(self.props.name, self.props.gid)
+
+    def __repr__(self):
+        return str(self)
 
 
 class Registrar:

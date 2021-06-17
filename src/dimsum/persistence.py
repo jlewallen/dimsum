@@ -48,7 +48,7 @@ class SqliteDatabase:
             "private": entity.identity.private,
             "signature": entity.identity.signature,
         }
-        log.debug("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
+        # log.debug("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
         self.dbc.execute(
             "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
             [

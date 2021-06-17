@@ -60,9 +60,6 @@ class Area(
     def __str__(self):
         return self.props.name
 
-    def __repr__(self):
-        return str(self)
-
 
 class Exit(movement.Navigable, things.Item):
     def __init__(self, area: Area = None, **kwargs):
