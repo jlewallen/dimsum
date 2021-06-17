@@ -328,10 +328,11 @@ modify when eaten
         async def poke(ctx, *, q: str):
             return await self.repl(ctx, "poke", q)
 
-    def parse_as(self, evaluator, prefix, remaining=""):
+    def parse_as(self, world, person, prefix, remaining=""):
         full = prefix + " " + remaining
-        tree = self.l.parse(full.strip())
+        tree, create_evaluator = self.l.parse(full.strip())
         log.info(str(tree))
+        evaluator = create_evaluator(world, person)
         return evaluator.transform(tree)
 
     async def send(self, ctx, reply):
@@ -343,9 +344,7 @@ modify when eaten
     async def repl(self, ctx, full_command: str, q: str = ""):
         async def op():
             player = await self.get_player(ctx.message)
-            action = self.parse_as(
-                evaluator.create(self.world, player), full_command, q
-            )
+            action = self.parse_as(self.world, player, full_command, q)
             reply = await self.world.perform(action, player)
             await self.save()
             return reply

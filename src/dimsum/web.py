@@ -9,7 +9,6 @@ import hashlib
 
 import game
 import grammar
-import evaluator
 import serializing
 
 log = logging.getLogger("dimsum.web")
@@ -140,14 +139,14 @@ def create(state):
 
         l = grammar.create_parser()
 
-        def parse_as(evaluator, full):
-            tree = l.parse(full.strip())
-            log.info(str(tree))
-            return evaluator.transform(tree)
-
         person_key = token["key"]
         player = world.find_by_key(person_key)
-        action = parse_as(evaluator.create(world, player), command)
+
+        tree, create_evaluator = l.parse(command.strip())
+        tree_eval = create_evaluator(world, player)
+        log.info(str(tree))
+        action = tree_eval.transform(tree)
+
         reply = await world.perform(action, player)
         await state.save()
 

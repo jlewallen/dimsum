@@ -13,7 +13,6 @@ import envo
 import things
 import animals
 import actions
-import evaluator
 import luaproxy
 import bus
 import messages
@@ -89,9 +88,10 @@ class TestWorld:
         if not person:
             person = self.player
         log.info("executing: %s" % (command,))
-        tree = self.l.parse(command)
+        tree, create_evaluator = self.l.parse(command)
         log.info("parsed: %s" % (tree,))
-        action = evaluator.create(self.world, person).transform(tree)
+        tree_eval = create_evaluator(self.world, person)
+        action = tree_eval.transform(tree)
         assert action
         assert isinstance(action, game.Action)
         response = await self.world.perform(action, person)

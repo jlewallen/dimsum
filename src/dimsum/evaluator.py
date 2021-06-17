@@ -10,7 +10,7 @@ import finders
 log = logging.getLogger("dimsum")
 
 
-class Evaluate(lark.Transformer):
+class Evaluator(lark.Transformer):
     def __init__(self, world, player):
         self.world = world
         self.player = player
@@ -21,22 +21,93 @@ class Evaluate(lark.Transformer):
     def verbs(self, args):
         return args[0]
 
-    def stimulate(self, args):
-        return args[0]
-
-    # Actions
-
-    def look(self, args):
-        return actions.Look()
-
-    def dig(self, args):
-        return actions.Dig(args[0], args[1])
-
     def quoted_string(self, args):
         return args[0][1:-1]
 
     def string(self, args):
         return args[0]
+
+    def text(self, args):
+        return str(args[0])
+
+    def number(self, args):
+        return float(args[0])
+
+    # Item lookup
+
+    def make_quantified(self, args):
+        quantity = args[0]
+        return actions.Make(template=things.MaybeQuantifiedItem(args[1], quantity))
+
+    def makeable_noun(self, args):
+        return finders.MaybeItemOrRecipe(str(args[0]))
+
+    def consumable_noun(self, args):
+        return finders.AnyConsumableItem(q=str(args[0]))
+
+    def held_noun(self, args):
+        return finders.HeldItem(q=str(args[0]))
+
+    def contained_noun(self, args):
+        return finders.ContainedItem(q=str(args[0]))
+
+    def unheld_noun(self, args):
+        return finders.UnheldItem(str(args[0]))
+
+    def general_noun(self, args):
+        return finders.AnyItem(str(args[0]))
+
+    def object_by_gid(self, args):
+        return finders.ObjectNumber(int(args[0]))
+
+    def makeable(self, args):
+        return args[0]
+
+    def contained(self, args):
+        return args[0]
+
+    def consumable(self, args):
+        return args[0]
+
+    def held(self, args):
+        return args[0]
+
+    def unheld(self, args):
+        return args[0]
+
+    def noun(self, args):
+        return args[0]
+
+    def direction(self, args):
+        for d in movement.Direction:
+            if str(args[0]).lower() == d.name.lower():
+                return d
+        raise Exception("unknown movement.Direction")
+
+    def find_direction(self, args):
+        return movement.FindDirectionalRoute(args[0])
+
+    def find_route_by_gid(self, args):
+        return movement.FindNavigableItem(args[0])
+
+    def route(self, args):
+        return args[0]
+
+    def named_route(self, args):
+        return movement.FindNamedRoute(str(args[0]))
+
+    def this(self, args):
+        return finders.AnyHeldItem()
+
+
+class Fallback(Evaluator):
+    def verb(self, args):
+        return actions.Unknown()
+
+
+class Dig(Evaluator):
+    def dig(self, args):
+        return actions.Dig(args[0], args[1])
 
     def dig_direction(self, args):
         return actions.DigDirection(direction=args[0])
@@ -49,6 +120,16 @@ class Evaluate(lark.Transformer):
 
     def dig_linkages(self, args):
         return actions.DigLinkage(args)
+
+
+class Default(Evaluator):
+    def stimulate(self, args):
+        return args[0]
+
+    # Actions
+
+    def look(self, args):
+        return actions.Look()
 
     def drop(self, args):
         return actions.Drop()
@@ -199,72 +280,6 @@ class Evaluate(lark.Transformer):
     def auth(self, args):
         return actions.Auth(password=str(args[0]))
 
-    # Item lookup
-
-    def make_quantified(self, args):
-        quantity = args[0]
-        return actions.Make(template=things.MaybeQuantifiedItem(args[1], quantity))
-
-    def makeable_noun(self, args):
-        return finders.MaybeItemOrRecipe(str(args[0]))
-
-    def consumable_noun(self, args):
-        return finders.AnyConsumableItem(q=str(args[0]))
-
-    def held_noun(self, args):
-        return finders.HeldItem(q=str(args[0]))
-
-    def contained_noun(self, args):
-        return finders.ContainedItem(q=str(args[0]))
-
-    def unheld_noun(self, args):
-        return finders.UnheldItem(str(args[0]))
-
-    def general_noun(self, args):
-        return finders.AnyItem(str(args[0]))
-
-    def object_by_gid(self, args):
-        return finders.ObjectNumber(int(args[0]))
-
-    def makeable(self, args):
-        return args[0]
-
-    def contained(self, args):
-        return args[0]
-
-    def consumable(self, args):
-        return args[0]
-
-    def held(self, args):
-        return args[0]
-
-    def unheld(self, args):
-        return args[0]
-
-    def noun(self, args):
-        return args[0]
-
-    def direction(self, args):
-        for d in movement.Direction:
-            if str(args[0]).lower() == d.name.lower():
-                return d
-        raise Exception("unknown movement.Direction")
-
-    def find_direction(self, args):
-        return movement.FindDirectionalRoute(args[0])
-
-    def find_route_by_gid(self, args):
-        return movement.FindNavigableItem(args[0])
-
-    def route(self, args):
-        return args[0]
-
-    def named_route(self, args):
-        return movement.FindNamedRoute(str(args[0]))
-
-    def this(self, args):
-        return finders.AnyHeldItem()
-
     def when_pours(self, args):
         return actions.ModifyPours(item=finders.AnyHeldItem(), produces=args[0])
 
@@ -307,16 +322,3 @@ class Evaluate(lark.Transformer):
 
     def remember(self, args):
         return actions.Remember()
-
-    def verb(self, args):
-        return actions.Unknown()
-
-    def text(self, args):
-        return str(args[0])
-
-    def number(self, args):
-        return float(args[0])
-
-
-def create(world, player):
-    return Evaluate(world, player)

@@ -1,34 +1,91 @@
-import logging
-
+from typing import List, Type
 from lark import Lark
 from lark import exceptions
+
+import logging
+
+import evaluator
 
 log = logging.getLogger("dimsum")
 
 
-class PleaseParser:
-    def __init__(self, parsers):
-        self.parsers = parsers
+class Grammar:
+    @property
+    def order(self) -> int:
+        return 1
+
+    @property
+    def evaluator(self) -> Type[evaluator.Evaluator]:
+        raise NotImplementedError
+
+    @property
+    def lark(self) -> str:
+        raise NotImplementedError
+
+
+grammars: List[Grammar] = []
+
+
+def grammar():
+    def wrap(klass):
+        log.info("registered grammar: %s", klass)
+        grammars.append(klass())
+
+    return wrap
+
+
+class ParseMultipleGrammars:
+    def __init__(self, grammars):
+        self.grammars = grammars
+        self.parsers = [
+            (wrap_parser(g.lark), g) for g in sorted(grammars, key=lambda g: g.order)
+        ]
 
     def parse(self, command: str):
-        for parser in self.parsers:
+        for parser, grammar in self.parsers:
             try:
                 tree = parser.parse(command)
+                log.info("done %s", tree)
                 if tree:
-                    return tree
+                    return tree, grammar.evaluator
             except exceptions.UnexpectedCharacters:
-                log.info("parse-failed")
+                log.debug("parse-failed")
         raise Exception("unable to parse")
 
 
 def create_parser():
-    parsers = [create_default_parser(), create_dig_parser()]
-    return PleaseParser(parsers)
+    log.info("create-parser: grammars=%s", grammars)
+
+    return ParseMultipleGrammars(sorted(grammars, key=lambda g: g.order))
 
 
-def create_dig_parser():
-    return wrap_parser(
-        """
+@grammar()
+class FallbackGrammar(Grammar):
+    @property
+    def order(self) -> int:
+        return 65536
+
+    @property
+    def evaluator(self) -> Type[evaluator.Evaluator]:
+        return evaluator.Fallback
+
+    @property
+    def lark(self) -> str:
+        return """
+        start:             verb
+        verb:              WORD (this | that | noun)?
+"""
+
+
+@grammar()
+class DigGrammar(Grammar):
+    @property
+    def evaluator(self) -> Type[evaluator.Evaluator]:
+        return evaluator.Dig
+
+    @property
+    def lark(self) -> str:
+        return """
         start:             dig
 
         dig_direction:     direction
@@ -36,50 +93,25 @@ def create_dig_parser():
         dig_linkage:       dig_direction | dig_arbitrary
         dig_linkages:      dig_linkage ("|" dig_linkage)*
         dig:               "dig" dig_linkages "to" string -> dig
-    """
-    )
+"""
 
 
-def wrap_parser(custom: str):
-    return Lark(
-        """
-        {0}
+@grammar()
+class DefaultGrammar(Grammar):
+    @property
+    def order(self) -> int:
+        return 0
 
-        DIRECTION:         "north" | "west" | "east" | "south"
-        direction:         DIRECTION
+    @property
+    def evaluator(self) -> Type[evaluator.Evaluator]:
+        return evaluator.Default
 
-        CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
-        NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
-        TEXT_FIELD:        "name" | "desc" | "presence"
+    @property
+    def lark(self) -> str:
+        return """
+        start: verbs
 
-        TEXT_INNER:   (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#")
-        TEXT:         TEXT_INNER (WS | TEXT_INNER)*
-        NAME:         TEXT
-        number:       NUMBER
-        text:         TEXT
-        _WS:          WS
-
-        DOUBLE_QUOTED_STRING:  /"[^"]*"/
-        SINGLE_QUOTED_STRING:  /'[^']*'/
-        quoted_string:         SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING
-        string:                (WORD | quoted_string)
-
-        %import common.WS
-        %import common.WORD
-        %import common.NUMBER
-        %ignore " "
-        """.format(
-            custom
-        )
-    )
-
-
-def create_default_parser():
-    l = Lark(
-        """
-        start: verbs | verb
-
-        verbs.2:           look
+        verbs:             look
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
                          | make | call | modify | obliterate | freeze | unfreeze
                          | eat | drink | hit | kick
@@ -89,27 +121,6 @@ def create_default_parser():
                          | hug | kiss | tickle | poke | heal | say | tell
                          | remember | forget | think
                          | auth
-
-        verb.1:            WORD (this | that | noun)?
-
-        USEFUL_WORD:      /(?!(on|from|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
-
-        makeable_noun:     TEXT
-        contained_noun:    USEFUL_WORD+
-        unheld_noun:       USEFUL_WORD+
-        held_noun:         USEFUL_WORD+
-        consumable_noun:   USEFUL_WORD+
-        general_noun:      USEFUL_WORD+
-
-        makeable:          makeable_noun
-        contained:         object_by_gid | contained_noun
-        consumable:        object_by_gid | consumable_noun
-        unheld:            object_by_gid | unheld_noun
-        held:              object_by_gid | held_noun
-        noun:              object_by_gid | general_noun
-
-        this:              "this"
-        that:              "that"
 
         look:              "look"
                          | "look" ("down")                         -> look_down
@@ -154,12 +165,6 @@ def create_default_parser():
                          | "drop" number held                      -> drop_quantity
                          | "drop" held                             -> drop_item
 
-        named_route:       USEFUL_WORD
-        DIRECTION:         "north" | "west" | "east" | "south"
-        direction:         DIRECTION
-        find_direction:    direction
-        find_route_by_gid: object_by_gid
-        route:             find_route_by_gid | find_direction | named_route
         home:              "home"
         go:                "go" route
         climb:             "climb" route
@@ -209,8 +214,42 @@ def create_default_parser():
                          | "modify" "easy" "to" "see"              -> modify_easy_to_see
 
         auth:              "auth" TEXT
+"""
+
+
+def wrap_parser(custom: str):
+    return Lark(
+        """
+        {0}
+
+        DIRECTION:         "north" | "west" | "east" | "south"
+        direction:         DIRECTION
+
+        named_route:       USEFUL_WORD
+        find_direction:    direction
+        find_route_by_gid: object_by_gid
+        route:             find_route_by_gid | find_direction | named_route
+
+        makeable_noun:     TEXT
+        contained_noun:    USEFUL_WORD+
+        unheld_noun:       USEFUL_WORD+
+        held_noun:         USEFUL_WORD+
+        consumable_noun:   USEFUL_WORD+
+        general_noun:      USEFUL_WORD+
+
+        makeable:          makeable_noun
+        contained:         object_by_gid | contained_noun
+        consumable:        object_by_gid | consumable_noun
+        unheld:            object_by_gid | unheld_noun
+        held:              object_by_gid | held_noun
+        noun:              object_by_gid | general_noun
 
         object_by_gid:     "#"NUMBER
+
+        this:              "this"
+        that:              "that"
+
+        USEFUL_WORD:      /(?!(on|from|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
 
         CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
         NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
@@ -232,7 +271,7 @@ def create_default_parser():
         %import common.WORD
         %import common.NUMBER
         %ignore " "
-        """
+        """.format(
+            custom
+        )
     )
-
-    return l

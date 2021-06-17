@@ -20,7 +20,6 @@ import actions
 import library
 
 import grammar
-import evaluator
 
 log = logging.getLogger("dimsum-repl")
 
@@ -61,11 +60,6 @@ class Repl:
         await self.save()
         return player
 
-    def parse_as(self, evaluator, full):
-        tree = self.l.parse(full.strip())
-        log.info(str(tree))
-        return evaluator.transform(tree)
-
     async def save(self):
         db = persistence.SqliteDatabase()
         await db.open(self.fn)
@@ -85,7 +79,11 @@ class Repl:
         if command == "":
             return True
 
-        action = self.parse_as(evaluator.create(self.world, player), command)
+        tree, create_evaluator = self.l.parse(command.strip())
+        tree_eval = create_evaluator(self.world, player)
+        log.info(str(tree))
+        action = tree_eval.transform(tree)
+
         reply = await self.world.perform(action, player)
         await self.save()
 
