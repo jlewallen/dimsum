@@ -100,11 +100,6 @@ class Evaluator(lark.Transformer):
         return finders.AnyHeldItem()
 
 
-class Fallback(Evaluator):
-    def verb(self, args):
-        return actions.Unknown()
-
-
 class Default(Evaluator):
     def stimulate(self, args):
         return args[0]
@@ -192,9 +187,6 @@ class Default(Evaluator):
     def call(self, args):
         return actions.CallThis(item=args[0], name=str(args[1]))
 
-    def plant(self, args):
-        return actions.Plant(item=args[0])
-
     def pour(self, args):
         return actions.Pour(
             item=args[0], source=args[1], destination=finders.FindHeldContainer()
@@ -203,38 +195,11 @@ class Default(Evaluator):
     def pour_from(self, args):
         return actions.Pour(source=args[0], destination=finders.FindHeldContainer())
 
-    def hug(self, args):
-        return actions.Hug(who=args[0])
-
-    def heal(self, args):
-        return actions.Heal(who=args[0])
-
-    def kiss(self, args):
-        return actions.Kiss(who=args[0])
-
-    def tickle(self, args):
-        return actions.Tickle(who=args[0])
-
-    def kick(self, args):
-        return actions.Kick(item=args[0])
-
-    def shake(self, args):
-        return actions.Shake(item=args[0])
-
-    def hit(self, args):
-        return actions.Hit(item=args[0])
-
-    def swing(self, args):
-        return actions.Swing(item=args[0])
-
     def wear(self, args):
         return actions.Wear(item=args[0])
 
     def remove(self, args):
         return actions.Remove(item=args[0])
-
-    def poke(self, args):
-        return actions.Poke(who=args[0])
 
     def look_item(self, args):
         return actions.Look(item=args[0])

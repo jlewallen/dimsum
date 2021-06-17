@@ -23,6 +23,7 @@ import persistence
 
 import sugar
 import digging
+import simple
 
 log = logging.getLogger("dimsum")
 

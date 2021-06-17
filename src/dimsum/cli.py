@@ -21,6 +21,11 @@ import library
 
 import grammar
 
+import sugar
+import digging
+import simple
+import fallback
+
 log = logging.getLogger("dimsum-repl")
 
 

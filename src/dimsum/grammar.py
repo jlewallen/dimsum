@@ -60,24 +60,6 @@ def create_parser():
 
 
 @grammar()
-class FallbackGrammar(Grammar):
-    @property
-    def order(self) -> int:
-        return 65536
-
-    @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
-        return evaluator.Fallback
-
-    @property
-    def lark(self) -> str:
-        return """
-        start:             verb
-        verb:              WORD (this | that | noun)?
-"""
-
-
-@grammar()
 class DefaultGrammar(Grammar):
     @property
     def order(self) -> int:
@@ -95,11 +77,10 @@ class DefaultGrammar(Grammar):
         verbs:             look
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
                          | make | call | modify | obliterate | freeze | unfreeze
-                         | eat | drink | hit | kick
+                         | eat | drink
                          | go | climb | walk | run | home
-                         | plant | pour | water
-                         | shake | swing
-                         | hug | kiss | tickle | poke | heal | say | tell
+                         | pour | water
+                         | say | tell
                          | remember | forget | think
                          | auth
 
@@ -162,17 +143,6 @@ class DefaultGrammar(Grammar):
 
         wear:              "wear" noun
         remove:            "remove" noun
-
-        plant:             "plant" (noun)?
-        swing:             "swing" noun
-        shake:             "shake" noun
-        heal:              "heal" noun
-        hug:               "hug" noun
-        kiss:              "kiss" noun
-        kick:              "kick" noun
-        tickle:            "tickle" noun ("with" noun)?
-        poke:              "poke" noun ("with" noun)?
-        hit:               "hit" noun ("with" noun)?
 
         water:             "water" noun ("with" noun)?
 
