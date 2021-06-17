@@ -1,7 +1,80 @@
+import logging
+
 from lark import Lark
+from lark import exceptions
+
+log = logging.getLogger("dimsum")
+
+
+class PleaseParser:
+    def __init__(self, parsers):
+        self.parsers = parsers
+
+    def parse(self, command: str):
+        for parser in self.parsers:
+            try:
+                tree = parser.parse(command)
+                if tree:
+                    return tree
+            except exceptions.UnexpectedCharacters:
+                log.info("parse-failed")
+        raise Exception("unable to parse")
 
 
 def create_parser():
+    parsers = [create_default_parser(), create_dig_parser()]
+    return PleaseParser(parsers)
+
+
+def create_dig_parser():
+    return wrap_parser(
+        """
+        start:             dig
+
+        dig_direction:     direction
+        dig_arbitrary:     WORD
+        dig_linkage:       dig_direction | dig_arbitrary
+        dig_linkages:      dig_linkage ("|" dig_linkage)*
+        dig:               "dig" dig_linkages "to" string -> dig
+    """
+    )
+
+
+def wrap_parser(custom: str):
+    return Lark(
+        """
+        {0}
+
+        DIRECTION:         "north" | "west" | "east" | "south"
+        direction:         DIRECTION
+
+        CONSUMABLE_FIELDS: "sugar" | "fat" | "protein" | "toxicity" | "caffeine" | "alcohol" | "nutrition" | "vitamins"
+        NUMERIC_FIELD:     "size" | "weight" | "volatility" | "explosivity" | CONSUMABLE_FIELDS
+        TEXT_FIELD:        "name" | "desc" | "presence"
+
+        TEXT_INNER:   (WORD | "?" | "!" | "." | "," | "'" | "`" | "$" | "%" | "#")
+        TEXT:         TEXT_INNER (WS | TEXT_INNER)*
+        NAME:         TEXT
+        number:       NUMBER
+        text:         TEXT
+        _WS:          WS
+
+        DOUBLE_QUOTED_STRING:  /"[^"]*"/
+        SINGLE_QUOTED_STRING:  /'[^']*'/
+        quoted_string:         SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING
+        string:                (WORD | quoted_string)
+
+        %import common.WS
+        %import common.WORD
+        %import common.NUMBER
+        %ignore " "
+        """.format(
+            custom
+        )
+    )
+
+
+def create_default_parser():
     l = Lark(
         """
         start: verbs | verb
@@ -15,7 +88,7 @@ def create_parser():
                          | shake | swing
                          | hug | kiss | tickle | poke | heal | say | tell
                          | remember | forget | think
-                         | auth | dig
+                         | auth
 
         verb.1:            WORD (this | that | noun)?
 
@@ -44,12 +117,6 @@ def create_parser():
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
-
-        dig_direction:     direction
-        dig_arbitrary:     WORD
-        dig_linkage:       dig_direction | dig_arbitrary
-        dig_linkages:      dig_linkage ("|" dig_linkage)*
-        dig:               "dig" dig_linkages "to" string -> dig
 
         call:              "call" this NAME
 
