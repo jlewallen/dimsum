@@ -20,7 +20,9 @@ import handlers
 import reply
 import serializing
 import persistence
+
 import sugar
+import digging
 
 log = logging.getLogger("dimsum")
 

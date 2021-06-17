@@ -78,25 +78,6 @@ class FallbackGrammar(Grammar):
 
 
 @grammar()
-class DigGrammar(Grammar):
-    @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
-        return evaluator.Dig
-
-    @property
-    def lark(self) -> str:
-        return """
-        start:             dig
-
-        dig_direction:     direction
-        dig_arbitrary:     WORD
-        dig_linkage:       dig_direction | dig_arbitrary
-        dig_linkages:      dig_linkage ("|" dig_linkage)*
-        dig:               "dig" dig_linkages "to" string -> dig
-"""
-
-
-@grammar()
 class DefaultGrammar(Grammar):
     @property
     def order(self) -> int:

@@ -105,23 +105,6 @@ class Fallback(Evaluator):
         return actions.Unknown()
 
 
-class Dig(Evaluator):
-    def dig(self, args):
-        return actions.Dig(args[0], args[1])
-
-    def dig_direction(self, args):
-        return actions.DigDirection(direction=args[0])
-
-    def dig_arbitrary(self, args):
-        return actions.DigDirection(arbitrary=args[0])
-
-    def dig_linkage(self, args):
-        return args[0]
-
-    def dig_linkages(self, args):
-        return actions.DigLinkage(args)
-
-
 class Default(Evaluator):
     def stimulate(self, args):
         return args[0]
