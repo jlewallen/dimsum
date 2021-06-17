@@ -205,136 +205,6 @@ class Make(PersonAction):
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
-class Hug(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        await ctx.extend(hug=self.who).hook("hug:after")
-        return Success("you hugged %s" % (self.who))
-
-
-class Heal(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        await ctx.extend(heal=self.who).hook("heal:after")
-        return Success("you healed %s" % (self.who))
-
-
-class Kiss(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        await ctx.extend(kiss=self.who).hook("kiss:after")
-        return Success("you kissed %s" % (self.who))
-
-
-class Tickle(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        await ctx.extend(tickle=self.who).hook("tickle:after")
-        return Success("you tickled %s" % (self.who))
-
-
-class Poke(PersonAction):
-    def __init__(self, who=None, **kwargs):
-        super().__init__(**kwargs)
-        self.who = who
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.who:
-            return Failure("who?")
-        # TODO Publish
-        await ctx.extend(poke=self.who).hook("poke:after")
-        return Success("you poked %s" % (self.who))
-
-
-class Hit(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        item = world.apply_item_finder(player, self.item)
-        if not item:
-            return Failure("hit what?")
-        await ctx.extend(swing=item).hook("hit")
-        return Success("you hit %s" % (item))
-
-
-class Kick(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        item = world.apply_item_finder(player, self.item)
-        if not item:
-            return Failure("what?")
-        await ctx.extend(kick=item).hook("kick:after")
-        return Success("you kicked %s" % (item))
-
-
-class Plant(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if not self.item:
-            return Failure("plant what?")
-        await ctx.extend(plant=self.item).hook("plant")
-        return Success("you planted %s" % (self.item))
-
-
-class Shake(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        item = world.apply_item_finder(player, self.item)
-        if not item:
-            return Failure("shake what?")
-        await ctx.extend(shake=item).hook("shake")
-        return Success("you shook %s" % (item))
-
-
-class Swing(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        item = world.apply_item_finder(player, self.item)
-        if self.item:
-            return Failure("swing what?")
-        await ctx.extend(swing=item).hook("swing")
-        return Success("you swung %s" % (item))
-
-
 class Wear(PersonAction):
     def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
@@ -1078,3 +948,94 @@ class Unfreeze(PersonAction):
             return Failure("you can't do that! is that yours?")
 
         return Success("unfrozen")
+
+
+class SimpleVerb(PersonAction):
+    def __init__(self, who=None, item: things.ItemFinder = None, **kwargs):
+        super().__init__(**kwargs)
+        self.who = who
+        self.item = item if item else finders.FindNone()
+
+
+class Hug(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.who:
+            return Failure("who?")
+        await ctx.extend(hug=self.who).hook("hug:after")
+        return Success("you hugged %s" % (self.who))
+
+
+class Heal(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.who:
+            return Failure("who?")
+        await ctx.extend(heal=self.who).hook("heal:after")
+        return Success("you healed %s" % (self.who))
+
+
+class Kiss(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.who:
+            return Failure("who?")
+        await ctx.extend(kiss=self.who).hook("kiss:after")
+        return Success("you kissed %s" % (self.who))
+
+
+class Tickle(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.who:
+            return Failure("who?")
+        await ctx.extend(tickle=self.who).hook("tickle:after")
+        return Success("you tickled %s" % (self.who))
+
+
+class Poke(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.who:
+            return Failure("who?")
+        await ctx.extend(poke=self.who).hook("poke:after")
+        return Success("you poked %s" % (self.who))
+
+
+class Hit(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("hit what?")
+        await ctx.extend(swing=item).hook("hit")
+        return Success("you hit %s" % (item))
+
+
+class Kick(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("what?")
+        await ctx.extend(kick=item).hook("kick:after")
+        return Success("you kicked %s" % (item))
+
+
+class Plant(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        if not self.item:
+            return Failure("plant what?")
+        await ctx.extend(plant=self.item).hook("plant")
+        return Success("you planted %s" % (self.item))
+
+
+class Shake(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if not item:
+            return Failure("shake what?")
+        await ctx.extend(shake=item).hook("shake")
+        return Success("you shook %s" % (item))
+
+
+class Swing(SimpleVerb):
+    async def perform(self, ctx: Ctx, world: World, player: Player):
+        item = world.apply_item_finder(player, self.item)
+        if self.item:
+            return Failure("swing what?")
+        await ctx.extend(swing=item).hook("swing")
+        return Success("you swung %s" % (item))
