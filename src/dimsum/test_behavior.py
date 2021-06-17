@@ -48,7 +48,6 @@ end
 
 @pytest.mark.asyncio
 async def test_wear_cape(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -83,7 +82,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_move(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -114,7 +112,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_create_item(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -145,7 +142,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_create_quantified_item(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -185,7 +181,6 @@ async def test_behavior_create_area(caplog):
 
 @pytest.mark.asyncio
 async def test_behavior_time_passing(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -217,7 +212,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_create_kind(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -251,7 +245,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_random(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -272,7 +265,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_numbering_by_kind(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -310,7 +302,6 @@ end
 
 @pytest.mark.asyncio
 async def test_behavior_numbering_person_by_name(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
