@@ -32,11 +32,11 @@ class TextBus(bus.EventBus):
     async def ItemsMade(self, person=None, items=None, **kwargs):
         return "%s created %s out of thin air!" % (person, items)
 
-    async def LivingEnteredArea(self, person=None, area=None, **kwargs):
-        return "%s entered %s" % (person, area)
+    async def LivingEnteredArea(self, living=None, area=None, **kwargs):
+        return "%s entered %s" % (living, area)
 
-    async def LivingLeftArea(self, person=None, area=None, **kwargs):
-        return "%s left %s" % (person, area)
+    async def LivingLeftArea(self, living=None, area=None, **kwargs):
+        return "%s left %s" % (living, area)
 
     async def PlayerJoined(self, player: Player = None, area=None, **kwargs):
         return "%s joined!" % (player)
