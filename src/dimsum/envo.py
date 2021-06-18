@@ -20,9 +20,6 @@ class Area(
     context.FindItemMixin,
     entity.Entity,
     carryable.ContainingMixin,
-    movement.MovementMixin,
-    movement.Area,
-    mechanics.Memorable,
 ):
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Area, **kwargs)
@@ -54,8 +51,8 @@ class Area(
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
-    def adjacent(self) -> List[movement.Area]:
-        areas: List[movement.Area] = []
+    def adjacent(self) -> List[entity.Entity]:
+        areas: List[entity.Entity] = []
         for e in self.entities():
             if e.props.navigable:
                 areas.append(e.props.navigable)

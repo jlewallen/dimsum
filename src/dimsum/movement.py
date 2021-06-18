@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict, Sequence, Optional
 import abc
 import logging
 import enum
+import entity
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")
@@ -18,18 +19,8 @@ class Direction(enum.Enum):
         return str(self).split(".")[1]
 
 
-class Area:
-    @abc.abstractmethod
-    def find_item_under(self, **kwargs):
-        raise NotImplementedError("FindItemMixin required")
-
-    @abc.abstractmethod
-    def find_route(self, **kwargs):
-        raise NotImplementedError
-
-
 class AreaRoute:
-    def __init__(self, area: Area = None):
+    def __init__(self, area: entity.Entity = None):
         super().__init__()
         assert area
         self.area = area
@@ -79,7 +70,7 @@ class Navigable:
         self.action = action
 
 
-class MovementMixin:
+class MovementMixin(entity.Spawned):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.routes: List[AreaRoute] = routes if routes else []
@@ -99,10 +90,10 @@ class MovementMixin:
                 return r
         return None
 
-    def adjacent(self) -> List[Area]:
+    def adjacent(self) -> List[entity.Entity]:
         return [r.area for r in self.routes]
 
-    def link_area(self, area: Area, verb=DefaultMoveVerb, **kwargs):
+    def link_area(self, area: entity.Entity, verb=DefaultMoveVerb, **kwargs):
         return self.add_route(VerbRoute(area=area, verb=verb))
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
@@ -112,7 +103,9 @@ class MovementMixin:
 
 
 class FindsRoute:
-    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(
+        self, area: entity.Entity, person, **kwargs
+    ) -> Optional[AreaRoute]:
         raise NotImplementedError
 
 
@@ -122,7 +115,9 @@ class FindNamedRoute(FindsRoute):
         assert name
         self.name = name
 
-    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(
+        self, area: entity.Entity, person, **kwargs
+    ) -> Optional[AreaRoute]:
         navigable = area.find_item_under(inherits=Navigable, q=self.name)
         if navigable:
             log.debug("navigable={0}".format(navigable))
@@ -136,7 +131,9 @@ class FindDirectionalRoute(FindsRoute):
         super().__init__()
         self.direction = direction
 
-    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(
+        self, area: entity.Entity, person, **kwargs
+    ) -> Optional[AreaRoute]:
         navigable = area.find_item_under(inherits=Navigable, q=self.direction.exiting)
         if navigable:
             log.debug("navigable={0}".format(navigable))
@@ -151,7 +148,9 @@ class FindNavigableItem(FindsRoute):
         assert finder
         self.finder = finder
 
-    async def find_route(self, area: Area, person, **kwargs) -> Optional[AreaRoute]:
+    async def find_route(
+        self, area: entity.Entity, person, **kwargs
+    ) -> Optional[AreaRoute]:
         area = self.finder.find_item(**kwargs)
         assert area
         return AreaRoute(area=area)

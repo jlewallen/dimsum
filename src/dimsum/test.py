@@ -20,6 +20,7 @@ import handlers
 import reply
 import serializing
 import persistence
+import movement
 
 import sugar
 import digging
@@ -46,7 +47,8 @@ class TestWorld:
     def add_simple_area_here(self, door, name):
         door = things.Item(creator=self.player, props=properties.Common(door))
         area = envo.Area(creator=self.player, props=properties.Common(name))
-        door.link_area(area)
+        with door.make(movement.MovementMixin) as nav:
+            nav.link_area(area)
         self.area.add_item(door)
         self.world.register(door)
         self.world.register(area)

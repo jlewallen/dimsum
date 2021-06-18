@@ -162,7 +162,8 @@ async def test_serialize():
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.get_kind("petals")
-    tree.link_area(clearing)
+    with tree.make(movement.MovementMixin) as nav:
+        nav.link_area(clearing)
     tree.add_behavior(
         "b:test:tick",
         lua="""

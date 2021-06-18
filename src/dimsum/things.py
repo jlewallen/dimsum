@@ -25,7 +25,6 @@ class Item(
     carryable.ContainingMixin,
     carryable.KeyMixin,
     mechanics.InteractableMixin,
-    movement.MovementMixin,
     entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):

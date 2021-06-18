@@ -12,6 +12,7 @@ import envo
 import living
 import animals
 import occupyable
+import movement
 import scopes
 
 DefaultMoveVerb = "walk"
@@ -106,7 +107,7 @@ class World(entity.Entity, entity.Registrar):
                 self.add_area(item.props.navigable, depth=depth + 1, seen=seen)
 
             if isinstance(item, things.Item):
-                for linked in item.adjacent():
+                for linked in item.make(movement.MovementMixin).adjacent():
                     log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
                     self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
 

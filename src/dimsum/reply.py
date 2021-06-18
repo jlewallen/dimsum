@@ -191,7 +191,9 @@ class AreaObservation(Observation):
                 or person.make(mechanics.VisibilityMixin).can_see(e.identity)
             ]
         )
-        self.routes: List[movement.AreaRoute] = area.available_routes
+        self.routes: List[movement.AreaRoute] = area.make(
+            movement.MovementMixin
+        ).available_routes
 
     @property
     def props(self):
