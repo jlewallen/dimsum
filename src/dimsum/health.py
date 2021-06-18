@@ -41,7 +41,7 @@ class Medical:
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
-class EdibleMixin(entity.Scope):
+class Edible(entity.Scope):
     def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
@@ -51,7 +51,7 @@ class EdibleMixin(entity.Scope):
         self.servings = s
 
 
-class HealthMixin(entity.Scope):
+class Health(entity.Scope):
     def __init__(self, medical=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.medical = medical if medical else Medical()
@@ -59,11 +59,11 @@ class HealthMixin(entity.Scope):
     async def consume(
         self, edible: entity.Entity, drink=True, area=None, ctx=None, **kwargs
     ):
-        with edible.make(EdibleMixin) as eating:
+        with edible.make(Edible) as eating:
             self.medical.nutrition.include(eating.nutrition)
             eating.servings -= 1
             if eating.servings == 0:
-                with self.ourselves.make(carryable.ContainingMixin) as pockets:
+                with self.ourselves.make(carryable.Containing) as pockets:
                     pockets.drop(edible)  # type: ignore
                 # TODO Holding chimera
                 eating.ourselves.destroy()  # type:ignore

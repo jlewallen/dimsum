@@ -10,7 +10,7 @@ import entity
 log = logging.getLogger("dimsum")
 
 
-class InteractableMixin(entity.Scope):
+class Interactable(entity.Scope):
     def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
         super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
@@ -80,7 +80,7 @@ class Visible:
         return obs[-1].memorable()
 
 
-class VisibilityMixin(entity.Scope):
+class Visibility(entity.Scope):
     def __init__(self, visible: Visible = None, **kwargs):
         super().__init__(**kwargs)
         self.visible: Visible = visible if visible else Visible()
@@ -120,7 +120,7 @@ class Physics:
         self.mass = mass
 
 
-class MemoryMixin(entity.Scope):
+class Memory(entity.Scope):
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
         super().__init__(**kwargs)
         self.memory = memory if memory else {}

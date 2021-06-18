@@ -58,16 +58,16 @@ class ObservedLiving(ObservedEntity):
         super().__init__()
         self.alive = alive
         self.activities: Sequence[Activity] = [
-            HoldingActivity(e) for e in alive.make(carryable.ContainingMixin).holding
+            HoldingActivity(e) for e in alive.make(carryable.Containing).holding
         ]
 
     @property
     def holding(self):
-        return self.alive.make(carryable.ContainingMixin).holding
+        return self.alive.make(carryable.Containing).holding
 
     @property
     def memory(self):
-        return self.alive.make(mechanics.MemoryMixin).memory
+        return self.alive.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.observed_living(self)
@@ -129,7 +129,7 @@ class PersonalObservation(Observation):
 
     @property
     def memory(self):
-        return self.who.make(mechanics.MemoryMixin).memory
+        return self.who.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.personal_observation(self)
@@ -190,20 +190,20 @@ class AreaObservation(Observation):
         self.living: List[ObservedLiving] = flatten(
             [
                 observe(e)
-                for e in area.make(occupyable.OccupyableMixin).occupied
+                for e in area.make(occupyable.Occupyable).occupied
                 if e != person
             ]
         )
         self.items: List[ObservedEntity] = flatten(
             [
                 observe(e)
-                for e in area.make(carryable.ContainingMixin).holding
-                if not e.make(mechanics.VisibilityMixin).visible.hard_to_see
-                or person.make(mechanics.VisibilityMixin).can_see(e.identity)
+                for e in area.make(carryable.Containing).holding
+                if not e.make(mechanics.Visibility).visible.hard_to_see
+                or person.make(mechanics.Visibility).can_see(e.identity)
             ]
         )
         self.routes: List[movement.AreaRoute] = area.make(
-            movement.MovementMixin
+            movement.Movement
         ).available_routes
 
     @property
@@ -223,7 +223,7 @@ class AreaObservation(Observation):
 
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if entity.make(mechanics.VisibilityMixin).is_invisible:
+    if entity.make(mechanics.Visibility).is_invisible:
         return []
     return [ObservedItem(entity)]
 

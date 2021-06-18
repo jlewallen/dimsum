@@ -5,7 +5,7 @@ import abc
 import entity
 
 
-class ApparelMixin(entity.Scope):
+class Apparel(entity.Scope):
     def __init__(self, wearing=None, **kwargs):
         super().__init__(**kwargs)
         self.wearing: List[entity.Entity] = wearing if wearing else []

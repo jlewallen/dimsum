@@ -24,7 +24,7 @@ p = inflect.engine()
 
 class EntityHooks(entity.Hooks):
     def describe(self, entity: entity.Entity) -> str:
-        with entity.make_and_discard(carryable.CarryableMixin) as carry:
+        with entity.make_and_discard(carryable.Carryable) as carry:
             if carry.quantity > 1:
                 return "{0} {1} (#{2})".format(
                     carry.quantity,
@@ -64,18 +64,18 @@ class World(entity.Entity, entity.Registrar):
 
     def welcome_area(self) -> entity.Entity:
         for _, entity in self.entities.items():
-            if entity.has(occupyable.OccupyableMixin):
+            if entity.has(occupyable.Occupyable):
                 return entity
         raise Exception("no welcome area")
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
         log.info("finding area for %s", entity)
-        if entity.has(occupyable.OccupyableMixin):
+        if entity.has(occupyable.Occupyable):
             return entity
         for _, needle in self.entities.items():
-            with needle.make(carryable.ContainingMixin) as contain:
+            with needle.make(carryable.Containing) as contain:
                 if contain.contains(entity) or needle.make(
-                    occupyable.OccupyableMixin
+                    occupyable.Occupyable
                 ).occupying(entity):
                     return needle
         return None
@@ -107,23 +107,23 @@ class World(entity.Entity, entity.Registrar):
 
         self.register(area)
 
-        for entity in area.make(occupyable.OccupyableMixin).occupied:
+        for entity in area.make(occupyable.Occupyable).occupied:
             self.register(entity)
 
-        for entity in area.make(carryable.ContainingMixin).holding:
+        for entity in area.make(carryable.Containing).holding:
             self.register(entity)
 
-        for item in area.make(carryable.ContainingMixin).holding:
-            maybe_area = item.make(movement.ExitMixin).area
+        for item in area.make(carryable.Containing).holding:
+            maybe_area = item.make(movement.Exit).area
             if maybe_area:
                 log.debug("linked-via-ex[%s] %s", depth, maybe_area)
                 self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
-            for linked in item.make(movement.MovementMixin).adjacent():
+            for linked in item.make(movement.Movement).adjacent():
                 log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
                 self.add_area(linked, depth=depth + 1, seen=seen)
 
-        for linked in area.make(movement.MovementMixin).adjacent():
+        for linked in area.make(movement.Movement).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
             self.add_area(linked, depth=depth + 1, seen=seen)
 
@@ -169,7 +169,7 @@ class World(entity.Entity, entity.Registrar):
         log.info("everywhere:%s %s", name, kwargs)
         everything = list(self.entities.values())
         for entity in everything:
-            with entity.make(behavior.BehaviorMixin) as behave:
+            with entity.make(behavior.Behaviors) as behave:
                 behaviors = behave.get_behaviors(name)
                 if len(behaviors) > 0:
                     log.info("everywhere: %s", entity)
@@ -249,7 +249,7 @@ class WorldCtx(context.Ctx):
         entities = self.entities()
         log.info("hook:%s %s" % (name, entities))
         for entity in entities:
-            behaviors = entity.make(behavior.BehaviorMixin).get_behaviors(name)
+            behaviors = entity.make(behavior.Behaviors).get_behaviors(name)
             if len(behaviors) > 0:
                 log.info(
                     "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
@@ -278,7 +278,7 @@ class WorldCtx(context.Ctx):
     ) -> entity.Entity:
         initialize = initialize if initialize else {}
         if quantity:
-            initialize = {carryable.CarryableMixin: dict(quantity=quantity)}
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
         return scopes.item(initialize=initialize, **kwargs)
 
     def find_item(

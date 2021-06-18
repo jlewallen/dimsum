@@ -11,7 +11,7 @@ import context
 log = logging.getLogger("dimsum")
 
 
-class KeyMixin(entity.Scope):
+class Key(entity.Scope):
     def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
         super().__init__(**kwargs)
         self.patterns = patterns if patterns else {}
@@ -20,9 +20,9 @@ class KeyMixin(entity.Scope):
         return pattern.public in self.patterns
 
 
-class Lockable:
+class Lockable(entity.Scope):
     def __init__(self, pattern: crypto.Identity = None, locked=None, **kwargs):
-        super().__init__(*kwargs)
+        super().__init__(**kwargs)
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
 
@@ -30,8 +30,9 @@ class Lockable:
         return self.locked
 
     def lock(self, key: entity.Entity = None, identity=None, **kwargs):
-        assert identity
         assert not self.locked
+
+        identity = identity if identity else self.ourselves.identity
 
         if not key:
             # Only way this works is if we don't have a secret yet.
@@ -45,7 +46,7 @@ class Lockable:
             patterns[self.pattern.public] = self.pattern
             key = context.get().create_item(props=properties.Common("Key"), **kwargs)
             assert key
-            with key.make(KeyMixin) as keying:
+            with key.make(Key) as keying:
                 keying.patterns = patterns
             log.info("new key:%s %s", key, patterns)
             return key
@@ -53,7 +54,7 @@ class Lockable:
         assert self.pattern
 
         # Key should fit us.
-        with key.make(KeyMixin) as inspecting:
+        with key.make(Key) as inspecting:
             if not inspecting.has_pattern(self.pattern):
                 log.info("wrong pattern on held held key:%s", key)
                 return False
@@ -69,7 +70,7 @@ class Lockable:
         if not self.pattern:
             raise Exception("no pattern, not locked")
 
-        with key.make(KeyMixin) as inspecting:
+        with key.make(Key) as inspecting:
             if not inspecting.has_pattern(self.pattern):
                 log.info("wrong key: %s vs %s", inspecting.patterns, self.pattern)
                 return False
@@ -79,21 +80,6 @@ class Lockable:
         log.info("unlcoked")
 
         return True
-
-
-class LockableMixin(entity.Scope):
-    def __init__(self, lockable=None, **kwargs):
-        super().__init__(**kwargs)
-        self.lockable = lockable if lockable else Lockable()
-
-    def lock(self, **kwargs):
-        return self.lockable.lock(identity=self.ourselves.identity, **kwargs)
-
-    def unlock(self, **kwargs):
-        return self.lockable.unlock(**kwargs)
-
-    def is_locked(self):
-        return self.lockable.is_locked()
 
 
 class OpenClose:
@@ -131,7 +117,7 @@ class UnknownOpenClose(OpenClose):
         return Opened()
 
 
-class OpenableMixin(LockableMixin):
+class Openable(Lockable):
     def __init__(self, openable: OpenClose = None, **kwargs):
         super().__init__(**kwargs)
         self.openable = openable if openable else UnknownOpenClose()
@@ -157,7 +143,7 @@ class OpenableMixin(LockableMixin):
         return False
 
 
-class CarryableMixin(entity.Scope):
+class Carryable(entity.Scope):
     def __init__(
         self,
         kind: kinds.Kind = None,
@@ -198,7 +184,7 @@ class CarryableMixin(entity.Scope):
 
         item = context.get().create_item(
             props=self.ourselves.props.clone(),
-            initialize={CarryableMixin: dict(quantity=quantity, kind=self.kind)},
+            initialize={Carryable: dict(quantity=quantity, kind=self.kind)},
             **kwargs,
         )
 
@@ -212,7 +198,7 @@ class Producer:
         raise NotImplementedError
 
 
-class ContainingMixin(OpenableMixin):
+class Containing(Openable):
     def __init__(self, holding=None, capacity=None, produces=None, **kwargs):
         super().__init__(**kwargs)
         self.holding: List[entity.Entity] = holding if holding else []
@@ -223,7 +209,7 @@ class ContainingMixin(OpenableMixin):
         self.produces[verb] = item
 
     def produce_into(self, verb: str, container: "entity.Entity", **kwargs):
-        with container.make(ContainingMixin) as into:
+        with container.make(Containing) as into:
             if not into.is_open():
                 log.info("produce_into: unopened")
                 return False
@@ -233,7 +219,7 @@ class ContainingMixin(OpenableMixin):
 
             producer = self.produces[verb]
             log.info("%s produces %s", self, producer)
-            item = cast(CarryableMixin, producer.produce_item(**kwargs))
+            item = cast(Carryable, producer.produce_item(**kwargs))
             context.get().registrar().register(item)
             return into.hold(item)
 
@@ -249,7 +235,7 @@ class ContainingMixin(OpenableMixin):
             return False
         return True
 
-    def contains(self, e: CarryableMixin) -> bool:
+    def contains(self, e: Carryable) -> bool:
         return e in self.holding
 
     def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:
@@ -275,8 +261,8 @@ class ContainingMixin(OpenableMixin):
         for already in self.holding:
             # log.info("adding %s already = %s", item.kind, already.kind)
             # log.info("adding %s already = %s", item, already)
-            with already.make(CarryableMixin) as additional:
-                with item.make(CarryableMixin) as coming:
+            with already.make(Carryable) as additional:
+                with item.make(Carryable) as coming:
                     if additional.kind.same(coming.kind):
                         additional.quantity += coming.quantity
 
@@ -314,7 +300,7 @@ class ContainingMixin(OpenableMixin):
             if not item:
                 return None, "please specify what?"
 
-            with item.make(CarryableMixin) as dropping:
+            with item.make(Carryable) as dropping:
                 if quantity > dropping.quantity or quantity < 1:
                     return None, "you should check how many you have"
 
@@ -333,7 +319,7 @@ class ContainingMixin(OpenableMixin):
                 assert dropped
 
         for item in dropped:
-            with area.make(ContainingMixin) as ground:
+            with area.make(Containing) as ground:
                 after_add = ground.add_item(item)
                 if after_add != item:
                     context.get().registrar().unregister(item)
@@ -356,13 +342,11 @@ class ContainingMixin(OpenableMixin):
         return [
             e
             for e in self.entities()
-            if e.make(CarryableMixin).kind and e.make(CarryableMixin).kind.same(kind)
+            if e.make(Carryable).kind and e.make(Carryable).kind.same(kind)
         ]
 
     def number_of_named(self, of: str) -> float:
         return sum([e.quantity for e in self.entities_named(of)])
 
     def number_of_kind(self, kind: kinds.Kind) -> float:
-        return sum(
-            [e.make(CarryableMixin).quantity for e in self.entities_of_kind(kind)]
-        )
+        return sum([e.make(Carryable).quantity for e in self.entities_of_kind(kind)])

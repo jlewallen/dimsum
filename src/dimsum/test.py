@@ -48,7 +48,7 @@ class TestWorld:
     def add_simple_area_here(self, door, name):
         door = scopes.item(creator=self.player, props=properties.Common(door))
         area = scopes.area(creator=self.player, props=properties.Common(name))
-        with door.make(movement.MovementMixin) as nav:
+        with door.make(movement.Movement) as nav:
             nav.link_area(area)
         self.add_item(door)
         self.world.register(door)
@@ -84,7 +84,7 @@ class TestWorld:
 
     def add_item(self, item):
         self.world.register(item)
-        with self.area.make(carryable.ContainingMixin) as ground:
+        with self.area.make(carryable.Containing) as ground:
             ground.add_item(item)
         return item
 

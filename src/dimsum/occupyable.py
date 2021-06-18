@@ -10,7 +10,7 @@ class Living:
     pass
 
 
-class OccupyableMixin(entity.Scope):
+class Occupyable(entity.Scope):
     def __init__(self, occupied=None, **kwargs):
         super().__init__(**kwargs)
         self.occupied: List[Living] = occupied if occupied else []

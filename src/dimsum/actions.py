@@ -78,7 +78,7 @@ class AddItemArea(PersonAction):
         self.area = area
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        with self.area.make(carryable.ContainingMixin) as ground:
+        with self.area.make(carryable.Containing) as ground:
             after_add = ground.add_item(self.item)
             world.register(after_add)
 
@@ -115,7 +115,7 @@ class Make(PersonAction):
         if not item:
             return Failure("make what now?")
 
-        with player.make(carryable.ContainingMixin) as contain:
+        with player.make(carryable.Containing) as contain:
             after_hold = contain.hold(item)
             # We do this after because we may consolidate this Item and
             # this keeps us from having to unregister the item.
@@ -137,14 +137,14 @@ class Wear(PersonAction):
         if not item:
             return Failure("wear what?")
 
-        with item.make(mechanics.InteractableMixin) as inaction:
+        with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_worn():
                 return Failure("you can't wear that")
 
-        with player.make(carryable.ContainingMixin) as contain:
+        with player.make(carryable.Containing) as contain:
             assert contain.is_holding(item)
 
-            with player.make(apparel.ApparelMixin) as wearing:
+            with player.make(apparel.Apparel) as wearing:
                 if wearing.wear(item):
                     contain.drop(item)
 
@@ -164,14 +164,14 @@ class Remove(PersonAction):
         if not item:
             return Failure("remove what?")
 
-        with player.make(apparel.ApparelMixin) as wearing:
+        with player.make(apparel.Apparel) as wearing:
             if not wearing.is_wearing(item):
                 return Failure("you aren't wearing that")
 
             assert wearing.is_wearing(item)
 
             if wearing.unwear(item):
-                with player.make(carryable.ContainingMixin) as contain:
+                with player.make(carryable.Containing) as contain:
                     contain.hold(item)
 
         await ctx.extend(remove=[item]).hook("remove:after")
@@ -189,12 +189,12 @@ class Eat(PersonAction):
         if not item:
             return Failure("dunno where that is")
 
-        with item.make(mechanics.InteractableMixin) as inaction:
+        with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_eaten():
                 return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        with player.make(health.HealthMixin) as p:
+        with player.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("eat:after")
 
@@ -212,12 +212,12 @@ class Drink(PersonAction):
         if not item:
             return Failure("dunno where that is")
 
-        with item.make(mechanics.InteractableMixin) as inaction:
+        with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_drank():
                 return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        with player.make(health.HealthMixin) as p:
+        with player.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("drink:after")
 
@@ -232,7 +232,7 @@ class Join(PersonAction):
         world.register(player)
         await world.bus.publish(PlayerJoined(player=player))
         await ctx.hook("entered:before")
-        with world.welcome_area().make(occupyable.OccupyableMixin) as area:
+        with world.welcome_area().make(occupyable.Occupyable) as area:
             await area.entered(world.bus, player)
         await ctx.hook("entered:after")
         return Success("welcome!")
@@ -249,7 +249,7 @@ class LookInside(PersonAction):
         if not item:
             return Failure("inside what?")
 
-        with item.make(carryable.ContainingMixin) as contain:
+        with item.make(carryable.Containing) as contain:
             if not contain.is_open():
                 return Failure("you can't do that")
 
@@ -267,10 +267,10 @@ class LookFor(PersonAction):
         if not item:
             return Failure("i can't seem to find that")
 
-        with player.make(mechanics.VisibilityMixin) as vis:
+        with player.make(mechanics.Visibility) as vis:
             vis.add_observation(item.identity)
 
-        with player.make(carryable.ContainingMixin) as contain:
+        with player.make(carryable.Containing) as contain:
             await ctx.extend(holding=contain.holding, item=item).hook("look-for")
             return EntitiesObservation([item])
 
@@ -290,7 +290,7 @@ class LookDown(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         await ctx.hook("look-down")
-        with player.make(carryable.ContainingMixin) as contain:
+        with player.make(carryable.Containing) as contain:
             return EntitiesObservation(contain.holding)
 
 
@@ -325,7 +325,7 @@ class Drop(PersonAction):
 
         area = world.find_player_area(player)
 
-        with player.make(carryable.ContainingMixin) as contain:
+        with player.make(carryable.Containing) as contain:
             dropped, failure = contain.drop_here(
                 area,
                 item,
@@ -357,15 +357,15 @@ class Hold(PersonAction):
         if not item:
             return Failure("sorry, hold what?")
 
-        with player.make(carryable.ContainingMixin) as pockets:
+        with player.make(carryable.Containing) as pockets:
             # This should happen after? What if there's more on the ground?
             if pockets.is_holding(item):
                 return Failure("you're already holding that")
 
             area = world.find_player_area(player)
-            with area.make(carryable.ContainingMixin) as ground:
+            with area.make(carryable.Containing) as ground:
                 if self.quantity:
-                    with item.make(carryable.CarryableMixin) as hands:
+                    with item.make(carryable.Carryable) as hands:
                         removed = hands.separate(
                             self.quantity, creator=player, owner=player, ctx=ctx
                         )
@@ -397,7 +397,7 @@ class Open(PersonAction):
         if not item:
             return Failure("open what?")
 
-        with item.make(carryable.ContainingMixin) as contain:
+        with item.make(carryable.Containing) as contain:
             if not contain.can_hold():
                 return Failure("you can't open that")
 
@@ -418,7 +418,7 @@ class Close(PersonAction):
         if not item:
             return Failure("close what?")
 
-        with item.make(carryable.ContainingMixin) as contain:
+        with item.make(carryable.Containing) as contain:
             if not contain.can_hold():
                 return Failure("you can't open that")
 
@@ -447,8 +447,8 @@ class Lock(PersonAction):
 
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
 
-        with player.make(carryable.ContainingMixin) as hands:
-            with item.make(carryable.ContainingMixin) as locking:
+        with player.make(carryable.Containing) as hands:
+            with item.make(carryable.Containing) as locking:
                 locked_with = locking.lock(
                     key=maybe_key, creator=player, owner=player, **kwargs
                 )
@@ -481,7 +481,7 @@ class Unlock(PersonAction):
         log.info("finding key %s", self.key)
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
         log.info("maybe key: %s", maybe_key)
-        with item.make(carryable.ContainingMixin) as unlocking:
+        with item.make(carryable.Containing) as unlocking:
             if unlocking.unlock(key=maybe_key, **kwargs):
                 return Success("done")
         return Failure("nope")
@@ -507,7 +507,7 @@ class PutInside(PersonAction):
         if not container:
             return Failure("what?")
 
-        with container.make(carryable.ContainingMixin) as containing:
+        with container.make(carryable.Containing) as containing:
             if not containing.can_hold():
                 return Failure("inside... that?")
 
@@ -516,7 +516,7 @@ class PutInside(PersonAction):
                 return Failure("what?")
 
             if containing.place_inside(item):
-                with player.make(carryable.ContainingMixin) as pockets:
+                with player.make(carryable.Containing) as pockets:
                     pockets.drop(item)
                 return Success("inside, done")
 
@@ -543,7 +543,7 @@ class TakeOut(PersonAction):
         if not container:
             return Failure("what?")
 
-        with container.make(carryable.ContainingMixin) as containing:
+        with container.make(carryable.Containing) as containing:
             if not containing.can_hold():
                 return Failure("outside of... that?")
 
@@ -552,7 +552,7 @@ class TakeOut(PersonAction):
                 return Failure("what?")
 
             if containing.take_out(item):
-                with player.make(carryable.ContainingMixin) as pockets:
+                with player.make(carryable.Containing) as pockets:
                     pockets.hold(item)
                 return Success("done, you're holding that now")
 
@@ -587,8 +587,8 @@ class MovingAction(PersonAction):
         if destination is None:
             return Failure("where?")
 
-        with destination.make(occupyable.OccupyableMixin) as entering:
-            with area.make(occupyable.OccupyableMixin) as leaving:
+        with destination.make(occupyable.Occupyable) as entering:
+            with area.make(occupyable.Occupyable) as leaving:
                 await ctx.extend(area=area).hook("left:before")
                 await leaving.left(world.bus, player)
                 await ctx.extend(area=area).hook("left:after")
@@ -618,12 +618,12 @@ class Obliterate(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
         items = None
-        with player.make(carryable.ContainingMixin) as pockets:
+        with player.make(carryable.Containing) as pockets:
             items = pockets.drop_all()
         if len(items) == 0:
             return Failure("you're not holding anything")
 
-        item: Any = None  # TODO CarryableMixin to Entity
+        item: Any = None  # TODO Carryable to Entity
 
         for item in items:
             item.try_modify()
@@ -661,13 +661,13 @@ class CallThis(PersonAction):
             creator=player,
             owner=player,
             props=item.props.clone(),
-            behaviors=item.make(behavior.BehaviorMixin).behaviors,
-            kind=item.make(carryable.CarryableMixin).kind,
+            behaviors=item.make(behavior.Behaviors).behaviors,
+            kind=item.make(carryable.Carryable).kind,
         )
-        with recipe.make(RecipeMixin) as makes:
+        with recipe.make(Recipe) as makes:
             makes.template = template
         world.register(recipe)
-        with player.make(mechanics.MemoryMixin) as brain:
+        with player.make(mechanics.Memory) as brain:
             brain.memorize("r:" + self.name, recipe)
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
@@ -680,7 +680,7 @@ class Forget(PersonAction):
         self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        with player.make(mechanics.MemoryMixin) as brain:
+        with player.make(mechanics.Memory) as brain:
             if self.name in brain.brain:
                 brain.forget(self.name)
                 return Success("oh wait, was that important?")
@@ -693,7 +693,7 @@ class Remember(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
-        with player.make(mechanics.MemoryMixin) as brain:
+        with player.make(mechanics.Memory) as brain:
             brain.memorize(MemoryAreaKey, area)
         return Success("you'll be able to remember this place, oh yeah")
 
@@ -712,7 +712,7 @@ class ModifyHardToSee(PersonAction):
 
         item.try_modify()
 
-        with item.make(mechanics.VisibilityMixin) as vis:
+        with item.make(mechanics.Visibility) as vis:
             if self.hard_to_see:
                 vis.make_hard_to_see()
             else:
@@ -736,7 +736,7 @@ class ModifyField(PersonAction):
         item.try_modify()
 
         if self.field in health.NutritionFields:
-            with item.make(health.EdibleMixin) as i:
+            with item.make(health.Edible) as i:
                 i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
@@ -761,7 +761,7 @@ class ModifyActivity(PersonAction):
             return Failure("of what?")
 
         item.try_modify()
-        with item.make(mechanics.InteractableMixin) as inaction:
+        with item.make(mechanics.Interactable) as inaction:
             inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
         return Success("done")
@@ -780,7 +780,7 @@ class ModifyServings(PersonAction):
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        with item.make(health.EdibleMixin) as edible:
+        with item.make(health.Edible) as edible:
             edible.modify_servings(self.number)
         return Success("done")
 
@@ -798,7 +798,7 @@ class ModifyCapacity(PersonAction):
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        with item.make(carryable.ContainingMixin) as contain:
+        with item.make(carryable.Containing) as contain:
             if contain.adjust_capacity(self.capacity):
                 return Success("done")
         return Failure("no way")
@@ -833,7 +833,7 @@ class Pour(PersonAction):
         if not destination:
             return Failure("into what?")
 
-        with source.make(carryable.ContainingMixin) as produces:
+        with source.make(carryable.Containing) as produces:
             if not PourVerb in produces.produces:
                 return Failure("you can't pour from that")
 
@@ -854,9 +854,9 @@ class PourProducer(carryable.Producer):
 
     def produce_item(self, **kwargs) -> entity.Entity:
         item = self.template.create_item(verb=PourVerb, **kwargs)
-        with item.make(mechanics.InteractableMixin) as inaction:
+        with item.make(mechanics.Interactable) as inaction:
             inaction.link_activity(properties.Drank)
-        with item.make(carryable.CarryableMixin) as carry:
+        with item.make(carryable.Carryable) as carry:
             carry.loose = True
         return item
 
@@ -882,7 +882,7 @@ class ModifyPours(PersonAction):
         log.info("modifying %s to produce %s", item, self.produces)
 
         item.try_modify()
-        with item.make(carryable.ContainingMixin) as produces:
+        with item.make(carryable.Containing) as produces:
             produces.produces_when(PourVerb, PourProducer(template=self.produces))
 
         return Success("done")

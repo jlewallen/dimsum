@@ -9,13 +9,13 @@ import world
 
 Alive = [
     ownership.Ownership,
-    carryable.ContainingMixin,
-    mechanics.MemoryMixin,
-    health.HealthMixin,
+    carryable.Containing,
+    mechanics.Memory,
+    health.Health,
 ]
-Item = [ownership.Ownership, carryable.CarryableMixin]
-Exit = [ownership.Ownership, movement.ExitMixin]
-Area = [ownership.Ownership, carryable.ContainingMixin, occupyable.OccupyableMixin]
+Item = [ownership.Ownership, carryable.Carryable]
+Exit = [ownership.Ownership, movement.Exit]
+Area = [ownership.Ownership, carryable.Containing, occupyable.Occupyable]
 World = [ownership.Ownership]
 
 

@@ -62,7 +62,7 @@ async def test_look_people_invisible():
     await tw.initialize()
     await tw.add_tomi()
     await tw.add_carla()
-    with tw.carla.make(mechanics.VisibilityMixin) as vis:
+    with tw.carla.make(mechanics.Visibility) as vis:
         vis.make_invisible()
 
     r = await tw.success("look")
@@ -87,15 +87,15 @@ async def test_making_item_hard_to_see(caplog):
     await tw.add_carla()
     await tw.success("make Box")
     await tw.success("drop")
-    assert len(tw.area.make(carryable.ContainingMixin).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
     r = await tw.success("look")
     assert len(r.items) == 1
 
     await tw.success("make Orb")
-    assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
     await tw.success("modify hard to see")
     await tw.success("drop")
-    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
+    assert len(tw.area.make(carryable.Containing).holding) == 2
     r = await tw.success("look")
     assert len(r.items) == 1
 

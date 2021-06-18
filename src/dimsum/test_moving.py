@@ -101,9 +101,9 @@ class Bidirectional:
             props=properties.Common(name="Exit to {0}".format(back.props.name)),
             **kwargs
         )
-        with back.make(carryable.ContainingMixin) as contain:
+        with back.make(carryable.Containing) as contain:
             contain.add_item(goes_there)
-        with there.make(carryable.ContainingMixin) as contain:
+        with there.make(carryable.Containing) as contain:
             contain.add_item(comes_back)
 
 
@@ -143,5 +143,5 @@ async def test_digging_with_return():
 
 
 def add_item(container: entity.Entity, item: entity.Entity):
-    with container.make(carryable.ContainingMixin) as contain:
+    with container.make(carryable.Containing) as contain:
         contain.add_item(item)

@@ -16,7 +16,7 @@ log = logging.getLogger("dimsum")
 
 
 def add_item(container: entity.Entity, item: entity.Entity):
-    with container.make(carryable.ContainingMixin) as contain:
+    with container.make(carryable.Containing) as contain:
         contain.add_item(item)
 
 
@@ -71,7 +71,7 @@ class LargeMapleTree(Factory):
             parent=generics.thing,
             props=properties.Common("Large Maple Tree", desc="It's heavy."),
         )
-        with item.make(behavior.BehaviorMixin) as behave:
+        with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 "b:drop-leaf:tick",
                 lua="""
@@ -107,7 +107,7 @@ class LargeOakTree(Factory):
             parent=generics.thing,
             props=properties.Common("Large Oak Tree", desc="It's heavy."),
         )
-        with item.make(behavior.BehaviorMixin) as behave:
+        with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 "b:drop-leaf:tick",
                 lua="""
@@ -161,7 +161,7 @@ class MysteriousBox(Factory):
                 desc="It looks like some weird antique your grandmother would have. Why would anyone carry this thing around?",
             ),
         )
-        with item.make(behavior.BehaviorMixin) as behave:
+        with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 "b:mystery:shake",
                 lua="""
@@ -182,7 +182,7 @@ class LargeSteepCliff(Factory):
                 desc="It's immense, with rocky outcroppings. It looks very climbable.",
             ),
         )
-        with item.make(behavior.BehaviorMixin) as behave:
+        with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 "b:make:stone",
                 lua="""
@@ -215,7 +215,7 @@ class Guitar(Factory):
                 "Acoustic Guitar", desc="Seems to be well travelled."
             ),
         )
-        with item.make(behavior.BehaviorMixin) as behave:
+        with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 "b:music:play",
                 lua="""
@@ -412,7 +412,7 @@ class WelcomeArea(Factory):
         add_item(area, MysteriousBox().create(world, generics))
         add_item(area, Guitar().create(world, generics))
         add_item(area, LargeSteepCliff().create(world, generics))
-        with area.make(occupyable.OccupyableMixin) as entering:
+        with area.make(occupyable.Occupyable) as entering:
             entering.add_living(TomorrowCat().create(world, generics))
 
         loft = ArtistsLoft().create(world, generics)

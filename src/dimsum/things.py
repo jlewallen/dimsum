@@ -32,7 +32,7 @@ class MaybeItem(ItemFactory):
         log.debug("create-item: {0} quantity={1}".format(kwargs, quantity))
         initialize = {}
         if quantity:
-            initialize = {carryable.CarryableMixin: dict(quantity=quantity)}
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
         return scopes.item(
             props=properties.Common(self.name), initialize=initialize, **kwargs
         )
@@ -44,7 +44,7 @@ class RecipeItem(ItemFactory):
         self.recipe = recipe
 
     def create_item(self, **kwargs) -> entity.Entity:
-        return self.recipe.make(RecipeMixin).create_item(**kwargs)
+        return self.recipe.make(Recipe).create_item(**kwargs)
 
 
 class MaybeQuantifiedItem(ItemFactory):
@@ -57,7 +57,7 @@ class MaybeQuantifiedItem(ItemFactory):
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
-class RecipeMixin(entity.Scope, ItemFactory):
+class Recipe(entity.Scope, ItemFactory):
     def __init__(self, template=None, **kwargs):
         super().__init__(**kwargs)
         self.template = template if template else None

@@ -85,7 +85,7 @@ class Dig(actions.PersonAction):
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
             )
-            with area.make(carryable.ContainingMixin) as ground:
+            with area.make(carryable.Containing) as ground:
                 ground.add_item(goes_there)
             world.register(goes_there)
 
@@ -95,7 +95,7 @@ class Dig(actions.PersonAction):
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),
             )
-            with digging.make(carryable.ContainingMixin) as ground:
+            with digging.make(carryable.Containing) as ground:
                 ground.add_item(comes_back)
             world.register(comes_back)
 

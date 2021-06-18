@@ -66,7 +66,7 @@ class Navigable:
         super().__init__(**kwargs)
 
 
-class MovementMixin(entity.Scope):
+class Movement(entity.Scope):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
         self.routes: List[AreaRoute] = routes if routes else []
@@ -96,14 +96,14 @@ class MovementMixin(entity.Scope):
 
     def adjacent(self) -> List[entity.Entity]:
         areas: List[entity.Entity] = []
-        for e in self.ourselves.make(carryable.ContainingMixin).holding:
-            maybe_area = e.make(ExitMixin).area
+        for e in self.ourselves.make(carryable.Containing).holding:
+            maybe_area = e.make(Exit).area
             if maybe_area:
                 areas.append(maybe_area)
         return areas + [r.area for r in self.routes]
 
 
-class ExitMixin(entity.Scope):
+class Exit(entity.Scope):
     def __init__(self, area: entity.Entity = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area if area else None
@@ -129,13 +129,13 @@ class FindNamedRoute(FindsRoute):
     async def find_route(
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
-        with area.make(carryable.ContainingMixin) as contain:
+        with area.make(carryable.Containing) as contain:
             navigable = context.get().find_item(
-                candidates=contain.holding, scopes=[ExitMixin], q=self.name
+                candidates=contain.holding, scopes=[Exit], q=self.name
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                area = navigable.make(ExitMixin).area
+                area = navigable.make(Exit).area
                 assert area
                 return AreaRoute(area=area)
         return None
@@ -149,13 +149,13 @@ class FindDirectionalRoute(FindsRoute):
     async def find_route(
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
-        with area.make(carryable.ContainingMixin) as contain:
+        with area.make(carryable.Containing) as contain:
             navigable = context.get().find_item(
-                candidates=contain.holding, scopes=[ExitMixin], q=self.direction.exiting
+                candidates=contain.holding, scopes=[Exit], q=self.direction.exiting
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                area = navigable.make(ExitMixin).area
+                area = navigable.make(Exit).area
                 assert area
                 return AreaRoute(area=area)
         return None

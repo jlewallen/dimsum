@@ -48,7 +48,7 @@ class AnyItem(things.ItemFinder):
         assert area
 
         log.info("%s finding wearing", self)
-        with person.make(apparel.ApparelMixin) as wearing:
+        with person.make(apparel.Apparel) as wearing:
             item = context.get().find_item(
                 candidates=wearing.wearing, q=self.q, **kwargs
             )
@@ -56,13 +56,13 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding pockets (contained)", self)
-        for item in person.make(carryable.ContainingMixin).holding:
-            for contained in item.make(carryable.ContainingMixin).holding:
+        for item in person.make(carryable.Containing).holding:
+            for contained in item.make(carryable.Containing).holding:
                 if contained.describes(q=self.q):
                     return contained
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.ContainingMixin) as pockets:
+        with person.make(carryable.Containing) as pockets:
             item = context.get().find_item(
                 candidates=pockets.holding, q=self.q, **kwargs
             )
@@ -70,7 +70,7 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding ground", self)
-        with area.make(carryable.ContainingMixin) as ground:
+        with area.make(carryable.Containing) as ground:
             item = context.get().find_item(
                 candidates=ground.holding, q=self.q, **kwargs
             )
@@ -97,13 +97,13 @@ class UnheldItem(things.ItemFinder):
         assert area
 
         log.info("%s finding area", self)
-        with area.make(carryable.ContainingMixin) as contain:
+        with area.make(carryable.Containing) as contain:
             item = context.get().find_item(candidates=contain.holding, q=self.q)
             if item:
                 return item
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.ContainingMixin) as pockets:
+        with person.make(carryable.Containing) as pockets:
             item = context.get().find_item(candidates=pockets.holding, q=self.q)
             if item:
                 return item
@@ -118,7 +118,7 @@ class AnyHeldItem(things.ItemFinder):
         assert person
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.ContainingMixin) as pockets:
+        with person.make(carryable.Containing) as pockets:
             return context.get().find_item(candidates=pockets.holding, **kwargs)
 
 
@@ -137,7 +137,7 @@ class HeldItem(things.ItemFinder):
         assert person
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.ContainingMixin) as pockets:
+        with person.make(carryable.Containing) as pockets:
             item = context.get().find_item(
                 candidates=pockets.holding, q=self.q, **kwargs
             )
@@ -154,7 +154,7 @@ class FindHeldContainer(things.ItemFinder):
         assert person
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.ContainingMixin) as pockets:
+        with person.make(carryable.Containing) as pockets:
             item = context.get().find_item(candidates=pockets.holding, **kwargs)
             if item:
                 return item
@@ -174,8 +174,8 @@ class ContainedItem(things.ItemFinder):
         assert person
 
         log.info("%s finding pockets (contained)", self)
-        for item in person.make(carryable.ContainingMixin).holding:
-            for contained in item.make(carryable.ContainingMixin).holding:
+        for item in person.make(carryable.Containing).holding:
+            for contained in item.make(carryable.Containing).holding:
                 if contained.describes(q=self.q):
                     return contained
 
@@ -192,7 +192,7 @@ class MaybeItemOrRecipe:
         assert person
 
         log.info("%s finding brain", self)
-        with person.make(mechanics.MemoryMixin) as brain:
+        with person.make(mechanics.Memory) as brain:
             recipe = brain.find_memory(self.q)
             if recipe:
                 return things.RecipeItem(recipe).create_item(person=person, **kwargs)

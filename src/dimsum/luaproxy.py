@@ -86,7 +86,7 @@ class LupaEntity:
 
         item = scopes.item(props=props, **kwargs)
         if kind:
-            with item.make(carryable.CarryableMixin) as carry:
+            with item.make(carryable.Carryable) as carry:
                 carry.kind = kind
                 carry.quantity = quantity
         return item
@@ -109,7 +109,7 @@ class LupaItem(LupaEntity):
         return self.entity
 
     def number(self, of):
-        with self.area.make(carryable.ContainingMixin) as contain:
+        with self.area.make(carryable.Containing) as contain:
             if isinstance(of, str):
                 return contain.number_of_named(of)
             return contain.number_of_kind(of)
@@ -118,15 +118,15 @@ class LupaItem(LupaEntity):
         return self.entity.get_kind(name)
 
     def visible(self):
-        with self.entity.make(mechanics.VisibilityMixin) as vis:
+        with self.entity.make(mechanics.Visibility) as vis:
             vis.make_visible()
 
     def invisible(self):
-        with self.entity.make(mechanics.VisibilityMixin) as vis:
+        with self.entity.make(mechanics.Visibility) as vis:
             vis.make_invisible()
 
     def is_invisible(self):
-        return self.entity.make(mechanics.VisibilityMixin).is_invisible
+        return self.entity.make(mechanics.Visibility).is_invisible
 
     def go(self, area) -> Sequence[game.Action]:
         return [actions.Go(area=area)]

@@ -56,7 +56,7 @@ async def test_serialize_world_one_item(caplog):
     add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
     world.add_area(area)
 
-    assert area.make(carryable.ContainingMixin).holding[0]
+    assert area.make(carryable.Containing).holding[0]
 
     json = serializing.all(world)
 
@@ -69,10 +69,9 @@ async def test_serialize_world_one_item(caplog):
     assert after.find_entity_by_name("Item")
 
     assert (
-        len(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding)
-        == 1
+        len(after.find_entity_by_name("Area").make(carryable.Containing).holding) == 1
     )
-    assert after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0]
+    assert after.find_entity_by_name("Area").make(carryable.Containing).holding[0]
 
     assert len(after.entities.items()) == 3
 
@@ -121,8 +120,8 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert two in one.make(movement.MovementMixin).adjacent()
-    assert one in two.make(movement.MovementMixin).adjacent()
+    assert two in one.make(movement.Movement).adjacent()
+    assert one in two.make(movement.Movement).adjacent()
 
     assert len(after.entities.items()) == 5
 
@@ -141,8 +140,8 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
         two, scopes.exit(area=one, creator=world, props=properties.Common("Item-Two"))
     )
 
-    assert two in one.make(movement.MovementMixin).adjacent()
-    assert one in two.make(movement.MovementMixin).adjacent()
+    assert two in one.make(movement.Movement).adjacent()
+    assert one in two.make(movement.Movement).adjacent()
 
     world.add_area(one)
 
@@ -159,11 +158,11 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert one.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area
-    assert two.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area
+    assert one.make(carryable.Containing).holding[0].make(movement.Exit).area
+    assert two.make(carryable.Containing).holding[0].make(movement.Exit).area
 
-    assert two in one.make(movement.MovementMixin).adjacent()
-    assert one in two.make(movement.MovementMixin).adjacent()
+    assert two in one.make(movement.Movement).adjacent()
+    assert one in two.make(movement.Movement).adjacent()
 
     assert len(after.entities.items()) == 5
 
@@ -178,10 +177,10 @@ async def test_serialize():
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.get_kind("petals")
-    with tree.make(movement.MovementMixin) as nav:
+    with tree.make(movement.Movement) as nav:
         nav.link_area(clearing)
 
-    with tree.make(behavior.BehaviorMixin) as behave:
+    with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
             "b:test:tick",
             lua="""
@@ -218,7 +217,7 @@ async def test_unregister_destroys(caplog):
     assert await db.number_of_entities() == 0
 
     await tw.execute("make Box")
-    box = tw.player.make(carryable.ContainingMixin).holding[0]
+    box = tw.player.make(carryable.Containing).holding[0]
     assert not box.props.destroyed
     await db.save(tw.world)
 
@@ -253,7 +252,7 @@ async def test_transients_preserved(caplog):
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].props.name
-    assert r.entities[0].make(carryable.CarryableMixin).loose
+    assert r.entities[0].make(carryable.Carryable).loose
 
 
 @pytest.mark.asyncio
@@ -326,5 +325,5 @@ async def test_serialize_properties_on_entity(caplog):
 
 
 def add_item(container: entity.Entity, item: entity.Entity):
-    with container.make(carryable.ContainingMixin) as contain:
+    with container.make(carryable.Containing) as contain:
         contain.add_item(item)
