@@ -3,12 +3,13 @@ import logging
 
 import context
 
-import model.things as things
-import model.carryable as carryable
 import model.entity as entity
+import model.things as things
 import model.world as world
-import model.mechanics as mechanics
-import model.apparel as apparel
+
+import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
+import model.scopes.apparel as apparel
 
 log = logging.getLogger("dimsum")
 

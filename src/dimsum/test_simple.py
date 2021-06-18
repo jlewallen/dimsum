@@ -1,15 +1,16 @@
 import pytest
 import logging
 
-import model.entity as entity
 import model.game as game
+import model.entity as entity
 import model.things as things
 import model.world as world
 import model.reply as reply
-import model.health as health
-import model.mechanics as mechanics
-import model.carryable as carryable
-import model.ownership as ownership
+
+import model.scopes.health as health
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
+import model.scopes.ownership as ownership
 
 import serializing
 import persistence

@@ -6,7 +6,7 @@ import inflect
 
 import model.properties as properties
 import model.entity as entity
-import model.carryable as carryable
+import model.scopes.carryable as carryable
 import model.scopes as scopes
 
 log = logging.getLogger("dimsum")

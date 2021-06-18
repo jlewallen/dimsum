@@ -1,11 +1,12 @@
 import logging
 import lark
 
-import model.properties as properties
 import model.game as game
-import model.movement as movement
 import model.things as things
 import model.finders as finders
+import model.properties as properties
+
+import model.scopes.movement as movement
 
 import actions
 

@@ -2,10 +2,11 @@ import logging
 import pytest
 
 import model.game as game
-import model.movement as movement
-import model.properties as properties
-import model.carryable as carryable
 import model.entity as entity
+import model.properties as properties
+
+import model.scopes.carryable as carryable
+import model.scopes.movement as movement
 import model.scopes as scopes
 
 import persistence

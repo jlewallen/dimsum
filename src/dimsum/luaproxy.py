@@ -8,8 +8,9 @@ import model.entity as entity
 import model.game as game
 import model.world as world
 import model.finders as finders
-import model.mechanics as mechanics
-import model.carryable as carryable
+
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
 import model.scopes as scopes
 
 import actions

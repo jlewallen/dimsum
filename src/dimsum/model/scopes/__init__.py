@@ -1,11 +1,12 @@
 import model.entity as entity
-import model.ownership as ownership
-import model.health as health
-import model.mechanics as mechanics
-import model.occupyable as occupyable
-import model.carryable as carryable
-import model.movement as movement
 import model.world as world
+
+import model.scopes.ownership as ownership
+import model.scopes.health as health
+import model.scopes.mechanics as mechanics
+import model.scopes.occupyable as occupyable
+import model.scopes.carryable as carryable
+import model.scopes.movement as movement
 
 Alive = [
     ownership.Ownership,

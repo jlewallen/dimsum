@@ -5,7 +5,7 @@ import enum
 
 import context
 import model.entity as entity
-import model.carryable as carryable
+import model.scopes.carryable as carryable
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")

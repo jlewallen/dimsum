@@ -3,8 +3,9 @@ from typing import Any, List, Type
 import logging
 
 import model.properties as properties
-import model.movement as movement
-import model.carryable as carryable
+
+import model.scopes.movement as movement
+import model.scopes.carryable as carryable
 
 import actions
 import grammar

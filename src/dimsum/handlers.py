@@ -7,9 +7,10 @@ import base64
 import bus
 import context
 
-import model.movement as movement
-import model.health as health
 import model.entity as entity
+
+import model.scopes.movement as movement
+import model.scopes.health as health
 
 from model.events import *
 

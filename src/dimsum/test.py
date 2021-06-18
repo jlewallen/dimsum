@@ -5,16 +5,17 @@ import logging
 import sys
 import lark
 
+import model.entity as entity
 import model.properties as properties
 import model.game as game
 import model.world as world
-import model.entity as entity
 import model.things as things
 import model.reply as reply
-import model.movement as movement
-import model.carryable as carryable
-import model.scopes as scopes
 import model.sugar as sugar
+
+import model.scopes.movement as movement
+import model.scopes.carryable as carryable
+import model.scopes as scopes
 
 import grammar
 import actions

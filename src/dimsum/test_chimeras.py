@@ -4,11 +4,12 @@ import pytest
 
 import context
 
-import model.properties as properties
 import model.crypto as crypto
 import model.entity as entity
+import model.properties as properties
 import model.world as world
-import model.ownership as ownership
+
+import model.scopes.ownership as ownership
 
 import handlers
 import messages

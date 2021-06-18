@@ -5,8 +5,9 @@ import abc
 
 import model.crypto as crypto
 import model.properties as properties
-import model.behavior as behavior
 import model.entity as entity
+
+import model.scopes.behavior as behavior
 
 log = logging.getLogger("dimsum")
 

@@ -2,10 +2,11 @@ from typing import Any, cast
 
 import logging
 
-import model.events as events
-import model.properties as properties
 import model.entity as entity
-import model.carryable as carryable
+import model.properties as properties
+import model.events as events
+
+import model.scopes.carryable as carryable
 
 log = logging.getLogger("dimsum")
 

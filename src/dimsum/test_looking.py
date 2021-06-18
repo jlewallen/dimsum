@@ -2,13 +2,14 @@ import pytest
 import logging
 import freezegun
 
-import model.entity as entity
 import model.game as game
+import model.entity as entity
 import model.things as things
 import model.world as world
 import model.reply as reply
-import model.mechanics as mechanics
-import model.carryable as carryable
+
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
 
 import serializing
 import persistence

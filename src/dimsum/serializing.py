@@ -8,7 +8,8 @@ import logging
 import model.crypto as crypto
 import model.entity as entity
 import model.world as world
-import model.movement as movement
+
+import model.scopes.movement as movement
 
 log = logging.getLogger("dimsum")
 

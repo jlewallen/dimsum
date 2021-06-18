@@ -2,11 +2,12 @@ import sys
 import logging
 import pytest
 
-import model.properties as properties
 import model.game as game
-import model.mechanics as mechanics
-import model.carryable as carryable
-import model.behavior as behavior
+import model.properties as properties
+
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
+import model.scopes.behavior as behavior
 import model.scopes as scopes
 
 import actions

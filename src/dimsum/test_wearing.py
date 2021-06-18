@@ -4,8 +4,9 @@ import test
 
 import model.game as game
 import model.reply as reply
-import model.apparel as apparel
-import model.carryable as carryable
+
+import model.scopes.apparel as apparel
+import model.scopes.carryable as carryable
 
 
 @pytest.mark.asyncio

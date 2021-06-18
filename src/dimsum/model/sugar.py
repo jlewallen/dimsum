@@ -1,11 +1,12 @@
 from typing import Any, Sequence, List, Dict
 import logging
 
-import model.behavior as behavior
 import model.entity as entity
 import model.world as world
-import model.mechanics as mechanics
-import model.occupyable as occupyable
+
+import model.scopes.behavior as behavior
+import model.scopes.mechanics as mechanics
+import model.scopes.occupyable as occupyable
 
 log = logging.getLogger("dimsum")
 

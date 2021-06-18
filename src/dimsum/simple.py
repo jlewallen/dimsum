@@ -2,13 +2,14 @@ from typing import Any, List, Type
 
 import logging
 
-import grammar
-import evaluator
 import model.properties as properties
-import model.movement as movement
 import model.finders as finders
 import model.entity as entity
 
+import model.scopes.movement as movement
+
+import grammar
+import evaluator
 import actions
 
 from context import *

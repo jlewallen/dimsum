@@ -3,7 +3,8 @@ import pytest
 
 import model.game as game
 import model.reply as reply
-import model.carryable as carryable
+
+import model.scopes.carryable as carryable
 
 import test
 

@@ -3,15 +3,17 @@ from typing import Any
 import os
 import base64
 
-import model.properties as properties
-import model.movement as movement
-import model.health as health
-import model.mechanics as mechanics
-import model.finders as finders
-import model.carryable as carryable
 import model.entity as entity
-import model.apparel as apparel
-import model.users as users
+import model.finders as finders
+
+import model.properties as properties
+
+import model.scopes.users as users
+import model.scopes.movement as movement
+import model.scopes.health as health
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
+import model.scopes.apparel as apparel
 
 from context import Ctx
 
