@@ -63,12 +63,12 @@ class DirectionalRoute(AreaRoute):
 
 class Navigable:
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)  # type:ignore
+        super().__init__(**kwargs)
 
 
 class MovementMixin(entity.Scope):
     def __init__(self, routes=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.routes: List[AreaRoute] = routes if routes else []
 
     @property

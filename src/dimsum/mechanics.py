@@ -12,7 +12,7 @@ log = logging.getLogger("dimsum")
 
 class InteractableMixin(entity.Scope):
     def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
 
     def link_activity(self, name: str, activity=True):
@@ -37,7 +37,7 @@ def get_now() -> datetime.datetime:
 
 class Observation:
     def __init__(self, time=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.time = time if time else get_now()
 
     def memorable(self) -> bool:
@@ -82,7 +82,7 @@ class Visible:
 
 class VisibilityMixin(entity.Scope):
     def __init__(self, visible: Visible = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):
@@ -122,7 +122,7 @@ class Physics:
 
 class MemoryMixin(entity.Scope):
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.memory = memory if memory else {}
 
     def memorize(self, q: str, thing: Memorable):

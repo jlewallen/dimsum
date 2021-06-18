@@ -13,7 +13,7 @@ log = logging.getLogger("dimsum")
 
 class KeyMixin(entity.Scope):
     def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.patterns = patterns if patterns else {}
 
     def has_pattern(self, pattern: crypto.Identity):
@@ -83,7 +83,7 @@ class Lockable:
 
 class LockableMixin(entity.Scope):
     def __init__(self, lockable=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.lockable = lockable if lockable else Lockable()
 
     def lock(self, **kwargs):
@@ -133,7 +133,7 @@ class UnknownOpenClose(OpenClose):
 
 class OpenableMixin(LockableMixin):
     def __init__(self, openable: OpenClose = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.openable = openable if openable else UnknownOpenClose()
 
     def is_open(self):
@@ -165,7 +165,7 @@ class CarryableMixin(entity.Scope):
         loose: bool = False,
         **kwargs,
     ):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.kind = kind if kind else kinds.Kind()
         self.quantity = quantity if quantity else 1
         self.loose = loose
