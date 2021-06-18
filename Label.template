@@ -27,10 +27,13 @@
 	{%- endif -%}
   {%- endfor -%}
 
+  {% if false -%}
   {% for key, behavior in entity.behaviors.items() -%}
   <tr>
      <td bgcolor="lightcyan"> {{ key }} </td>
   </tr>
   {%- endfor %}
+  {%- endif -%}
+
   {% include entity.klass + 'Label.template' ignore missing %}
 </table>
