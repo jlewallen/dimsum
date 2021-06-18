@@ -107,14 +107,15 @@ class Entity(behavior.BehaviorMixin):
                 log.info("scope %s", kwargs)
                 with self.make(
                     scope,
-                    key=self.key,
-                    identity=self.identity,
-                    parent=self.parent,
-                    creator=self.creator,
-                    props=self.props,
-                    **kwargs
                 ) as change:
-                    pass
+                    change.constructed(
+                        key=self.key,
+                        identity=self.identity,
+                        parent=self.parent,
+                        creator=self.creator,
+                        props=self.props,
+                        **kwargs
+                    )
 
         self.validate()
 
@@ -213,6 +214,10 @@ class Spawned:
         super().__init__()
         assert chimera
         self.chimera = chimera
+
+    @abc.abstractmethod
+    def constructed(self, **kwargs):
+        pass
 
     @property
     def ourselves(self):

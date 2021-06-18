@@ -4,11 +4,9 @@ import entity
 
 
 class Ownership(entity.Spawned):
-    def __init__(
-        self, owner: entity.Entity = None, creator: entity.Entity = None, **kwargs
-    ):
+    def __init__(self, owner: entity.Entity = None, **kwargs):
         super().__init__(**kwargs)
-        self.owner = owner if owner else creator if creator else self.ourselves
+        self.owner = owner if owner else None
 
-    def constructed(self, **kwargs):
-        pass
+    def constructed(self, creator: entity.Entity = None, **kwargs):
+        self.owner = creator if creator else self.ourselves
