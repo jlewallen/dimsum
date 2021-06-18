@@ -5,7 +5,6 @@ import pytest
 import context
 import properties
 import crypto
-import chimeras
 import entity
 import luaproxy
 import messages
@@ -20,7 +19,7 @@ import test
 log = logging.getLogger("dimsum")
 
 
-class SimpleCore(chimeras.Spawned):
+class SimpleCore(entity.Spawned):
     def __init__(self, name: str = None, frozen=None, destroyed=None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
@@ -28,12 +27,12 @@ class SimpleCore(chimeras.Spawned):
         self.destroyed = destroyed
 
 
-class SimpleHolding(chimeras.Spawned):
+class SimpleHolding(entity.Spawned):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
         self.holding = holding if holding else []
 
-    def add_item(self, entity: chimeras.Chimera):
+    def add_item(self, entity: entity.Entity):
         self.holding.append(entity)
 
 
@@ -42,10 +41,10 @@ async def test_chimeric_entities_serialize(caplog):
     bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
     universe = world.World(bus, luaproxy.context_factory)
 
-    jacob = chimeras.Chimera(creator=universe, props=properties.Common(name="Jacob"))
+    jacob = entity.Entity(creator=universe, props=properties.Common(name="Jacob"))
     universe.register(jacob)
 
-    toy = chimeras.Chimera(creator=universe, props=properties.Common(name="Toy"))
+    toy = entity.Entity(creator=universe, props=properties.Common(name="Toy"))
     universe.register(toy)
 
     with jacob.make(SimpleHolding) as holding:

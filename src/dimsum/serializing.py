@@ -13,7 +13,6 @@ import living
 import animals
 import world
 import movement
-import chimeras
 
 log = logging.getLogger("dimsum")
 
@@ -64,7 +63,6 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
 @jsonpickle.handlers.register(animals.Player)
 @jsonpickle.handlers.register(animals.Person)
 @jsonpickle.handlers.register(animals.Animal)
-@jsonpickle.handlers.register(chimeras.Chimera)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
@@ -100,7 +98,6 @@ allowed = [
     animals.Animal,
     animals.Person,
     animals.Player,
-    chimeras.Chimera,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}

@@ -69,6 +69,7 @@ class Entity(behavior.BehaviorMixin):
         creator: "Entity" = None,
         parent: "Entity" = None,
         klass: str = None,
+        chimeras=None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
         **kwargs
@@ -79,6 +80,7 @@ class Entity(behavior.BehaviorMixin):
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
         self.klass = klass if klass else self.__class__.__name__
+        self.chimeras = chimeras if chimeras else {}
 
         if identity:
             self.identity = identity
@@ -178,6 +180,40 @@ class Entity(behavior.BehaviorMixin):
 
     def __repr__(self):
         return str(self)
+
+    def make(self, ctor):
+        key = ctor.__name__
+
+        log.info("splitting chimera: %s", key)
+        child = (
+            ctor(chimera=self, **self.chimeras[key])
+            if key in self.chimeras
+            else ctor(chimera=self)
+        )
+        return child
+
+    def update(self, child):
+        key = child.__class__.__name__
+        data = child.__dict__
+        del data["chimera"]
+        log.info("updating chimera: %s %s", key, data)
+        self.chimeras[key] = copy.deepcopy(data)
+
+
+class Spawned:
+    def __init__(self, chimera: Entity = None, **kwargs):
+        super().__init__()
+        assert chimera
+        self.chimera = chimera
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.save()
+
+    def save(self):
+        self.chimera.update(self)
 
 
 class Registrar:
