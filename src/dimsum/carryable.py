@@ -190,27 +190,21 @@ class CarryableMixin(entity.Scope):
         return self
 
     def separate(
-        self, quantity: int, ctx: context.Ctx = None, **kwargs
-    ) -> List["entity.Entity"]:
+        self, quantity: float, ctx: context.Ctx = None, **kwargs
+    ) -> List[entity.Entity]:
         assert ctx
-        log.info("separating")
+
         self.decrease_quantity(quantity)
+
         item = context.get().create_item(
             props=self.ourselves.props.clone(),
-            # behaviors=self.behaviors,
+            initialize={CarryableMixin: dict(quantity=quantity, kind=self.kind)},
             **kwargs,
         )
 
-        with item.make(CarryableMixin) as carry:
-            carry.quantity = quantity
-            carry.kind = self.kind
-
-        # TODO Move to caller
         ctx.registrar().register(item)
+
         return [item]
-
-
-CarryableType = Union[entity.Entity, CarryableMixin]
 
 
 class Producer:

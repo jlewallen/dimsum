@@ -273,8 +273,10 @@ class WorldCtx(context.Ctx):
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
 
-    def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
-        initialize = {}
+    def create_item(
+        self, quantity: float = None, initialize=None, **kwargs
+    ) -> entity.Entity:
+        initialize = initialize if initialize else {}
         if quantity:
             initialize = {carryable.CarryableMixin: dict(quantity=quantity)}
         return scopes.item(initialize=initialize, **kwargs)
