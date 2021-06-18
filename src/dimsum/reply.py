@@ -26,7 +26,7 @@ class ObservedEntity(Observable):
 
 
 class ObservedItem(ObservedEntity):
-    def __init__(self, item: things.Item):
+    def __init__(self, item: entity.Entity):
         super().__init__()
         self.item = item
 
@@ -58,8 +58,7 @@ class ObservedLiving(ObservedEntity):
         super().__init__()
         self.alive = alive
         self.activities: Sequence[Activity] = [
-            HoldingActivity(e)
-            for e in things.expected(alive.make(carryable.ContainingMixin).holding)
+            HoldingActivity(e) for e in alive.make(carryable.ContainingMixin).holding
         ]
 
     @property
@@ -198,7 +197,7 @@ class AreaObservation(Observation):
         self.items: List[ObservedEntity] = flatten(
             [
                 observe(e)
-                for e in things.expected(area.make(carryable.ContainingMixin).holding)
+                for e in area.make(carryable.ContainingMixin).holding
                 if not e.make(mechanics.VisibilityMixin).visible.hard_to_see
                 or person.make(mechanics.VisibilityMixin).can_see(e.identity)
             ]

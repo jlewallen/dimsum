@@ -56,10 +56,8 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding pockets (contained)", self)
-        for item in things.expected(person.make(carryable.ContainingMixin).holding):
-            for contained in things.expected(
-                item.make(carryable.ContainingMixin).holding
-            ):
+        for item in person.make(carryable.ContainingMixin).holding:
+            for contained in item.make(carryable.ContainingMixin).holding:
                 if contained.describes(q=self.q):
                     return contained
 
@@ -176,10 +174,8 @@ class ContainedItem(things.ItemFinder):
         assert person
 
         log.info("%s finding pockets (contained)", self)
-        for item in things.expected(person.make(carryable.ContainingMixin).holding):
-            for contained in things.expected(
-                item.make(carryable.ContainingMixin).holding
-            ):
+        for item in person.make(carryable.ContainingMixin).holding:
+            for contained in item.make(carryable.ContainingMixin).holding:
                 if contained.describes(q=self.q):
                     return contained
 

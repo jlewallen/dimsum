@@ -13,13 +13,6 @@ log = logging.getLogger("dimsum")
 p = inflect.engine()
 
 
-class Item(
-    entity.Entity,
-    entity.IgnoreExtraConstructorArguments,
-):
-    pass
-
-
 class ItemFinder:
     def find_item(self, **kwargs) -> Optional[entity.Entity]:
         raise NotImplementedError
@@ -50,7 +43,7 @@ class RecipeItem(ItemFactory):
         super().__init__()
         self.recipe = recipe
 
-    def create_item(self, **kwargs) -> Item:
+    def create_item(self, **kwargs) -> entity.Entity:
         return self.recipe.make(RecipeMixin).create_item(**kwargs)
 
 
@@ -81,11 +74,3 @@ class RecipeMixin(entity.Scope, ItemFactory):
         updated.update(props=self.template.props.clone(), **kwargs)
         cloned = scopes.item(**updated)
         return cloned
-
-
-def expected(maybes: Sequence[Any]) -> Sequence[Item]:
-    return [cast(Item, e) for e in maybes]
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]

@@ -253,7 +253,7 @@ class LookInside(PersonAction):
             if not contain.is_open():
                 return Failure("you can't do that")
 
-            return EntitiesObservation(things.expected(contain.holding))
+            return EntitiesObservation(contain.holding)
 
 
 class LookFor(PersonAction):
@@ -291,7 +291,7 @@ class LookDown(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         await ctx.hook("look-down")
         with player.make(carryable.ContainingMixin) as contain:
-            return EntitiesObservation(things.expected(contain.holding))
+            return EntitiesObservation(contain.holding)
 
 
 class Look(PersonAction):
@@ -619,7 +619,7 @@ class Obliterate(PersonAction):
         area = world.find_player_area(player)
         items = None
         with player.make(carryable.ContainingMixin) as pockets:
-            items = things.expected(pockets.drop_all())
+            items = pockets.drop_all()
         if len(items) == 0:
             return Failure("you're not holding anything")
 
