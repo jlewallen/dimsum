@@ -5,6 +5,7 @@ import abc
 import crypto
 import properties
 import behavior
+import entity
 
 log = logging.getLogger("dimsum")
 
@@ -125,7 +126,7 @@ class PhysicsMixin:
         self.physics = physics if physics else Physics()
 
 
-class MemoryMixin:
+class MemoryMixin(entity.Spawned):
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.memory = memory if memory else {}

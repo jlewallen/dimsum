@@ -54,7 +54,7 @@ class ObservedLiving(ObservedEntity):
 
     @property
     def memory(self):
-        return self.alive.memory
+        return self.alive.make(mechanics.MemoryMixin).memory
 
     def accept(self, visitor):
         return visitor.observed_living(self)
@@ -116,7 +116,7 @@ class PersonalObservation(Observation):
 
     @property
     def memory(self):
-        return self.who.memory
+        return self.who.make(mechanics.MemoryMixin).memory
 
     def accept(self, visitor):
         return visitor.personal_observation(self)

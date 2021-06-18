@@ -617,7 +617,8 @@ class CallThis(PersonAction):
             template=template,
         )
         world.register(recipe)
-        player.memorize("r:" + self.name, recipe)
+        with player.make(mechanics.MemoryMixin) as brain:
+            brain.memorize("r:" + self.name, recipe)
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )
@@ -629,9 +630,10 @@ class Forget(PersonAction):
         self.name = name
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.name in player.memory:
-            player.forget(self.name)
-            return Success("oh wait, was that important?")
+        with player.make(mechanics.MemoryMixin) as brain:
+            if self.name in brain.brain:
+                brain.forget(self.name)
+                return Success("oh wait, was that important?")
         return Failure("huh, seems i already have forgotten that!")
 
 
@@ -641,7 +643,8 @@ class Remember(PersonAction):
 
     async def perform(self, ctx: Ctx, world: World, player: Player):
         area = world.find_player_area(player)
-        player.memorize(MemoryAreaKey, area)
+        with player.make(mechanics.MemoryMixin) as brain:
+            brain.memorize(MemoryAreaKey, area)
         return Success("you'll be able to remember this place, oh yeah")
 
 

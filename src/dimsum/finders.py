@@ -6,6 +6,7 @@ import carryable
 import context
 import envo
 import world
+import mechanics
 
 log = logging.getLogger("dimsum")
 
@@ -151,7 +152,8 @@ class MaybeItemOrRecipe:
 
     def create_item(self, person: animals.Person = None, **kwargs) -> things.Item:
         assert person
-        recipe = cast(things.Recipe, person.find_memory(self.q))
-        if recipe:
-            return things.RecipeItem(recipe).create_item(person=person, **kwargs)
+        with person.make(mechanics.MemoryMixin) as brain:
+            recipe = cast(things.Recipe, brain.find_memory(self.q))
+            if recipe:
+                return things.RecipeItem(recipe).create_item(person=person, **kwargs)
         return things.MaybeItem(self.q).create_item(person=person, **kwargs)

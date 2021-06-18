@@ -9,6 +9,7 @@ import reply
 import serializing
 import persistence
 import health
+import mechanics
 import test
 
 import ownership
@@ -52,9 +53,9 @@ async def test_recipe_simple():
     with tw.player.holding[0].make(health.EdibleMixin) as edible:
         assert edible.nutrition.properties["alcohol"] == 100
 
-    assert len(tw.player.memory.keys()) == 0
+    assert len(tw.player.make(mechanics.MemoryMixin).memory.keys()) == 0
     await tw.success("call this Fancy IPA")
-    assert len(tw.player.memory.keys()) == 1
+    assert len(tw.player.make(mechanics.MemoryMixin).memory.keys()) == 1
 
     await tw.success("make fancy")
     assert len(tw.player.holding) == 1
