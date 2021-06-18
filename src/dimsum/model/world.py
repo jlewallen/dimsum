@@ -43,6 +43,7 @@ class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
         super().__init__(
             key="world",
+            klass=entity.RootEntityClass,
             props=properties.Common("World", desc="Ya know, everything"),
             scopes=scopes.World,
             **kwargs

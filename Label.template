@@ -35,5 +35,5 @@
   {%- endfor %}
   {%- endif -%}
 
-  {% include entity.klass + 'Label.template' ignore missing %}
+  {% include entity.klass.__name__ + 'Label.template' ignore missing %}
 </table>

@@ -1,3 +1,5 @@
+import logging
+
 import model.entity as entity
 import model.world as world
 
@@ -7,6 +9,8 @@ import model.scopes.mechanics as mechanics
 import model.scopes.occupyable as occupyable
 import model.scopes.carryable as carryable
 import model.scopes.movement as movement
+
+log = logging.getLogger("dimsum")
 
 Alive = [
     ownership.Ownership,
@@ -20,17 +24,33 @@ Area = [ownership.Ownership, carryable.Containing, occupyable.Occupyable]
 World = [ownership.Ownership]
 
 
+class LivingClass(entity.EntityClass):
+    pass
+
+
+class ItemClass(entity.EntityClass):
+    pass
+
+
+class AreaClass(entity.EntityClass):
+    pass
+
+
+class ExitClass(entity.EntityClass):
+    pass
+
+
 def alive(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Alive, **kwargs)
+    return entity.Entity(scopes=Alive, klass=LivingClass, **kwargs)
 
 
-def item(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Item, **kwargs)
+def item(klass=ItemClass, **kwargs) -> entity.Entity:
+    return entity.Entity(scopes=Item, klass=klass, **kwargs)
 
 
 def area(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Area, **kwargs)
+    return entity.Entity(scopes=Area, klass=AreaClass, **kwargs)
 
 
 def exit(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Exit, **kwargs)
+    return entity.Entity(scopes=Exit, klass=ExitClass, **kwargs)

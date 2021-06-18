@@ -61,7 +61,7 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
 
     def flatten(self, obj, data):
         data["key"] = obj.key
-        data["klass"] = obj.__class__.__name__
+        data["klass"] = obj.klass.__name__
         data["name"] = obj.props.name
         return data
 

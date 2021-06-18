@@ -123,15 +123,11 @@ class Repl:
 
 def get_color(e: entity.Entity) -> str:
     map = {
-        "World": "white",
-        "Animal": "darkseagreen",
-        "Player": "coral",
-        "Item": "khaki",
-        "Exit": "salmon",
-        "Area": "skyblue",
-        "Recipe": "thistle",
-        "Chimera": "lavenderblush",
-        "Entity": "lavenderblush",
+        entity.RootEntityClass: "white",
+        scopes.LivingClass: "darkseagreen",
+        scopes.ItemClass: "khaki",
+        scopes.ExitClass: "salmon",
+        scopes.AreaClass: "skyblue",
     }
     return map[e.klass]
 

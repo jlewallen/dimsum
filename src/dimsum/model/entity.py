@@ -63,6 +63,18 @@ def get_instance_key(instance) -> str:
     return get_ctor_key(instance.__class__)
 
 
+class EntityClass:
+    pass
+
+
+class RootEntityClass(EntityClass):
+    pass
+
+
+class UnknownClass(EntityClass):
+    pass
+
+
 class Entity:
     def __init__(
         self,
@@ -70,7 +82,7 @@ class Entity:
         kind: kinds.Kind = None,
         creator: "Entity" = None,
         parent: "Entity" = None,
-        klass: str = None,
+        klass: Type[EntityClass] = None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
         chimeras=None,
@@ -83,8 +95,8 @@ class Entity:
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
-        self.klass = klass if klass else self.__class__.__name__
         self.chimeras = chimeras if chimeras else {}
+        self.klass: Type[EntityClass] = klass if klass else UnknownClass
 
         if identity:
             self.identity = identity
@@ -124,13 +136,15 @@ class Entity:
 
         self.validate()
 
-        log.info("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
+        # log.info("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
 
     def validate(self) -> None:
         assert self.key
         assert self.props
         # Ugly, keeping this around, though.
-        if self.klass != "World":
+        if RootEntityClass == self.klass:
+            pass
+        else:
             assert self.creator
 
     def registered(self, gid: int) -> int:
