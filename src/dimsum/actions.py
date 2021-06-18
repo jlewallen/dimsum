@@ -336,7 +336,6 @@ class Drop(PersonAction):
                 owner=player,
                 ctx=ctx,
             )
-            log.info("DROPPED = %s", [e.kind for e in dropped])
             if dropped:
                 area = world.find_player_area(player)
                 await world.bus.publish(
@@ -662,7 +661,7 @@ class CallThis(PersonAction):
             owner=player,
             props=item.props.clone(),
             behaviors=item.make(behavior.BehaviorMixin).behaviors,
-            kind=item.kind,
+            kind=item.make(carryable.CarryableMixin).kind,
             template=template,
         )
         world.register(recipe)

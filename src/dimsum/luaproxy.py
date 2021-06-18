@@ -103,9 +103,10 @@ class LupaEntity:
         for key, value in table.items():
             props.map[key] = value
 
-        item = things.Item(props=props, kind=kind, **kwargs)
-        if quantity > 1:
+        item = things.Item(props=props, **kwargs)
+        if kind:
             with item.make(carryable.CarryableMixin) as carry:
+                carry.kind = kind
                 carry.quantity = quantity
         return item
 

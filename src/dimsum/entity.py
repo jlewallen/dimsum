@@ -75,7 +75,6 @@ class Entity:
         **kwargs
     ):
         super().__init__(**kwargs)  # type: ignore
-        self.kind = kind if kind else kinds.Kind()
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
