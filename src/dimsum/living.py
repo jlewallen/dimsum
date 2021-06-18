@@ -5,7 +5,6 @@ import occupyable
 import carryable
 import apparel
 import mechanics
-import health
 import scopes
 
 

@@ -2,6 +2,7 @@ import pytest
 
 import game
 import reply
+import health
 import test
 
 
@@ -14,7 +15,8 @@ async def test_make_food():
     await tw.success("modify protein 100")
     await tw.success("eat steak")
     assert len(tw.player.holding) == 0
-    assert tw.player.medical.nutrition.properties["protein"] == 100
+    with tw.player.make(health.HealthMixin) as player:
+        assert player.medical.nutrition.properties["protein"] == 100
 
 
 @pytest.mark.asyncio
@@ -26,7 +28,8 @@ async def test_make_drinks():
     await tw.success("modify alcohol 100")
     await tw.success("drink ipa")
     assert len(tw.player.holding) == 0
-    assert tw.player.medical.nutrition.properties["alcohol"] == 100
+    with tw.player.make(health.HealthMixin) as player:
+        assert player.medical.nutrition.properties["alcohol"] == 100
 
 
 @pytest.mark.asyncio

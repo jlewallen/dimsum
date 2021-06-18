@@ -185,7 +185,8 @@ class Eat(PersonAction):
             return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        await player.consume(item, area=area, ctx=ctx)
+        with player.make(health.HealthMixin) as p:
+            await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("eat:after")
 
         return Success("you ate %s" % (item))
@@ -206,7 +207,8 @@ class Drink(PersonAction):
             return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        await player.consume(item, area=area, ctx=ctx)
+        with player.make(health.HealthMixin) as p:
+            await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("drink:after")
 
         return Success("you drank %s" % (item))
@@ -680,7 +682,8 @@ class ModifyField(PersonAction):
         item.try_modify()
 
         if self.field in health.NutritionFields:
-            item.nutrition.properties[self.field] = self.value
+            with item.make(health.EdibleMixin) as i:
+                i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
         return Success("done")
@@ -722,7 +725,8 @@ class ModifyServings(PersonAction):
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        item.modify_servings(self.number)
+        with item.make(health.EdibleMixin) as edible:
+            edible.modify_servings(self.number)
         return Success("done")
 
 

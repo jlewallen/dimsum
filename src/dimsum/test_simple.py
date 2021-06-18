@@ -8,6 +8,7 @@ import world
 import reply
 import serializing
 import persistence
+import health
 import test
 
 import ownership
@@ -48,7 +49,8 @@ async def test_recipe_simple():
     await tw.initialize()
     await tw.success("make IPA")
     await tw.success("modify alcohol 100")
-    assert tw.player.holding[0].nutrition.properties["alcohol"] == 100
+    with tw.player.holding[0].make(health.EdibleMixin) as edible:
+        assert edible.nutrition.properties["alcohol"] == 100
 
     assert len(tw.player.memory.keys()) == 0
     await tw.success("call this Fancy IPA")

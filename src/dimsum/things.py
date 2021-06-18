@@ -11,7 +11,6 @@ import apparel
 import carryable
 import mechanics
 import movement
-import health
 import scopes
 
 log = logging.getLogger("dimsum")
@@ -28,7 +27,6 @@ class Item(
     mechanics.InteractableMixin,
     mechanics.VisibilityMixin,
     movement.MovementMixin,
-    health.EdibleMixin,
     entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):

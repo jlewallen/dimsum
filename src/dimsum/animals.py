@@ -4,7 +4,6 @@ import entity
 import context
 import living
 import apparel
-import health
 import carryable
 
 log = logging.getLogger("dimsum")
@@ -14,7 +13,6 @@ class HealthyAndClothedAnimal(
     context.FindItemMixin,
     living.Alive,
     apparel.ApparelMixin,
-    health.HealthMixin,
 ):
     def gather_entities(self) -> List[entity.Entity]:
         log.debug("animal-gather-entities: %s", self)
