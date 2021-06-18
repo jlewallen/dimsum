@@ -21,7 +21,6 @@ Password = "password"
 Frozen = "frozen"
 Destroyed = "destroyed"
 Related = "related"
-Navigable = "navigable"
 
 # TODO remove
 Worn = "worn"
@@ -174,16 +173,6 @@ class Common(Map):
     @related.setter
     def related(self, value: Dict[str, kinds.Kind]):
         self.set(Related, value)
-
-    @property
-    def navigable(self):
-        if Navigable in self:
-            return self[Navigable]
-        return None
-
-    @navigable.setter
-    def navigable(self, value):
-        self.set(Navigable, value)
 
     def clone(self) -> "Common":
         cloned = Common(**copy.deepcopy(self.map))  # type: ignore

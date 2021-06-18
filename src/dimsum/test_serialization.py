@@ -112,6 +112,9 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
     assert len(json.items()) == 5
 
+    for key, data in json.items():
+        log.info("%s", data)
+
     after = test.create_empty_world()
     entities = serializing.restore(after, json)
 
@@ -121,8 +124,8 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert two in one.adjacent()
-    assert one in two.adjacent()
+    assert two in one.make(movement.MovementMixin).adjacent()
+    assert one in two.make(movement.MovementMixin).adjacent()
 
     assert len(after.entities.items()) == 5
 
@@ -154,14 +157,16 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert two
 
     assert isinstance(
-        one.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area
+        one.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area,
+        envo.Area,
     )
     assert isinstance(
-        two.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area
+        two.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area,
+        envo.Area,
     )
 
-    assert two in one.adjacent()
-    assert one in two.adjacent()
+    assert two in one.make(movement.MovementMixin).adjacent()
+    assert one in two.make(movement.MovementMixin).adjacent()
 
     assert len(after.entities.items()) == 5
 

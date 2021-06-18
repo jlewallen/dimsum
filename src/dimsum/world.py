@@ -107,16 +107,17 @@ class World(entity.Entity, entity.Registrar):
             self.register(entity)
 
         for item in area.make(carryable.ContainingMixin).holding:
-            if item.props.navigable:
-                log.debug("linked-via-navigable[%s] %s", depth, item.props.navigable)
-                self.add_area(item.props.navigable, depth=depth + 1, seen=seen)
+            maybe_area = item.make(movement.ExitMixin).area
+            if maybe_area:
+                log.debug("linked-via-ex[%s] %s", depth, maybe_area)
+                self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
             if isinstance(item, things.Item):
                 for linked in item.make(movement.MovementMixin).adjacent():
                     log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
                     self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
 
-        for linked in area.adjacent():
+        for linked in area.make(movement.MovementMixin).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
             self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
 
@@ -274,19 +275,20 @@ class WorldCtx(context.Ctx):
         return item
 
     def find_item(
-        self, inherits=None, candidates=None, exclude=None, things_only=True, **kwargs
+        self, inherits=None, candidates=None, exclude=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(
-            "find-item: candidates=%s exclude=%s kw=%s", candidates, exclude, kwargs
+            "find-item: candidates=%s exclude=%s inherits=%s kw=%s",
+            candidates,
+            exclude,
+            inherits,
+            kwargs,
         )
 
         if len(candidates) == 0:
             return None
 
         found: Optional[entity.Entity] = None
-
-        if things_only:
-            inherits = things.Item
 
         for e in candidates:
             if exclude and e in exclude:

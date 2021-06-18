@@ -224,7 +224,7 @@ def observe(entity: Any) -> Sequence[ObservedEntity]:
         return [ObservedAnimal(entity)]
     if isinstance(entity, things.Item):
         return [ObservedItem(entity)]
-    raise Exception("unexpected observation target: %s" % (entity,))
+    return [ObservedItem(entity)]
 
 
 def flatten(l):

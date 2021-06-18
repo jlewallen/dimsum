@@ -84,7 +84,7 @@ class Dig(actions.PersonAction):
 
         if self.linkage.there:
             goes_there = envo.Exit(
-                digging,
+                area=digging,
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
             )
@@ -94,7 +94,7 @@ class Dig(actions.PersonAction):
 
         if self.linkage.back:
             comes_back = envo.Exit(
-                area,
+                area=area,
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),
             )

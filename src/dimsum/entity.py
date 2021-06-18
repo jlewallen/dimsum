@@ -170,7 +170,10 @@ class Entity:
         self.props.frozen = None
         return True
 
-    def describes(self, **kwargs) -> bool:
+    def describes(self, q: str = None, **kwargs) -> bool:
+        if q:
+            if q.lower() in self.props.name.lower():
+                return True
         return False
 
     def accept(self, visitor: "EntityVisitor") -> Any:

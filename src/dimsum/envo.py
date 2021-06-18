@@ -25,26 +25,13 @@ class Area(
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)
 
-    def adjacent(self) -> List[entity.Entity]:
-        areas: List[entity.Entity] = []
-        for e in self.make(carryable.ContainingMixin).holding:
-            if e.props.navigable:
-                areas.append(e.props.navigable)
-        return areas
-
     def __str__(self):
         return self.props.name
 
 
-class Exit(movement.Navigable, things.Item):
-    def __init__(self, area: Area = None, **kwargs):
-        super().__init__(**kwargs)
-        if area:
-            self.props[properties.Navigable] = area
-        assert self.props[properties.Navigable]
-
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.exit(self)
+class Exit(entity.Entity, movement.Navigable, entity.IgnoreExtraConstructorArguments):
+    def __init__(self, **kwargs):
+        super().__init__(scopes=[movement.ExitMixin], **kwargs)
 
 
 def flatten(l):

@@ -86,9 +86,6 @@ class MovementMixin(entity.Scope):
                 return r
         return None
 
-    def adjacent(self) -> List[entity.Entity]:
-        return [r.area for r in self.routes]
-
     def link_area(self, area: entity.Entity, verb=DefaultMoveVerb, **kwargs):
         return self.add_route(VerbRoute(area=area, verb=verb))
 
@@ -96,6 +93,26 @@ class MovementMixin(entity.Scope):
         self.routes.append(route)
         log.debug("new route: {0} {1}".format(self, self.routes))
         return route
+
+    def adjacent(self) -> List[entity.Entity]:
+        areas: List[entity.Entity] = []
+        for e in self.ourselves.make(carryable.ContainingMixin).holding:
+            maybe_area = e.make(ExitMixin).area
+            if maybe_area:
+                areas.append(maybe_area)
+        return areas + [r.area for r in self.routes]
+
+
+class ExitMixin(entity.Scope):
+    def __init__(self, area: entity.Entity = None, **kwargs):
+        super().__init__(**kwargs)
+        self.area = area if area else None
+        log.info("ctor: %s", self.area)
+
+    def constructed(self, area: entity.Entity = None, **kwargs):
+        if area:
+            self.area = area
+        log.info("constructed: %s", self.area)
 
 
 class FindsRoute:
@@ -120,8 +137,9 @@ class FindNamedRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                assert navigable.props.navigable
-                return AreaRoute(area=navigable.props.navigable)
+                area = navigable.make(ExitMixin).area
+                assert area
+                return AreaRoute(area=area)
         return None
 
 
@@ -139,8 +157,9 @@ class FindDirectionalRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                assert navigable.props.navigable
-                return AreaRoute(area=navigable.props.navigable)
+                area = navigable.make(ExitMixin).area
+                assert area
+                return AreaRoute(area=area)
         return None
 
 
