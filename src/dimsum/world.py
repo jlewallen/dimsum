@@ -12,6 +12,7 @@ import envo
 import living
 import animals
 import occupyable
+import carryable
 import movement
 import scopes
 
@@ -65,10 +66,11 @@ class World(entity.Entity, entity.Registrar):
         if isinstance(entity, envo.Area):  # HACK
             return entity
         for area in self.areas():
-            if area.contains(entity) or area.make(occupyable.OccupyableMixin).occupying(
-                entity
-            ):
-                return area
+            with area.make(carryable.ContainingMixin) as contain:
+                if contain.contains(entity) or area.make(
+                    occupyable.OccupyableMixin
+                ).occupying(entity):
+                    return area
         return None
 
     def find_player_area(self, player: animals.Person) -> envo.Area:
@@ -256,8 +258,12 @@ class WorldCtx(context.Ctx):
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
 
-    def create_item(self, **kwargs) -> things.Item:
-        return things.Item(**kwargs)
+    def create_item(self, quantity: int = None, **kwargs) -> things.Item:
+        item = things.Item(**kwargs)
+        if quantity:
+            with item.make(carryable.CarryableMixin) as carry:
+                carry.quantity = quantity
+        return item
 
     def find_item(
         self, inherits=None, candidates=None, exclude=None, things_only=True, **kwargs

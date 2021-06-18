@@ -8,6 +8,7 @@ import things
 import envo
 import actions
 import mechanics
+import carryable
 import test
 
 
@@ -137,10 +138,10 @@ end
 
     await tw.success("look")
     await tw.success("hold box")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     await tw.success("shake box")
-    assert len(tw.player.holding) == 2
-    assert tw.player.holding[1].creator == tw.player
+    assert len(tw.player.make(carryable.ContainingMixin).holding) == 2
+    assert tw.player.make(carryable.ContainingMixin).holding[1].creator == tw.player
     await tw.success("look")
 
 
@@ -168,13 +169,13 @@ end
 
     await tw.success("look")
     await tw.success("hold box")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.entities()) == 1
     await tw.success("shake box")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.entities()) == 2
     assert tw.area.entities()[0].creator == box
-    assert tw.area.entities()[0].quantity == 10
+    assert tw.area.entities()[0].make(carryable.CarryableMixin).quantity == 10
     await tw.success("look")
 
 

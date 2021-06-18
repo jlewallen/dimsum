@@ -11,6 +11,7 @@ import persistence
 import health
 import mechanics
 import test
+import carryable
 
 import ownership
 
@@ -24,7 +25,8 @@ async def test_simple_action_verbs():
     await tw.add_carla()
     for verb in ["kiss", "heal", "hug", "tickle", "poke"]:
         await tw.success(verb + " carla")
-    assert len(tw.player.holding) == 0
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 0
 
 
 @pytest.mark.asyncio
@@ -39,9 +41,22 @@ async def test_obliterate():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Hammer")
-    assert len(tw.player.holding) == 1
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 1
+        await tw.success("obliterate")
+        assert len(pockets.holding) == 0
+
+
+@pytest.mark.asyncio
+async def test_obliterate_separate_transactions():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Hammer")
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 1
     await tw.success("obliterate")
-    assert len(tw.player.holding) == 0
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 0
 
 
 @pytest.mark.asyncio
@@ -50,15 +65,17 @@ async def test_recipe_simple():
     await tw.initialize()
     await tw.success("make IPA")
     await tw.success("modify alcohol 100")
-    with tw.player.holding[0].make(health.EdibleMixin) as edible:
-        assert edible.nutrition.properties["alcohol"] == 100
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        with pockets.holding[0].make(health.EdibleMixin) as edible:
+            assert edible.nutrition.properties["alcohol"] == 100
 
     assert len(tw.player.make(mechanics.MemoryMixin).memory.keys()) == 0
     await tw.success("call this Fancy IPA")
     assert len(tw.player.make(mechanics.MemoryMixin).memory.keys()) == 1
 
     await tw.success("make fancy")
-    assert len(tw.player.holding) == 1
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 1
 
 
 @pytest.mark.asyncio
@@ -66,7 +83,8 @@ async def test_freezing_simple():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Box")
-    assert len(tw.player.holding) == 1
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 1
     await tw.failure("unfreeze box")
     await tw.success("freeze box")
     await tw.failure("modify name Ignored Box")
@@ -80,7 +98,8 @@ async def test_freezing_others_unable_unfreeze():
     await tw.initialize()
     await tw.add_carla()
     await tw.success("make Box")
-    assert len(tw.player.holding) == 1
+    with tw.player.make(carryable.ContainingMixin) as pockets:
+        assert len(pockets.holding) == 1
     await tw.failure("unfreeze box")
     await tw.success("freeze box")
     await tw.success("drop")

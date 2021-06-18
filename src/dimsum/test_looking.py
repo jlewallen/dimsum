@@ -9,6 +9,7 @@ import reply
 import serializing
 import persistence
 import mechanics
+import carryable
 import test
 
 log = logging.getLogger("dimsum")
@@ -86,15 +87,15 @@ async def test_making_item_hard_to_see(caplog):
     await tw.add_carla()
     await tw.success("make Box")
     await tw.success("drop")
-    assert len(tw.area.holding) == 1
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 1
     r = await tw.success("look")
     assert len(r.items) == 1
 
     await tw.success("make Orb")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     await tw.success("modify hard to see")
     await tw.success("drop")
-    assert len(tw.area.holding) == 2
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     r = await tw.success("look")
     assert len(r.items) == 1
 

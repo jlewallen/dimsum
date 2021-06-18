@@ -14,6 +14,7 @@ import animals
 import actions
 import finders
 import mechanics
+import carryable
 
 log = logging.getLogger("dimsum")
 
@@ -102,8 +103,10 @@ class LupaEntity:
         for key, value in table.items():
             props.map[key] = value
 
-        item = things.Item(props=props, quantity=quantity, kind=kind, **kwargs)
-
+        item = things.Item(props=props, kind=kind, **kwargs)
+        if quantity > 1:
+            with item.make(carryable.CarryableMixin) as carry:
+                carry.quantity = quantity
         return item
 
 

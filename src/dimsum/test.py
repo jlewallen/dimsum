@@ -21,6 +21,7 @@ import reply
 import serializing
 import persistence
 import movement
+import carryable
 
 import sugar
 import digging
@@ -49,7 +50,7 @@ class TestWorld:
         area = envo.Area(creator=self.player, props=properties.Common(name))
         with door.make(movement.MovementMixin) as nav:
             nav.link_area(area)
-        self.area.add_item(door)
+        self.add_item(door)
         self.world.register(door)
         self.world.register(area)
         return area
@@ -83,7 +84,8 @@ class TestWorld:
 
     def add_item(self, item):
         self.world.register(item)
-        self.get_default_area().add_item(item)
+        with self.area.make(carryable.ContainingMixin) as ground:
+            ground.add_item(item)
         return item
 
     def dumps(self, item) -> str:

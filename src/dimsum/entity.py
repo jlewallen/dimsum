@@ -190,6 +190,9 @@ class Entity(behavior.BehaviorMixin):
     def __repr__(self):
         return str(self)
 
+    def make_and_discard(self, ctor, **kwargs):
+        return self.make(ctor, **kwargs)
+
     def make(self, ctor, **kwargs):
         key = ctor.__name__
 
@@ -197,7 +200,7 @@ class Entity(behavior.BehaviorMixin):
         if key in self.chimeras:
             chargs.update(**self.chimeras[key])
 
-        log.info("%s splitting chimera: %s", self.key, key)
+        log.debug("%s splitting chimera: %s", self.key, key)
         child = ctor(chimera=self, **chargs)
         return child
 
@@ -205,7 +208,7 @@ class Entity(behavior.BehaviorMixin):
         key = child.__class__.__name__
         data = child.__dict__
         del data["chimera"]
-        log.info("%s updating chimera: %s %s", self.key, key, data)
+        log.debug("%s updating chimera: %s %s", self.key, key, data)
         self.chimeras[key] = data
 
 

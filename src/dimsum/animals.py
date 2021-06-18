@@ -16,8 +16,15 @@ class HealthyAndClothedAnimal(
     def gather_entities(self) -> List[entity.Entity]:
         log.debug("animal-gather-entities: %s", self)
         return (
-            entity.entities(self.holding)
-            + flatten([e.gather_entities() for e in entity.entities(self.holding)])
+            entity.entities(self.make(carryable.ContainingMixin).holding)
+            + flatten(
+                [
+                    e.gather_entities()
+                    for e in entity.entities(
+                        self.make(carryable.ContainingMixin).holding
+                    )
+                ]
+            )
             + entity.entities(self.make(apparel.ApparelMixin).wearing)
         )
 

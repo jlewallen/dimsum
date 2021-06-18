@@ -63,8 +63,8 @@ class HealthMixin(entity.Spawned):
             self.medical.nutrition.include(eating.nutrition)
             eating.servings -= 1
             if eating.servings == 0:
-                # TODO Holding chimera
-                self.ourselves.drop(edible)  # type: ignore
+                with self.ourselves.make(carryable.ContainingMixin) as pockets:
+                    pockets.drop(edible)  # type: ignore
                 # TODO Holding chimera
                 eating.ourselves.destroy()  # type:ignore
 

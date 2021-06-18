@@ -137,8 +137,10 @@ class ContainedItem(things.ItemFinder):
         self, person: animals.Person = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
-        for item in things.expected(person.holding):
-            for contained in things.expected(item.holding):
+        for item in things.expected(person.make(carryable.ContainingMixin).holding):
+            for contained in things.expected(
+                item.make(carryable.ContainingMixin).holding
+            ):
                 if contained.describes(q=self.q):
                     return contained
         return None

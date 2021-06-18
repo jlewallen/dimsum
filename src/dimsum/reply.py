@@ -10,6 +10,7 @@ import animals
 import movement
 import mechanics
 import occupyable
+import carryable
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -47,12 +48,13 @@ class ObservedLiving(ObservedEntity):
         super().__init__()
         self.alive = alive
         self.activities: Sequence[living.Activity] = [
-            living.HoldingActivity(e) for e in things.expected(alive.holding)
+            living.HoldingActivity(e)
+            for e in things.expected(alive.make(carryable.ContainingMixin).holding)
         ]
 
     @property
     def holding(self):
-        return self.alive.holding
+        return self.alive.make(carryable.ContainingMixin).holding
 
     @property
     def memory(self):
@@ -186,7 +188,7 @@ class AreaObservation(Observation):
         self.items: List[ObservedEntity] = flatten(
             [
                 observe(e)
-                for e in things.expected(area.holding)
+                for e in things.expected(area.make(carryable.ContainingMixin).holding)
                 if not e.make(mechanics.VisibilityMixin).visible.hard_to_see
                 or person.make(mechanics.VisibilityMixin).can_see(e.identity)
             ]

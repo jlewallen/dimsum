@@ -8,6 +8,7 @@ import evaluator
 import properties
 import movement
 import actions
+import carryable
 
 from context import *
 from reply import *
@@ -87,7 +88,8 @@ class Dig(actions.PersonAction):
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
             )
-            area.add_item(goes_there)
+            with area.make(carryable.ContainingMixin) as ground:
+                ground.add_item(goes_there)
             world.register(goes_there)
 
         if self.linkage.back:
@@ -96,7 +98,8 @@ class Dig(actions.PersonAction):
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),
             )
-            digging.add_item(comes_back)
+            with digging.make(carryable.ContainingMixin) as ground:
+                ground.add_item(comes_back)
             world.register(comes_back)
 
         world.register(digging)

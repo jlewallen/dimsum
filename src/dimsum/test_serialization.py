@@ -11,6 +11,7 @@ import movement
 import serializing
 import persistence
 import library
+import carryable
 import test
 
 import ownership
@@ -51,10 +52,10 @@ async def test_serialize_world_one_item(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
     area = envo.Area(creator=world, props=properties.Common("Area"))
-    area.add_item(things.Item(creator=world, props=properties.Common("Item")))
+    add_item(area, things.Item(creator=world, props=properties.Common("Item")))
     world.add_area(area)
 
-    assert isinstance(area.holding[0], things.Item)
+    assert isinstance(area.make(carryable.ContainingMixin).holding[0], things.Item)
 
     json = serializing.all(world)
 
@@ -66,8 +67,8 @@ async def test_serialize_world_one_item(caplog):
     assert isinstance(after.find_entity_by_name("Area"), envo.Area)
     assert isinstance(after.find_entity_by_name("Item"), things.Item)
 
-    assert len(after.find_entity_by_name("Area").holding) == 1
-    assert isinstance(after.find_entity_by_name("Area").holding[0], things.Item)
+    assert len(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding) == 1
+    assert isinstance(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0], things.Item)
 
     assert len(after.entities.items()) == 3
 
@@ -80,7 +81,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     two = envo.Area(creator=world, props=properties.Common("Two"))
     one = envo.Area(creator=world, props=properties.Common("One"))
 
-    one.add_item(
+    add_item(one,
         envo.Exit(
             area=two,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
@@ -88,7 +89,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
         )
     )
 
-    two.add_item(
+    add_item(two,
         envo.Exit(
             area=one,
             props=properties.Common(name=movement.Direction.SOUTH.exiting),
@@ -125,8 +126,8 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     one = envo.Area(creator=world, props=properties.Common("One"))
     two = envo.Area(creator=world, props=properties.Common("Two"))
 
-    one.add_item(envo.Exit(area=two, creator=world, props=properties.Common("Item")))
-    two.add_item(envo.Exit(area=one, creator=world, props=properties.Common("Item")))
+    add_item(one, envo.Exit(area=two, creator=world, props=properties.Common("Item")))
+    add_item(two, envo.Exit(area=one, creator=world, props=properties.Common("Item")))
 
     world.add_area(one)
 
@@ -143,8 +144,8 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert isinstance(one.holding[0].props.navigable, envo.Area)
-    assert isinstance(two.holding[0].props.navigable, envo.Area)
+    assert isinstance(one.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area)
+    assert isinstance(two.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area)
 
     assert two in one.adjacent()
     assert one in two.adjacent()
@@ -201,7 +202,7 @@ async def test_unregister_destroys(caplog):
     assert await db.number_of_entities() == 0
 
     await tw.execute("make Box")
-    box = tw.player.holding[0]
+    box = tw.player.make(carryable.ContainingMixin).holding[0]
     assert not box.props.destroyed
     await db.save(tw.world)
 
@@ -237,7 +238,7 @@ async def test_transients_preserved(caplog):
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].props.name
-    assert r.entities[0].loose
+    assert r.entities[0].make(carryable.CarryableMixin).loose
 
 
 @pytest.mark.asyncio
@@ -308,3 +309,7 @@ async def test_serialize_properties_on_entity(caplog):
     json = serializing.serialize(ex, indent=True)
 
     log.info(json)
+
+def add_item(container: entity.Entity, item: entity.Entity):
+    with container.make(carryable.ContainingMixin) as contain:
+        contain.add_item(item)

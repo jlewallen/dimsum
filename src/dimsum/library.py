@@ -11,8 +11,14 @@ import actions
 import movement
 import mechanics
 import occupyable
+import carryable
 
 log = logging.getLogger("dimsum")
+
+
+def add_item(container: entity.Entity, item: entity.Entity):
+    with container.make(carryable.ContainingMixin) as contain:
+        contain.add_item(item)
 
 
 class Generics:
@@ -264,13 +270,14 @@ class DarkCavern(Factory):
 
         entrance = CavernEntrance().create(world, generics)
 
-        area.add_item(
+        add_item(
+            area,
             envo.Exit(
                 area=entrance,
                 creator=world,
                 parent=generics.thing,
                 props=properties.Common(name=movement.Direction.NORTH.exiting),
-            )
+            ),
         )
 
         return area
@@ -310,13 +317,14 @@ class RoomGrid(Factory):
         ]
 
         def add_doorway(from_cell, to_cell, direction):
-            from_cell.add_item(
+            add_item(
+                from_cell,
                 envo.Exit(
                     area=to_cell,
                     creator=world,
                     parent=generics.thing,
                     props=properties.Common(name=direction.exiting),
-                )
+                ),
             )
 
         def link_cells(cell1, cell2, direction):
@@ -393,54 +401,56 @@ class WelcomeArea(Factory):
                 "Town Courtyard.", desc="There's a ton going on here."
             ),
         )
-        area.add_item(BeerKeg().create(world, generics))
-        area.add_item(LargeOakTree().create(world, generics))
-        area.add_item(Hammer().create(world, generics))
-        area.add_item(MysteriousBox().create(world, generics))
-        area.add_item(Guitar().create(world, generics))
-        area.add_item(LargeSteepCliff().create(world, generics))
+        add_item(area, BeerKeg().create(world, generics))
+        add_item(area, LargeOakTree().create(world, generics))
+        add_item(area, Hammer().create(world, generics))
+        add_item(area, MysteriousBox().create(world, generics))
+        add_item(area, Guitar().create(world, generics))
+        add_item(area, LargeSteepCliff().create(world, generics))
         with area.make(occupyable.OccupyableMixin) as entering:
             entering.add_living(TomorrowCat().create(world, generics))
 
         loft = ArtistsLoft().create(world, generics)
-        area.add_item(WoodenLadder().create(world, generics, loft))
-        loft.add_item(WoodenLadder().create(world, generics, area))
+        add_item(area, WoodenLadder().create(world, generics, loft))
+        add_item(loft, WoodenLadder().create(world, generics, area))
 
         canyon = NarrowCanyon().create(world, generics)
-        area.add_item(RockyPath().create(world, generics, canyon))
-        canyon.add_item(RockyPath().create(world, generics, area))
+        add_item(area, RockyPath().create(world, generics, canyon))
+        add_item(canyon, RockyPath().create(world, generics, area))
 
         clearing = envo.Area(
             creator=world,
             parent=generics.area,
             props=properties.Common("A small clearing."),
         )
-        area.add_item(
+        add_item(
+            area,
             envo.Exit(
                 area=clearing,
                 creator=world,
                 parent=generics.thing,
                 props=properties.Common("Worn Path"),
-            )
+            ),
         )
-        clearing.add_item(
+        add_item(
+            clearing,
             envo.Exit(
                 area=area,
                 creator=world,
                 parent=generics.thing,
                 props=properties.Common("Worn Path"),
-            )
+            ),
         )
 
-        clearing.add_item(LargeMapleTree().create(world, generics))
+        add_item(clearing, LargeMapleTree().create(world, generics))
 
         cavern = DarkCavern().create(world, generics)
-        clearing.add_item(SmallCrevice().create(world, generics, cavern))
-        cavern.add_item(SmallCrevice().create(world, generics, clearing))
+        add_item(clearing, SmallCrevice().create(world, generics, cavern))
+        add_item(cavern, SmallCrevice().create(world, generics, clearing))
 
         museum = Museum().create(world, generics)
-        clearing.add_item(MarbleSteps().create(world, generics, museum))
-        museum.add_item(MarbleSteps().create(world, generics, clearing))
+        add_item(clearing, MarbleSteps().create(world, generics, museum))
+        add_item(museum, MarbleSteps().create(world, generics, clearing))
 
         return area
 

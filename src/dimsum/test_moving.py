@@ -7,6 +7,8 @@ import movement
 import properties
 import test
 import persistence
+import carryable
+import entity
 
 
 @pytest.mark.asyncio
@@ -27,8 +29,9 @@ async def test_go_adjacent():
 
     another_room = envo.Area(creator=tw.world, props=properties.Common("Another Room"))
 
-    tw.area.add_item(
-        envo.Exit(area=another_room, creator=tw.world, props=properties.Common("Door"))
+    add_item(
+        tw.area,
+        envo.Exit(area=another_room, creator=tw.world, props=properties.Common("Door")),
     )
 
     tw.world.add_area(another_room)
@@ -62,12 +65,13 @@ async def test_directional_moving():
     park = envo.Area(props=properties.Common("North Park"), creator=tw.jacob)
 
     tw.world.add_area(park)
-    tw.area.add_item(
+    add_item(
+        tw.area,
         envo.Exit(
             area=park,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=tw.jacob,
-        )
+        ),
     )
 
     area_before = tw.world.find_player_area(tw.player)
@@ -91,8 +95,10 @@ class Bidirectional:
             props=properties.Common(name="Exit to {0}".format(back.props.name)),
             **kwargs
         )
-        back.add_item(goes_there)
-        there.add_item(comes_back)
+        with back.make(carryable.ContainingMixin) as contain:
+            contain.add_item(goes_there)
+        with there.make(carryable.ContainingMixin) as contain:
+            contain.add_item(comes_back)
 
 
 @pytest.mark.asyncio
@@ -128,3 +134,8 @@ async def test_digging_with_return():
     await tw.save("test.sqlite3")
     await tw.success("go north")
     await tw.success("go south")
+
+
+def add_item(container: entity.Entity, item: entity.Entity):
+    with container.make(carryable.ContainingMixin) as contain:
+        contain.add_item(item)

@@ -19,7 +19,6 @@ log = logging.getLogger("dimsum")
 class Area(
     context.FindItemMixin,
     entity.Entity,
-    carryable.ContainingMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Area, **kwargs)
@@ -32,7 +31,10 @@ class Area(
         return [
             e
             for e in flatten(
-                [self.holding, self.make(occupyable.OccupyableMixin).occupied]
+                [
+                    self.make(carryable.ContainingMixin).holding,
+                    self.make(occupyable.OccupyableMixin).occupied,
+                ]
             )
         ]
 
@@ -46,7 +48,12 @@ class Area(
         return sum([e.quantity for e in self.entities_named(of)])
 
     def number_of_kind(self, kind: kinds.Kind) -> int:
-        return sum([e.quantity for e in self.entities_of_kind(kind)])
+        return sum(
+            [
+                e.make(carryable.CarryableMixin).quantity
+                for e in self.entities_of_kind(kind)
+            ]
+        )
 
     def accept(self, visitor: entity.EntityVisitor):
         return visitor.area(self)

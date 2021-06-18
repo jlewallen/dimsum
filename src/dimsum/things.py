@@ -20,9 +20,6 @@ p = inflect.engine()
 class Item(
     context.FindItemMixin,
     entity.Entity,
-    carryable.CarryableMixin,
-    carryable.ContainingMixin,
-    carryable.KeyMixin,
     entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):
@@ -39,40 +36,32 @@ class Item(
 
     def gather_entities(self) -> List[entity.Entity]:
         log.debug("item-gather-entities: %s", self)
-        return entity.entities(self.holding) + flatten(
-            [e.gather_entities() for e in entity.entities(self.holding)]
+        return entity.entities(self.make(carryable.ContainingMixin).holding) + flatten(
+            [
+                e.gather_entities()
+                for e in entity.entities(self.make(carryable.ContainingMixin).holding)
+            ]
         )
 
-    def separate(
-        self, quantity: int, ctx: context.Ctx = None, **kwargs
-    ) -> List["Item"]:
-        assert ctx
-        self.decrease_quantity(quantity)
-        item = Item(
-            kind=self.kind,
-            props=self.props.clone(),
-            behaviors=self.behaviors,
-            quantity=quantity,
-            **kwargs
-        )
-        # TODO Move to caller
-        ctx.registrar().register(item)
-        return [item]
-
-    def clone(self, **kwargs):
+    def clone(self, quantity: float = None, **kwargs):
         updated = copy.deepcopy(self.__dict__)
         updated.update(props=self.props.clone(), **kwargs)
-        return Item(**updated)
+        cloned = Item(**updated)
+        if quantity:
+            with cloned.make(carryable.CarryableMixin) as more:
+                more.quantity = quantity
+        return cloned
 
     def accept(self, visitor: entity.EntityVisitor) -> Any:
         return visitor.item(self)
 
     def __str__(self):
-        if self.quantity > 1:
-            return "%d %s" % (
-                self.quantity,
-                p.plural(self.props[properties.Name], self.quantity),
-            )
+        with self.make_and_discard(carryable.CarryableMixin) as carry:
+            if carry.quantity > 1:
+                return "%d %s" % (
+                    carry.quantity,
+                    p.plural(self.props[properties.Name], carry.quantity),
+                )
         return p.a(self.props[properties.Name])
 
 
@@ -91,9 +80,13 @@ class MaybeItem(ItemFactory):
         super().__init__()
         self.name = name
 
-    def create_item(self, **kwargs) -> Item:
+    def create_item(self, quantity: float = None, **kwargs) -> Item:
         log.debug("create-item: {0}".format(kwargs))
-        return Item(props=properties.Common(self.name), **kwargs)
+        original = Item(props=properties.Common(self.name), **kwargs)
+        if quantity:
+            with original.make(carryable.CarryableMixin) as multiple:
+                multiple.quantity = quantity
+        return original
 
 
 class RecipeItem(ItemFactory):
