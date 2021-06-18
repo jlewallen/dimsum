@@ -161,7 +161,7 @@ class CarryableMixin(entity.Scope):
     def __init__(
         self,
         kind: kinds.Kind = None,
-        quantity: int = None,
+        quantity: float = None,
         loose: bool = False,
         **kwargs,
     ):
@@ -170,16 +170,16 @@ class CarryableMixin(entity.Scope):
         self.quantity = quantity if quantity else 1
         self.loose = loose
 
-    def constructed(self, quantity: int = None, **kwargs):
+    def constructed(self, quantity: float = None, **kwargs):
         log.info("carryable::constructed")
         if quantity:
             self.quantity = quantity
 
-    def increase_quantity(self, q: int):
+    def increase_quantity(self, q: float):
         self.quantity += q
         return self
 
-    def decrease_quantity(self, q: int):
+    def decrease_quantity(self, q: float):
         if q < 1:
             raise Exception("too few to separate")
 
@@ -221,7 +221,7 @@ class Producer:
 class ContainingMixin(OpenableMixin):
     def __init__(self, holding=None, capacity=None, produces=None, **kwargs):
         super().__init__(**kwargs)
-        self.holding: List[CarryableMixin] = holding if holding else []
+        self.holding: List[entity.Entity] = holding if holding else []
         self.capacity = capacity if capacity else None
         self.produces: Dict[str, Producer] = produces if produces else {}
 
@@ -258,31 +258,31 @@ class ContainingMixin(OpenableMixin):
     def contains(self, e: CarryableMixin) -> bool:
         return e in self.holding
 
-    def unhold(self, e: CarryableMixin, **kwargs) -> CarryableMixin:
+    def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:
         self.holding.remove(e)
         return e
 
-    def place_inside(self, item: CarryableMixin, **kwargs):
+    def place_inside(self, item: entity.Entity, **kwargs):
         if self.is_open():
             return self.hold(item, **kwargs)
         return False
 
-    def take_out(self, item: CarryableMixin, **kwargs):
+    def take_out(self, item: entity.Entity, **kwargs):
         if self.is_open():
             if item in self.holding:
                 return self.unhold(item, **kwargs)
         return False
 
-    def hold(self, item: CarryableMixin, quantity: int = None, **kwargs):
+    def hold(self, item: entity.Entity, quantity: float = None, **kwargs):
         log.info("holding %s", item)
         return self.add_item(item, **kwargs)
 
-    def add_item(self, item: CarryableMixin, **kwargs) -> CarryableMixin:
+    def add_item(self, item: entity.Entity, **kwargs) -> entity.Entity:
         for already in self.holding:
             # log.info("adding %s already = %s", item.kind, already.kind)
             # log.info("adding %s already = %s", item, already)
-            with cast(entity.Entity, already).make(CarryableMixin) as additional:
-                with cast(entity.Entity, item).make(CarryableMixin) as coming:
+            with already.make(CarryableMixin) as additional:
+                with item.make(CarryableMixin) as coming:
                     if additional.kind.same(coming.kind):
                         additional.quantity += coming.quantity
 
@@ -294,7 +294,7 @@ class ContainingMixin(OpenableMixin):
         self.holding.append(item)
         return item
 
-    def drop_all(self) -> List[CarryableMixin]:
+    def drop_all(self) -> List[entity.Entity]:
         dropped = []
         while len(self.holding) > 0:
             item = self.holding[0]
@@ -302,25 +302,25 @@ class ContainingMixin(OpenableMixin):
             dropped.append(item)
         return dropped
 
-    def is_holding(self, item: CarryableMixin):
+    def is_holding(self, item: entity.Entity):
         return item in self.holding
 
     def drop_here(
         self,
-        area: "ContainingMixin",
-        item: CarryableMixin = None,
-        quantity: int = None,
+        area: entity.Entity,
+        item: entity.Entity = None,
+        quantity: float = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
             return None, "nothing to drop"
 
-        dropped: List[CarryableMixin] = []
+        dropped: List[entity.Entity] = []
         if quantity:
             if not item:
                 return None, "please specify what?"
 
-            with cast(entity.Entity, item).make(CarryableMixin) as dropping:
+            with item.make(CarryableMixin) as dropping:
                 if quantity > dropping.quantity or quantity < 1:
                     return None, "you should check how many you have"
 
@@ -339,21 +339,21 @@ class ContainingMixin(OpenableMixin):
                 assert dropped
 
         for item in dropped:
-            with cast(entity.Entity, area).make(ContainingMixin) as ground:
+            with area.make(ContainingMixin) as ground:
                 after_add = ground.add_item(item)
                 if after_add != item:
                     context.get().registrar().unregister(item)
 
         return dropped, None
 
-    def drop(self, item: CarryableMixin) -> List[CarryableMixin]:
+    def drop(self, item: entity.Entity) -> List[entity.Entity]:
         if item in self.holding:
             self.holding.remove(item)
             return [item]
         return []
 
     def entities(self) -> List[entity.Entity]:
-        return entity.entities(self.holding)
+        return self.holding
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(q=of)]
@@ -365,14 +365,10 @@ class ContainingMixin(OpenableMixin):
             if e.make(CarryableMixin).kind and e.make(CarryableMixin).kind.same(kind)
         ]
 
-    def number_of_named(self, of: str) -> int:
+    def number_of_named(self, of: str) -> float:
         return sum([e.quantity for e in self.entities_named(of)])
 
-    def number_of_kind(self, kind: kinds.Kind) -> int:
+    def number_of_kind(self, kind: kinds.Kind) -> float:
         return sum(
             [e.make(CarryableMixin).quantity for e in self.entities_of_kind(kind)]
         )
-
-
-def expected(maybes: List[Any]) -> List[CarryableMixin]:
-    return [cast(CarryableMixin, e) for e in maybes]

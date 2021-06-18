@@ -286,7 +286,3 @@ class Registrar:
         entity.destroy()
         del self.entities[entity.key]
         self.garbage[entity.key] = entity
-
-
-def entities(maybes: List[Any]) -> List[Entity]:
-    return [cast(Entity, e) for e in maybes]
