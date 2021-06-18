@@ -2,8 +2,9 @@ from typing import Optional, List, Any
 import logging
 import datetime
 import abc
-import entity
 import contextvars
+
+import model.entity as entity
 
 worldCtx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")

@@ -3,16 +3,17 @@ import time
 import logging
 import inflect
 
-import entity
-import context
-import properties
-import game
 import bus
-import behavior
-import occupyable
-import carryable
-import movement
-import scopes
+import context
+
+import model.entity as entity
+import model.properties as properties
+import model.game as game
+import model.behavior as behavior
+import model.occupyable as occupyable
+import model.carryable as carryable
+import model.movement as movement
+import model.scopes as scopes
 
 DefaultMoveVerb = "walk"
 TickHook = "tick"

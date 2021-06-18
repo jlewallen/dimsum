@@ -1,21 +1,21 @@
 import pytest
 import logging
 
-import properties
-import entity
-import game
-import things
-import world
-import movement
+import model.properties as properties
+import model.entity as entity
+import model.game as game
+import model.things as things
+import model.world as world
+import model.movement as movement
+import model.library as library
+import model.carryable as carryable
+import model.behavior as behavior
+import model.scopes as scopes
+import model.ownership as ownership
 import serializing
 import persistence
-import library
-import carryable
-import behavior
-import scopes
-import test
 
-import ownership
+import test
 
 log = logging.getLogger("dimsum")
 

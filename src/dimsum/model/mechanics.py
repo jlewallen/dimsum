@@ -2,10 +2,11 @@ from typing import List, Dict, Any, Optional
 import logging
 import datetime
 import abc
-import crypto
-import properties
-import behavior
-import entity
+
+import model.crypto as crypto
+import model.properties as properties
+import model.behavior as behavior
+import model.entity as entity
 
 log = logging.getLogger("dimsum")
 

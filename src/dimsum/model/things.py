@@ -4,10 +4,10 @@ import logging
 import copy
 import inflect
 
-import properties
-import entity
-import carryable
-import scopes
+import model.properties as properties
+import model.entity as entity
+import model.carryable as carryable
+import model.scopes as scopes
 
 log = logging.getLogger("dimsum")
 p = inflect.engine()

@@ -6,21 +6,22 @@ import logging
 import inflect
 import lark
 
-import properties
-import game
+import model.properties as properties
+import model.game as game
+import model.world as world
+import model.reply as reply
+import model.library as library
+import model.events as events
+import model.movement as movement
+import model.scopes as scopes
+
 import bus
-import world
-import reply
-import library
 import persistence
 import grammar
 import evaluator
 import actions
-import events
 import luaproxy
-import movement
 import messages
-import scopes
 
 import sugar
 import digging

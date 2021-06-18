@@ -7,8 +7,8 @@ import time
 import asyncio
 import lupa
 
-import properties
-import entity
+import model.properties as properties
+import model.entity as entity
 
 log = logging.getLogger("dimsum")
 

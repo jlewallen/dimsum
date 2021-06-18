@@ -2,11 +2,11 @@ from typing import Any, List, Type
 
 import logging
 
+import model.properties as properties
+import model.movement as movement
+
 import grammar
 import evaluator
-
-import properties
-import movement
 import actions
 
 log = logging.getLogger("dimsum")

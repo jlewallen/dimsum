@@ -2,14 +2,16 @@ import sys
 import logging
 import pytest
 
-import properties
-import game
+import model.properties as properties
+import model.game as game
+import model.mechanics as mechanics
+import model.carryable as carryable
+import model.behavior as behavior
+import model.scopes as scopes
+
 import actions
-import mechanics
-import carryable
-import behavior
+
 import test
-import scopes
 
 
 @pytest.mark.asyncio

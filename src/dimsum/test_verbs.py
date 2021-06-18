@@ -3,11 +3,12 @@ import logging
 import pytest
 
 import context
-import properties
-import game
-import things
-import entity
-import world
+
+import model.properties as properties
+import model.game as game
+import model.things as things
+import model.entity as entity
+import model.world as world
 
 import test
 

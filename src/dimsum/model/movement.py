@@ -4,8 +4,8 @@ import logging
 import enum
 
 import context
-import entity
-import carryable
+import model.entity as entity
+import model.carryable as carryable
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")

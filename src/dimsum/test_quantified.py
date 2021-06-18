@@ -1,9 +1,10 @@
 import logging
 import pytest
 
-import game
-import reply
-import carryable
+import model.game as game
+import model.reply as reply
+import model.carryable as carryable
+
 import test
 
 log = logging.getLogger("dimsum")

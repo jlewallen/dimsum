@@ -2,16 +2,17 @@ from typing import Sequence
 import logging
 import lupa
 
-import properties
-import kinds
-import entity
-import game
-import world
+import model.properties as properties
+import model.kinds as kinds
+import model.entity as entity
+import model.game as game
+import model.world as world
+import model.finders as finders
+import model.mechanics as mechanics
+import model.carryable as carryable
+import model.scopes as scopes
+
 import actions
-import finders
-import mechanics
-import carryable
-import scopes
 
 log = logging.getLogger("dimsum")
 

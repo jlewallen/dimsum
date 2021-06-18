@@ -5,25 +5,26 @@ import logging
 import sys
 import lark
 
-import properties
+import model.properties as properties
+import model.game as game
+import model.world as world
+import model.entity as entity
+import model.things as things
+import model.reply as reply
+import model.movement as movement
+import model.carryable as carryable
+import model.scopes as scopes
+import model.sugar as sugar
+
 import grammar
-import game
-import world
-import entity
-import things
 import actions
 import luaproxy
 import bus
 import messages
 import handlers
-import reply
 import serializing
 import persistence
-import movement
-import carryable
-import scopes
 
-import sugar
 import digging
 import simple
 

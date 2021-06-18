@@ -6,8 +6,8 @@ import time
 import copy
 import re
 
-import crypto
-import kinds
+import model.crypto as crypto
+import model.kinds as kinds
 
 log = logging.getLogger("dimsum")
 

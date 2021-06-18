@@ -4,15 +4,14 @@ import os
 import hashlib
 import base64
 
-import movement
-import health
+import bus
+import context
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from events import *
-from world import *
+import model.movement as movement
+import model.health as health
+import model.entity as entity
+
+from model.events import *
 
 log = logging.getLogger("dimsum")
 

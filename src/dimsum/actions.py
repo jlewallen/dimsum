@@ -3,22 +3,23 @@ from typing import Any
 import os
 import base64
 
-import properties
-import movement
-import health
-import mechanics
-import finders
-import carryable
-import entity
-import apparel
-import users
+import model.properties as properties
+import model.movement as movement
+import model.health as health
+import model.mechanics as mechanics
+import model.finders as finders
+import model.carryable as carryable
+import model.entity as entity
+import model.apparel as apparel
+import model.users as users
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from events import *
-from world import *
+from context import Ctx
+
+from model.reply import *
+from model.game import *
+from model.things import *
+from model.events import *
+from model.world import *
 
 
 MemoryAreaKey = "m:area"

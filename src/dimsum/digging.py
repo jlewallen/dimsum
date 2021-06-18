@@ -2,20 +2,21 @@ from typing import Any, List, Type
 
 import logging
 
+import model.properties as properties
+import model.movement as movement
+import model.carryable as carryable
+
+import actions
 import grammar
 import evaluator
 
-import properties
-import movement
-import actions
-import carryable
-
 from context import *
-from reply import *
-from game import *
-from things import *
-from events import *
-from world import *
+
+from model.reply import *
+from model.game import *
+from model.things import *
+from model.events import *
+from model.world import *
 
 log = logging.getLogger("dimsum")
 

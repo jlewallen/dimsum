@@ -1,14 +1,15 @@
 import logging
 import pytest
 
-import game
-import movement
-import properties
-import test
+import model.game as game
+import model.movement as movement
+import model.properties as properties
+import model.carryable as carryable
+import model.entity as entity
+import model.scopes as scopes
+
 import persistence
-import carryable
-import entity
-import scopes
+import test
 
 
 @pytest.mark.asyncio

@@ -1,8 +1,9 @@
 import pytest
 
-import game
-import properties
-import users
+import model.game as game
+import model.properties as properties
+import model.users as users
+
 import test
 
 

@@ -1,11 +1,11 @@
-import entity
-import ownership
-import health
-import mechanics
-import occupyable
-import carryable
-import movement
-import world
+import model.entity as entity
+import model.ownership as ownership
+import model.health as health
+import model.mechanics as mechanics
+import model.occupyable as occupyable
+import model.carryable as carryable
+import model.movement as movement
+import model.world as world
 
 Alive = [
     ownership.Ownership,

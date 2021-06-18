@@ -2,11 +2,12 @@ from typing import Any, List, Tuple, Dict, Sequence, Optional, Union, cast
 
 import logging
 import abc
-import properties
-import crypto
-import kinds
-import entity
+
 import context
+import model.properties as properties
+import model.crypto as crypto
+import model.kinds as kinds
+import model.entity as entity
 
 log = logging.getLogger("dimsum")
 

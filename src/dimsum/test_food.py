@@ -1,9 +1,10 @@
 import pytest
 
-import game
-import reply
-import health
-import carryable
+import model.game as game
+import model.reply as reply
+import model.health as health
+import model.carryable as carryable
+
 import test
 
 

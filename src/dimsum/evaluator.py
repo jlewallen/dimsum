@@ -1,11 +1,13 @@
 import logging
 import lark
-import properties
-import game
-import movement
-import things
+
+import model.properties as properties
+import model.game as game
+import model.movement as movement
+import model.things as things
+import model.finders as finders
+
 import actions
-import finders
 
 log = logging.getLogger("dimsum")
 

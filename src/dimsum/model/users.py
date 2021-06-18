@@ -4,7 +4,7 @@ import os
 import hashlib
 import base64
 
-import entity
+import model.entity as entity
 
 
 class Auth(entity.Scope):

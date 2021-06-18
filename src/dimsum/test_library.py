@@ -1,12 +1,13 @@
 import pytest
 import logging
 
-import entity
-import game
-import world
+import model.entity as entity
+import model.game as game
+import model.world as world
+import model.library as library
+
 import serializing
 import persistence
-import library
 import test
 
 log = logging.getLogger("dimsum")

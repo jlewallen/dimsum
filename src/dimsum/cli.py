@@ -8,19 +8,20 @@ import json
 import argparse
 import os
 
+import model.sugar as sugar
+import model.properties as properties
+import model.world as world
+import model.entity as entity
+import model.library as library
+import model.scopes as scopes
+
 import luaproxy
 import handlers
-import properties
-import world
 import messages
 import persistence
-import entity
 import actions
-import library
-import scopes
 import grammar
 
-import sugar
 import digging
 import simple
 import fallback

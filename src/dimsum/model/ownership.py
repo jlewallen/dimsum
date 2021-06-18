@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-import entity
+import model.entity as entity
 
 
 class Ownership(entity.Scope):

@@ -3,17 +3,18 @@ import logging
 import pytest
 
 import context
-import properties
-import crypto
-import entity
-import luaproxy
-import messages
+
+import model.properties as properties
+import model.crypto as crypto
+import model.entity as entity
+import model.world as world
+import model.ownership as ownership
+
 import handlers
-import world
+import messages
+import luaproxy
 import serializing
 import persistence
-
-import ownership
 
 import test
 

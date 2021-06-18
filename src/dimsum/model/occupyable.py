@@ -2,8 +2,9 @@ from typing import List, Any
 
 import abc
 import bus
-import events
-import entity
+
+import model.events as events
+import model.entity as entity
 
 
 class Living:

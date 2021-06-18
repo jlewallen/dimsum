@@ -4,12 +4,11 @@ import copy
 import jsonpickle
 import wrapt
 import logging
-import crypto
-import entity
-import game
-import things
-import world
-import movement
+
+import model.crypto as crypto
+import model.entity as entity
+import model.world as world
+import model.movement as movement
 
 log = logging.getLogger("dimsum")
 

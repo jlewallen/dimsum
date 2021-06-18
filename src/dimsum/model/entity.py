@@ -7,9 +7,9 @@ import copy
 import wrapt
 import inflect
 
-import properties
-import crypto
-import kinds
+import model.properties as properties
+import model.crypto as crypto
+import model.kinds as kinds
 
 log = logging.getLogger("dimsum")
 p = inflect.engine()

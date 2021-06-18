@@ -1,12 +1,14 @@
 from typing import Any, List, Optional, cast
 import logging
-import things
-import carryable
+
 import context
-import entity
-import world
-import mechanics
-import apparel
+
+import model.things as things
+import model.carryable as carryable
+import model.entity as entity
+import model.world as world
+import model.mechanics as mechanics
+import model.apparel as apparel
 
 log = logging.getLogger("dimsum")
 

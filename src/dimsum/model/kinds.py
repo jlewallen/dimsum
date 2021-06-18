@@ -1,4 +1,4 @@
-import crypto
+import model.crypto as crypto
 
 
 class Kind:

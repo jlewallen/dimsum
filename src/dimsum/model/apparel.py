@@ -2,7 +2,7 @@ from typing import List
 
 import abc
 
-import entity
+import model.entity as entity
 
 
 class Apparel(entity.Scope):

@@ -1,13 +1,14 @@
 from typing import List, Sequence, Any
 import logging
 import inflect
-import entity
-import game
-import things
-import movement
-import mechanics
-import occupyable
-import carryable
+
+import model.entity as entity
+import model.game as game
+import model.things as things
+import model.movement as movement
+import model.mechanics as mechanics
+import model.occupyable as occupyable
+import model.carryable as carryable
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")

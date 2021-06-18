@@ -1,10 +1,11 @@
 from typing import Any, Sequence, List, Dict
 import logging
-import behavior
-import entity
-import world
-import mechanics
-import occupyable
+
+import model.behavior as behavior
+import model.entity as entity
+import model.world as world
+import model.mechanics as mechanics
+import model.occupyable as occupyable
 
 log = logging.getLogger("dimsum")
 
