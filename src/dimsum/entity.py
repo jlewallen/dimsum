@@ -72,6 +72,7 @@ class Entity(behavior.BehaviorMixin):
         chimeras=None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
+        scopes=None,
         **kwargs
     ):
         super().__init__(**kwargs)  # type: ignore
@@ -101,10 +102,19 @@ class Entity(behavior.BehaviorMixin):
 
         self.props: properties.Common = props
 
-        # If we don't have an owner, we use the creator first and then
-        # just fall back on ourselves. Only use that if the prop is missing.
-        initial_owner = self.creator if self.creator else self
-        self.props.owner = self.props.owner if self.props.owner else initial_owner
+        if scopes:
+            for scope in scopes:
+                log.info("scope %s", kwargs)
+                with self.make(
+                    scope,
+                    key=self.key,
+                    identity=self.identity,
+                    parent=self.parent,
+                    creator=self.creator,
+                    props=self.props,
+                    **kwargs
+                ) as change:
+                    pass
 
         self.validate()
 
@@ -179,23 +189,23 @@ class Entity(behavior.BehaviorMixin):
     def __repr__(self):
         return str(self)
 
-    def make(self, ctor):
+    def make(self, ctor, **kwargs):
         key = ctor.__name__
 
-        log.info("splitting chimera: %s", key)
-        child = (
-            ctor(chimera=self, **self.chimeras[key])
-            if key in self.chimeras
-            else ctor(chimera=self)
-        )
+        chargs = kwargs
+        if key in self.chimeras:
+            chargs.update(**self.chimeras[key])
+
+        log.info("%s splitting chimera: %s", self.key, key)
+        child = ctor(chimera=self, **chargs)
         return child
 
     def update(self, child):
         key = child.__class__.__name__
         data = child.__dict__
         del data["chimera"]
-        log.info("updating chimera: %s %s", key, data)
-        self.chimeras[key] = copy.deepcopy(data)
+        log.info("%s updating chimera: %s %s", self.key, key, data)
+        self.chimeras[key] = data
 
 
 class Spawned:
@@ -203,6 +213,10 @@ class Spawned:
         super().__init__()
         assert chimera
         self.chimera = chimera
+
+    @property
+    def ourselves(self):
+        return self.chimera
 
     def __enter__(self):
         return self
