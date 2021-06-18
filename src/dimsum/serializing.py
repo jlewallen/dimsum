@@ -60,7 +60,6 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
 @jsonpickle.handlers.register(envo.Area)
 @jsonpickle.handlers.register(envo.Exit)
 @jsonpickle.handlers.register(things.Item)
-@jsonpickle.handlers.register(things.Recipe)
 @jsonpickle.handlers.register(animals.Player)
 @jsonpickle.handlers.register(animals.Person)
 @jsonpickle.handlers.register(animals.Animal)
@@ -94,7 +93,6 @@ def derive_from(klass):
 
 allowed = [
     things.Item,
-    things.Recipe,
     envo.Area,
     envo.Exit,
     animals.Animal,

@@ -77,12 +77,12 @@ class MaybeItem(ItemFactory):
 
 
 class RecipeItem(ItemFactory):
-    def __init__(self, recipe: "Recipe"):
+    def __init__(self, recipe: entity.Entity):
         super().__init__()
         self.recipe = recipe
 
     def create_item(self, **kwargs) -> Item:
-        return self.recipe.create_item(**kwargs)
+        return self.recipe.make(RecipeMixin).create_item(**kwargs)
 
 
 class MaybeQuantifiedItem(ItemFactory):
@@ -95,13 +95,17 @@ class MaybeQuantifiedItem(ItemFactory):
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
-class Recipe(Item, ItemFactory, mechanics.Memorable):
+class RecipeMixin(entity.Scope, ItemFactory):
     def __init__(self, template=None, **kwargs):
         super().__init__(**kwargs)
-        assert template
-        self.template = template.clone()
+        self.template = template if template else None
+
+    def constructed(self, template=None, **kwargs):
+        if template:
+            self.template = template
 
     def create_item(self, **kwargs) -> Item:
+        assert self.template
         log.info("recipe:creating %s %s (todo:sign)", self.template, kwargs)
         return self.template.clone(**kwargs)
 

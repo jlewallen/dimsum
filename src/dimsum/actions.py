@@ -656,14 +656,15 @@ class CallThis(PersonAction):
 
         # Copy all of the base props from the item. Exclude stamps.
         template = item
-        recipe = Recipe(
+        recipe = Item(
             creator=player,
             owner=player,
             props=item.props.clone(),
             behaviors=item.make(behavior.BehaviorMixin).behaviors,
             kind=item.make(carryable.CarryableMixin).kind,
-            template=template,
         )
+        with recipe.make(RecipeMixin) as makes:
+            makes.template = template
         world.register(recipe)
         with player.make(mechanics.MemoryMixin) as brain:
             brain.memorize("r:" + self.name, recipe)

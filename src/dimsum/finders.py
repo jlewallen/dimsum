@@ -205,7 +205,7 @@ class MaybeItemOrRecipe:
 
         log.info("%s finding brain", self)
         with person.make(mechanics.MemoryMixin) as brain:
-            recipe = cast(things.Recipe, brain.find_memory(self.q))
+            recipe = brain.find_memory(self.q)
             if recipe:
                 return things.RecipeItem(recipe).create_item(person=person, **kwargs)
 
