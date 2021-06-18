@@ -41,13 +41,3 @@ def get():
 
 def set(ctx: Ctx):
     worldCtx.set(ctx)
-
-
-class FindItemMixin:
-    def find_item_under(self, **kwargs) -> Optional[entity.Entity]:
-        log.info("finding {0}".format(kwargs))
-        return get().find_item(candidates=self.gather_entities(), **kwargs)
-
-    @abc.abstractmethod
-    def gather_entities(self) -> List[entity.Entity]:
-        raise NotImplementedError

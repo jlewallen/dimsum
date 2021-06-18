@@ -139,12 +139,6 @@ class Entity(behavior.BehaviorMixin):
             self.props.gid = gid
             return gid
 
-    def gather_entities(self) -> List["Entity"]:
-        return []
-
-    def find_item_under(self, **kwargs) -> Optional["Entity"]:
-        return None
-
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
             self.props.related[name] = kinds.Kind()

@@ -100,10 +100,13 @@ class World(entity.Entity, entity.Registrar):
 
         self.register(area)
 
-        for entity in area.entities():
+        for entity in area.make(occupyable.OccupyableMixin).occupied:
             self.register(entity)
 
-        for item in area.entities():
+        for entity in area.make(carryable.ContainingMixin).holding:
+            self.register(entity)
+
+        for item in area.make(carryable.ContainingMixin).holding:
             if item.props.navigable:
                 log.debug("linked-via-navigable[%s] %s", depth, item.props.navigable)
                 self.add_area(item.props.navigable, depth=depth + 1, seen=seen)
@@ -290,7 +293,10 @@ class WorldCtx(context.Ctx):
             if e.describes(**kwargs):
                 return e
             else:
-                found = e
+                if "q" in kwargs:
+                    found = None
+                else:
+                    found = e
 
         return found
 

@@ -18,7 +18,6 @@ p = inflect.engine()
 
 
 class Item(
-    context.FindItemMixin,
     entity.Entity,
     entity.IgnoreExtraConstructorArguments,
 ):
@@ -33,15 +32,6 @@ class Item(
             if q.lower() in str(self).lower():
                 return True
         return False
-
-    def gather_entities(self) -> List[entity.Entity]:
-        log.debug("item-gather-entities: %s", self)
-        return entity.entities(self.make(carryable.ContainingMixin).holding) + flatten(
-            [
-                e.gather_entities()
-                for e in entity.entities(self.make(carryable.ContainingMixin).holding)
-            ]
-        )
 
     def clone(self, quantity: float = None, **kwargs):
         updated = copy.deepcopy(self.__dict__)

@@ -2,7 +2,10 @@ from typing import List, Tuple, Dict, Sequence, Optional
 import abc
 import logging
 import enum
+import context
 import entity
+
+import carryable
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum")
@@ -118,11 +121,14 @@ class FindNamedRoute(FindsRoute):
     async def find_route(
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
-        navigable = area.find_item_under(inherits=Navigable, q=self.name)
-        if navigable:
-            log.debug("navigable={0}".format(navigable))
-            assert navigable.props.navigable
-            return AreaRoute(area=navigable.props.navigable)
+        with area.make(carryable.ContainingMixin) as contain:
+            navigable = context.get().find_item(
+                candidates=contain.holding, inherits=Navigable, q=self.name
+            )
+            if navigable:
+                log.debug("navigable={0}".format(navigable))
+                assert navigable.props.navigable
+                return AreaRoute(area=navigable.props.navigable)
         return None
 
 
@@ -134,11 +140,14 @@ class FindDirectionalRoute(FindsRoute):
     async def find_route(
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
-        navigable = area.find_item_under(inherits=Navigable, q=self.direction.exiting)
-        if navigable:
-            log.debug("navigable={0}".format(navigable))
-            assert navigable.props.navigable
-            return AreaRoute(area=navigable.props.navigable)
+        with area.make(carryable.ContainingMixin) as contain:
+            navigable = context.get().find_item(
+                candidates=contain.holding, inherits=Navigable, q=self.direction.exiting
+            )
+            if navigable:
+                log.debug("navigable={0}".format(navigable))
+                assert navigable.props.navigable
+                return AreaRoute(area=navigable.props.navigable)
         return None
 
 

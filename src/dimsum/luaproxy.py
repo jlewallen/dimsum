@@ -124,9 +124,10 @@ class LupaArea(LupaEntity):
         return self.entity
 
     def number(self, of):
-        if isinstance(of, str):
-            return self.area.number_of_named(of)
-        return self.area.number_of_kind(of)
+        with self.area.make(carryable.ContainingMixin) as contain:
+            if isinstance(of, str):
+                return contain.number_of_named(of)
+            return contain.number_of_kind(of)
 
     def make(self, table):
         item = self.make_item_from_table(table, creator=self.ctx.creator)

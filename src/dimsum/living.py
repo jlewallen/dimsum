@@ -1,10 +1,6 @@
 from typing import List, Optional
 import logging
 import entity
-import occupyable
-import carryable
-import apparel
-import mechanics
 import scopes
 
 
@@ -23,14 +19,9 @@ class HoldingActivity(Activity):
 
 class Alive(
     entity.Entity,
-    occupyable.Living,
 ):
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Alive, **kwargs)
-
-    @property
-    def quantity(self):
-        return 1
 
     def describes(self, q: str = None, **kwargs) -> bool:
         assert q

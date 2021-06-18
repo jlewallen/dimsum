@@ -195,7 +195,7 @@ class CarryableMixin(entity.Spawned):
             kind=self.ourselves.kind,
             props=self.ourselves.props.clone(),
             # behaviors=self.behaviors,
-            **kwargs
+            **kwargs,
         )
         with item.make(CarryableMixin) as carry:
             carry.quantity = quantity
@@ -273,8 +273,8 @@ class ContainingMixin(OpenableMixin):
 
     def add_item(self, item: CarryableMixin, **kwargs) -> CarryableMixin:
         for already in self.holding:
-            log.info("adding %s already = %s", item.kind, already.kind)
-            log.info("adding %s already = %s", item, already)
+            # log.info("adding %s already = %s", item.kind, already.kind)
+            # log.info("adding %s already = %s", item, already)
             if item.kind.same(already.kind):
                 with cast(entity.Entity, already).make(CarryableMixin) as additional:
                     with cast(entity.Entity, item).make(CarryableMixin) as coming:
@@ -345,6 +345,23 @@ class ContainingMixin(OpenableMixin):
             self.holding.remove(item)
             return [item]
         return []
+
+    def entities(self) -> List[entity.Entity]:
+        return entity.entities(self.holding)
+
+    def entities_named(self, of: str):
+        return [e for e in self.entities() if e.describes(q=of)]
+
+    def entities_of_kind(self, kind: kinds.Kind):
+        return [e for e in self.entities() if e.kind and e.kind.same(kind)]
+
+    def number_of_named(self, of: str) -> int:
+        return sum([e.quantity for e in self.entities_named(of)])
+
+    def number_of_kind(self, kind: kinds.Kind) -> int:
+        return sum(
+            [e.make(CarryableMixin).quantity for e in self.entities_of_kind(kind)]
+        )
 
 
 def expected(maybes: List[Any]) -> List[CarryableMixin]:

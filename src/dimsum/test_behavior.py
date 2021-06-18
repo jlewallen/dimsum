@@ -170,12 +170,18 @@ end
     await tw.success("look")
     await tw.success("hold box")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
-    assert len(tw.area.entities()) == 1
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 0
     await tw.success("shake box")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
-    assert len(tw.area.entities()) == 2
-    assert tw.area.entities()[0].creator == box
-    assert tw.area.entities()[0].make(carryable.CarryableMixin).quantity == 10
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 1
+    assert tw.area.make(carryable.ContainingMixin).holding[0].creator == box
+    assert (
+        tw.area.make(carryable.ContainingMixin)
+        .holding[0]
+        .make(carryable.CarryableMixin)
+        .quantity
+        == 10
+    )
     await tw.success("look")
 
 
@@ -207,11 +213,11 @@ end
     )
 
     await tw.world.tick(0)
-    assert len(tw.area.entities()) == 3
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     assert len(tw.world.items()) == 2
 
     await tw.world.tick(1)
-    assert len(tw.area.entities()) == 4
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 3
     assert len(tw.world.items()) == 3
 
 
@@ -238,13 +244,13 @@ end
     )
 
     await tw.world.tick(0)
-    assert len(tw.area.entities()) == 3
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     assert len(tw.world.items()) == 2
     await tw.world.tick(1)
-    assert len(tw.area.entities()) == 3
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     assert len(tw.world.items()) == 2
     await tw.world.tick(2)
-    assert len(tw.area.entities()) == 3
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     assert len(tw.world.items()) == 2
 
 
@@ -300,9 +306,9 @@ end
     )
 
     await tw.world.tick(0)
-    assert len(tw.area.entities()) == 3
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     await tw.world.tick(1)
-    assert len(tw.area.entities()) == 4
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 3
 
 
 @pytest.mark.asyncio
@@ -330,6 +336,6 @@ end
     )
 
     await tw.world.tick(0)
-    assert len(tw.area.entities()) == 2
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
     await tw.world.tick(1)
-    assert len(tw.area.entities()) == 2
+    assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
