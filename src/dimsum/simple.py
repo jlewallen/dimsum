@@ -4,7 +4,6 @@ import logging
 
 import grammar
 import evaluator
-
 import properties
 import movement
 import actions
@@ -15,7 +14,6 @@ from context import *
 from reply import *
 from game import *
 from things import *
-from living import *
 from events import *
 from world import *
 
@@ -23,7 +21,7 @@ log = logging.getLogger("dimsum")
 
 
 class SimpleVerb(actions.PersonAction):
-    def __init__(self, who=None, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, who=None, item: ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
         self.who = who
         self.item = item if item else finders.FindNone()

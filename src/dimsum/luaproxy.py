@@ -7,7 +7,6 @@ import kinds
 import entity
 import game
 import world
-import living
 import actions
 import finders
 import mechanics

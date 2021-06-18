@@ -9,13 +9,6 @@ import properties
 import movement
 import actions
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from events import *
-from world import *
-
 log = logging.getLogger("dimsum")
 
 

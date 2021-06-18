@@ -3,14 +3,10 @@ from typing import List, Optional, Any, Sequence, cast
 import logging
 import copy
 import inflect
+
 import properties
-import crypto
 import entity
-import context
-import apparel
 import carryable
-import mechanics
-import movement
 import scopes
 
 log = logging.getLogger("dimsum")

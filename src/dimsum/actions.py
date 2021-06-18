@@ -11,12 +11,12 @@ import mechanics
 import finders
 import carryable
 import entity
+import apparel
 
 from context import *
 from reply import *
 from game import *
 from things import *
-from living import *
 from events import *
 from world import *
 

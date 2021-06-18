@@ -8,7 +8,6 @@ import movement
 import mechanics
 import occupyable
 import carryable
-import living
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -41,12 +40,25 @@ class ObservedItem(ObservedEntity):
         return str(self)
 
 
+class Activity:
+    pass
+
+
+class HoldingActivity(Activity):
+    def __init__(self, item: entity.Entity):
+        super().__init__()
+        self.item = item
+
+    def __str__(self):
+        return "holding %s" % (self.item,)
+
+
 class ObservedLiving(ObservedEntity):
     def __init__(self, alive: entity.Entity):
         super().__init__()
         self.alive = alive
-        self.activities: Sequence[living.Activity] = [
-            living.HoldingActivity(e)
+        self.activities: Sequence[Activity] = [
+            HoldingActivity(e)
             for e in things.expected(alive.make(carryable.ContainingMixin).holding)
         ]
 

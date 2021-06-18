@@ -8,7 +8,6 @@ import crypto
 import entity
 import game
 import things
-import living
 import world
 import movement
 
@@ -56,7 +55,6 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
 
 
 @jsonpickle.handlers.register(entity.Entity)
-@jsonpickle.handlers.register(things.Item)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
@@ -87,7 +85,6 @@ def derive_from(klass):
 
 allowed = [
     entity.Entity,
-    things.Item,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}

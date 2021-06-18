@@ -1,14 +1,13 @@
 from typing import Any, Optional, Dict, List, Sequence, cast
 import time
 import logging
+
 import entity
 import context
 import properties
 import game
 import bus
 import behavior
-import things
-import living
 import occupyable
 import carryable
 import movement
