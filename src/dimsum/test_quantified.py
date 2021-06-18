@@ -17,7 +17,7 @@ async def test_quantified_drop_partial_and_hold():
     await tw.success("make 20 Coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 0
-    assert len(tw.world.items()) == 1
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
@@ -39,17 +39,17 @@ async def test_quantified_drop_partial_and_hold():
     assert (
         tw.player.make(carryable.ContainingMixin).holding[0].key in tw.world.entities
     )  # Meh
-    assert len(tw.world.items()) == 2
+    assert len(tw.world.entities) == 5
 
     await tw.success("hold coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 0
-    assert len(tw.world.items()) == 1
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 1
-    assert len(tw.world.items()) == 2
+    assert len(tw.world.entities) == 5
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
@@ -68,7 +68,7 @@ async def test_quantified_drop_partial_and_hold():
         .quantity
         == 10
     )
-    assert len(tw.world.items()) == 2
+    assert len(tw.world.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -90,10 +90,11 @@ async def test_quantified_drop_all():
     tw = test.TestWorld()
 
     await tw.initialize()
+    assert len(tw.world.entities) == 3
     await tw.success("make 20 Coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 0
-    assert len(tw.world.items()) == 1
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 20 coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 0
@@ -105,7 +106,7 @@ async def test_quantified_drop_all():
         .quantity
         == 20
     )
-    assert len(tw.world.items()) == 1
+    assert len(tw.world.entities) == 4
 
 
 @pytest.mark.asyncio
@@ -119,7 +120,7 @@ async def test_quantified_drop_inflected():
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
 
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 0
-    await tw.success("drop 10 coins")
+    await tw.success("drop 10 coin")
     assert len(tw.player.make(carryable.ContainingMixin).holding) == 1
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 1
 

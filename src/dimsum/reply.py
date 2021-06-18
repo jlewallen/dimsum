@@ -4,7 +4,6 @@ import inflect
 import entity
 import game
 import things
-import envo
 import movement
 import mechanics
 import occupyable
@@ -171,12 +170,12 @@ class EntitiesObservation(Observation):
 
 
 class AreaObservation(Observation):
-    def __init__(self, area: envo.Area, person: entity.Entity):
+    def __init__(self, area: entity.Entity, person: entity.Entity):
         super().__init__()
         assert area
         assert person
         self.who: ObservedPerson = ObservedPerson(person)
-        self.where: envo.Area = area
+        self.where: entity.Entity = area
         self.living: List[ObservedLiving] = flatten(
             [
                 observe(e)

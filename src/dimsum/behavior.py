@@ -179,7 +179,7 @@ class BehaviorMixin(entity.Scope):
         returning = self.behaviors.get_all(name)
         for rb in registered_behaviors:
             if rb.name == name:
-                if rb.behavior.enabled(entity=self):
+                if rb.behavior.enabled(entity=self.ourselves):
                     returning.append(Behavior(lua=rb.behavior.lua, logs=[]))
         return returning
 

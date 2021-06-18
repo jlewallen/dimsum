@@ -23,7 +23,6 @@ class KeyMixin(entity.Scope):
 class Lockable:
     def __init__(self, pattern: crypto.Identity = None, locked=None, **kwargs):
         super().__init__(*kwargs)
-        log.info("lockable %s", locked)
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
 
@@ -170,6 +169,11 @@ class CarryableMixin(entity.Scope):
         self.kind = kind if kind else kinds.Kind()
         self.quantity = quantity if quantity else 1
         self.loose = loose
+
+    def constructed(self, quantity: int = None, **kwargs):
+        log.info("carryable::constructed")
+        if quantity:
+            self.quantity = quantity
 
     def increase_quantity(self, q: int):
         self.quantity += q

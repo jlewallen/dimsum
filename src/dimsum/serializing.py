@@ -7,7 +7,6 @@ import logging
 import crypto
 import entity
 import game
-import envo
 import things
 import living
 import world
@@ -56,8 +55,7 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(envo.Area)
-@jsonpickle.handlers.register(envo.Exit)
+@jsonpickle.handlers.register(entity.Entity)
 @jsonpickle.handlers.register(things.Item)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
@@ -88,9 +86,8 @@ def derive_from(klass):
 
 
 allowed = [
+    entity.Entity,
     things.Item,
-    envo.Area,
-    envo.Exit,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
@@ -140,9 +137,10 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(world: world.World):
+def all(world: world.World, **kwargs):
     return {
-        key: serialize(entity, secure=True) for key, entity in world.entities.items()
+        key: serialize(entity, secure=True, **kwargs)
+        for key, entity in world.entities.items()
     }
 
 

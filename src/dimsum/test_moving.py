@@ -2,13 +2,13 @@ import logging
 import pytest
 
 import game
-import envo
 import movement
 import properties
 import test
 import persistence
 import carryable
 import entity
+import scopes
 
 
 @pytest.mark.asyncio
@@ -27,11 +27,15 @@ async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()
 
-    another_room = envo.Area(creator=tw.world, props=properties.Common("Another Room"))
+    another_room = scopes.area(
+        creator=tw.world, props=properties.Common("Another Room")
+    )
 
     add_item(
         tw.area,
-        envo.Exit(area=another_room, creator=tw.world, props=properties.Common("Door")),
+        scopes.exit(
+            area=another_room, creator=tw.world, props=properties.Common("Door")
+        ),
     )
 
     tw.world.add_area(another_room)
@@ -62,12 +66,12 @@ async def test_directional_moving():
     obs = await tw.success("look")
     assert obs
 
-    park = envo.Area(props=properties.Common("North Park"), creator=tw.jacob)
+    park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
 
     tw.world.add_area(park)
     add_item(
         tw.area,
-        envo.Exit(
+        scopes.exit(
             area=park,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=tw.jacob,
@@ -82,15 +86,17 @@ async def test_directional_moving():
 
 
 class Bidirectional:
-    def __init__(self, there: envo.Area = None, back: envo.Area = None, **kwargs):
+    def __init__(
+        self, there: entity.Entity = None, back: entity.Entity = None, **kwargs
+    ):
         assert there
         assert back
-        goes_there = envo.Exit(
+        goes_there = scopes.exit(
             area=there,
             props=properties.Common(name="Exit to {0}".format(there.props.name)),
             **kwargs
         )
-        comes_back = envo.Exit(
+        comes_back = scopes.exit(
             area=back,
             props=properties.Common(name="Exit to {0}".format(back.props.name)),
             **kwargs
@@ -105,8 +111,8 @@ class Bidirectional:
 async def test_programmatic_basic_entrances_and_exits():
     tw = test.TestWorld()
 
-    earth = envo.Area(creator=tw.jacob, props=properties.Common(name="Earth"))
-    asteroid = envo.Area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
+    earth = scopes.area(creator=tw.jacob, props=properties.Common(name="Earth"))
+    asteroid = scopes.area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
     Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
 
     await tw.initialize(earth)

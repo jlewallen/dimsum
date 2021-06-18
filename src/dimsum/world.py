@@ -8,7 +8,6 @@ import game
 import bus
 import behavior
 import things
-import envo
 import living
 import occupyable
 import carryable
@@ -34,12 +33,6 @@ class World(entity.Entity, entity.Registrar):
         self.context_factory = context_factory
         self.register(self)
 
-    def items(self):
-        return self.all_of_type(things.Item)
-
-    def areas(self):
-        return self.all_of_type(envo.Area)
-
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
             if name in e.props.name:
@@ -53,21 +46,25 @@ class World(entity.Entity, entity.Registrar):
                 return e
         return None
 
-    def welcome_area(self) -> envo.Area:
-        return self.areas()[0]
+    def welcome_area(self) -> entity.Entity:
+        for _, entity in self.entities.items():
+            if entity.has(occupyable.OccupyableMixin):
+                return entity
+        raise Exception("no welcome area")
 
-    def find_entity_area(self, entity: entity.Entity) -> Optional[envo.Area]:
-        if isinstance(entity, envo.Area):  # HACK
+    def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
+        log.info("finding area for %s", entity)
+        if entity.has(occupyable.OccupyableMixin):
             return entity
-        for area in self.areas():
-            with area.make(carryable.ContainingMixin) as contain:
-                if contain.contains(entity) or area.make(
+        for _, needle in self.entities.items():
+            with needle.make(carryable.ContainingMixin) as contain:
+                if contain.contains(entity) or needle.make(
                     occupyable.OccupyableMixin
                 ).occupying(entity):
-                    return area
+                    return needle
         return None
 
-    def find_player_area(self, player: entity.Entity) -> envo.Area:
+    def find_player_area(self, player: entity.Entity) -> entity.Entity:
         area = self.find_entity_area(player)
         assert area
         return area
@@ -81,7 +78,7 @@ class World(entity.Entity, entity.Registrar):
     def resolve(self, keys) -> Sequence[entity.Entity]:
         return [self.entities[key] for key in keys]
 
-    def add_area(self, area: envo.Area, depth=0, seen: Dict[str, str] = None):
+    def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         if seen is None:
             seen = {}
 
@@ -106,14 +103,13 @@ class World(entity.Entity, entity.Registrar):
                 log.debug("linked-via-ex[%s] %s", depth, maybe_area)
                 self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
-            if isinstance(item, things.Item):
-                for linked in item.make(movement.MovementMixin).adjacent():
-                    log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                    self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+            for linked in item.make(movement.MovementMixin).adjacent():
+                log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
+                self.add_area(linked, depth=depth + 1, seen=seen)
 
         for linked in area.make(movement.MovementMixin).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
-            self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+            self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
 
@@ -123,8 +119,8 @@ class World(entity.Entity, entity.Registrar):
             self.register(entity)
 
     def apply_item_finder(
-        self, person: entity.Entity, finder: things.ItemFinder, **kwargs
-    ) -> Optional[things.Item]:
+        self, person: entity.Entity, finder, **kwargs
+    ) -> Optional[entity.Entity]:
         assert person
         assert finder
         area = self.find_player_area(person)
@@ -261,21 +257,21 @@ class WorldCtx(context.Ctx):
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
 
-    def create_item(self, quantity: int = None, **kwargs) -> things.Item:
-        item = things.Item(**kwargs)
+    def create_item(self, quantity: int = None, **kwargs) -> entity.Entity:
+        item = scopes.item(**kwargs)
         if quantity:
             with item.make(carryable.CarryableMixin) as carry:
                 carry.quantity = quantity
         return item
 
     def find_item(
-        self, inherits=None, candidates=None, exclude=None, **kwargs
+        self, candidates=None, scopes=[], exclude=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(
-            "find-item: candidates=%s exclude=%s inherits=%s kw=%s",
+            "find-item: candidates=%s exclude=%s scopes=%s kw=%s",
             candidates,
             exclude,
-            inherits,
+            scopes,
             kwargs,
         )
 
@@ -288,8 +284,10 @@ class WorldCtx(context.Ctx):
             if exclude and e in exclude:
                 continue
 
-            if inherits and not isinstance(e, inherits):
-                continue
+            if scopes:
+                has = [e.has(scope) for scope in scopes]
+                if len(has) == 0:
+                    continue
 
             if e.describes(**kwargs):
                 return e

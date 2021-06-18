@@ -41,10 +41,14 @@ async def test_chimeric_entities_serialize(caplog):
     bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
     universe = world.World(bus, luaproxy.context_factory)
 
-    jacob = entity.Entity(creator=universe, props=properties.Common(name="Jacob"))
+    jacob = entity.Entity(
+        creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
+    )
     universe.register(jacob)
 
-    toy = entity.Entity(creator=universe, props=properties.Common(name="Toy"))
+    toy = entity.Entity(
+        creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
+    )
     universe.register(toy)
 
     with jacob.make(SimpleHolding) as holding:
@@ -66,7 +70,7 @@ async def test_chimeric_entities_serialize(caplog):
 def make_person(
     props: properties.Common = None, creator: entity.Entity = None, **kwargs
 ):
-    person = entity.Entity(props=props, creator=creator, **kwargs)
+    person = entity.Entity(props=props, creator=creator, scopes=[SimpleCore], **kwargs)
 
     assert props
 

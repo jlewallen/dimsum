@@ -10,7 +10,6 @@ import grammar
 import game
 import world
 import entity
-import envo
 import things
 import actions
 import luaproxy
@@ -22,6 +21,7 @@ import serializing
 import persistence
 import movement
 import carryable
+import scopes
 
 import sugar
 import digging
@@ -38,7 +38,7 @@ class TestWorld:
     def __init__(self):
         self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
         self.world = world.World(self.bus, luaproxy.context_factory)
-        self.jacob = entity.Entity(
+        self.jacob = scopes.alive(
             creator=self.world,
             props=properties.Common("Jacob", desc="Curly haired bastard."),
         )
@@ -46,8 +46,8 @@ class TestWorld:
         self.l = grammar.create_parser()
 
     def add_simple_area_here(self, door, name):
-        door = things.Item(creator=self.player, props=properties.Common(door))
-        area = envo.Area(creator=self.player, props=properties.Common(name))
+        door = scopes.item(creator=self.player, props=properties.Common(door))
+        area = scopes.area(creator=self.player, props=properties.Common(name))
         with door.make(movement.MovementMixin) as nav:
             nav.link_area(area)
         self.add_item(door)
@@ -56,14 +56,14 @@ class TestWorld:
         return area
 
     async def add_carla(self):
-        self.carla = entity.Entity(
+        self.carla = scopes.alive(
             creator=self.world,
             props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
-        self.tomi = entity.Entity(
+        self.tomi = scopes.alive(
             creator=self.world,
             props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )
@@ -72,7 +72,7 @@ class TestWorld:
     async def initialize(self, area=None, **kwargs):
         self.area = area
         if not self.area:
-            self.area = envo.Area(
+            self.area = scopes.area(
                 creator=self.player, props=properties.Common("Living room")
             )
             self.world.register(self.area)

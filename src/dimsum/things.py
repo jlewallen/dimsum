@@ -21,44 +21,24 @@ class Item(
     entity.Entity,
     entity.IgnoreExtraConstructorArguments,
 ):
-    def __init__(self, **kwargs):
-        super().__init__(scopes=scopes.Item, **kwargs)
-        self.validate()
-
-    def describes(self, q: str = None, **kwargs) -> bool:
-        if q:
-            if q.lower() in self.props[properties.Name].lower():
-                return True
-            if q.lower() in str(self).lower():
-                return True
-        return False
-
-    def clone(self, quantity: float = None, **kwargs):
-        updated = copy.deepcopy(self.__dict__)
-        updated.update(props=self.props.clone(), **kwargs)
-        cloned = Item(**updated)
-        if quantity:
-            with cloned.make(carryable.CarryableMixin) as more:
-                more.quantity = quantity
-        return cloned
-
-    def __str__(self):
+    def describe(self) -> str:
         with self.make_and_discard(carryable.CarryableMixin) as carry:
             if carry.quantity > 1:
-                return "%d %s" % (
+                return "{0} {1} (#{2})".format(
                     carry.quantity,
-                    p.plural(self.props[properties.Name], carry.quantity),
+                    p.plural(self.props.name, carry.quantity),
+                    self.props.gid,
                 )
-        return p.a(self.props[properties.Name])
+        return "{0} (#{1})".format(p.a(self.props.name), self.props.gid)
 
 
 class ItemFinder:
-    def find_item(self, **kwargs) -> Optional[Item]:
+    def find_item(self, **kwargs) -> Optional[entity.Entity]:
         raise NotImplementedError
 
 
 class ItemFactory:
-    def create_item(self, **kwargs) -> Item:
+    def create_item(self, **kwargs) -> entity.Entity:
         raise NotImplementedError
 
 
@@ -67,9 +47,9 @@ class MaybeItem(ItemFactory):
         super().__init__()
         self.name = name
 
-    def create_item(self, quantity: float = None, **kwargs) -> Item:
+    def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
         log.debug("create-item: {0}".format(kwargs))
-        original = Item(props=properties.Common(self.name), **kwargs)
+        original = scopes.item(props=properties.Common(self.name), **kwargs)
         if quantity:
             with original.make(carryable.CarryableMixin) as multiple:
                 multiple.quantity = quantity
@@ -91,7 +71,7 @@ class MaybeQuantifiedItem(ItemFactory):
         self.template: MaybeItem = template
         self.quantity: float = quantity
 
-    def create_item(self, **kwargs) -> Item:
+    def create_item(self, **kwargs) -> entity.Entity:
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
@@ -104,10 +84,14 @@ class RecipeMixin(entity.Scope, ItemFactory):
         if template:
             self.template = template
 
-    def create_item(self, **kwargs) -> Item:
+    def create_item(self, **kwargs) -> entity.Entity:
         assert self.template
+
         log.info("recipe:creating %s %s (todo:sign)", self.template, kwargs)
-        return self.template.clone(**kwargs)
+        updated = copy.deepcopy(self.template.__dict__)
+        updated.update(props=self.template.props.clone(), **kwargs)
+        cloned = scopes.item(**updated)
+        return cloned
 
 
 def expected(maybes: Sequence[Any]) -> Sequence[Item]:

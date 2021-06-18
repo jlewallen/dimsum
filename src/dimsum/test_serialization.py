@@ -4,7 +4,6 @@ import logging
 import properties
 import entity
 import game
-import envo
 import things
 import world
 import movement
@@ -13,6 +12,7 @@ import persistence
 import library
 import carryable
 import behavior
+import scopes
 import test
 
 import ownership
@@ -36,7 +36,7 @@ async def test_serialize_empty_world(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_one_area(caplog):
     world = test.create_empty_world()
-    world.add_area(envo.Area(creator=world, props=properties.Common("Area")))
+    world.add_area(scopes.area(creator=world, props=properties.Common("Area")))
 
     json = serializing.all(world)
 
@@ -52,11 +52,11 @@ async def test_serialize_world_one_area(caplog):
 async def test_serialize_world_one_item(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
-    area = envo.Area(creator=world, props=properties.Common("Area"))
-    add_item(area, things.Item(creator=world, props=properties.Common("Item")))
+    area = scopes.area(creator=world, props=properties.Common("Area"))
+    add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
     world.add_area(area)
 
-    assert isinstance(area.make(carryable.ContainingMixin).holding[0], things.Item)
+    assert area.make(carryable.ContainingMixin).holding[0]
 
     json = serializing.all(world)
 
@@ -65,17 +65,14 @@ async def test_serialize_world_one_item(caplog):
     after = test.create_empty_world()
     serializing.restore(after, json)
 
-    assert isinstance(after.find_entity_by_name("Area"), envo.Area)
-    assert isinstance(after.find_entity_by_name("Item"), things.Item)
+    assert after.find_entity_by_name("Area")
+    assert after.find_entity_by_name("Item")
 
     assert (
         len(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding)
         == 1
     )
-    assert isinstance(
-        after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0],
-        things.Item,
-    )
+    assert after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0]
 
     assert len(after.entities.items()) == 3
 
@@ -85,12 +82,12 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     caplog.set_level(logging.INFO)
     world = test.create_empty_world()
 
-    two = envo.Area(creator=world, props=properties.Common("Two"))
-    one = envo.Area(creator=world, props=properties.Common("One"))
+    two = scopes.area(creator=world, props=properties.Common("Two"))
+    one = scopes.area(creator=world, props=properties.Common("One"))
 
     add_item(
         one,
-        envo.Exit(
+        scopes.exit(
             area=two,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=world,
@@ -99,7 +96,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
     add_item(
         two,
-        envo.Exit(
+        scopes.exit(
             area=one,
             props=properties.Common(name=movement.Direction.SOUTH.exiting),
             creator=world,
@@ -132,18 +129,24 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_items(caplog):
-    caplog.set_level(logging.INFO)
     world = test.create_empty_world()
 
-    one = envo.Area(creator=world, props=properties.Common("One"))
-    two = envo.Area(creator=world, props=properties.Common("Two"))
+    one = scopes.area(creator=world, props=properties.Common("One"))
+    two = scopes.area(creator=world, props=properties.Common("Two"))
 
-    add_item(one, envo.Exit(area=two, creator=world, props=properties.Common("Item")))
-    add_item(two, envo.Exit(area=one, creator=world, props=properties.Common("Item")))
+    add_item(
+        one, scopes.exit(area=two, creator=world, props=properties.Common("Item-One"))
+    )
+    add_item(
+        two, scopes.exit(area=one, creator=world, props=properties.Common("Item-Two"))
+    )
+
+    assert two in one.make(movement.MovementMixin).adjacent()
+    assert one in two.make(movement.MovementMixin).adjacent()
 
     world.add_area(one)
 
-    json = serializing.all(world)
+    json = serializing.all(world, indent=True)
 
     assert len(json.items()) == 5
 
@@ -156,14 +159,8 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert isinstance(
-        one.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area,
-        envo.Area,
-    )
-    assert isinstance(
-        two.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area,
-        envo.Area,
-    )
+    assert one.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area
+    assert two.make(carryable.ContainingMixin).holding[0].make(movement.ExitMixin).area
 
     assert two in one.make(movement.MovementMixin).adjacent()
     assert one in two.make(movement.MovementMixin).adjacent()
@@ -177,7 +174,7 @@ async def test_serialize():
     await tw.initialize()
 
     tree = tw.add_item(
-        things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
+        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
     clearing = tw.add_simple_area_here("Door", "Clearing")
     tree.get_kind("petals")
@@ -211,7 +208,6 @@ end
 
 @pytest.mark.asyncio
 async def test_unregister_destroys(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -240,7 +236,6 @@ async def test_unregister_destroys(caplog):
 
 @pytest.mark.asyncio
 async def test_transients_preserved(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("make Beer Keg")
@@ -263,7 +258,6 @@ async def test_transients_preserved(caplog):
 
 @pytest.mark.asyncio
 async def test_serialize_library(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -271,7 +265,7 @@ async def test_serialize_library(caplog):
     tw.world.add_area(area)
 
     json = serializing.serialize(
-        {"aras": tw.world.areas()}, unpicklable=False, indent=4
+        {"entities": tw.world.entities}, unpicklable=False, indent=4
     )
 
     assert "py/id" not in json
@@ -280,7 +274,7 @@ async def test_serialize_library(caplog):
 @pytest.mark.asyncio
 async def test_serialize_preserves_owner_reference(caplog):
     world = test.create_empty_world()
-    world.add_area(envo.Area(creator=world, props=properties.Common("Area")))
+    world.add_area(scopes.area(creator=world, props=properties.Common("Area")))
 
     json = serializing.all(world)
 
@@ -312,7 +306,7 @@ async def test_serialize_properties_directly(caplog):
 
 class Example:
     def __init__(self, world: world.World = None):
-        self.one = envo.Area(creator=world, props=properties.Common("Area"))
+        self.one = scopes.area(creator=world, props=properties.Common("Area"))
         self.two = self.one
 
 
@@ -320,7 +314,7 @@ class Example:
 async def test_serialize_properties_on_entity(caplog):
     world = test.create_empty_world()
 
-    area = envo.Area(creator=world, props=properties.Common("Area"))
+    area = scopes.area(creator=world, props=properties.Common("Area"))
     area.owner = world
     area.damn = world
 

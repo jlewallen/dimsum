@@ -4,7 +4,6 @@ import things
 import carryable
 import context
 import entity
-import envo
 import world
 import mechanics
 import apparel
@@ -13,16 +12,16 @@ log = logging.getLogger("dimsum")
 
 
 class FindNone(things.ItemFinder):
-    def find_item(self, **kwargs) -> Optional[things.Item]:
+    def find_item(self, **kwargs) -> Optional[entity.Entity]:
         return None
 
 
 class StaticItem(things.ItemFinder):
-    def __init__(self, item: things.Item = None, **kwargs):
+    def __init__(self, item: entity.Entity = None, **kwargs):
         super().__init__()
         self.item = item
 
-    def find_item(self, **kwargs) -> Optional[things.Item]:
+    def find_item(self, **kwargs) -> Optional[entity.Entity]:
         return self.item
 
 
@@ -31,9 +30,9 @@ class ObjectNumber(things.ItemFinder):
         super().__init__()
         self.number = number
 
-    def find_item(self, world: world.World = None, **kwargs) -> Optional[things.Item]:
+    def find_item(self, world: world.World = None, **kwargs) -> Optional[entity.Entity]:
         assert world
-        return cast(things.Item, world.find_by_number(self.number))
+        return world.find_by_number(self.number)
 
 
 class AnyItem(things.ItemFinder):
@@ -43,8 +42,8 @@ class AnyItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: entity.Entity = None, area: envo.Area = None, **kwargs
-    ) -> Optional[things.Item]:
+        self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
+    ) -> Optional[entity.Entity]:
         assert person
         assert area
 
@@ -54,8 +53,7 @@ class AnyItem(things.ItemFinder):
                 candidates=wearing.wearing, q=self.q, **kwargs
             )
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         log.info("%s finding pockets (contained)", self)
         for item in things.expected(person.make(carryable.ContainingMixin).holding):
@@ -71,8 +69,7 @@ class AnyItem(things.ItemFinder):
                 candidates=pockets.holding, q=self.q, **kwargs
             )
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         log.info("%s finding ground", self)
         with area.make(carryable.ContainingMixin) as ground:
@@ -80,8 +77,7 @@ class AnyItem(things.ItemFinder):
                 candidates=ground.holding, q=self.q, **kwargs
             )
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         return None
 
@@ -97,8 +93,8 @@ class UnheldItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: entity.Entity = None, area: envo.Area = None, **kwargs
-    ) -> Optional[things.Item]:
+        self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
+    ) -> Optional[entity.Entity]:
         assert person
         assert area
 
@@ -106,15 +102,13 @@ class UnheldItem(things.ItemFinder):
         with area.make(carryable.ContainingMixin) as contain:
             item = context.get().find_item(candidates=contain.holding, q=self.q)
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         log.info("%s finding pockets", self)
         with person.make(carryable.ContainingMixin) as pockets:
             item = context.get().find_item(candidates=pockets.holding, q=self.q)
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         return None
 
@@ -122,7 +116,7 @@ class UnheldItem(things.ItemFinder):
 class AnyHeldItem(things.ItemFinder):
     def find_item(
         self, person: entity.Entity = None, **kwargs
-    ) -> Optional[things.Item]:
+    ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
@@ -141,7 +135,7 @@ class HeldItem(things.ItemFinder):
 
     def find_item(
         self, person: entity.Entity = None, **kwargs
-    ) -> Optional[things.Item]:
+    ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
@@ -150,8 +144,7 @@ class HeldItem(things.ItemFinder):
                 candidates=pockets.holding, q=self.q, **kwargs
             )
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         return None
 
@@ -159,15 +152,14 @@ class HeldItem(things.ItemFinder):
 class FindHeldContainer(things.ItemFinder):
     def find_item(
         self, person: entity.Entity = None, **kwargs
-    ) -> Optional[things.Item]:
+    ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
         with person.make(carryable.ContainingMixin) as pockets:
             item = context.get().find_item(candidates=pockets.holding, **kwargs)
             if item:
-                assert isinstance(item, things.Item)
-                return cast(things.Item, item)
+                return item
 
         return None
 
@@ -180,7 +172,7 @@ class ContainedItem(things.ItemFinder):
 
     def find_item(
         self, person: entity.Entity = None, **kwargs
-    ) -> Optional[things.Item]:
+    ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets (contained)", self)
@@ -200,7 +192,7 @@ class MaybeItemOrRecipe:
         assert q
         self.q = q
 
-    def create_item(self, person: entity.Entity = None, **kwargs) -> things.Item:
+    def create_item(self, person: entity.Entity = None, **kwargs) -> entity.Entity:
         assert person
 
         log.info("%s finding brain", self)

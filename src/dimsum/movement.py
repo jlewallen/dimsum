@@ -107,12 +107,10 @@ class ExitMixin(entity.Scope):
     def __init__(self, area: entity.Entity = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area if area else None
-        log.info("ctor: %s", self.area)
 
     def constructed(self, area: entity.Entity = None, **kwargs):
         if area:
             self.area = area
-        log.info("constructed: %s", self.area)
 
 
 class FindsRoute:
@@ -133,7 +131,7 @@ class FindNamedRoute(FindsRoute):
     ) -> Optional[AreaRoute]:
         with area.make(carryable.ContainingMixin) as contain:
             navigable = context.get().find_item(
-                candidates=contain.holding, inherits=Navigable, q=self.name
+                candidates=contain.holding, scopes=[ExitMixin], q=self.name
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
@@ -153,7 +151,7 @@ class FindDirectionalRoute(FindsRoute):
     ) -> Optional[AreaRoute]:
         with area.make(carryable.ContainingMixin) as contain:
             navigable = context.get().find_item(
-                candidates=contain.holding, inherits=Navigable, q=self.direction.exiting
+                candidates=contain.holding, scopes=[ExitMixin], q=self.direction.exiting
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))

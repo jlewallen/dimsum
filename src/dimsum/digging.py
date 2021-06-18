@@ -14,8 +14,6 @@ from context import *
 from reply import *
 from game import *
 from things import *
-from envo import *
-from living import *
 from events import *
 from world import *
 
@@ -76,13 +74,13 @@ class Dig(actions.PersonAction):
             "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
         )
 
-        digging = envo.Area(
+        digging = scopes.area(
             creator=player,
             props=properties.Common(name=self.area_name),
         )
 
         if self.linkage.there:
-            goes_there = envo.Exit(
+            goes_there = scopes.exit(
                 area=digging,
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
@@ -92,7 +90,7 @@ class Dig(actions.PersonAction):
             world.register(goes_there)
 
         if self.linkage.back:
-            comes_back = envo.Exit(
+            comes_back = scopes.exit(
                 area=area,
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),

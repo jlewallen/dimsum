@@ -15,7 +15,6 @@ from context import *
 from reply import *
 from game import *
 from things import *
-from envo import *
 from living import *
 from events import *
 from world import *

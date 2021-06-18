@@ -3,8 +3,6 @@ import logging
 import properties
 import game
 import world
-import things
-import envo
 import entity
 import actions
 import movement
@@ -12,6 +10,7 @@ import mechanics
 import occupyable
 import carryable
 import behavior
+import scopes
 
 log = logging.getLogger("dimsum")
 
@@ -23,15 +22,15 @@ def add_item(container: entity.Entity, item: entity.Entity):
 
 class Generics:
     def __init__(self, world: world.World):
-        self.thing = things.Item(
+        self.thing = scopes.item(
             creator=world,
             props=properties.Common("generic thing"),
         )
-        self.area = envo.Area(
+        self.area = scopes.area(
             creator=world,
             props=properties.Common("generic area"),
         )
-        self.player = things.Item(
+        self.player = scopes.alive(
             creator=world,
             props=properties.Common("generic player"),
         )
@@ -48,7 +47,7 @@ class Factory:
 
 class Hammer(Factory):
     def create(self, world: world.World, generics: Generics):
-        return things.Item(
+        return scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common("Hammer", desc="It's heavy."),
@@ -57,7 +56,7 @@ class Hammer(Factory):
 
 class BeerKeg(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common("Beer Keg", desc="It's heavy."),
@@ -67,7 +66,7 @@ class BeerKeg(Factory):
 
 class LargeMapleTree(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common("Large Maple Tree", desc="It's heavy."),
@@ -77,7 +76,7 @@ class LargeMapleTree(Factory):
                 "b:drop-leaf:tick",
                 lua="""
 function(s, world, area, item)
-    return area.make({
+    return area.make_here({
         kind = item.kind("leaf-1"),
         name = "Maple Leaf",
         quantity = 1,
@@ -90,7 +89,7 @@ end
                 "b:drop-branch:tick",
                 lua="""
 function(s, world, area, item)
-    return area.make({
+    return area.make_here({
         kind = item.kind("branch-1"),
         name = "Maple Branch",
         quantity = 1,
@@ -103,7 +102,7 @@ end
 
 class LargeOakTree(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common("Large Oak Tree", desc="It's heavy."),
@@ -113,7 +112,7 @@ class LargeOakTree(Factory):
                 "b:drop-leaf:tick",
                 lua="""
 function(s, world, area, item)
-    return area.make({
+    return area.make_here({
         kind = item.kind("leaf-1"),
         name = "Oak Leaf",
         quantity = 1,
@@ -126,7 +125,7 @@ end
                 "b:drop-branch:tick",
                 lua="""
 function(s, world, area, item)
-    return area.make({
+    return area.make_here({
         kind = item.kind("branch-1"),
         name = "Oak Branch",
         quantity = 1,
@@ -138,8 +137,8 @@ end
 
 
 class SmallCrevice:
-    def create(self, world: world.World, generics: Generics, area: envo.Area):
-        item = envo.Exit(
+    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+        item = scopes.exit(
             area=area,
             creator=world,
             parent=generics.thing,
@@ -154,7 +153,7 @@ class SmallCrevice:
 
 class MysteriousBox(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common(
@@ -175,7 +174,7 @@ end
 
 class LargeSteepCliff(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common(
@@ -189,7 +188,7 @@ class LargeSteepCliff(Factory):
                 lua="""
 function(s, world, area, item)
     if math.random() > 0.7 then
-        return area.make({
+        return area.make_here({
             kind = item.kind("stone-1"),
             name = "Heavy Stone",
             quantity = 1,
@@ -209,7 +208,7 @@ end
 
 class Guitar(Factory):
     def create(self, world: world.World, generics: Generics):
-        item = things.Item(
+        item = scopes.item(
             creator=world,
             parent=generics.thing,
             props=properties.Common(
@@ -228,8 +227,8 @@ end
 
 
 class WoodenLadder:
-    def create(self, world: world.World, generics: Generics, area: envo.Area):
-        item = envo.Exit(
+    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+        item = scopes.exit(
             area=area,
             creator=world,
             parent=generics.thing,
@@ -240,7 +239,7 @@ class WoodenLadder:
 
 class TomorrowCat(Factory):
     def create(self, world: world.World, generics: Generics):
-        animal = things.Item(
+        animal = scopes.alive(
             creator=world,
             parent=generics.thing,
             props=properties.Common(
@@ -252,7 +251,7 @@ class TomorrowCat(Factory):
 
 class CavernEntrance(Factory):
     def create(self, world: world.World, generics: Generics):
-        area = envo.Area(
+        area = scopes.exit(
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -265,7 +264,7 @@ class CavernEntrance(Factory):
 
 class DarkCavern(Factory):
     def create(self, world: world.World, generics: Generics):
-        area = envo.Area(
+        area = scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -278,7 +277,7 @@ class DarkCavern(Factory):
 
         add_item(
             area,
-            envo.Exit(
+            scopes.exit(
                 area=entrance,
                 creator=world,
                 parent=generics.thing,
@@ -291,7 +290,7 @@ class DarkCavern(Factory):
 
 class ArtistsLoft(Factory):
     def create(self, world: world.World, generics: Generics):
-        area = envo.Area(
+        area = scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -310,7 +309,7 @@ class RoomGrid(Factory):
 
     def make_cell(self, world: world.World, generics: Generics, x, y):
         name = "Grid Room %d x %x" % (x, y)
-        return envo.Area(
+        return scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common(name, desc=name),
@@ -325,7 +324,7 @@ class RoomGrid(Factory):
         def add_doorway(from_cell, to_cell, direction):
             add_item(
                 from_cell,
-                envo.Exit(
+                scopes.exit(
                     area=to_cell,
                     creator=world,
                     parent=generics.thing,
@@ -362,8 +361,8 @@ class Museum(Factory):
 
 
 class MarbleSteps:
-    def create(self, world: world.World, generics: Generics, area: envo.Area):
-        item = envo.Exit(
+    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+        item = scopes.exit(
             area=area,
             creator=world,
             parent=generics.thing,
@@ -374,7 +373,7 @@ class MarbleSteps:
 
 class NarrowCanyon:
     def create(self, world: world.World, generics: Generics):
-        area = envo.Area(
+        area = scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -388,8 +387,8 @@ class NarrowCanyon:
 
 
 class RockyPath:
-    def create(self, world: world.World, generics: Generics, area: envo.Area):
-        item = envo.Exit(
+    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+        item = scopes.exit(
             area=area,
             creator=world,
             parent=generics.thing,
@@ -400,7 +399,7 @@ class RockyPath:
 
 class WelcomeArea(Factory):
     def create(self, world: world.World, generics: Generics):
-        area = envo.Area(
+        area = scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -424,14 +423,14 @@ class WelcomeArea(Factory):
         add_item(area, RockyPath().create(world, generics, canyon))
         add_item(canyon, RockyPath().create(world, generics, area))
 
-        clearing = envo.Area(
+        clearing = scopes.area(
             creator=world,
             parent=generics.area,
             props=properties.Common("A small clearing."),
         )
         add_item(
             area,
-            envo.Exit(
+            scopes.exit(
                 area=clearing,
                 creator=world,
                 parent=generics.thing,
@@ -440,7 +439,7 @@ class WelcomeArea(Factory):
         )
         add_item(
             clearing,
-            envo.Exit(
+            scopes.exit(
                 area=area,
                 creator=world,
                 parent=generics.thing,
@@ -461,7 +460,7 @@ class WelcomeArea(Factory):
         return area
 
 
-def create_example_world(world: world.World) -> Tuple[Generics, envo.Area]:
+def create_example_world(world: world.World) -> Tuple[Generics, entity.Entity]:
     generics = Generics(world)
     area = WelcomeArea().create(world, generics)
     return generics, area

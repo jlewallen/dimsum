@@ -5,11 +5,14 @@ import logging
 import time
 import copy
 import wrapt
+import inflect
+
 import properties
 import crypto
 import kinds
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 class EntityRef(wrapt.ObjectProxy):
@@ -53,7 +56,8 @@ class Entity:
         scopes=None,
         **kwargs
     ):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__()
+
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
@@ -96,7 +100,7 @@ class Entity:
 
         self.validate()
 
-        # log.debug("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
+        log.info("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
 
     def validate(self) -> None:
         assert self.key
@@ -149,20 +153,23 @@ class Entity:
         self.props.frozen = None
         return True
 
+    def describe(self) -> str:
+        return "{0} (#{1})".format(p.a(self.props.name), self.props.gid)
+
     def describes(self, q: str = None, **kwargs) -> bool:
         if q:
             if q.lower() in self.props.name.lower():
                 return True
+            if q.lower() in self.describe():
+                return True
         return False
-
-    def __str__(self):
-        return "{0} (#{1})".format(self.props.name, self.props.gid)
-
-    def __repr__(self):
-        return str(self)
 
     def make_and_discard(self, ctor, **kwargs):
         return self.make(ctor, **kwargs)
+
+    def has(self, ctor, **kwargs):
+        key = ctor.__name__
+        return key in self.chimeras
 
     def make(self, ctor, **kwargs):
         key = ctor.__name__
@@ -181,6 +188,9 @@ class Entity:
         del data["chimera"]
         log.debug("%s updating chimera: %s %s", self.key, key, data)
         self.chimeras[key] = data
+
+    def __repr__(self):
+        return self.describe()
 
 
 class Scope:

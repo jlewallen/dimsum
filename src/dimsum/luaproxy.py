@@ -6,14 +6,13 @@ import properties
 import kinds
 import entity
 import game
-import things
-import envo
 import world
 import living
 import actions
 import finders
 import mechanics
 import carryable
+import scopes
 
 log = logging.getLogger("dimsum")
 
@@ -35,10 +34,6 @@ class LupaContext:
             return {key: self.wrap(value) for key, value in thing.items()}
         if isinstance(thing, world.World):
             return LupaWorld(self, thing)
-        if isinstance(thing, envo.Area):
-            return LupaArea(self, thing)
-        if isinstance(thing, things.Item):
-            return LupaItem(self, thing)
         return LupaItem(self, thing)
 
 
@@ -72,7 +67,7 @@ class LupaEntity:
             return getattr(self.entity, key)
         return None
 
-    def make_item_from_table(self, table, **kwargs) -> things.Item:
+    def make_item_from_table(self, table, **kwargs) -> entity.Entity:
         log.info(
             "area:make: %s",
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
@@ -90,7 +85,7 @@ class LupaEntity:
         for key, value in table.items():
             props.map[key] = value
 
-        item = things.Item(props=props, **kwargs)
+        item = scopes.item(props=props, **kwargs)
         if kind:
             with item.make(carryable.CarryableMixin) as carry:
                 carry.kind = kind
@@ -105,10 +100,13 @@ class LupaWorld(LupaEntity):
         return self.entity
 
 
-class LupaArea(LupaEntity):
+class LupaItem(LupaEntity):
     @property
-    def area(self) -> envo.Area:
-        assert isinstance(self.entity, envo.Area)
+    def area(self) -> entity.Entity:
+        return self.entity
+
+    @property
+    def item(self) -> entity.Entity:
         return self.entity
 
     def number(self, of):
@@ -116,17 +114,6 @@ class LupaArea(LupaEntity):
             if isinstance(of, str):
                 return contain.number_of_named(of)
             return contain.number_of_kind(of)
-
-    def make(self, table):
-        item = self.make_item_from_table(table, creator=self.ctx.creator)
-        return [actions.AddItemArea(area=self.area, item=item)]
-
-
-class LupaItem(LupaEntity):
-    @property
-    def item(self) -> things.Item:
-        assert isinstance(self.entity, things.Item)
-        return self.entity
 
     def kind(self, name: str) -> kinds.Kind:
         return self.entity.get_kind(name)
@@ -145,6 +132,10 @@ class LupaItem(LupaEntity):
     def go(self, area) -> Sequence[game.Action]:
         return [actions.Go(area=area)]
 
-    def make(self, table) -> Sequence[game.Action]:
+    def make_hands(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.entity)
         return [actions.Make(item=finders.StaticItem(item=item))]
+
+    def make_here(self, table):
+        item = self.make_item_from_table(table, creator=self.ctx.creator)
+        return [actions.AddItemArea(area=self.area, item=item)]

@@ -14,6 +14,10 @@ class OccupyableMixin(entity.Scope):
     def __init__(self, occupied=None, **kwargs):
         super().__init__(**kwargs)
         self.occupied: List[Living] = occupied if occupied else []
+        self.occupancy: int = 100
+
+    def constructed(self, **kwargs):
+        pass
 
     def add_living(self, living: Living) -> Living:
         self.occupied.append(living)

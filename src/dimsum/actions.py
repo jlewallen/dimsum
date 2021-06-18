@@ -16,7 +16,6 @@ from context import *
 from reply import *
 from game import *
 from things import *
-from envo import *
 from living import *
 from events import *
 from world import *
@@ -104,7 +103,7 @@ class Make(PersonAction):
         self.item = item
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        item: Optional[things.Item] = None
+        item: Optional[entity.Entity] = None
         if self.item:
             item = world.apply_item_finder(player, self.item)
 
@@ -112,7 +111,6 @@ class Make(PersonAction):
             item = self.template.create_item(
                 person=player, creator=player, owner=player
             )
-            assert isinstance(item, things.Item)
 
         if not item:
             return Failure("make what now?")
@@ -563,7 +561,7 @@ class TakeOut(PersonAction):
 
 class MovingAction(PersonAction):
     def __init__(
-        self, area: envo.Area = None, finder: movement.FindsRoute = None, **kwargs
+        self, area: entity.Entity = None, finder: movement.FindsRoute = None, **kwargs
     ):
         super().__init__(**kwargs)
         self.area = area
@@ -657,8 +655,9 @@ class CallThis(PersonAction):
         item.try_modify()
 
         # Copy all of the base props from the item. Exclude stamps.
+        # TODO This looks like it's been broken.
         template = item
-        recipe = Item(
+        recipe = scopes.item(
             creator=player,
             owner=player,
             props=item.props.clone(),
