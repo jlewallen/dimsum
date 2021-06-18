@@ -130,6 +130,7 @@ def get_color(e: entity.Entity) -> str:
         "Area": "skyblue",
         "Recipe": "thistle",
         "Chimera": "lavenderblush",
+        "Entity": "lavenderblush",
     }
     return map[e.klass]
 
