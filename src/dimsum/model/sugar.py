@@ -16,7 +16,6 @@ class WindBehavior(behavior.ConditionalBehavior):
     def enabled(self, entity: entity.Entity = None, **kwargs):
         assert entity
         if entity.has(occupyable.Occupyable):
-            log.info("occupyable: %s", entity)
             with entity.make(mechanics.Weather) as weather:
                 if weather.wind:
                     return True

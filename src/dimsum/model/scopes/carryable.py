@@ -158,7 +158,6 @@ class Carryable(entity.Scope):
         self.loose = loose
 
     def constructed(self, quantity: float = None, **kwargs):
-        log.info("carryable::constructed")
         if quantity:
             self.quantity = quantity
 
