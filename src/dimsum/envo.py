@@ -24,7 +24,6 @@ class Area(
     movement.MovementMixin,
     movement.Area,
     mechanics.Memorable,
-    mechanics.WeatherMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Area, **kwargs)

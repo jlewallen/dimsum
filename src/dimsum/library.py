@@ -367,7 +367,8 @@ class NarrowCanyon:
                 desc="It's barely wide enough to walk two by two down. The narrow walls really funnel the wind, creating powerful gusts.",
             ),
         )
-        area.add_weather(mechanics.Weather(wind=mechanics.Wind(magnitude=50)))
+        with area.make(mechanics.Weather) as weather:
+            weather.wind = mechanics.Wind(magnitude=50)
         return area
 
 

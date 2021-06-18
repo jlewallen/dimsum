@@ -5,6 +5,7 @@ import entity
 import things
 import envo
 import world
+import mechanics
 
 log = logging.getLogger("dimsum")
 
@@ -14,9 +15,11 @@ class WindBehavior(behavior.ConditionalBehavior):
     def enabled(self, entity: entity.Entity = None, **kwargs):
         if not isinstance(entity, envo.Area):  # HACK
             return False
-        if entity.weather.wind is None:
-            return False
-        return True
+
+        with entity.make(mechanics.Weather) as weather:
+            if weather.wind is None:
+                return False
+            return True
 
     @property
     def lua(self):

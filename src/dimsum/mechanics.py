@@ -120,12 +120,6 @@ class Physics:
         self.mass = mass
 
 
-class PhysicsMixin:
-    def __init__(self, physics: Physics = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
-        self.physics = physics if physics else Physics()
-
-
 class MemoryMixin(entity.Spawned):
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
@@ -153,16 +147,7 @@ class Wind:
         self.magnitude = magnitude
 
 
-class Weather:
+class Weather(entity.Spawned):
     def __init__(self, wind: Wind = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.wind = wind
-
-
-class WeatherMixin:
-    def __init__(self, weather: Weather = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
-        self.weather = weather if weather else Weather()
-
-    def add_weather(self, weather: Weather):
-        self.weather = weather
