@@ -22,9 +22,6 @@ class Area(
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Area, **kwargs)
 
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.area(self)
-
     def __str__(self):
         return self.props.name
 

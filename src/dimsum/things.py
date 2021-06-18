@@ -42,9 +42,6 @@ class Item(
                 more.quantity = quantity
         return cloned
 
-    def accept(self, visitor: entity.EntityVisitor) -> Any:
-        return visitor.item(self)
-
     def __str__(self):
         with self.make_and_discard(carryable.CarryableMixin) as carry:
             if carry.quantity > 1:
@@ -107,9 +104,6 @@ class Recipe(Item, ItemFactory, mechanics.Memorable):
     def create_item(self, **kwargs) -> Item:
         log.info("recipe:creating %s %s (todo:sign)", self.template, kwargs)
         return self.template.clone(**kwargs)
-
-    def accept(self, visitor: entity.EntityVisitor) -> Any:
-        return visitor.recipe(self)
 
 
 def expected(maybes: Sequence[Any]) -> Sequence[Item]:

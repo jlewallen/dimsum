@@ -23,27 +23,6 @@ class EntityRef(wrapt.ObjectProxy):
             super().__init__(targetOrKey)
 
 
-# TODO Move this
-class EntityVisitor:
-    def item(self, item):
-        pass
-
-    def recipe(self, recipe):
-        pass
-
-    def person(self, person):
-        pass
-
-    def exit(self, exit):
-        pass
-
-    def area(self, area):
-        pass
-
-    def animal(self, animal):
-        pass
-
-
 class IgnoreExtraConstructorArguments:
     """
     This can be applied in the inheritance hierarchy to swallow unused
@@ -175,9 +154,6 @@ class Entity:
             if q.lower() in self.props.name.lower():
                 return True
         return False
-
-    def accept(self, visitor: "EntityVisitor") -> Any:
-        raise NotImplementedError
 
     def __str__(self):
         return "{0} (#{1})".format(self.props.name, self.props.gid)

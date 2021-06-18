@@ -20,18 +20,12 @@ class Mammal(HealthyAndClothedAnimal):
 
 
 class Animal(Mammal):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.animal(self)
+    pass
 
 
 class Person(Mammal):
-    def accept(self, visitor: entity.EntityVisitor):
-        return visitor.person(self)
+    pass
 
 
 class Player(Person):
     pass
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]
