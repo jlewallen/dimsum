@@ -61,16 +61,9 @@ class DirectionalRoute(AreaRoute):
         return self.direction.exiting
 
 
-class NavigationAction(enum.Enum):
-    EXIT = 1
-    ENTER = 2
-
-
 class Navigable:
-    def __init__(self, action: NavigationAction = None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)  # type:ignore
-        assert action
-        self.action = action
 
 
 class MovementMixin(entity.Scope):

@@ -38,7 +38,7 @@ class Area(
 
 class Exit(movement.Navigable, things.Item):
     def __init__(self, area: Area = None, **kwargs):
-        super().__init__(action=movement.NavigationAction.EXIT, **kwargs)
+        super().__init__(**kwargs)
         if area:
             self.props[properties.Navigable] = area
         assert self.props[properties.Navigable]
