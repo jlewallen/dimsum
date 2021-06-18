@@ -6,6 +6,7 @@ import carryable
 import apparel
 import mechanics
 import health
+import scopes
 
 
 class Activity:
@@ -29,7 +30,7 @@ class Alive(
     mechanics.MemoryMixin,
 ):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(scopes=scopes.Alive, **kwargs)
 
     @property
     def quantity(self):

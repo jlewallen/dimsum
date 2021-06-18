@@ -12,6 +12,7 @@ import carryable
 import mechanics
 import movement
 import health
+import scopes
 
 log = logging.getLogger("dimsum")
 p = inflect.engine()
@@ -31,7 +32,7 @@ class Item(
     entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(scopes=scopes.Item, **kwargs)
         self.validate()
 
     def describes(self, q: str = None, **kwargs) -> bool:

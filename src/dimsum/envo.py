@@ -11,6 +11,7 @@ import occupyable
 import movement
 import mechanics
 import things
+import scopes
 
 log = logging.getLogger("dimsum")
 
@@ -26,7 +27,7 @@ class Area(
     mechanics.WeatherMixin,
 ):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(scopes=scopes.Area, **kwargs)
 
     def gather_entities(self) -> List[entity.Entity]:
         log.debug("area-gather-entities: %s", self)

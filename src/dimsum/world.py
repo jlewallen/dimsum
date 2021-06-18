@@ -11,6 +11,7 @@ import things
 import envo
 import living
 import animals
+import scopes
 
 DefaultMoveVerb = "walk"
 TickHook = "tick"
@@ -24,6 +25,7 @@ class World(entity.Entity, entity.Registrar):
         super().__init__(
             key="world",
             props=properties.Common("World", desc="Ya know, everything"),
+            scopes=scopes.World,
             **kwargs
         )
         self.bus = bus
