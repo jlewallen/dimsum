@@ -5,12 +5,11 @@ import entity
 import game
 import things
 import envo
-import living
-import animals
 import movement
 import mechanics
 import occupyable
 import carryable
+import living
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -44,7 +43,7 @@ class ObservedItem(ObservedEntity):
 
 
 class ObservedLiving(ObservedEntity):
-    def __init__(self, alive: living.Alive):
+    def __init__(self, alive: entity.Entity):
         super().__init__()
         self.alive = alive
         self.activities: Sequence[living.Activity] = [
@@ -106,7 +105,7 @@ class ObservedEntities(Observable):
 
 
 class PersonalObservation(Observation):
-    def __init__(self, who: animals.Person):
+    def __init__(self, who: entity.Entity):
         super().__init__()
         self.who = ObservedPerson(who)
 
@@ -172,7 +171,7 @@ class EntitiesObservation(Observation):
 
 
 class AreaObservation(Observation):
-    def __init__(self, area: envo.Area, person: animals.Person):
+    def __init__(self, area: envo.Area, person: entity.Entity):
         super().__init__()
         assert area
         assert person
@@ -214,16 +213,8 @@ class AreaObservation(Observation):
 
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if isinstance(entity, animals.Person):
-        if entity.make(mechanics.VisibilityMixin).is_invisible:
-            return []
-        return [ObservedPerson(entity)]
-    if isinstance(entity, animals.Animal):
-        if entity.make(mechanics.VisibilityMixin).is_invisible:
-            return []
-        return [ObservedAnimal(entity)]
-    if isinstance(entity, things.Item):
-        return [ObservedItem(entity)]
+    if entity.make(mechanics.VisibilityMixin).is_invisible:
+        return []
     return [ObservedItem(entity)]
 
 

@@ -10,7 +10,6 @@ import behavior
 import things
 import envo
 import living
-import animals
 import occupyable
 import carryable
 import movement
@@ -41,22 +40,17 @@ class World(entity.Entity, entity.Registrar):
     def areas(self):
         return self.all_of_type(envo.Area)
 
-    def people(self):
-        return self.all_of_type(animals.Person)
-
-    def players(self):
-        return self.all_of_type(animals.Player)
-
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
             if name in e.props.name:
                 return e
         return None
 
-    def find_person_by_name(self, name) -> Optional[animals.Person]:
-        for person in self.people():
-            if person.props.name == name:
-                return person
+    def find_person_by_name(self, name) -> Optional[entity.Entity]:
+        for key, e in self.entities.items():
+            # TODO Check type
+            if e.props.name == name:
+                return e
         return None
 
     def welcome_area(self) -> envo.Area:
@@ -73,7 +67,7 @@ class World(entity.Entity, entity.Registrar):
                     return area
         return None
 
-    def find_player_area(self, player: animals.Person) -> envo.Area:
+    def find_player_area(self, player: entity.Entity) -> envo.Area:
         area = self.find_entity_area(player)
         assert area
         return area
@@ -129,7 +123,7 @@ class World(entity.Entity, entity.Registrar):
             self.register(entity)
 
     def apply_item_finder(
-        self, person: animals.Person, finder: things.ItemFinder, **kwargs
+        self, person: entity.Entity, finder: things.ItemFinder, **kwargs
     ) -> Optional[things.Item]:
         assert person
         assert finder
@@ -142,7 +136,7 @@ class World(entity.Entity, entity.Registrar):
             log.info("found: nada")
         return found
 
-    async def perform(self, action, person: Optional[animals.Person]) -> game.Reply:
+    async def perform(self, action, person: Optional[entity.Entity]) -> game.Reply:
         area = self.find_entity_area(person) if person else None
         with WorldCtx(
             self.context_factory, world=self, person=person, area=area
@@ -195,7 +189,7 @@ class WorldCtx(context.Ctx):
         self,
         context_factory,
         world: World = None,
-        person: animals.Person = None,
+        person: entity.Entity = None,
         **kwargs
     ):
         super().__init__()

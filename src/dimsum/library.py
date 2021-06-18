@@ -6,7 +6,6 @@ import world
 import things
 import envo
 import entity
-import animals
 import actions
 import movement
 import mechanics
@@ -32,7 +31,7 @@ class Generics:
             creator=world,
             props=properties.Common("generic area"),
         )
-        self.player = animals.Player(
+        self.player = things.Item(
             creator=world,
             props=properties.Common("generic player"),
         )
@@ -241,8 +240,9 @@ class WoodenLadder:
 
 class TomorrowCat(Factory):
     def create(self, world: world.World, generics: Generics):
-        animal = animals.Animal(
+        animal = things.Item(
             creator=world,
+            parent=generics.thing,
             props=properties.Common(
                 "Tomorrow", desc="She's a Maine Coon, and very elegant and pretty."
             ),

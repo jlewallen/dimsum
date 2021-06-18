@@ -9,9 +9,9 @@ import properties
 import grammar
 import game
 import world
+import entity
 import envo
 import things
-import animals
 import actions
 import luaproxy
 import bus
@@ -38,7 +38,7 @@ class TestWorld:
     def __init__(self):
         self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
         self.world = world.World(self.bus, luaproxy.context_factory)
-        self.jacob = animals.Player(
+        self.jacob = entity.Entity(
             creator=self.world,
             props=properties.Common("Jacob", desc="Curly haired bastard."),
         )
@@ -56,14 +56,14 @@ class TestWorld:
         return area
 
     async def add_carla(self):
-        self.carla = animals.Player(
+        self.carla = entity.Entity(
             creator=self.world,
             props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
-        self.tomi = animals.Player(
+        self.tomi = entity.Entity(
             creator=self.world,
             props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )

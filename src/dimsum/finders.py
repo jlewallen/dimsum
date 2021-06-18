@@ -1,9 +1,9 @@
 from typing import Any, List, Optional, cast
 import logging
 import things
-import animals
 import carryable
 import context
+import entity
 import envo
 import world
 import mechanics
@@ -43,7 +43,7 @@ class AnyItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: animals.Person = None, area: envo.Area = None, **kwargs
+        self, person: entity.Entity = None, area: envo.Area = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
         assert area
@@ -97,7 +97,7 @@ class UnheldItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: animals.Person = None, area: envo.Area = None, **kwargs
+        self, person: entity.Entity = None, area: envo.Area = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
         assert area
@@ -121,7 +121,7 @@ class UnheldItem(things.ItemFinder):
 
 class AnyHeldItem(things.ItemFinder):
     def find_item(
-        self, person: animals.Person = None, **kwargs
+        self, person: entity.Entity = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
 
@@ -140,7 +140,7 @@ class HeldItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: animals.Person = None, **kwargs
+        self, person: entity.Entity = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
 
@@ -158,7 +158,7 @@ class HeldItem(things.ItemFinder):
 
 class FindHeldContainer(things.ItemFinder):
     def find_item(
-        self, person: animals.Person = None, **kwargs
+        self, person: entity.Entity = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
 
@@ -179,7 +179,7 @@ class ContainedItem(things.ItemFinder):
         self.q = q
 
     def find_item(
-        self, person: animals.Person = None, **kwargs
+        self, person: entity.Entity = None, **kwargs
     ) -> Optional[things.Item]:
         assert person
 
@@ -200,7 +200,7 @@ class MaybeItemOrRecipe:
         assert q
         self.q = q
 
-    def create_item(self, person: animals.Person = None, **kwargs) -> things.Item:
+    def create_item(self, person: entity.Entity = None, **kwargs) -> things.Item:
         assert person
 
         log.info("%s finding brain", self)

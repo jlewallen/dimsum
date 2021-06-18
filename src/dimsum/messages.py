@@ -9,7 +9,6 @@ from game import *
 from things import *
 from envo import *
 from living import *
-from animals import *
 from events import *
 from world import *
 
@@ -38,7 +37,7 @@ class TextBus(bus.EventBus):
     async def LivingLeftArea(self, living=None, area=None, **kwargs):
         return "%s left %s" % (living, area)
 
-    async def PlayerJoined(self, player: Player = None, area=None, **kwargs):
+    async def PlayerJoined(self, player: entity.Entity = None, area=None, **kwargs):
         return "%s joined!" % (player)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):

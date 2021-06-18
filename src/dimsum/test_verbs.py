@@ -6,9 +6,7 @@ import context
 import properties
 import game
 import things
-import envo
-import actions
-import animals
+import entity
 import world
 
 import test
@@ -16,14 +14,14 @@ import test
 
 class Verb:
     async def perform(
-        self, ctx: context.Ctx, world: world.World, player: animals.Player
+        self, ctx: context.Ctx, world: world.World, player: entity.Entity
     ):
         pass
 
 
 class LuaVerb(Verb):
     async def perform(
-        self, ctx: context.Ctx, world: world.World, player: animals.Player
+        self, ctx: context.Ctx, world: world.World, player: entity.Entity
     ):
         pass
 

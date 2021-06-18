@@ -15,14 +15,3 @@ class HoldingActivity(Activity):
 
     def __str__(self):
         return "holding %s" % (self.item,)
-
-
-class Alive(
-    entity.Entity,
-):
-    def __init__(self, **kwargs):
-        super().__init__(scopes=scopes.Alive, **kwargs)
-
-    def describes(self, q: str = None, **kwargs) -> bool:
-        assert q
-        return q.lower() in self.props.name.lower()

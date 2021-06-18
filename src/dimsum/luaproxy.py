@@ -10,7 +10,6 @@ import things
 import envo
 import world
 import living
-import animals
 import actions
 import finders
 import mechanics
@@ -36,23 +35,11 @@ class LupaContext:
             return {key: self.wrap(value) for key, value in thing.items()}
         if isinstance(thing, world.World):
             return LupaWorld(self, thing)
-        if isinstance(thing, animals.Person):
-            return LupaPerson(self, thing)
-        if isinstance(thing, animals.Animal):
-            return LupaAnimal(self, thing)
         if isinstance(thing, envo.Area):
             return LupaArea(self, thing)
         if isinstance(thing, things.Item):
             return LupaItem(self, thing)
-        if isinstance(thing, entity.Entity):
-            raise Exception(
-                "no wrapper for entity: %s (%s)"
-                % (
-                    thing,
-                    type(thing),
-                )
-            )
-        return thing
+        return LupaItem(self, thing)
 
 
 class LupaEntity:
@@ -144,8 +131,6 @@ class LupaItem(LupaEntity):
     def kind(self, name: str) -> kinds.Kind:
         return self.entity.get_kind(name)
 
-
-class LupaLivingCreature(LupaEntity):
     def visible(self):
         with self.entity.make(mechanics.VisibilityMixin) as vis:
             vis.make_visible()
@@ -163,17 +148,3 @@ class LupaLivingCreature(LupaEntity):
     def make(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.entity)
         return [actions.Make(item=finders.StaticItem(item=item))]
-
-
-class LupaPerson(LupaLivingCreature):
-    @property
-    def person(self) -> animals.Person:
-        assert isinstance(self.entity, animals.Person)
-        return self.entity
-
-
-class LupaAnimal(LupaLivingCreature):
-    @property
-    def animal(self) -> animals.Animal:
-        assert isinstance(self.entity, animals.Animal)
-        return self.entity

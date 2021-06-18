@@ -13,7 +13,6 @@ from game import *
 from things import *
 from envo import *
 from living import *
-from animals import *
 from events import *
 from world import *
 
@@ -25,5 +24,5 @@ class WhateverHandlers:
         super().__init__()
 
         @bus.handler(PlayerJoined)
-        def handle_player_joined(player: Player = None, **kwargs):
+        def handle_player_joined(player: entity.Entity = None, **kwargs):
             log.info("player joined handler: %s %s", player, kwargs)

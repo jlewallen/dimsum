@@ -16,7 +16,6 @@ from game import *
 from things import *
 from envo import *
 from living import *
-from animals import *
 from events import *
 from world import *
 
@@ -70,7 +69,7 @@ class Dig(actions.PersonAction):
         self.linkage = linkage
         self.area_name = area_name
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
 
         log.info(

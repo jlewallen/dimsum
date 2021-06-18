@@ -15,7 +15,6 @@ import world
 import messages
 import persistence
 import entity
-import animals
 import actions
 import library
 

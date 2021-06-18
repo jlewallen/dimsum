@@ -10,7 +10,6 @@ import game
 import envo
 import things
 import living
-import animals
 import world
 import movement
 
@@ -60,9 +59,6 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
 @jsonpickle.handlers.register(envo.Area)
 @jsonpickle.handlers.register(envo.Exit)
 @jsonpickle.handlers.register(things.Item)
-@jsonpickle.handlers.register(animals.Player)
-@jsonpickle.handlers.register(animals.Person)
-@jsonpickle.handlers.register(animals.Animal)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
@@ -95,9 +91,6 @@ allowed = [
     things.Item,
     envo.Area,
     envo.Exit,
-    animals.Animal,
-    animals.Person,
-    animals.Player,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}

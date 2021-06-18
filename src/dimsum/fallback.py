@@ -15,7 +15,6 @@ from game import *
 from things import *
 from envo import *
 from living import *
-from animals import *
 from events import *
 from world import *
 
