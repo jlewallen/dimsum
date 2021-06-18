@@ -2,6 +2,8 @@ from typing import List
 
 import abc
 
+import entity
+
 
 class WearableMixin:
     def __init__(self, **kwargs):
@@ -12,7 +14,7 @@ class WearableMixin:
         pass
 
 
-class ApparelMixin:
+class ApparelMixin(entity.Spawned):
     def __init__(self, wearing=None, **kwargs):
         super().__init__(**kwargs)
         self.wearing: List[WearableMixin] = wearing if wearing else []

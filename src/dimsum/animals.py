@@ -12,14 +12,13 @@ log = logging.getLogger("dimsum")
 class HealthyAndClothedAnimal(
     context.FindItemMixin,
     living.Alive,
-    apparel.ApparelMixin,
 ):
     def gather_entities(self) -> List[entity.Entity]:
         log.debug("animal-gather-entities: %s", self)
         return (
             entity.entities(self.holding)
             + flatten([e.gather_entities() for e in entity.entities(self.holding)])
-            + entity.entities(self.wearing)
+            + entity.entities(self.make(apparel.ApparelMixin).wearing)
         )
 
 

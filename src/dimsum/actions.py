@@ -140,8 +140,9 @@ class Wear(PersonAction):
 
         assert player.is_holding(item)
 
-        if player.wear(item):
-            player.drop(item)
+        with player.make(apparel.ApparelMixin) as wearing:
+            if wearing.wear(item):
+                player.drop(item)
 
         # TODO Publish
         await ctx.extend(wear=[item]).hook("wear:after")
@@ -159,13 +160,14 @@ class Remove(PersonAction):
         if not item:
             return Failure("remove what?")
 
-        if not player.is_wearing(item):
-            return Failure("you aren't wearing that")
+        with player.make(apparel.ApparelMixin) as wearing:
+            if not wearing.is_wearing(item):
+                return Failure("you aren't wearing that")
 
-        assert player.is_wearing(item)
+            assert wearing.is_wearing(item)
 
-        if player.unwear(item):
-            player.hold(item)
+            if wearing.unwear(item):
+                player.hold(item)
 
         await ctx.extend(remove=[item]).hook("remove:after")
         return Success("you removed %s" % (item))

@@ -20,7 +20,6 @@ p = inflect.engine()
 class Item(
     context.FindItemMixin,
     entity.Entity,
-    apparel.WearableMixin,
     carryable.CarryableMixin,
     carryable.ContainingMixin,
     carryable.KeyMixin,
