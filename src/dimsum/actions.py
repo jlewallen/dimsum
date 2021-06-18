@@ -135,8 +135,9 @@ class Wear(PersonAction):
         if not item:
             return Failure("wear what?")
 
-        if not item.when_worn():
-            return Failure("you can't wear that")
+        with item.make(mechanics.InteractableMixin) as inaction:
+            if not inaction.when_worn():
+                return Failure("you can't wear that")
 
         assert player.is_holding(item)
 
@@ -184,8 +185,9 @@ class Eat(PersonAction):
         if not item:
             return Failure("dunno where that is")
 
-        if not item.when_eaten():
-            return Failure("you can't eat that")
+        with item.make(mechanics.InteractableMixin) as inaction:
+            if not inaction.when_eaten():
+                return Failure("you can't eat that")
 
         area = world.find_player_area(player)
         with player.make(health.HealthMixin) as p:
@@ -206,8 +208,9 @@ class Drink(PersonAction):
         if not item:
             return Failure("dunno where that is")
 
-        if not item.when_drank():
-            return Failure("you can't drink that")
+        with item.make(mechanics.InteractableMixin) as inaction:
+            if not inaction.when_drank():
+                return Failure("you can't drink that")
 
         area = world.find_player_area(player)
         with player.make(health.HealthMixin) as p:
@@ -718,7 +721,8 @@ class ModifyActivity(PersonAction):
             return Failure("of what?")
 
         item.try_modify()
-        item.link_activity(self.activity, self.value)
+        with item.make(mechanics.InteractableMixin) as inaction:
+            inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
         return Success("done")
 
@@ -807,10 +811,11 @@ class PourProducer(carryable.Producer):
         self.template: finders.MaybeItemOrRecipe = template
 
     def produce_item(self, **kwargs) -> carryable.CarryableMixin:
-        interactions = {properties.Drank: True}
-        return self.template.create_item(
-            verb=PourVerb, loose=True, interactions=interactions, **kwargs
-        )
+        item = self.template.create_item(
+            verb=PourVerb, loose=True, **kwargs)
+        with item.make(mechanics.InteractableMixin) as inaction:
+            inaction.link_activity(properties.Drank)
+        return item
 
 
 class ModifyPours(PersonAction):

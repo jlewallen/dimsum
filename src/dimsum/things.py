@@ -23,7 +23,6 @@ class Item(
     carryable.CarryableMixin,
     carryable.ContainingMixin,
     carryable.KeyMixin,
-    mechanics.InteractableMixin,
     entity.IgnoreExtraConstructorArguments,
 ):
     def __init__(self, **kwargs):

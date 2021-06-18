@@ -10,7 +10,7 @@ import entity
 log = logging.getLogger("dimsum")
 
 
-class InteractableMixin:
+class InteractableMixin(entity.Spawned):
     def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.interactions = interactions if interactions else {}

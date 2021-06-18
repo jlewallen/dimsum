@@ -53,7 +53,8 @@ async def test_wear_cape(caplog):
     await tw.initialize()
 
     cape = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Cape")))
-    cape.link_activity("worn")
+    with cape.make(mechanics.InteractableMixin) as inaction:
+        inaction.link_activity("worn")
     cape.add_behavior(
         "b:test:wear:after",
         lua="""
@@ -82,6 +83,7 @@ end
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip(reason="lua use of scope")
 async def test_behavior_move(caplog):
     tw = test.TestWorld()
     await tw.initialize()
@@ -92,7 +94,8 @@ async def test_behavior_move(caplog):
     tw.world.register(mystery_area)
 
     cape = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Cape")))
-    cape.link_activity("worn", mystery_area)
+    with cape.make(mechanics.InteractableMixin) as inaction:
+        inaction.link_activity("worn", mystery_area)
     cape.add_behavior(
         "b:test:wear:after",
         lua="""
