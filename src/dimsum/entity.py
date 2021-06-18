@@ -42,6 +42,19 @@ class EntityFrozen(Exception):
     pass
 
 
+class Hooks:
+    def describe(self, entity: "Entity") -> str:
+        return "{0} (#{1})".format(entity.props.name, entity.props.gid)
+
+
+global_hooks = Hooks()
+
+
+def hooks(new_hooks: Hooks):
+    global global_hooks
+    global_hooks = new_hooks
+
+
 class Entity:
     def __init__(
         self,
@@ -157,7 +170,7 @@ class Entity:
         return True
 
     def describe(self) -> str:
-        return "{0} (#{1})".format(p.a(self.props.name), self.props.gid)
+        return global_hooks.describe(self)
 
     def describes(self, q: str = None, **kwargs) -> bool:
         if q:

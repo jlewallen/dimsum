@@ -17,15 +17,7 @@ class Item(
     entity.Entity,
     entity.IgnoreExtraConstructorArguments,
 ):
-    def describe(self) -> str:
-        with self.make_and_discard(carryable.CarryableMixin) as carry:
-            if carry.quantity > 1:
-                return "{0} {1} (#{2})".format(
-                    carry.quantity,
-                    p.plural(self.props.name, carry.quantity),
-                    self.props.gid,
-                )
-        return "{0} (#{1})".format(p.a(self.props.name), self.props.gid)
+    pass
 
 
 class ItemFinder:
