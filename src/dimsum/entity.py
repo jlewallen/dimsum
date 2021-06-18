@@ -50,10 +50,11 @@ class Entity:
         creator: "Entity" = None,
         parent: "Entity" = None,
         klass: str = None,
-        chimeras=None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
+        chimeras=None,
         scopes=None,
+        initialize=None,
         **kwargs
     ):
         super().__init__()
@@ -85,10 +86,12 @@ class Entity:
 
         if scopes:
             for scope in scopes:
-                log.debug("scope %s %s", scope, kwargs)
-                with self.make(
-                    scope,
-                ) as change:
+                args = {}
+                if initialize and scope in initialize:
+                    args = initialize[scope]
+
+                log.debug("scope %s %s %s", scope, kwargs, args)
+                with self.make(scope, **args) as change:
                     change.constructed(
                         key=self.key,
                         identity=self.identity,
@@ -183,7 +186,7 @@ class Entity:
         return child
 
     def update(self, child):
-        key = child.__class__.__name__
+        key = child.chimera_key
         data = child.__dict__
         del data["chimera"]
         log.debug("%s updating chimera: %s %s", self.key, key, data)
@@ -198,6 +201,10 @@ class Scope:
         super().__init__()
         assert chimera
         self.chimera = chimera
+
+    @property
+    def chimera_key(self) -> str:
+        return self.__class__.__name__
 
     @abc.abstractmethod
     def constructed(self, **kwargs):

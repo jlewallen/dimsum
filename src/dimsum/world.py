@@ -256,12 +256,11 @@ class WorldCtx(context.Ctx):
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
 
-    def create_item(self, quantity: int = None, **kwargs) -> entity.Entity:
-        item = scopes.item(**kwargs)
+    def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
+        initialize = {}
         if quantity:
-            with item.make(carryable.CarryableMixin) as carry:
-                carry.quantity = quantity
-        return item
+            initialize = {carryable.CarryableMixin: dict(quantity=quantity)}
+        return scopes.item(initialize=initialize, **kwargs)
 
     def find_item(
         self, candidates=None, scopes=[], exclude=None, **kwargs

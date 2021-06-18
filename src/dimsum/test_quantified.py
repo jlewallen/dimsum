@@ -127,7 +127,6 @@ async def test_quantified_drop_inflected():
 
 @pytest.mark.asyncio
 async def test_quantified_from_recipe_holding_template(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     await tw.initialize()
@@ -150,7 +149,6 @@ async def test_quantified_from_recipe_holding_template(caplog):
 
 @pytest.mark.asyncio
 async def test_quantified_from_recipe(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     await tw.initialize()

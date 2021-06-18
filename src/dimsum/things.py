@@ -44,12 +44,13 @@ class MaybeItem(ItemFactory):
         self.name = name
 
     def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
-        log.debug("create-item: {0}".format(kwargs))
-        original = scopes.item(props=properties.Common(self.name), **kwargs)
+        log.debug("create-item: {0} quantity={1}".format(kwargs, quantity))
+        initialize = {}
         if quantity:
-            with original.make(carryable.CarryableMixin) as multiple:
-                multiple.quantity = quantity
-        return original
+            initialize = {carryable.CarryableMixin: dict(quantity=quantity)}
+        return scopes.item(
+            props=properties.Common(self.name), initialize=initialize, **kwargs
+        )
 
 
 class RecipeItem(ItemFactory):
