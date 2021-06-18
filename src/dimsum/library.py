@@ -12,6 +12,7 @@ import movement
 import mechanics
 import occupyable
 import carryable
+import behavior
 
 log = logging.getLogger("dimsum")
 
@@ -72,9 +73,10 @@ class LargeMapleTree(Factory):
             parent=generics.thing,
             props=properties.Common("Large Maple Tree", desc="It's heavy."),
         )
-        item.add_behavior(
-            "b:drop-leaf:tick",
-            lua="""
+        with item.make(behavior.BehaviorMixin) as behave:
+            behave.add_behavior(
+                "b:drop-leaf:tick",
+                lua="""
 function(s, world, area, item)
     return area.make({
         kind = item.kind("leaf-1"),
@@ -84,10 +86,10 @@ function(s, world, area, item)
     })
 end
 """,
-        )
-        item.add_behavior(
-            "b:drop-branch:tick",
-            lua="""
+            )
+            behave.add_behavior(
+                "b:drop-branch:tick",
+                lua="""
 function(s, world, area, item)
     return area.make({
         kind = item.kind("branch-1"),
@@ -96,7 +98,7 @@ function(s, world, area, item)
     })
 end
 """,
-        )
+            )
         return item
 
 
@@ -107,9 +109,10 @@ class LargeOakTree(Factory):
             parent=generics.thing,
             props=properties.Common("Large Oak Tree", desc="It's heavy."),
         )
-        item.add_behavior(
-            "b:drop-leaf:tick",
-            lua="""
+        with item.make(behavior.BehaviorMixin) as behave:
+            behave.add_behavior(
+                "b:drop-leaf:tick",
+                lua="""
 function(s, world, area, item)
     return area.make({
         kind = item.kind("leaf-1"),
@@ -119,10 +122,10 @@ function(s, world, area, item)
     })
 end
 """,
-        )
-        item.add_behavior(
-            "b:drop-branch:tick",
-            lua="""
+            )
+            behave.add_behavior(
+                "b:drop-branch:tick",
+                lua="""
 function(s, world, area, item)
     return area.make({
         kind = item.kind("branch-1"),
@@ -131,7 +134,7 @@ function(s, world, area, item)
     })
 end
 """,
-        )
+            )
         return item
 
 
@@ -160,13 +163,14 @@ class MysteriousBox(Factory):
                 desc="It looks like some weird antique your grandmother would have. Why would anyone carry this thing around?",
             ),
         )
-        item.add_behavior(
-            "b:mystery:shake",
-            lua="""
+        with item.make(behavior.BehaviorMixin) as behave:
+            behave.add_behavior(
+                "b:mystery:shake",
+                lua="""
 function(s, world, area, item)
 end
 """,
-        )
+            )
         return item
 
 
@@ -180,9 +184,10 @@ class LargeSteepCliff(Factory):
                 desc="It's immense, with rocky outcroppings. It looks very climbable.",
             ),
         )
-        item.add_behavior(
-            "b:make:stone",
-            lua="""
+        with item.make(behavior.BehaviorMixin) as behave:
+            behave.add_behavior(
+                "b:make:stone",
+                lua="""
 function(s, world, area, item)
     if math.random() > 0.7 then
         return area.make({
@@ -199,7 +204,7 @@ function(s, world, area, item)
     })
 end
 """,
-        )
+            )
         return item
 
 
@@ -212,13 +217,14 @@ class Guitar(Factory):
                 "Acoustic Guitar", desc="Seems to be well travelled."
             ),
         )
-        item.add_behavior(
-            "b:music:play",
-            lua="""
+        with item.make(behavior.BehaviorMixin) as behave:
+            behave.add_behavior(
+                "b:music:play",
+                lua="""
 function(s, world, area, item)
 end
 """,
-        )
+            )
         return item
 
 

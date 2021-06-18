@@ -12,6 +12,7 @@ import serializing
 import persistence
 import library
 import carryable
+import behavior
 import test
 
 import ownership
@@ -67,8 +68,14 @@ async def test_serialize_world_one_item(caplog):
     assert isinstance(after.find_entity_by_name("Area"), envo.Area)
     assert isinstance(after.find_entity_by_name("Item"), things.Item)
 
-    assert len(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding) == 1
-    assert isinstance(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0], things.Item)
+    assert (
+        len(after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding)
+        == 1
+    )
+    assert isinstance(
+        after.find_entity_by_name("Area").make(carryable.ContainingMixin).holding[0],
+        things.Item,
+    )
 
     assert len(after.entities.items()) == 3
 
@@ -81,20 +88,22 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     two = envo.Area(creator=world, props=properties.Common("Two"))
     one = envo.Area(creator=world, props=properties.Common("One"))
 
-    add_item(one,
+    add_item(
+        one,
         envo.Exit(
             area=two,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=world,
-        )
+        ),
     )
 
-    add_item(two,
+    add_item(
+        two,
         envo.Exit(
             area=one,
             props=properties.Common(name=movement.Direction.SOUTH.exiting),
             creator=world,
-        )
+        ),
     )
 
     world.add_area(one)
@@ -144,8 +153,12 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = after.find_entity_by_name("Two")
     assert two
 
-    assert isinstance(one.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area)
-    assert isinstance(two.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area)
+    assert isinstance(
+        one.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area
+    )
+    assert isinstance(
+        two.make(carryable.ContainingMixin).holding[0].props.navigable, envo.Area
+    )
 
     assert two in one.adjacent()
     assert one in two.adjacent()
@@ -165,9 +178,11 @@ async def test_serialize():
     tree.get_kind("petals")
     with tree.make(movement.MovementMixin) as nav:
         nav.link_area(clearing)
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     debug("ok", area, item, time)
     return area.make({
@@ -178,7 +193,7 @@ function(s, world, area, item)
     })
 end
 """,
-    )
+        )
 
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
@@ -309,6 +324,7 @@ async def test_serialize_properties_on_entity(caplog):
     json = serializing.serialize(ex, indent=True)
 
     log.info(json)
+
 
 def add_item(container: entity.Entity, item: entity.Entity):
     with container.make(carryable.ContainingMixin) as contain:

@@ -6,7 +6,6 @@ import time
 import copy
 import wrapt
 import properties
-import behavior
 import crypto
 import kinds
 
@@ -61,7 +60,7 @@ class EntityFrozen(Exception):
     pass
 
 
-class Entity(behavior.BehaviorMixin):
+class Entity:
     def __init__(
         self,
         key: str = None,

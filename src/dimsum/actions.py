@@ -661,7 +661,7 @@ class CallThis(PersonAction):
             creator=player,
             owner=player,
             props=item.props.clone(),
-            behaviors=item.behaviors,
+            behaviors=item.make(behavior.BehaviorMixin).behaviors,
             kind=item.kind,
             template=template,
         )

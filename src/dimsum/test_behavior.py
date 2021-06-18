@@ -9,6 +9,7 @@ import envo
 import actions
 import mechanics
 import carryable
+import behavior
 import test
 
 
@@ -20,9 +21,11 @@ async def test_drop_hammer_funny_gold(caplog):
     hammer = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("Hammer"))
     )
-    hammer.add_behavior(
-        "b:test:drop:after",
-        lua="""
+
+    with hammer.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:drop:after",
+            lua="""
 function(s, world, area, player)
     if not player.gold then
         player.gold = { total = 0 }
@@ -35,7 +38,7 @@ function(s, world, area, player)
     debug("ok")
 end
 """,
-    )
+        )
 
     await tw.success("look")
     await tw.success("hold hammer")
@@ -56,23 +59,25 @@ async def test_wear_cape(caplog):
     cape = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Cape")))
     with cape.make(mechanics.InteractableMixin) as inaction:
         inaction.link_activity("worn")
-    cape.add_behavior(
-        "b:test:wear:after",
-        lua="""
+
+    with cape.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:wear:after",
+            lua="""
 function(s, world, area, player)
     player.invisible()
     debug(player.is_invisible())
 end
 """,
-    )
-    cape.add_behavior(
-        "b:test:remove:after",
-        lua="""
+        )
+        behave.add_behavior(
+            "b:test:remove:after",
+            lua="""
 function(s, world, area, player)
     player.visible()
 end
 """,
-    )
+        )
 
     await tw.success("look")
     await tw.success("hold cape")
@@ -97,15 +102,16 @@ async def test_behavior_move(caplog):
     cape = tw.add_item(things.Item(creator=tw.jacob, props=properties.Common("Cape")))
     with cape.make(mechanics.InteractableMixin) as inaction:
         inaction.link_activity("worn", mystery_area)
-    cape.add_behavior(
-        "b:test:wear:after",
-        lua="""
+    with cape.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:wear:after",
+            lua="""
 function(s, world, area, player)
     debug('wear[0].worn', wear[0].interactions.worn)
     return player.go(wear[0].interactions.worn)
 end
 """,
-    )
+        )
 
     await tw.success("look")
     await tw.success("hold cape")
@@ -123,9 +129,10 @@ async def test_behavior_create_item(caplog):
     box = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Colorful Box"))
     )
-    box.add_behavior(
-        "b:test:shake:after",
-        lua="""
+    with box.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:shake:after",
+            lua="""
 function(s, world, area, player)
     debug(area)
     return player.make({
@@ -134,7 +141,7 @@ function(s, world, area, player)
     })
 end
 """,
-    )
+        )
 
     await tw.success("look")
     await tw.success("hold box")
@@ -153,9 +160,10 @@ async def test_behavior_create_quantified_item(caplog):
     box = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Colorful Box"))
     )
-    box.add_behavior(
-        "b:test:shake:after",
-        lua="""
+    with box.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:shake:after",
+            lua="""
 function(s, world, area, player)
     debug(area)
     return area.make({
@@ -165,7 +173,7 @@ function(s, world, area, player)
     })
 end
 """,
-    )
+        )
 
     await tw.success("look")
     await tw.success("hold box")
@@ -198,9 +206,10 @@ async def test_behavior_time_passing(caplog):
     tree = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     debug("ok", area, item, time)
     return area.make({
@@ -210,7 +219,7 @@ function(s, world, area, item)
     })
 end
 """,
-    )
+        )
 
     await tw.world.tick(0)
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
@@ -229,9 +238,10 @@ async def test_behavior_create_kind(caplog):
     tree = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     return area.make({
         kind = item.kind("petals"),
@@ -241,7 +251,7 @@ function(s, world, area, item)
     })
 end
 """,
-    )
+        )
 
     await tw.world.tick(0)
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
@@ -262,14 +272,15 @@ async def test_behavior_random(caplog):
     tree = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     debug("random", math.random())
 end
 """,
-    )
+        )
 
     await tw.world.tick(0)
 
@@ -282,9 +293,10 @@ async def test_behavior_numbering_by_kind(caplog):
     tree = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     if area.number(item.kind("petals")) == 0 then
         return area.make({
@@ -303,7 +315,7 @@ function(s, world, area, item)
     end
 end
 """,
-    )
+        )
 
     await tw.world.tick(0)
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 2
@@ -319,9 +331,11 @@ async def test_behavior_numbering_person_by_name(caplog):
     tree = tw.add_item(
         things.Item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
     )
-    tree.add_behavior(
-        "b:test:tick",
-        lua="""
+
+    with tree.make(behavior.BehaviorMixin) as behave:
+        behave.add_behavior(
+            "b:test:tick",
+            lua="""
 function(s, world, area, item)
     if area.number("Jacob") == 0 then
         return area.make({
@@ -333,7 +347,7 @@ function(s, world, area, item)
     end
 end
 """,
-    )
+        )
 
     await tw.world.tick(0)
     assert len(tw.area.make(carryable.ContainingMixin).holding) == 2

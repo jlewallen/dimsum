@@ -162,19 +162,24 @@ class World(entity.Entity, entity.Registrar):
         log.info("everywhere:%s %s", name, kwargs)
         everything = list(self.entities.values())
         for entity in everything:
-            behaviors = entity.get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info("everywhere: %s", entity)
-                area = self.find_entity_area(entity)
-                assert area
-                if (
-                    area == entity
-                ):  # HACK I think the default here should actually be entity.
-                    entity = None
-                with WorldCtx(
-                    self.context_factory, world=self, area=area, entity=entity, **kwargs
-                ) as ctx:
-                    await ctx.hook(name)
+            with entity.make(behavior.BehaviorMixin) as behave:
+                behaviors = behave.get_behaviors(name)
+                if len(behaviors) > 0:
+                    log.info("everywhere: %s", entity)
+                    area = self.find_entity_area(entity)
+                    assert area
+                    if (
+                        area == entity
+                    ):  # HACK I think the default here should actually be entity.
+                        entity = None
+                    with WorldCtx(
+                        self.context_factory,
+                        world=self,
+                        area=area,
+                        entity=entity,
+                        **kwargs
+                    ) as ctx:
+                        await ctx.hook(name)
 
     def __str__(self):
         return "$world"
@@ -237,7 +242,7 @@ class WorldCtx(context.Ctx):
         entities = self.entities()
         log.info("hook:%s %s" % (name, entities))
         for entity in entities:
-            behaviors = entity.get_behaviors(name)
+            behaviors = entity.make(behavior.BehaviorMixin).get_behaviors(name)
             if len(behaviors) > 0:
                 log.info(
                     "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))

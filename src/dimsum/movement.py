@@ -2,9 +2,9 @@ from typing import List, Tuple, Dict, Sequence, Optional
 import abc
 import logging
 import enum
+
 import context
 import entity
-
 import carryable
 
 DefaultMoveVerb = "walk"

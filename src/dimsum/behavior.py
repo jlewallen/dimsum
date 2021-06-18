@@ -8,6 +8,7 @@ import asyncio
 import lupa
 
 import properties
+import entity
 
 log = logging.getLogger("dimsum")
 
@@ -169,7 +170,7 @@ class BehaviorMap(properties.Map):
         return super().replace(**typed)
 
 
-class BehaviorMixin:
+class BehaviorMixin(entity.Spawned):
     def __init__(self, behaviors: BehaviorMap = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.behaviors = behaviors if behaviors else BehaviorMap()
