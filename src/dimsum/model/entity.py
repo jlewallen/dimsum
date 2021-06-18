@@ -55,6 +55,14 @@ def hooks(new_hooks: Hooks):
     global_hooks = new_hooks
 
 
+def get_ctor_key(ctor) -> str:
+    return ctor.__name__.lower()
+
+
+def get_instance_key(instance) -> str:
+    return get_ctor_key(instance.__class__)
+
+
 class Entity:
     def __init__(
         self,
@@ -184,11 +192,11 @@ class Entity:
         return self.make(ctor, **kwargs)
 
     def has(self, ctor, **kwargs):
-        key = ctor.__name__
+        key = get_ctor_key(ctor)
         return key in self.chimeras
 
     def make(self, ctor, **kwargs):
-        key = ctor.__name__
+        key = get_ctor_key(ctor)
 
         chargs = kwargs
         if key in self.chimeras:
@@ -217,7 +225,7 @@ class Scope:
 
     @property
     def chimera_key(self) -> str:
-        return self.__class__.__name__
+        return get_instance_key(self)
 
     @abc.abstractmethod
     def constructed(self, **kwargs):
