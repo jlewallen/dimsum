@@ -20,7 +20,6 @@ class Area(
     context.FindItemMixin,
     entity.Entity,
     carryable.ContainingMixin,
-    occupyable.OccupyableMixin,
     movement.MovementMixin,
     movement.Area,
     mechanics.Memorable,
@@ -33,7 +32,12 @@ class Area(
         return self.entities()
 
     def entities(self) -> List[entity.Entity]:
-        return [e for e in flatten([self.holding, self.occupied])]
+        return [
+            e
+            for e in flatten(
+                [self.holding, self.make(occupyable.OccupyableMixin).occupied]
+            )
+        ]
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(q=of)]

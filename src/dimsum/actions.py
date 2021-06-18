@@ -223,7 +223,8 @@ class Join(PersonAction):
         world.register(player)
         await world.bus.publish(PlayerJoined(player=player))
         await ctx.hook("entered:before")
-        await world.welcome_area().entered(world.bus, player)
+        with world.welcome_area().make(occupyable.OccupyableMixin) as area:
+            await area.entered(world.bus, player)
         await ctx.hook("entered:after")
         return Success("welcome!")
 
@@ -545,13 +546,15 @@ class MovingAction(PersonAction):
         if destination is None:
             return Failure("where?")
 
-        await ctx.extend(area=area).hook("left:before")
-        await area.left(world.bus, player)
-        await ctx.extend(area=area).hook("left:after")
+        with destination.make(occupyable.OccupyableMixin) as entering:
+            with area.make(occupyable.OccupyableMixin) as leaving:
+                await ctx.extend(area=area).hook("left:before")
+                await leaving.left(world.bus, player)
+                await ctx.extend(area=area).hook("left:after")
 
-        await ctx.extend(area=destination).hook("entered:before")
-        await destination.entered(world.bus, player)
-        await ctx.extend(area=destination).hook("entered:after")
+                await ctx.extend(area=destination).hook("entered:before")
+                await entering.entered(world.bus, player)
+                await ctx.extend(area=destination).hook("entered:after")
 
         return AreaObservation(world.find_player_area(player), player)
 

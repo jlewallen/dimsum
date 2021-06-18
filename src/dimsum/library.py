@@ -10,6 +10,7 @@ import animals
 import actions
 import movement
 import mechanics
+import occupyable
 
 log = logging.getLogger("dimsum")
 
@@ -398,7 +399,8 @@ class WelcomeArea(Factory):
         area.add_item(MysteriousBox().create(world, generics))
         area.add_item(Guitar().create(world, generics))
         area.add_item(LargeSteepCliff().create(world, generics))
-        area.add_living(TomorrowCat().create(world, generics))
+        with area.make(occupyable.OccupyableMixin) as entering:
+            entering.add_living(TomorrowCat().create(world, generics))
 
         loft = ArtistsLoft().create(world, generics)
         area.add_item(WoodenLadder().create(world, generics, loft))

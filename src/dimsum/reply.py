@@ -9,6 +9,7 @@ import living
 import animals
 import movement
 import mechanics
+import occupyable
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -176,7 +177,11 @@ class AreaObservation(Observation):
         self.who: ObservedPerson = ObservedPerson(person)
         self.where: envo.Area = area
         self.living: List[ObservedLiving] = flatten(
-            [observe(e) for e in area.occupied if e != person]
+            [
+                observe(e)
+                for e in area.make(occupyable.OccupyableMixin).occupied
+                if e != person
+            ]
         )
         self.items: List[ObservedEntity] = flatten(
             [

@@ -11,6 +11,7 @@ import things
 import envo
 import living
 import animals
+import occupyable
 import scopes
 
 DefaultMoveVerb = "walk"
@@ -63,7 +64,9 @@ class World(entity.Entity, entity.Registrar):
         if isinstance(entity, envo.Area):  # HACK
             return entity
         for area in self.areas():
-            if area.contains(entity) or area.occupying(entity):
+            if area.contains(entity) or area.make(occupyable.OccupyableMixin).occupying(
+                entity
+            ):
                 return area
         return None
 
