@@ -167,24 +167,13 @@ def create(state):
         if not person:
             raise Exception("no way")
 
-        if not "s:password" in person.props:
-            raise Exception("no way")
+        with person.make(users.Auth) as auth:
+            token = auth.try_password(password)
 
-        saltEncoded, keyEncoded = person.props["s:password"]
-        salt = base64.b64decode(saltEncoded)
-        key = base64.b64decode(keyEncoded)
-        actual_key = hashlib.pbkdf2_hmac(
-            "sha256", password.encode("utf-8"), salt, 100000
-        )
+            encoded = base64.b64encode(
+                jwt.encode(token, session_key, algorithm="HS256")
+            )
 
-        token = {
-            "key": person.key,
-        }
-
-        encoded = base64.b64encode(
-            jwt.encode({"key": person.key}, session_key, algorithm="HS256")
-        )
-
-        return {"token": encoded.decode("utf-8"), "person": None}
+            return {"token": encoded.decode("utf-8"), "person": None}
 
     return app

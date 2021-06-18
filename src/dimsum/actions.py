@@ -1,7 +1,6 @@
 from typing import Any
 
 import os
-import hashlib
 import base64
 
 import properties
@@ -12,6 +11,7 @@ import finders
 import carryable
 import entity
 import apparel
+import users
 
 from context import *
 from reply import *
@@ -45,21 +45,9 @@ class Auth(PersonAction):
         self.password = password
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        if properties.Password in player.props:
-            saltEncoded, keyEncoded = player.props[properties.Password]
-            salt = base64.b64decode(saltEncoded)
-            key = base64.b64decode(keyEncoded)
-            actual_key = hashlib.pbkdf2_hmac(
-                "sha256", self.password.encode("utf-8"), salt, 100000
-            )
-
-        salt = os.urandom(32)
-        key = hashlib.pbkdf2_hmac("sha256", self.password.encode("utf-8"), salt, 100000)
-        player.props[properties.Password] = [
-            base64.b64encode(salt).decode("utf-8"),
-            base64.b64encode(key).decode("utf-8"),
-        ]
-        return Success("done, https://mud.espial.me")
+        with player.make(users.Auth) as auth:
+            auth.change(self.password)
+            return Success("done, https://mud.espial.me")
 
 
 class Home(PersonAction):
