@@ -73,7 +73,7 @@ class Navigable:
         self.action = action
 
 
-class MovementMixin(entity.Spawned):
+class MovementMixin(entity.Scope):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.routes: List[AreaRoute] = routes if routes else []

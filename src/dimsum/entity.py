@@ -204,7 +204,7 @@ class Entity:
         self.chimeras[key] = data
 
 
-class Spawned:
+class Scope:
     def __init__(self, chimera: Entity = None, **kwargs):
         super().__init__()
         assert chimera

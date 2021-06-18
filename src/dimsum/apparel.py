@@ -14,7 +14,7 @@ class WearableMixin:
         pass
 
 
-class ApparelMixin(entity.Spawned):
+class ApparelMixin(entity.Scope):
     def __init__(self, wearing=None, **kwargs):
         super().__init__(**kwargs)
         self.wearing: List[WearableMixin] = wearing if wearing else []

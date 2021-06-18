@@ -11,7 +11,7 @@ import context
 log = logging.getLogger("dimsum")
 
 
-class KeyMixin(entity.Spawned):
+class KeyMixin(entity.Scope):
     def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.patterns = patterns if patterns else {}
@@ -82,7 +82,7 @@ class Lockable:
         return True
 
 
-class LockableMixin(entity.Spawned):
+class LockableMixin(entity.Scope):
     def __init__(self, lockable=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.lockable = lockable if lockable else Lockable()
@@ -158,7 +158,7 @@ class OpenableMixin(LockableMixin):
         return False
 
 
-class CarryableMixin(entity.Spawned):
+class CarryableMixin(entity.Scope):
     def __init__(
         self,
         kind: kinds.Kind = None,

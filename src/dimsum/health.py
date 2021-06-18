@@ -41,7 +41,7 @@ class Medical:
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
-class EdibleMixin(entity.Spawned):
+class EdibleMixin(entity.Scope):
     def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
@@ -51,7 +51,7 @@ class EdibleMixin(entity.Spawned):
         self.servings = s
 
 
-class HealthMixin(entity.Spawned):
+class HealthMixin(entity.Scope):
     def __init__(self, medical=None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.medical = medical if medical else Medical()

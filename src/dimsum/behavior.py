@@ -170,7 +170,7 @@ class BehaviorMap(properties.Map):
         return super().replace(**typed)
 
 
-class BehaviorMixin(entity.Spawned):
+class BehaviorMixin(entity.Scope):
     def __init__(self, behaviors: BehaviorMap = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.behaviors = behaviors if behaviors else BehaviorMap()

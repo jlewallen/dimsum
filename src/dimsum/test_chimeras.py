@@ -21,13 +21,13 @@ import test
 log = logging.getLogger("dimsum")
 
 
-class SimpleCore(entity.Spawned):
+class SimpleCore(entity.Scope):
     def __init__(self, name: str = None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
 
 
-class SimpleHolding(entity.Spawned):
+class SimpleHolding(entity.Scope):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
         self.holding = holding if holding else []
