@@ -103,7 +103,7 @@ class Entity:
 
         if scopes:
             for scope in scopes:
-                log.info("scope %s", kwargs)
+                log.debug("scope %s %s", scope, kwargs)
                 with self.make(
                     scope,
                 ) as change:
