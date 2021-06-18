@@ -17,7 +17,7 @@ import persistence
 import entity
 import actions
 import library
-
+import scopes
 import grammar
 
 import sugar
@@ -55,7 +55,7 @@ class Repl:
             player = self.world.find_by_key(self.name)
             return player
 
-        player = animals.Player(
+        player = scopes.alive(
             key=self.name,
             creator=self.world,
             props=properties.Common(self.name, desc="A repl user"),

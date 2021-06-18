@@ -10,7 +10,6 @@ import properties
 import game
 import bus
 import world
-import animals
 import reply
 import library
 import persistence
@@ -21,6 +20,7 @@ import events
 import luaproxy
 import movement
 import messages
+import scopes
 
 import sugar
 import digging
@@ -419,7 +419,7 @@ modify when eaten
                 raise Exception("no player")
             return player
 
-        player = animals.Player(
+        player = scopes.alive(
             key=key,
             creator=self.world,
             props=properties.Common(author.name, desc="A discord user"),
