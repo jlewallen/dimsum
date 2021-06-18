@@ -13,6 +13,8 @@ import world
 import serializing
 import persistence
 
+import ownership
+
 import test
 
 
@@ -61,8 +63,10 @@ async def test_chimeric_entities_serialize(caplog):
     assert await db.number_of_entities() == 3
 
 
-def make_person(props: properties.Common = None, **kwargs):
-    person = entity.Entity(props=props, **kwargs)
+def make_person(
+    props: properties.Common = None, creator: entity.Entity = None, **kwargs
+):
+    person = entity.Entity(props=props, creator=creator, **kwargs)
 
     assert props
 
@@ -75,10 +79,17 @@ def make_person(props: properties.Common = None, **kwargs):
     return person
 
 
-def make_thing(props: properties.Common = None, **kwargs):
-    thing = entity.Entity(props=props, **kwargs)
+def make_thing(
+    props: properties.Common = None, creator: entity.Entity = None, **kwargs
+):
+    thing = entity.Entity(
+        props=props, creator=creator, scopes=[ownership.Ownership], **kwargs
+    )
 
     assert props
+
+    with thing.make(ownership.Ownership) as change:
+        change.owner = creator
 
     with thing.make(SimpleCore) as core:
         core.name = props.name

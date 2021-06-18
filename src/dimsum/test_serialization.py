@@ -13,6 +13,8 @@ import persistence
 import library
 import test
 
+import ownership
+
 log = logging.getLogger("dimsum")
 
 
@@ -270,7 +272,8 @@ async def test_serialize_preserves_owner_reference(caplog):
     assert len(after.entities.items()) == 2
 
     for key, e in after.entities.items():
-        assert isinstance(e.props.owner, entity.Entity)
+        with e.make(ownership.Ownership) as props:
+            assert isinstance(props.owner, entity.Entity)
 
 
 @pytest.mark.asyncio

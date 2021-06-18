@@ -10,6 +10,8 @@ import serializing
 import persistence
 import test
 
+import ownership
+
 log = logging.getLogger("dimsum")
 
 
@@ -26,7 +28,8 @@ async def test_simple_action_verbs():
 @pytest.mark.asyncio
 async def test_world_owns_itself(caplog):
     whatever = test.create_empty_world()
-    assert isinstance(whatever.props.owner, world.World)
+    with whatever.make(ownership.Ownership) as props:
+        assert isinstance(props.owner, world.World)
 
 
 @pytest.mark.asyncio

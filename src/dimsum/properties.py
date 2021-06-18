@@ -123,7 +123,6 @@ class Common(Map):
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
         self.set(Touched, time.time())
-        self.set(Owner, None)
         self.set(Frozen, None)
         self.set(Destroyed, None)
         self.set(Related, {})
@@ -151,15 +150,6 @@ class Common(Map):
     @desc.setter
     def desc(self, value: str):
         self.set(Desc, value)
-
-    @property
-    def owner(self):
-        return self[Owner]
-
-    @owner.setter
-    def owner(self, value):
-        assert value
-        self.set(Owner, value)
 
     @property
     def destroyed(self) -> Optional[crypto.Identity]:
