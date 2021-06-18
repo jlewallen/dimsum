@@ -6,24 +6,27 @@ import logging
 import inflect
 import lark
 
-import model.properties as properties
 import model.game as game
+import model.properties as properties
 import model.world as world
 import model.reply as reply
-import model.library as library
 import model.events as events
-import model.movement as movement
+import model.library as library
+import model.sugar
+
+import model.scopes.movement as movement
 import model.scopes as scopes
 
 import bus
 import persistence
-import grammar
-import evaluator
-import actions
 import luaproxy
 import messages
+import grammars
 
-import sugar
+import default.actions
+import default.evaluator as evaluator
+
+import default
 import digging
 import simple
 import fallback
@@ -146,7 +149,7 @@ class GameBot:
         self.bot = bot
         self.players = {}
         self.world = None
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
 
         @bot.event
         async def on_ready():

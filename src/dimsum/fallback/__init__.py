@@ -3,23 +3,24 @@ from typing import Any, List, Type
 import logging
 
 import model.properties as properties
-import model.movement as movement
+import model.scopes.movement as movement
 
-import grammar
-import evaluator
-import actions
+import default.evaluator as evaluator
+import default.actions as actions
+
+import grammars
 
 log = logging.getLogger("dimsum")
 
 
-@grammar.grammar()
-class Grammar(grammar.Grammar):
+@grammars.grammar()
+class Grammar(grammars.Grammar):
     @property
     def order(self) -> int:
         return 65536
 
     @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
+    def evaluator(self):
         return Evaluator
 
     @property

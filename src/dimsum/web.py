@@ -7,9 +7,9 @@ import uuid
 import base64
 import hashlib
 
-import game
-import grammar
+import model.game as game
 import serializing
+import grammars
 
 log = logging.getLogger("dimsum.web")
 
@@ -137,7 +137,7 @@ def create(state):
         form = await quart.request.get_json()
         command = form["command"]
 
-        l = grammar.create_parser()
+        l = grammars.create_parser()
 
         person_key = token["key"]
         player = world.find_by_key(person_key)

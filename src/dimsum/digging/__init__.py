@@ -7,9 +7,10 @@ import model.properties as properties
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
 
-import actions
-import grammar
-import evaluator
+import default.actions as actions
+import default.evaluator as evaluator
+
+import grammars
 
 from context import *
 
@@ -106,10 +107,10 @@ class Dig(actions.PersonAction):
         return Success("dug and done", created=[area])
 
 
-@grammar.grammar()
-class Grammar(grammar.Grammar):
+@grammars.grammar()
+class Grammar(grammars.Grammar):
     @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
+    def evaluator(self):
         return Evaluator
 
     @property

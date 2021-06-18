@@ -15,16 +15,17 @@ import model.entity as entity
 import model.library as library
 import model.scopes as scopes
 
+import default.actions as actions
+import default
+import digging
+import simple
+import fallback
+
+import grammars
 import luaproxy
 import handlers
 import messages
 import persistence
-import actions
-import grammar
-
-import digging
-import simple
-import fallback
 
 log = logging.getLogger("dimsum-repl")
 
@@ -32,7 +33,7 @@ log = logging.getLogger("dimsum-repl")
 class Repl:
     def __init__(self, fn: str, name: str):
         super().__init__()
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
         self.fn = fn
         self.name = name
         self.world = None

@@ -7,12 +7,15 @@ import crypt
 import sys
 import logging
 
-import grammar
-import actions
-import properties
-import evaluator
+import model.properties as properties
+import model.scopes as scopes
+
 import messages
-import scopes
+
+import default.evaluator as evaluator
+import default.actions as actions
+
+import grammars
 
 import rich
 import rich.console

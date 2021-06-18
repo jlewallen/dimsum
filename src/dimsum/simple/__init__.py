@@ -8,9 +8,10 @@ import model.entity as entity
 
 import model.scopes.movement as movement
 
-import grammar
-import evaluator
-import actions
+import default.evaluator as evaluator
+import default.actions as actions
+
+import grammars
 
 from context import *
 
@@ -114,8 +115,8 @@ class Hit(SimpleVerb):
         return Success("you hit %s" % (item))
 
 
-@grammar.grammar()
-class Grammar(grammar.Grammar):
+@grammars.grammar()
+class Grammar(grammars.Grammar):
     @property
     def evaluator(self) -> Type[evaluator.Evaluator]:
         return Evaluator

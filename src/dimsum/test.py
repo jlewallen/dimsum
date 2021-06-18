@@ -17,10 +17,11 @@ import model.scopes.movement as movement
 import model.scopes.carryable as carryable
 import model.scopes as scopes
 
-import grammar
-import actions
-import luaproxy
+import default.actions as actions
+
 import bus
+import grammars
+import luaproxy
 import messages
 import handlers
 import serializing
@@ -45,7 +46,7 @@ class TestWorld:
             props=properties.Common("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
 
     def add_simple_area_here(self, door, name):
         door = scopes.item(creator=self.player, props=properties.Common(door))

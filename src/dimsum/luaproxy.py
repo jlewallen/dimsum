@@ -13,7 +13,7 @@ import model.scopes.mechanics as mechanics
 import model.scopes.carryable as carryable
 import model.scopes as scopes
 
-import actions
+import default.actions as actions
 
 log = logging.getLogger("dimsum")
 
