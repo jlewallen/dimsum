@@ -25,7 +25,6 @@ class Item(
     carryable.ContainingMixin,
     carryable.KeyMixin,
     mechanics.InteractableMixin,
-    mechanics.VisibilityMixin,
     movement.MovementMixin,
     entity.IgnoreExtraConstructorArguments,
 ):

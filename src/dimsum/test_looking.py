@@ -8,6 +8,7 @@ import world
 import reply
 import serializing
 import persistence
+import mechanics
 import test
 
 log = logging.getLogger("dimsum")
@@ -60,7 +61,8 @@ async def test_look_people_invisible():
     await tw.initialize()
     await tw.add_tomi()
     await tw.add_carla()
-    tw.carla.make_invisible()
+    with tw.carla.make(mechanics.VisibilityMixin) as vis:
+        vis.make_invisible()
 
     r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)

@@ -8,6 +8,7 @@ import envo
 import living
 import animals
 import movement
+import mechanics
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -181,7 +182,8 @@ class AreaObservation(Observation):
             [
                 observe(e)
                 for e in things.expected(area.holding)
-                if not e.visible.hard_to_see or person.can_see(e.identity)
+                if not e.make(mechanics.VisibilityMixin).visible.hard_to_see
+                or person.make(mechanics.VisibilityMixin).can_see(e.identity)
             ]
         )
         self.routes: List[movement.AreaRoute] = area.available_routes
@@ -204,11 +206,11 @@ class AreaObservation(Observation):
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:
     if isinstance(entity, animals.Person):
-        if entity.is_invisible:
+        if entity.make(mechanics.VisibilityMixin).is_invisible:
             return []
         return [ObservedPerson(entity)]
     if isinstance(entity, animals.Animal):
-        if entity.is_invisible:
+        if entity.make(mechanics.VisibilityMixin).is_invisible:
             return []
         return [ObservedAnimal(entity)]
     if isinstance(entity, things.Item):

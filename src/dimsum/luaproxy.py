@@ -13,6 +13,7 @@ import living
 import animals
 import actions
 import finders
+import mechanics
 
 log = logging.getLogger("dimsum")
 
@@ -141,13 +142,15 @@ class LupaItem(LupaEntity):
 
 class LupaLivingCreature(LupaEntity):
     def visible(self):
-        return self.entity.make_visible()
+        with self.entity.make(mechanics.VisibilityMixin) as vis:
+            vis.make_visible()
 
     def invisible(self):
-        return self.entity.make_invisible()
+        with self.entity.make(mechanics.VisibilityMixin) as vis:
+            vis.make_invisible()
 
     def is_invisible(self):
-        return self.entity.is_invisible
+        return self.entity.make(mechanics.VisibilityMixin).is_invisible
 
     def go(self, area) -> Sequence[game.Action]:
         return [actions.Go(area=area)]

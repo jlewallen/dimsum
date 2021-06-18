@@ -80,7 +80,7 @@ class Visible:
         return obs[-1].memorable()
 
 
-class VisibilityMixin:
+class VisibilityMixin(entity.Spawned):
     def __init__(self, visible: Visible = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         self.visible: Visible = visible if visible else Visible()

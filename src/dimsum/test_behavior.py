@@ -7,6 +7,7 @@ import game
 import things
 import envo
 import actions
+import mechanics
 import test
 
 
@@ -74,9 +75,9 @@ end
     await tw.success("look")
     await tw.success("hold cape")
     await tw.success("wear cape")
-    assert tw.jacob.is_invisible
+    assert tw.jacob.make(mechanics.VisibilityMixin).is_invisible
     await tw.success("remove cape")
-    assert not tw.jacob.is_invisible
+    assert not tw.jacob.make(mechanics.VisibilityMixin).is_invisible
     await tw.success("drop")
 
 

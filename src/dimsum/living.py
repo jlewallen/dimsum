@@ -25,7 +25,6 @@ class Alive(
     entity.Entity,
     occupyable.Living,
     carryable.CarryingMixin,
-    mechanics.VisibilityMixin,
 ):
     def __init__(self, **kwargs):
         super().__init__(scopes=scopes.Alive, **kwargs)

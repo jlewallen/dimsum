@@ -7,6 +7,7 @@ import base64
 import properties
 import movement
 import health
+import mechanics
 import finders
 
 from context import *
@@ -255,7 +256,8 @@ class LookFor(PersonAction):
         if not item:
             return Failure("i can't seem to find that")
 
-        player.add_observation(item.identity)
+        with player.make(mechanics.VisibilityMixin) as vis:
+            vis.add_observation(item.identity)
 
         await ctx.extend(holding=player.holding, item=item).hook("look-for")
         return EntitiesObservation([item])
@@ -662,10 +664,11 @@ class ModifyHardToSee(PersonAction):
 
         item.try_modify()
 
-        if self.hard_to_see:
-            item.make_hard_to_see()
-        else:
-            item.make_easy_to_see()
+        with item.make(mechanics.VisibilityMixin) as vis:
+            if self.hard_to_see:
+                vis.make_hard_to_see()
+            else:
+                vis.make_easy_to_see()
 
         return Success("done")
 
