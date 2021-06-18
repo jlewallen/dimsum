@@ -128,13 +128,11 @@ class Entity(behavior.BehaviorMixin):
             self.props.gid = gid
             return gid
 
-    @abc.abstractmethod
     def gather_entities(self) -> List["Entity"]:
-        raise NotImplementedError("FindItemMixin required")
+        return []
 
-    @abc.abstractmethod
     def find_item_under(self, **kwargs) -> Optional["Entity"]:
-        raise NotImplementedError("FindItemMixin required")
+        return None
 
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
