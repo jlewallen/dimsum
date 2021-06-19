@@ -6,6 +6,17 @@ import bus
 import model.events as events
 import model.entity as entity
 
+"""
+One thing I've considered is to use this as a place for a way to
+intercept existing scopes/operations.
+
+So, being able to decorate with something like
+
+@entity.before(carryable.Containing)
+
+And then using that to maintain our state.
+"""
+
 
 class Occupying(entity.Scope):
     def __init__(self, area: entity.Entity = None, **kwargs):
