@@ -54,7 +54,7 @@ prod-server:
 graph:
 	+@for m in *.sqlite3; do                                             \
     n=`basename $$m .sqlite3`;                                           \
-    env/bin/python3 src/dimsum/cli.py --graph $$m;                       \
+    env/bin/python3 src/dimsum/cli.py graph --path $$m;                  \
 	jq . $$n.json > $$n-pretty.json && mv $$n-pretty.json $$n.json;      \
 	dot -T png $$n.dot > $$n.png;                                        \
 	done

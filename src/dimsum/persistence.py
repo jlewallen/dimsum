@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, TextIO
 
 import logging
 import sqlite3
@@ -96,12 +96,11 @@ class SqliteDatabase:
 
         self.db.commit()
 
-    async def write(self, fn: str):
-        with open(fn, "w") as file:
-            file.write("[\n")
-            prefix = ""
-            for row in self.dbc.execute("SELECT key, serialized FROM entities"):
-                file.write(prefix)
-                file.write(row[1])
-                prefix = ","
-            file.write("]\n")
+    async def write(self, stream: TextIO):
+        stream.write("[\n")
+        prefix = ""
+        for row in self.dbc.execute("SELECT key, serialized FROM entities"):
+            stream.write(prefix)
+            stream.write(row[1])
+            prefix = ","
+        stream.write("]\n")
