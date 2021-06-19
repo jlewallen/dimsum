@@ -29,16 +29,6 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(world.World, base=True)
-class WorldHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        return self.context.lookup(None)
-
-    def flatten(self, obj, data):
-        data["key"] = "world"
-        return data
-
-
 @jsonpickle.handlers.register(movement.Direction)
 class DirectionHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
@@ -141,12 +131,10 @@ def all(world: world.World, **kwargs):
     }
 
 
-def restore(world: world.World, rows: Dict[str, Any]):
+def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
     refs: Dict[str, Dict] = {}
 
     def reference(key):
-        if key is None:
-            return world
         if key not in refs:
             refs[key] = entity.EntityRef(key)
         return refs[key]
@@ -155,7 +143,7 @@ def restore(world: world.World, rows: Dict[str, Any]):
     for key in rows.keys():
         e = deserialize(rows[key], reference)
         assert isinstance(e, entity.Entity)
-        world.register(e)
+        registrar.register(e)
         entities[key] = e
 
     for key, baby_entity in refs.items():
