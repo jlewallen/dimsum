@@ -31,7 +31,12 @@ def commands():
 
 
 @commands.command()
-@click.option("--path", required=True, help="Database to open in a repl.")
+@click.option(
+    "--path",
+    required=True,
+    help="Database to open in a repl.",
+    type=click.Path(exists=True),
+)
 async def repl(path: str):
     """Allow easy one-person interaction with a world."""
     repl = Repl(path, "jlewallen")

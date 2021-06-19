@@ -18,7 +18,12 @@ def commands():
 
 
 @commands.command()
-@click.option("--path", required=True, help="Database to export from.")
+@click.option(
+    "--path",
+    required=True,
+    help="Database to export from.",
+    type=click.Path(exists=True),
+)
 async def export(path: str):
     """Exporting entities from a database."""
     world, db = await utils.open_world(path)

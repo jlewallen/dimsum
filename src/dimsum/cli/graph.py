@@ -29,7 +29,9 @@ def get_color(e: entity.Entity) -> str:
 
 
 @commands.command()
-@click.option("--path", required=True, help="Database to graph.")
+@click.option(
+    "--path", required=True, help="Database to graph.", type=click.Path(exists=True)
+)
 async def graph(path: str):
     """Graph the entities in a database."""
     world, db = await utils.open_world(path)
