@@ -4,15 +4,12 @@ import copy
 import jsonpickle
 import wrapt
 import logging
-import crypto
-import entity
-import game
-import envo
-import things
-import living
-import animals
-import world
-import movement
+
+import model.crypto as crypto
+import model.entity as entity
+import model.world as world
+
+import model.scopes.movement as movement
 
 log = logging.getLogger("dimsum")
 
@@ -57,19 +54,14 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(envo.Area)
-@jsonpickle.handlers.register(things.Item)
-@jsonpickle.handlers.register(things.Recipe)
-@jsonpickle.handlers.register(animals.Player)
-@jsonpickle.handlers.register(animals.Person)
-@jsonpickle.handlers.register(animals.Animal)
+@jsonpickle.handlers.register(entity.Entity)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
 
     def flatten(self, obj, data):
         data["key"] = obj.key
-        data["klass"] = obj.__class__.__name__
+        data["klass"] = obj.klass.__name__
         data["name"] = obj.props.name
         return data
 
@@ -92,12 +84,7 @@ def derive_from(klass):
 
 
 allowed = [
-    things.Item,
-    things.Recipe,
-    envo.Area,
-    animals.Animal,
-    animals.Person,
-    animals.Player,
+    entity.Entity,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
@@ -147,9 +134,10 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(world: world.World):
+def all(world: world.World, **kwargs):
     return {
-        key: serialize(entity, secure=True) for key, entity in world.entities.items()
+        key: serialize(entity, secure=True, **kwargs)
+        for key, entity in world.entities.items()
     }
 
 

@@ -4,18 +4,15 @@ import os
 import hashlib
 import base64
 
-import movement
-import health
+import bus
+import context
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from envo import *
-from living import *
-from animals import *
-from events import *
-from world import *
+import model.entity as entity
+
+import model.scopes.movement as movement
+import model.scopes.health as health
+
+from model.events import *
 
 log = logging.getLogger("dimsum")
 
@@ -25,5 +22,5 @@ class WhateverHandlers:
         super().__init__()
 
         @bus.handler(PlayerJoined)
-        def handle_player_joined(player: Player = None, **kwargs):
+        def handle_player_joined(player: entity.Entity = None, **kwargs):
             log.info("player joined handler: %s %s", player, kwargs)

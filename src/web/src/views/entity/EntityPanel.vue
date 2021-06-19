@@ -1,13 +1,13 @@
 <template>
     <div class="entity" v-on:click="(ev) => raiseSelected(entity)" v-bind:class="entityToClass(entity)">
         <div class="one">
-            <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.props.name }}</div>
-            <div class="name" v-else>{{ entity.props.name }}</div>
+            <div class="name" v-if="entity.quantity > 1">{{ entity.quantity }} {{ entity.props.map.name.value }}</div>
+            <div class="name" v-else>{{ entity.props.map.name.value }}</div>
             <div class="creator">
                 {{ entity.creator.name }}
             </div>
         </div>
-        <div class="desc">{{ entity.props.desc }}</div>
+        <div class="desc">{{ entity.props.map.desc.value }}</div>
         <div class="summary" v-if="summary">
             {{ summary }}
         </div>
@@ -73,10 +73,10 @@ export default defineComponent({
 .entity.item {
     background-color: khaki;
 }
-.entity.recipe {
+.entity.exit {
     background-color: thistle;
 }
-.entity.animal {
+.entity.living {
     background-color: darkseagreen;
 }
 

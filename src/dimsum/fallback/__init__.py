@@ -2,34 +2,25 @@ from typing import Any, List, Type
 
 import logging
 
-import grammar
-import evaluator
+import model.properties as properties
+import model.scopes.movement as movement
 
-import properties
-import movement
-import actions
+import default.evaluator as evaluator
+import default.actions as actions
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from envo import *
-from living import *
-from animals import *
-from events import *
-from world import *
+import grammars
 
 log = logging.getLogger("dimsum")
 
 
-@grammar.grammar()
-class Grammar(grammar.Grammar):
+@grammars.grammar()
+class Grammar(grammars.Grammar):
     @property
     def order(self) -> int:
         return 65536
 
     @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
+    def evaluator(self):
         return Evaluator
 
     @property

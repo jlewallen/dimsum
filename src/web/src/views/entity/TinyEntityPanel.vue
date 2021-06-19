@@ -1,9 +1,9 @@
 <template>
     <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entityToClass(entity)">
         <template v-if="entity.quantity == 1">
-            {{ entity.props.name }}
+            {{ entity.props.map.name.value }}
         </template>
-        <template v-else>{{ entity.quantity }} {{ entity.props.name }}</template>
+        <template v-else>{{ entity.quantity }} {{ entity.props.map.name.value }}</template>
     </div>
 </template>
 
@@ -51,10 +51,10 @@ export default defineComponent({
 .entity.item {
     background-color: khaki;
 }
-.entity.recipe {
+.entity.exit {
     background-color: thistle;
 }
-.entity.animal {
+.entity.living {
     background-color: darkseagreen;
 }
 </style>

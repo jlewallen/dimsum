@@ -1,12 +1,16 @@
 import logging
 import pytest
 
-import game
-import envo
-import movement
-import properties
-import test
+import model.game as game
+import model.entity as entity
+import model.properties as properties
+
+import model.scopes.carryable as carryable
+import model.scopes.movement as movement
+import model.scopes as scopes
+
 import persistence
+import test
 
 
 @pytest.mark.asyncio
@@ -25,10 +29,17 @@ async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()
 
-    another_room = envo.Area(creator=tw.world, props=properties.Common("Another Room"))
+    another_room = scopes.area(
+        creator=tw.world, props=properties.Common("Another Room")
+    )
 
-    tw.area.add_item(
-        envo.Exit(area=another_room, creator=tw.world, props=properties.Common("Door"))
+    add_item(
+        tw.area,
+        scopes.exit(
+            creator=tw.world,
+            props=properties.Common("Door"),
+            initialize={movement.Exit: dict(area=another_room)},
+        ),
     )
 
     tw.world.add_area(another_room)
@@ -59,15 +70,16 @@ async def test_directional_moving():
     obs = await tw.success("look")
     assert obs
 
-    park = envo.Area(props=properties.Common("North Park"), creator=tw.jacob)
+    park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
 
     tw.world.add_area(park)
-    tw.area.add_item(
-        envo.Exit(
-            area=park,
-            props=properties.Common(name=movement.Direction.NORTH.exiting),
+    add_item(
+        tw.area,
+        scopes.exit(
             creator=tw.jacob,
-        )
+            props=properties.Common(name=movement.Direction.NORTH.exiting),
+            initialize={movement.Exit: dict(area=park)},
+        ),
     )
 
     area_before = tw.world.find_player_area(tw.player)
@@ -78,29 +90,33 @@ async def test_directional_moving():
 
 
 class Bidirectional:
-    def __init__(self, there: envo.Area = None, back: envo.Area = None, **kwargs):
+    def __init__(
+        self, there: entity.Entity = None, back: entity.Entity = None, **kwargs
+    ):
         assert there
         assert back
-        goes_there = envo.Exit(
-            area=there,
+        goes_there = scopes.exit(
             props=properties.Common(name="Exit to {0}".format(there.props.name)),
+            initialize={movement.Exit: dict(area=there)},
             **kwargs
         )
-        comes_back = envo.Exit(
-            area=back,
+        comes_back = scopes.exit(
             props=properties.Common(name="Exit to {0}".format(back.props.name)),
+            initialize={movement.Exit: dict(area=back)},
             **kwargs
         )
-        back.add_item(goes_there)
-        there.add_item(comes_back)
+        with back.make(carryable.Containing) as contain:
+            contain.add_item(goes_there)
+        with there.make(carryable.Containing) as contain:
+            contain.add_item(comes_back)
 
 
 @pytest.mark.asyncio
 async def test_programmatic_basic_entrances_and_exits():
     tw = test.TestWorld()
 
-    earth = envo.Area(creator=tw.jacob, props=properties.Common(name="Earth"))
-    asteroid = envo.Area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
+    earth = scopes.area(creator=tw.jacob, props=properties.Common(name="Earth"))
+    asteroid = scopes.area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
     Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
 
     await tw.initialize(earth)
@@ -128,3 +144,8 @@ async def test_digging_with_return():
     await tw.save("test.sqlite3")
     await tw.success("go north")
     await tw.success("go south")
+
+
+def add_item(container: entity.Entity, item: entity.Entity):
+    with container.make(carryable.Containing) as contain:
+        contain.add_item(item)

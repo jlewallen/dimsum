@@ -5,12 +5,14 @@ import logging
 import time
 import copy
 import wrapt
-import properties
-import behavior
-import crypto
-import kinds
+import inflect
+
+import model.properties as properties
+import model.crypto as crypto
+import model.kinds as kinds
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 class EntityRef(wrapt.ObjectProxy):
@@ -22,27 +24,6 @@ class EntityRef(wrapt.ObjectProxy):
             super().__init__(object())
         else:
             super().__init__(targetOrKey)
-
-
-# TODO Move this
-class EntityVisitor:
-    def item(self, item):
-        pass
-
-    def recipe(self, recipe):
-        pass
-
-    def person(self, person):
-        pass
-
-    def exit(self, exit):
-        pass
-
-    def area(self, area):
-        pass
-
-    def animal(self, animal):
-        pass
 
 
 class IgnoreExtraConstructorArguments:
@@ -61,24 +42,61 @@ class EntityFrozen(Exception):
     pass
 
 
-class Entity(behavior.BehaviorMixin):
+class Hooks:
+    def describe(self, entity: "Entity") -> str:
+        return "{0} (#{1})".format(entity.props.name, entity.props.gid)
+
+
+global_hooks = Hooks()
+
+
+def hooks(new_hooks: Hooks):
+    global global_hooks
+    global_hooks = new_hooks
+
+
+def get_ctor_key(ctor) -> str:
+    return ctor.__name__.lower()
+
+
+def get_instance_key(instance) -> str:
+    return get_ctor_key(instance.__class__)
+
+
+class EntityClass:
+    pass
+
+
+class RootEntityClass(EntityClass):
+    pass
+
+
+class UnknownClass(EntityClass):
+    pass
+
+
+class Entity:
     def __init__(
         self,
         key: str = None,
         kind: kinds.Kind = None,
         creator: "Entity" = None,
         parent: "Entity" = None,
-        klass: str = None,
+        klass: Type[EntityClass] = None,
         identity: crypto.Identity = None,
         props: properties.Common = None,
+        chimeras=None,
+        scopes=None,
+        initialize=None,
         **kwargs
     ):
-        super().__init__(**kwargs)  # type: ignore
-        self.kind = kind if kind else kinds.Kind()
+        super().__init__()
+
         # Ignoring this error because we only ever have a None creator if we're the world.
         self.creator: "Entity" = creator if creator else None  # type: ignore
         self.parent: "Entity" = parent if parent else None  # type: ignore
-        self.klass = klass if klass else self.__class__.__name__
+        self.chimeras = chimeras if chimeras else {}
+        self.klass: Type[EntityClass] = klass if klass else UnknownClass
 
         if identity:
             self.identity = identity
@@ -99,20 +117,34 @@ class Entity(behavior.BehaviorMixin):
 
         self.props: properties.Common = props
 
-        # If we don't have an owner, we use the creator first and then
-        # just fall back on ourselves. Only use that if the prop is missing.
-        initial_owner = self.creator if self.creator else self
-        self.props.owner = self.props.owner if self.props.owner else initial_owner
+        if scopes:
+            for scope in scopes:
+                args = {}
+                if initialize and scope in initialize:
+                    args = initialize[scope]
+
+                log.debug("scope %s %s %s", scope, kwargs, args)
+                with self.make(scope, **args) as change:
+                    change.constructed(
+                        key=self.key,
+                        identity=self.identity,
+                        parent=self.parent,
+                        creator=self.creator,
+                        props=self.props,
+                        **kwargs
+                    )
 
         self.validate()
 
-        # log.debug("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
+        # log.info("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
 
     def validate(self) -> None:
         assert self.key
         assert self.props
         # Ugly, keeping this around, though.
-        if self.klass != "World":
+        if RootEntityClass == self.klass:
+            pass
+        else:
             assert self.creator
 
     def registered(self, gid: int) -> int:
@@ -125,14 +157,6 @@ class Entity(behavior.BehaviorMixin):
         else:
             self.props.gid = gid
             return gid
-
-    @abc.abstractmethod
-    def gather_entities(self) -> List["Entity"]:
-        raise NotImplementedError("FindItemMixin required")
-
-    @abc.abstractmethod
-    def find_item_under(self, **kwargs) -> Optional["Entity"]:
-        raise NotImplementedError("FindItemMixin required")
 
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
@@ -167,17 +191,72 @@ class Entity(behavior.BehaviorMixin):
         self.props.frozen = None
         return True
 
-    def describes(self, **kwargs) -> bool:
+    def describe(self) -> str:
+        return global_hooks.describe(self)
+
+    def describes(self, q: str = None, **kwargs) -> bool:
+        if q:
+            if q.lower() in self.props.name.lower():
+                return True
+            if q.lower() in self.describe():
+                return True
         return False
 
-    def accept(self, visitor: "EntityVisitor") -> Any:
-        raise NotImplementedError
+    def make_and_discard(self, ctor, **kwargs):
+        return self.make(ctor, **kwargs)
 
-    def __str__(self):
-        return "{0} (#{1})".format(self.props.name, self.props.gid)
+    def has(self, ctor, **kwargs):
+        key = get_ctor_key(ctor)
+        return key in self.chimeras
+
+    def make(self, ctor, **kwargs):
+        key = get_ctor_key(ctor)
+
+        chargs = kwargs
+        if key in self.chimeras:
+            chargs.update(**self.chimeras[key])
+
+        log.debug("%s splitting chimera: %s", self.key, key)
+        child = ctor(chimera=self, **chargs)
+        return child
+
+    def update(self, child):
+        key = child.chimera_key
+        data = child.__dict__
+        del data["chimera"]
+        log.debug("%s updating chimera: %s %s", self.key, key, data)
+        self.chimeras[key] = data
 
     def __repr__(self):
-        return str(self)
+        return self.describe()
+
+
+class Scope:
+    def __init__(self, chimera: Entity = None, **kwargs):
+        super().__init__()
+        assert chimera
+        self.chimera = chimera
+
+    @property
+    def chimera_key(self) -> str:
+        return get_instance_key(self)
+
+    @abc.abstractmethod
+    def constructed(self, **kwargs):
+        pass
+
+    @property
+    def ourselves(self):
+        return self.chimera
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.save()
+
+    def save(self):
+        self.chimera.update(self)
 
 
 class Registrar:
@@ -229,7 +308,3 @@ class Registrar:
         entity.destroy()
         del self.entities[entity.key]
         self.garbage[entity.key] = entity
-
-
-def entities(maybes: List[Any]) -> List[Entity]:
-    return [cast(Entity, e) for e in maybes]

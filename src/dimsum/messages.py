@@ -1,17 +1,15 @@
 import logging
 import bus
-import events
 import inflect
 
 from context import *
-from reply import *
-from game import *
-from things import *
-from envo import *
-from living import *
-from animals import *
-from events import *
-from world import *
+
+import model.events as events
+
+from model.reply import *
+from model.game import *
+from model.things import *
+from model.world import *
 
 log = logging.getLogger("dimsum")
 p = inflect.engine()
@@ -38,7 +36,7 @@ class TextBus(bus.EventBus):
     async def LivingLeftArea(self, living=None, area=None, **kwargs):
         return "%s left %s" % (living, area)
 
-    async def PlayerJoined(self, player: Player = None, area=None, **kwargs):
+    async def PlayerJoined(self, player: entity.Entity = None, area=None, **kwargs):
         return "%s joined!" % (player)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):

@@ -21,7 +21,7 @@ klass: {{ entity.klass }}
 		"{{ entity.key }}" -> "{{ entity.props.owner.key }}" [ label="owner" ]
 	{%- endif -%}
 
-	{%- if entity.props.navigable -%}
+	{%- if False and entity.props.navigable -%}
 		"{{ entity.key }}" -> "{{ entity.props.navigable.key }}" [ label="nav" ]
 	{%- endif -%}
 

@@ -2,22 +2,23 @@ from typing import Any, List, Type
 
 import logging
 
-import grammar
-import evaluator
+import model.properties as properties
 
-import properties
-import movement
-import actions
+import model.scopes.movement as movement
+import model.scopes.carryable as carryable
+
+import default.actions as actions
+import default.evaluator as evaluator
+
+import grammars
 
 from context import *
-from reply import *
-from game import *
-from things import *
-from envo import *
-from living import *
-from animals import *
-from events import *
-from world import *
+
+from model.reply import *
+from model.game import *
+from model.things import *
+from model.events import *
+from model.world import *
 
 log = logging.getLogger("dimsum")
 
@@ -69,34 +70,36 @@ class Dig(actions.PersonAction):
         self.linkage = linkage
         self.area_name = area_name
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
 
         log.info(
             "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
         )
 
-        digging = envo.Area(
+        digging = scopes.area(
             creator=player,
             props=properties.Common(name=self.area_name),
         )
 
         if self.linkage.there:
-            goes_there = envo.Exit(
-                digging,
+            goes_there = scopes.exit(
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
+                initialize={movement.Exit: dict(area=digging)},
             )
-            area.add_item(goes_there)
+            with area.make(carryable.Containing) as ground:
+                ground.add_item(goes_there)
             world.register(goes_there)
 
         if self.linkage.back:
-            comes_back = envo.Exit(
-                area,
+            comes_back = scopes.exit(
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),
+                initialize={movement.Exit: dict(area=area)},
             )
-            digging.add_item(comes_back)
+            with digging.make(carryable.Containing) as ground:
+                ground.add_item(comes_back)
             world.register(comes_back)
 
         world.register(digging)
@@ -104,10 +107,10 @@ class Dig(actions.PersonAction):
         return Success("dug and done", created=[area])
 
 
-@grammar.grammar()
-class Grammar(grammar.Grammar):
+@grammars.grammar()
+class Grammar(grammars.Grammar):
     @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
+    def evaluator(self):
         return Evaluator
 
     @property

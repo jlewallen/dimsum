@@ -3,27 +3,26 @@ import logging
 import pytest
 
 import context
-import properties
-import game
-import things
-import envo
-import actions
-import animals
-import world
+
+import model.properties as properties
+import model.game as game
+import model.things as things
+import model.entity as entity
+import model.world as world
 
 import test
 
 
 class Verb:
     async def perform(
-        self, ctx: context.Ctx, world: world.World, player: animals.Player
+        self, ctx: context.Ctx, world: world.World, player: entity.Entity
     ):
         pass
 
 
 class LuaVerb(Verb):
     async def perform(
-        self, ctx: context.Ctx, world: world.World, player: animals.Player
+        self, ctx: context.Ctx, world: world.World, player: entity.Entity
     ):
         pass
 

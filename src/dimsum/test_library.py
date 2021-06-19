@@ -1,12 +1,13 @@
 import pytest
 import logging
 
-import entity
-import game
-import world
+import model.entity as entity
+import model.game as game
+import model.world as world
+import model.library as library
+
 import serializing
 import persistence
-import library
 import test
 
 log = logging.getLogger("dimsum")
@@ -36,4 +37,4 @@ async def test_library(caplog):
 
     await db.save(empty)
 
-    assert await db.number_of_entities() == 67
+    assert await db.number_of_entities() == 65

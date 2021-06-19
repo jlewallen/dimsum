@@ -4,27 +4,29 @@ import sys
 import logging
 import asyncio
 import jinja2
+import base64
 import json
 import argparse
 import os
 
-import luaproxy
-import handlers
-import properties
-import world
-import messages
-import persistence
-import entity
-import animals
-import actions
-import library
+import model.sugar as sugar
+import model.properties as properties
+import model.world as world
+import model.entity as entity
+import model.library as library
+import model.scopes as scopes
 
-import grammar
-
-import sugar
+import default.actions as actions
+import default
 import digging
 import simple
 import fallback
+
+import grammars
+import luaproxy
+import handlers
+import messages
+import persistence
 
 log = logging.getLogger("dimsum-repl")
 
@@ -32,7 +34,7 @@ log = logging.getLogger("dimsum-repl")
 class Repl:
     def __init__(self, fn: str, name: str):
         super().__init__()
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
         self.fn = fn
         self.name = name
         self.world = None
@@ -56,8 +58,8 @@ class Repl:
             player = self.world.find_by_key(self.name)
             return player
 
-        player = animals.Player(
-            key=self.name,
+        player = scopes.alive(
+            key=base64.b64encode(self.name),
             creator=self.world,
             props=properties.Common(self.name, desc="A repl user"),
         )
@@ -122,13 +124,11 @@ class Repl:
 
 def get_color(e: entity.Entity) -> str:
     map = {
-        "World": "white",
-        "Animal": "darkseagreen",
-        "Player": "coral",
-        "Item": "khaki",
-        "Exit": "salmon",
-        "Area": "skyblue",
-        "Recipe": "thistle",
+        entity.RootEntityClass: "white",
+        scopes.LivingClass: "darkseagreen",
+        scopes.ItemClass: "khaki",
+        scopes.ExitClass: "salmon",
+        scopes.AreaClass: "skyblue",
     }
     return map[e.klass]
 

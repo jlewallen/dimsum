@@ -1,23 +1,27 @@
 from typing import Any
 
 import os
-import hashlib
 import base64
 
-import properties
-import movement
-import health
-import finders
+import model.entity as entity
+import model.finders as finders
 
-from context import *
-from reply import *
-from game import *
-from things import *
-from envo import *
-from living import *
-from animals import *
-from events import *
-from world import *
+import model.properties as properties
+
+import model.scopes.users as users
+import model.scopes.movement as movement
+import model.scopes.health as health
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
+import model.scopes.apparel as apparel
+
+from context import Ctx
+
+from model.reply import *
+from model.game import *
+from model.things import *
+from model.events import *
+from model.world import *
 
 
 MemoryAreaKey = "m:area"
@@ -25,7 +29,7 @@ log = logging.getLogger("dimsum")
 
 
 class PersonAction(Action):
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         raise NotImplementedError
 
 
@@ -33,7 +37,7 @@ class Unknown(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         log.warning("{0} performed".format(self))
         return Failure("sorry, i don't understand")
 
@@ -43,21 +47,10 @@ class Auth(PersonAction):
         super().__init__(**kwargs)
         self.password = password
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if properties.Password in player.props:
-            saltEncoded, keyEncoded = player.props[properties.Password]
-            salt = base64.b64decode(saltEncoded)
-            key = base64.b64decode(keyEncoded)
-            actual_key = hashlib.pbkdf2_hmac(
-                "sha256", self.password.encode("utf-8"), salt, 100000
-            )
-
-        salt = os.urandom(32)
-        key = hashlib.pbkdf2_hmac("sha256", self.password.encode("utf-8"), salt, 100000)
-        player.props[properties.Password] = [
-            base64.b64encode(salt).decode("utf-8"),
-            base64.b64encode(key).decode("utf-8"),
-        ]
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
+        with player.make(users.Auth) as auth:
+            auth.change(self.password)
+            log.info(auth.password)
         return Success("done, https://mud.espial.me")
 
 
@@ -65,7 +58,7 @@ class Home(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         await ctx.extend().hook("home:before")
         return await Go(area=world.welcome_area()).perform(ctx, world, player)
 
@@ -76,13 +69,14 @@ class AddItemArea(PersonAction):
         self.item = item
         self.area = area
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        after_add = self.area.add_item(self.item)
-        world.register(after_add)
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
+        with self.area.make(carryable.Containing) as ground:
+            after_add = ground.add_item(self.item)
+            world.register(after_add)
 
-        # We do this after because we may consolidate this Item and
-        # this keeps us from having to unregister the item.
-        world.register(after_add)
+            # We do this after because we may consolidate this Item and
+            # this keeps us from having to unregister the item.
+            world.register(after_add)
 
         await world.bus.publish(ItemsAppeared(area=self.area, items=[self.item]))
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
@@ -100,8 +94,8 @@ class Make(PersonAction):
         self.template = template
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        item: Optional[things.Item] = None
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
+        item: Optional[entity.Entity] = None
         if self.item:
             item = world.apply_item_finder(player, self.item)
 
@@ -109,15 +103,16 @@ class Make(PersonAction):
             item = self.template.create_item(
                 person=player, creator=player, owner=player
             )
-            assert isinstance(item, things.Item)
 
         if not item:
             return Failure("make what now?")
 
-        after_hold = player.hold(item)
-        # We do this after because we may consolidate this Item and
-        # this keeps us from having to unregister the item.
-        world.register(after_hold)
+        with player.make(carryable.Containing) as contain:
+            after_hold = contain.hold(item)
+            # We do this after because we may consolidate this Item and
+            # this keeps us from having to unregister the item.
+            world.register(after_hold)
+
         area = world.find_player_area(player)
         await world.bus.publish(ItemsMade(person=player, area=area, items=[after_hold]))
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
@@ -129,18 +124,21 @@ class Wear(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("wear what?")
 
-        if not item.when_worn():
-            return Failure("you can't wear that")
+        with item.make(mechanics.Interactable) as inaction:
+            if not inaction.when_worn():
+                return Failure("you can't wear that")
 
-        assert player.is_holding(item)
+        with player.make(carryable.Containing) as contain:
+            assert contain.is_holding(item)
 
-        if player.wear(item):
-            player.drop(item)
+            with player.make(apparel.Apparel) as wearing:
+                if wearing.wear(item):
+                    contain.drop(item)
 
         # TODO Publish
         await ctx.extend(wear=[item]).hook("wear:after")
@@ -153,18 +151,20 @@ class Remove(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("remove what?")
 
-        if not player.is_wearing(item):
-            return Failure("you aren't wearing that")
+        with player.make(apparel.Apparel) as wearing:
+            if not wearing.is_wearing(item):
+                return Failure("you aren't wearing that")
 
-        assert player.is_wearing(item)
+            assert wearing.is_wearing(item)
 
-        if player.unwear(item):
-            player.hold(item)
+            if wearing.unwear(item):
+                with player.make(carryable.Containing) as contain:
+                    contain.hold(item)
 
         await ctx.extend(remove=[item]).hook("remove:after")
         return Success("you removed %s" % (item))
@@ -176,16 +176,18 @@ class Eat(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("dunno where that is")
 
-        if not item.when_eaten():
-            return Failure("you can't eat that")
+        with item.make(mechanics.Interactable) as inaction:
+            if not inaction.when_eaten():
+                return Failure("you can't eat that")
 
         area = world.find_player_area(player)
-        await player.consume(item, area=area, ctx=ctx)
+        with player.make(health.Health) as p:
+            await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("eat:after")
 
         return Success("you ate %s" % (item))
@@ -197,16 +199,18 @@ class Drink(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("dunno where that is")
 
-        if not item.when_drank():
-            return Failure("you can't drink that")
+        with item.make(mechanics.Interactable) as inaction:
+            if not inaction.when_drank():
+                return Failure("you can't drink that")
 
         area = world.find_player_area(player)
-        await player.consume(item, area=area, ctx=ctx)
+        with player.make(health.Health) as p:
+            await p.consume(item, area=area, ctx=ctx)
         await ctx.extend(eat=item).hook("drink:after")
 
         return Success("you drank %s" % (item))
@@ -216,11 +220,12 @@ class Join(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         world.register(player)
         await world.bus.publish(PlayerJoined(player=player))
         await ctx.hook("entered:before")
-        await world.welcome_area().entered(world.bus, player)
+        with world.welcome_area().make(occupyable.Occupyable) as area:
+            await area.entered(world.bus, player)
         await ctx.hook("entered:after")
         return Success("welcome!")
 
@@ -231,15 +236,16 @@ class LookInside(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("inside what?")
 
-        if not item.is_open():
-            return Failure("you can't do that")
+        with item.make(carryable.Containing) as contain:
+            if not contain.is_open():
+                return Failure("you can't do that")
 
-        return EntitiesObservation(things.expected(item.holding))
+            return EntitiesObservation(contain.holding)
 
 
 class LookFor(PersonAction):
@@ -248,22 +254,24 @@ class LookFor(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("i can't seem to find that")
 
-        player.add_observation(item.identity)
+        with player.make(mechanics.Visibility) as vis:
+            vis.add_observation(item.identity)
 
-        await ctx.extend(holding=player.holding, item=item).hook("look-for")
-        return EntitiesObservation([item])
+        with player.make(carryable.Containing) as contain:
+            await ctx.extend(holding=contain.holding, item=item).hook("look-for")
+            return EntitiesObservation([item])
 
 
 class LookMyself(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         await ctx.hook("look-myself")
         return PersonalObservation(player)
 
@@ -272,9 +280,10 @@ class LookDown(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         await ctx.hook("look-down")
-        return EntitiesObservation(things.expected(player.holding))
+        with player.make(carryable.Containing) as contain:
+            return EntitiesObservation(contain.holding)
 
 
 class Look(PersonAction):
@@ -282,7 +291,7 @@ class Look(PersonAction):
         super().__init__(**kwargs)
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         if self.item:
             return DetailedObservation(ObservedItem(self.item))
         log.info("person: %s %s", player.key, player)
@@ -298,7 +307,7 @@ class Drop(PersonAction):
         self.quantity = quantity if quantity else None
         self.item = item if item else None
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = None
 
         if self.item:
@@ -307,17 +316,25 @@ class Drop(PersonAction):
                 return Failure("drop what?")
 
         area = world.find_player_area(player)
-        dropped, failure = player.drop_here(
-            area, item, quantity=self.quantity, creator=player, owner=player, ctx=ctx
-        )
-        if dropped:
-            area = world.find_player_area(player)
-            await world.bus.publish(
-                ItemsDropped(person=player, area=area, dropped=dropped)
+
+        with player.make(carryable.Containing) as contain:
+            dropped, failure = contain.drop_here(
+                area,
+                item,
+                quantity=self.quantity,
+                creator=player,
+                owner=player,
+                ctx=ctx,
             )
-            await ctx.extend(dropped=dropped).hook("drop:after")
-            return Success("you dropped %s" % (p.join(dropped),))
-        return Failure(failure)
+            if dropped:
+                area = world.find_player_area(player)
+                await world.bus.publish(
+                    ItemsDropped(person=player, area=area, dropped=dropped)
+                )
+                await ctx.extend(dropped=dropped).hook("drop:after")
+                return Success("you dropped %s" % (p.join(dropped),))
+
+            return Failure(failure)
 
 
 class Hold(PersonAction):
@@ -327,32 +344,38 @@ class Hold(PersonAction):
         self.item = item
         self.quantity = quantity
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("sorry, hold what?")
 
-        if player.is_holding(item):
-            return Failure("you're already holding that")
+        with player.make(carryable.Containing) as pockets:
+            # This should happen after? What if there's more on the ground?
+            if pockets.is_holding(item):
+                return Failure("you're already holding that")
 
-        area = world.find_player_area(player)
-        if self.quantity:
-            removed = item.separate(
-                self.quantity, creator=player, owner=player, ctx=ctx
-            )
-            if item.quantity == 0:
-                world.unregister(item)
-                area.drop(item)
-            item = removed[0]
-        else:
-            area.unhold(item)
+            area = world.find_player_area(player)
+            with area.make(carryable.Containing) as ground:
+                if self.quantity:
+                    with item.make(carryable.Carryable) as hands:
+                        removed = hands.separate(
+                            self.quantity, creator=player, owner=player, ctx=ctx
+                        )
+                        if hands.quantity == 0:
+                            world.unregister(item)
+                            ground.drop(item)
+                    item = removed[0]
+                else:
+                    ground.unhold(item)
 
-        after_hold = player.hold(item)
-        if after_hold != item:
-            world.unregister(item)
-        await world.bus.publish(ItemHeld(person=player, area=area, hold=[after_hold]))
-        await ctx.extend(hold=[after_hold]).hook("hold:after")
-        return Success("you picked up %s" % (after_hold,), item=after_hold)
+                after_hold = pockets.hold(item)
+                if after_hold != item:
+                    world.unregister(item)
+                await world.bus.publish(
+                    ItemHeld(person=player, area=area, hold=[after_hold])
+                )
+                await ctx.extend(hold=[after_hold]).hook("hold:after")
+                return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
 class Open(PersonAction):
@@ -361,16 +384,17 @@ class Open(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("open what?")
 
-        if not item.can_hold():
-            return Failure("you can't open that")
+        with item.make(carryable.Containing) as contain:
+            if not contain.can_hold():
+                return Failure("you can't open that")
 
-        if not item.open():
-            return Failure("huh, won't open")
+            if not contain.open():
+                return Failure("huh, won't open")
 
         return Success("opened")
 
@@ -381,16 +405,17 @@ class Close(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("close what?")
 
-        if not item.can_hold():
-            return Failure("you can't open that")
+        with item.make(carryable.Containing) as contain:
+            if not contain.can_hold():
+                return Failure("you can't open that")
 
-        if not item.close():
-            return Failure("it's got other plans")
+            if not contain.close():
+                return Failure("it's got other plans")
 
         return Success("closed")
 
@@ -405,7 +430,7 @@ class Lock(PersonAction):
         assert key
         self.key = key
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         area = world.find_player_area(player)
 
         item = world.apply_item_finder(player, self.item)
@@ -413,11 +438,17 @@ class Lock(PersonAction):
             return Failure("what?")
 
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
-        locked_with = item.lock(key=maybe_key, creator=player, owner=player, **kwargs)
-        if not locked_with:
-            return Failure("can't seem to lock that")
 
-        player.hold(locked_with)
+        with player.make(carryable.Containing) as hands:
+            with item.make(carryable.Containing) as locking:
+                locked_with = locking.lock(
+                    key=maybe_key, creator=player, owner=player, **kwargs
+                )
+                if not locked_with:
+                    return Failure("can't seem to lock that")
+
+                assert locking.is_locked()
+                hands.hold(locked_with)
 
         return Success("done")
 
@@ -432,7 +463,7 @@ class Unlock(PersonAction):
         assert key
         self.key = key
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         area = world.find_player_area(player)
 
         item = world.apply_item_finder(player, self.item)
@@ -442,8 +473,9 @@ class Unlock(PersonAction):
         log.info("finding key %s", self.key)
         maybe_key = world.apply_item_finder(player, self.key, exclude=[item])
         log.info("maybe key: %s", maybe_key)
-        if item.unlock(key=maybe_key, **kwargs):
-            return Success("done")
+        with item.make(carryable.Containing) as unlocking:
+            if unlocking.unlock(key=maybe_key, **kwargs):
+                return Success("done")
         return Failure("nope")
 
 
@@ -460,23 +492,25 @@ class PutInside(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         area = world.find_player_area(player)
 
         container = world.apply_item_finder(player, self.container)
         if not container:
             return Failure("what?")
 
-        if not container.can_hold():
-            return Failure("inside... that?")
+        with container.make(carryable.Containing) as containing:
+            if not containing.can_hold():
+                return Failure("inside... that?")
 
-        item = world.apply_item_finder(player, self.item)
-        if not item:
-            return Failure("what?")
+            item = world.apply_item_finder(player, self.item)
+            if not item:
+                return Failure("what?")
 
-        if container.place_inside(item):
-            player.drop(item)
-            return Success("inside, done")
+            if containing.place_inside(item):
+                with player.make(carryable.Containing) as pockets:
+                    pockets.drop(item)
+                return Success("inside, done")
 
         return Failure("you can't do that")
 
@@ -494,36 +528,40 @@ class TakeOut(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         area = world.find_player_area(player)
 
         container = world.apply_item_finder(player, self.container)
         if not container:
             return Failure("what?")
 
-        if not container.can_hold():
-            return Failure("outside of... that?")
+        with container.make(carryable.Containing) as containing:
+            if not containing.can_hold():
+                return Failure("outside of... that?")
 
-        item = world.apply_item_finder(player, self.item)
-        if not item:
-            return Failure("what?")
+            item = world.apply_item_finder(player, self.item)
+            if not item:
+                return Failure("what?")
 
-        if container.take_out(item):
-            player.hold(item)
-            return Success("done, you're holding that now")
+            if containing.take_out(item):
+                with player.make(carryable.Containing) as pockets:
+                    pockets.hold(item)
+                return Success("done, you're holding that now")
 
         return Failure("doesn't seem like you can")
 
 
 class MovingAction(PersonAction):
     def __init__(
-        self, area: envo.Area = None, finder: movement.FindsRoute = None, **kwargs
+        self, area: entity.Entity = None, finder: movement.FindsRoute = None, **kwargs
     ):
         super().__init__(**kwargs)
         self.area = area
         self.finder = finder
 
-    async def move(self, ctx: Ctx, world: World, player: Player, verb=DefaultMoveVerb):
+    async def move(
+        self, ctx: Ctx, world: World, player: entity.Entity, verb=DefaultMoveVerb
+    ):
         area = world.find_player_area(player)
 
         destination = self.area
@@ -541,25 +579,27 @@ class MovingAction(PersonAction):
         if destination is None:
             return Failure("where?")
 
-        await ctx.extend(area=area).hook("left:before")
-        await area.left(world.bus, player)
-        await ctx.extend(area=area).hook("left:after")
+        with destination.make(occupyable.Occupyable) as entering:
+            with area.make(occupyable.Occupyable) as leaving:
+                await ctx.extend(area=area).hook("left:before")
+                await leaving.left(world.bus, player)
+                await ctx.extend(area=area).hook("left:after")
 
-        await ctx.extend(area=destination).hook("entered:before")
-        await destination.entered(world.bus, player)
-        await ctx.extend(area=destination).hook("entered:after")
+                await ctx.extend(area=destination).hook("entered:before")
+                await entering.entered(world.bus, player)
+                await ctx.extend(area=destination).hook("entered:after")
 
         return AreaObservation(world.find_player_area(player), player)
 
 
 class Climb(MovingAction):
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         # If climb ever becomes a string outside of this function, rethink.
         return await self.move(ctx, world, player, verb="climb")
 
 
 class Go(MovingAction):
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         return await self.move(ctx, world, player)
 
 
@@ -567,13 +607,15 @@ class Obliterate(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
-        items = things.expected(player.drop_all())
+        items = None
+        with player.make(carryable.Containing) as pockets:
+            items = pockets.drop_all()
         if len(items) == 0:
             return Failure("you're not holding anything")
 
-        item: Any = None  # TODO CarryableMixin to Entity
+        item: Any = None  # TODO Carryable to Entity
 
         for item in items:
             item.try_modify()
@@ -597,7 +639,7 @@ class CallThis(PersonAction):
         assert name
         self.name = name
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("you don't have anything")
@@ -605,17 +647,20 @@ class CallThis(PersonAction):
         item.try_modify()
 
         # Copy all of the base props from the item. Exclude stamps.
+        # TODO This looks like it's been broken.
         template = item
-        recipe = Recipe(
+        recipe = scopes.item(
             creator=player,
             owner=player,
             props=item.props.clone(),
-            behaviors=item.behaviors,
-            kind=item.kind,
-            template=template,
+            behaviors=item.make(behavior.Behaviors).behaviors,
+            kind=item.make(carryable.Carryable).kind,
         )
+        with recipe.make(Recipe) as makes:
+            makes.template = template
         world.register(recipe)
-        player.memorize("r:" + self.name, recipe)
+        with player.make(mechanics.Memory) as brain:
+            brain.memorize("r:" + self.name, recipe)
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )
@@ -626,10 +671,11 @@ class Forget(PersonAction):
         super().__init__(**kwargs)
         self.name = name
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
-        if self.name in player.memory:
-            player.forget(self.name)
-            return Success("oh wait, was that important?")
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
+        with player.make(mechanics.Memory) as brain:
+            if self.name in brain.brain:
+                brain.forget(self.name)
+                return Success("oh wait, was that important?")
         return Failure("huh, seems i already have forgotten that!")
 
 
@@ -637,9 +683,10 @@ class Remember(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         area = world.find_player_area(player)
-        player.memorize(MemoryAreaKey, area)
+        with player.make(mechanics.Memory) as brain:
+            brain.memorize(MemoryAreaKey, area)
         return Success("you'll be able to remember this place, oh yeah")
 
 
@@ -650,17 +697,18 @@ class ModifyHardToSee(PersonAction):
         self.item = item
         self.hard_to_see = hard_to_see
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("of what?")
 
         item.try_modify()
 
-        if self.hard_to_see:
-            item.make_hard_to_see()
-        else:
-            item.make_easy_to_see()
+        with item.make(mechanics.Visibility) as vis:
+            if self.hard_to_see:
+                vis.make_hard_to_see()
+            else:
+                vis.make_easy_to_see()
 
         return Success("done")
 
@@ -672,7 +720,7 @@ class ModifyField(PersonAction):
         self.field = field
         self.value = value
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("of what?")
@@ -680,7 +728,8 @@ class ModifyField(PersonAction):
         item.try_modify()
 
         if self.field in health.NutritionFields:
-            item.nutrition.properties[self.field] = self.value
+            with item.make(health.Edible) as i:
+                i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
         return Success("done")
@@ -698,13 +747,14 @@ class ModifyActivity(PersonAction):
         assert value
         self.value = value
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("of what?")
 
         item.try_modify()
-        item.link_activity(self.activity, self.value)
+        with item.make(mechanics.Interactable) as inaction:
+            inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
         return Success("done")
 
@@ -717,12 +767,13 @@ class ModifyServings(PersonAction):
         assert number
         self.number = number
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        item.modify_servings(self.number)
+        with item.make(health.Edible) as edible:
+            edible.modify_servings(self.number)
         return Success("done")
 
 
@@ -734,13 +785,14 @@ class ModifyCapacity(PersonAction):
         assert capacity
         self.capacity = capacity
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
         item.try_modify()
-        if item.adjust_capacity(self.capacity):
-            return Success("done")
+        with item.make(carryable.Containing) as contain:
+            if contain.adjust_capacity(self.capacity):
+                return Success("done")
         return Failure("no way")
 
 
@@ -762,7 +814,7 @@ class Pour(PersonAction):
         assert destination
         self.destination = destination
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         source = world.apply_item_finder(player, self.source)
         if not source:
             return Failure("from what?")
@@ -773,16 +825,17 @@ class Pour(PersonAction):
         if not destination:
             return Failure("into what?")
 
-        if not PourVerb in source.produces:
-            return Failure("you can't pour from that")
+        with source.make(carryable.Containing) as produces:
+            if not PourVerb in produces.produces:
+                return Failure("you can't pour from that")
 
-        produced = source.produce_into(
-            PourVerb, destination, person=player, creator=player, owner=player
-        )
-        if not produced:
-            return Failure("oh no")
+            produced = produces.produce_into(
+                PourVerb, destination, person=player, creator=player, owner=player
+            )
+            if produced:
+                return Success("done")
 
-        return Success("done")
+        return Failure("oh no")
 
 
 class PourProducer(carryable.Producer):
@@ -791,11 +844,13 @@ class PourProducer(carryable.Producer):
         assert template
         self.template: finders.MaybeItemOrRecipe = template
 
-    def produce_item(self, **kwargs) -> carryable.CarryableMixin:
-        interactions = {properties.Drank: True}
-        return self.template.create_item(
-            verb=PourVerb, loose=True, interactions=interactions, **kwargs
-        )
+    def produce_item(self, **kwargs) -> entity.Entity:
+        item = self.template.create_item(verb=PourVerb, **kwargs)
+        with item.make(mechanics.Interactable) as inaction:
+            inaction.link_activity(properties.Drank)
+        with item.make(carryable.Carryable) as carry:
+            carry.loose = True
+        return item
 
 
 class ModifyPours(PersonAction):
@@ -811,7 +866,7 @@ class ModifyPours(PersonAction):
         assert produces
         self.produces = produces
 
-    async def perform(self, ctx: Ctx, world: World, player: Player):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("nothing to modify")
@@ -819,7 +874,8 @@ class ModifyPours(PersonAction):
         log.info("modifying %s to produce %s", item, self.produces)
 
         item.try_modify()
-        item.produces_when(PourVerb, PourProducer(template=self.produces))
+        with item.make(carryable.Containing) as produces:
+            produces.produces_when(PourVerb, PourProducer(template=self.produces))
 
         return Success("done")
 
@@ -834,7 +890,7 @@ class Freeze(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("freeze what?")
@@ -854,7 +910,7 @@ class Unfreeze(PersonAction):
         assert item
         self.item = item
 
-    async def perform(self, ctx: Ctx, world: World, player: Player, **kwargs):
+    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
         item = world.apply_item_finder(player, self.item)
         if not item:
             return Failure("unfreeze what?")

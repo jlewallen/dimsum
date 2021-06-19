@@ -7,9 +7,13 @@ import uuid
 import base64
 import hashlib
 
-import game
-import grammar
+import model.game as game
+import model.scopes.users as users
+import model.scopes.behavior as behavior
+import model.scopes as scopes
+
 import serializing
+import grammars
 
 log = logging.getLogger("dimsum.web")
 
@@ -30,9 +34,7 @@ def create(state):
         if "authorization" in quart.request.headers:
             header = quart.request.headers["authorization"]
             bearer, encoded = header.split(" ")
-            decoded = jwt.decode(
-                base64.b64decode(encoded), session_key, algorithms="HS256"
-            )
+            decoded = jwt.decode(encoded, session_key, algorithms="HS256")
             return state.world, decoded
         raise Exception("unauthorized")
 
@@ -57,7 +59,9 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"areas": world.areas()}, unpicklable=False)
+        return serializing.serialize(
+            {"areas": world.entities_of_klass(scopes.AreaClass)}, unpicklable=False
+        )
 
     @app.route("/api/people")
     def people_index():
@@ -65,7 +69,9 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"people": world.people()}, unpicklable=False)
+        return serializing.serialize(
+            {"people": world.entities_of_klass(scopes.LivingClass)}, unpicklable=False
+        )
 
     @app.route("/api/entities/<string:ukey>")
     def get_entity(ukey: str):
@@ -120,7 +126,8 @@ def create(state):
             log.info("form: %s" % (form,))
 
             entity = world.find_by_key(key)
-            entity.behaviors.replace(form)
+            with entity.make(behavior.Behaviors) as behave:
+                behave.behaviors.replace(form)
             entity.touch()
             await state.save()
 
@@ -137,7 +144,7 @@ def create(state):
         form = await quart.request.get_json()
         command = form["command"]
 
-        l = grammar.create_parser()
+        l = grammars.create_parser()
 
         person_key = token["key"]
         player = world.find_by_key(person_key)
@@ -167,24 +174,14 @@ def create(state):
         if not person:
             raise Exception("no way")
 
-        if not "s:password" in person.props:
-            raise Exception("no way")
+        with person.make(users.Auth) as auth:
+            token = auth.try_password(password)
 
-        saltEncoded, keyEncoded = person.props["s:password"]
-        salt = base64.b64decode(saltEncoded)
-        key = base64.b64decode(keyEncoded)
-        actual_key = hashlib.pbkdf2_hmac(
-            "sha256", password.encode("utf-8"), salt, 100000
-        )
-
-        token = {
-            "key": person.key,
-        }
-
-        encoded = base64.b64encode(
-            jwt.encode({"key": person.key}, session_key, algorithm="HS256")
-        )
-
-        return {"token": encoded.decode("utf-8"), "person": None}
+            if token:
+                jwt_token = jwt.encode(token, session_key, algorithm="HS256")
+                return {
+                    "token": jwt_token,
+                    "person": None,
+                }
 
     return app

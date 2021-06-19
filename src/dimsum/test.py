@@ -5,23 +5,28 @@ import logging
 import sys
 import lark
 
-import properties
-import grammar
-import game
-import world
-import envo
-import things
-import animals
-import actions
-import luaproxy
+import model.entity as entity
+import model.properties as properties
+import model.game as game
+import model.world as world
+import model.things as things
+import model.reply as reply
+import model.sugar as sugar
+
+import model.scopes.movement as movement
+import model.scopes.carryable as carryable
+import model.scopes as scopes
+
+import default.actions as actions
+
 import bus
+import grammars
+import luaproxy
 import messages
 import handlers
-import reply
 import serializing
 import persistence
 
-import sugar
 import digging
 import simple
 
@@ -36,31 +41,32 @@ class TestWorld:
     def __init__(self):
         self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
         self.world = world.World(self.bus, luaproxy.context_factory)
-        self.jacob = animals.Player(
+        self.jacob = scopes.alive(
             creator=self.world,
             props=properties.Common("Jacob", desc="Curly haired bastard."),
         )
         self.player = self.jacob
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
 
     def add_simple_area_here(self, door, name):
-        door = things.Item(creator=self.player, props=properties.Common(door))
-        area = envo.Area(creator=self.player, props=properties.Common(name))
-        door.link_area(area)
-        self.area.add_item(door)
+        door = scopes.item(creator=self.player, props=properties.Common(door))
+        area = scopes.area(creator=self.player, props=properties.Common(name))
+        with door.make(movement.Movement) as nav:
+            nav.link_area(area)
+        self.add_item(door)
         self.world.register(door)
         self.world.register(area)
         return area
 
     async def add_carla(self):
-        self.carla = animals.Player(
+        self.carla = scopes.alive(
             creator=self.world,
             props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
         return await self.world.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
-        self.tomi = animals.Player(
+        self.tomi = scopes.alive(
             creator=self.world,
             props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )
@@ -69,7 +75,7 @@ class TestWorld:
     async def initialize(self, area=None, **kwargs):
         self.area = area
         if not self.area:
-            self.area = envo.Area(
+            self.area = scopes.area(
                 creator=self.player, props=properties.Common("Living room")
             )
             self.world.register(self.area)
@@ -81,7 +87,8 @@ class TestWorld:
 
     def add_item(self, item):
         self.world.register(item)
-        self.get_default_area().add_item(item)
+        with self.area.make(carryable.Containing) as ground:
+            ground.add_item(item)
         return item
 
     def dumps(self, item) -> str:

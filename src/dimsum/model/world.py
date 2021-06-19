@@ -1,46 +1,59 @@
-from typing import Any, Optional, Dict, List, Sequence, cast
+from typing import Any, Optional, Dict, List, Sequence, cast, Type
 import time
 import logging
-import entity
-import context
-import properties
-import game
+import inflect
+
 import bus
-import behavior
-import things
-import envo
-import living
-import animals
+import context
+
+import model.entity as entity
+import model.game as game
+import model.properties as properties
+
+import model.scopes.behavior as behavior
+import model.scopes.occupyable as occupyable
+import model.scopes.carryable as carryable
+import model.scopes.movement as movement
+import model.scopes as scopes
 
 DefaultMoveVerb = "walk"
 TickHook = "tick"
 WindHook = "wind"
 log = logging.getLogger("dimsum")
 scripting = behavior.ScriptEngine()
+p = inflect.engine()
+
+
+class EntityHooks(entity.Hooks):
+    def describe(self, entity: entity.Entity) -> str:
+        with entity.make_and_discard(carryable.Carryable) as carry:
+            if carry.quantity > 1:
+                return "{0} {1} (#{2})".format(
+                    carry.quantity,
+                    p.plural(entity.props.name, carry.quantity),
+                    entity.props.gid,
+                )
+        return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
+
+
+entity.hooks(EntityHooks())
 
 
 class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
         super().__init__(
             key="world",
+            klass=entity.RootEntityClass,
             props=properties.Common("World", desc="Ya know, everything"),
+            scopes=scopes.World,
             **kwargs
         )
         self.bus = bus
         self.context_factory = context_factory
         self.register(self)
 
-    def items(self):
-        return self.all_of_type(things.Item)
-
-    def areas(self):
-        return self.all_of_type(envo.Area)
-
-    def people(self):
-        return self.all_of_type(animals.Person)
-
-    def players(self):
-        return self.all_of_type(animals.Player)
+    def entities_of_klass(self, klass: Type[entity.EntityClass]):
+        return [e for key, e in self.entities.items() if e.klass == klass]
 
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
@@ -48,24 +61,32 @@ class World(entity.Entity, entity.Registrar):
                 return e
         return None
 
-    def find_person_by_name(self, name) -> Optional[animals.Person]:
-        for person in self.people():
-            if person.props.name == name:
-                return person
+    def find_person_by_name(self, name) -> Optional[entity.Entity]:
+        for key, e in self.entities.items():
+            # TODO Check type
+            if e.props.name == name:
+                return e
         return None
 
-    def welcome_area(self) -> envo.Area:
-        return self.areas()[0]
+    def welcome_area(self) -> entity.Entity:
+        for _, entity in self.entities.items():
+            if entity.has(occupyable.Occupyable):
+                return entity
+        raise Exception("no welcome area")
 
-    def find_entity_area(self, entity: entity.Entity) -> Optional[envo.Area]:
-        if isinstance(entity, envo.Area):  # HACK
+    def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
+        log.info("finding area for %s", entity)
+        if entity.has(occupyable.Occupyable):
             return entity
-        for area in self.areas():
-            if area.contains(entity) or area.occupying(entity):
-                return area
+        for _, needle in self.entities.items():
+            with needle.make(carryable.Containing) as contain:
+                if contain.contains(entity) or needle.make(
+                    occupyable.Occupyable
+                ).occupying(entity):
+                    return needle
         return None
 
-    def find_player_area(self, player: animals.Person) -> envo.Area:
+    def find_player_area(self, player: entity.Entity) -> entity.Entity:
         area = self.find_entity_area(player)
         assert area
         return area
@@ -79,7 +100,7 @@ class World(entity.Entity, entity.Registrar):
     def resolve(self, keys) -> Sequence[entity.Entity]:
         return [self.entities[key] for key in keys]
 
-    def add_area(self, area: envo.Area, depth=0, seen: Dict[str, str] = None):
+    def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         if seen is None:
             seen = {}
 
@@ -92,22 +113,25 @@ class World(entity.Entity, entity.Registrar):
 
         self.register(area)
 
-        for entity in area.entities():
+        for entity in area.make(occupyable.Occupyable).occupied:
             self.register(entity)
 
-        for item in area.entities():
-            if item.props.navigable:
-                log.debug("linked-via-navigable[%s] %s", depth, item.props.navigable)
-                self.add_area(item.props.navigable, depth=depth + 1, seen=seen)
+        for entity in area.make(carryable.Containing).holding:
+            self.register(entity)
 
-            if isinstance(item, things.Item):
-                for linked in item.adjacent():
-                    log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                    self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+        for item in area.make(carryable.Containing).holding:
+            maybe_area = item.make(movement.Exit).area
+            if maybe_area:
+                log.debug("linked-via-ex[%s] %s", depth, maybe_area)
+                self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
-        for linked in area.adjacent():
+            for linked in item.make(movement.Movement).adjacent():
+                log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
+                self.add_area(linked, depth=depth + 1, seen=seen)
+
+        for linked in area.make(movement.Movement).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
-            self.add_area(cast(envo.Area, linked), depth=depth + 1, seen=seen)
+            self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
 
@@ -117,8 +141,8 @@ class World(entity.Entity, entity.Registrar):
             self.register(entity)
 
     def apply_item_finder(
-        self, person: animals.Person, finder: things.ItemFinder, **kwargs
-    ) -> Optional[things.Item]:
+        self, person: entity.Entity, finder, **kwargs
+    ) -> Optional[entity.Entity]:
         assert person
         assert finder
         area = self.find_player_area(person)
@@ -130,7 +154,7 @@ class World(entity.Entity, entity.Registrar):
             log.info("found: nada")
         return found
 
-    async def perform(self, action, person: Optional[animals.Person]) -> game.Reply:
+    async def perform(self, action, person: Optional[entity.Entity]) -> game.Reply:
         area = self.find_entity_area(person) if person else None
         with WorldCtx(
             self.context_factory, world=self, person=person, area=area
@@ -151,19 +175,24 @@ class World(entity.Entity, entity.Registrar):
         log.info("everywhere:%s %s", name, kwargs)
         everything = list(self.entities.values())
         for entity in everything:
-            behaviors = entity.get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info("everywhere: %s", entity)
-                area = self.find_entity_area(entity)
-                assert area
-                if (
-                    area == entity
-                ):  # HACK I think the default here should actually be entity.
-                    entity = None
-                with WorldCtx(
-                    self.context_factory, world=self, area=area, entity=entity, **kwargs
-                ) as ctx:
-                    await ctx.hook(name)
+            with entity.make(behavior.Behaviors) as behave:
+                behaviors = behave.get_behaviors(name)
+                if len(behaviors) > 0:
+                    log.info("everywhere: %s", entity)
+                    area = self.find_entity_area(entity)
+                    assert area
+                    if (
+                        area == entity
+                    ):  # HACK I think the default here should actually be entity.
+                        entity = None
+                    with WorldCtx(
+                        self.context_factory,
+                        world=self,
+                        area=area,
+                        entity=entity,
+                        **kwargs
+                    ) as ctx:
+                        await ctx.hook(name)
 
     def __str__(self):
         return "$world"
@@ -178,7 +207,7 @@ class WorldCtx(context.Ctx):
         self,
         context_factory,
         world: World = None,
-        person: animals.Person = None,
+        person: entity.Entity = None,
         **kwargs
     ):
         super().__init__()
@@ -226,7 +255,7 @@ class WorldCtx(context.Ctx):
         entities = self.entities()
         log.info("hook:%s %s" % (name, entities))
         for entity in entities:
-            behaviors = entity.get_behaviors(name)
+            behaviors = entity.make(behavior.Behaviors).get_behaviors(name)
             if len(behaviors) > 0:
                 log.info(
                     "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
@@ -250,14 +279,23 @@ class WorldCtx(context.Ctx):
                         await self.world.perform(action, self.person)
                         log.info("performing: %s", action)
 
-    def create_item(self, **kwargs) -> things.Item:
-        return things.Item(**kwargs)
+    def create_item(
+        self, quantity: float = None, initialize=None, **kwargs
+    ) -> entity.Entity:
+        initialize = initialize if initialize else {}
+        if quantity:
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
+        return scopes.item(initialize=initialize, **kwargs)
 
     def find_item(
-        self, inherits=None, candidates=None, exclude=None, things_only=True, **kwargs
+        self, candidates=None, scopes=[], exclude=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(
-            "find-item: candidates=%s exclude=%s kw=%s", candidates, exclude, kwargs
+            "find-item: candidates=%s exclude=%s scopes=%s kw=%s",
+            candidates,
+            exclude,
+            scopes,
+            kwargs,
         )
 
         if len(candidates) == 0:
@@ -265,20 +303,22 @@ class WorldCtx(context.Ctx):
 
         found: Optional[entity.Entity] = None
 
-        if things_only:
-            inherits = things.Item
-
         for e in candidates:
             if exclude and e in exclude:
                 continue
 
-            if inherits and not isinstance(e, inherits):
-                continue
+            if scopes:
+                has = [e.has(scope) for scope in scopes]
+                if len(has) == 0:
+                    continue
 
             if e.describes(**kwargs):
                 return e
             else:
-                found = e
+                if "q" in kwargs:
+                    found = None
+                else:
+                    found = e
 
         return found
 

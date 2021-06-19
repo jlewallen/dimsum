@@ -2,17 +2,18 @@ from typing import Sequence
 import logging
 import lupa
 
-import properties
-import kinds
-import entity
-import game
-import things
-import envo
-import world
-import living
-import animals
-import actions
-import finders
+import model.properties as properties
+import model.kinds as kinds
+import model.entity as entity
+import model.game as game
+import model.world as world
+import model.finders as finders
+
+import model.scopes.mechanics as mechanics
+import model.scopes.carryable as carryable
+import model.scopes as scopes
+
+import default.actions as actions
 
 log = logging.getLogger("dimsum")
 
@@ -34,23 +35,7 @@ class LupaContext:
             return {key: self.wrap(value) for key, value in thing.items()}
         if isinstance(thing, world.World):
             return LupaWorld(self, thing)
-        if isinstance(thing, animals.Person):
-            return LupaPerson(self, thing)
-        if isinstance(thing, animals.Animal):
-            return LupaAnimal(self, thing)
-        if isinstance(thing, envo.Area):
-            return LupaArea(self, thing)
-        if isinstance(thing, things.Item):
-            return LupaItem(self, thing)
-        if isinstance(thing, entity.Entity):
-            raise Exception(
-                "no wrapper for entity: %s (%s)"
-                % (
-                    thing,
-                    type(thing),
-                )
-            )
-        return thing
+        return LupaItem(self, thing)
 
 
 class LupaEntity:
@@ -83,7 +68,7 @@ class LupaEntity:
             return getattr(self.entity, key)
         return None
 
-    def make_item_from_table(self, table, **kwargs) -> things.Item:
+    def make_item_from_table(self, table, **kwargs) -> entity.Entity:
         log.info(
             "area:make: %s",
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
@@ -101,8 +86,11 @@ class LupaEntity:
         for key, value in table.items():
             props.map[key] = value
 
-        item = things.Item(props=props, quantity=quantity, kind=kind, **kwargs)
-
+        item = scopes.item(props=props, **kwargs)
+        if kind:
+            with item.make(carryable.Carryable) as carry:
+                carry.kind = kind
+                carry.quantity = quantity
         return item
 
 
@@ -113,59 +101,42 @@ class LupaWorld(LupaEntity):
         return self.entity
 
 
-class LupaArea(LupaEntity):
+class LupaItem(LupaEntity):
     @property
-    def area(self) -> envo.Area:
-        assert isinstance(self.entity, envo.Area)
+    def area(self) -> entity.Entity:
+        return self.entity
+
+    @property
+    def item(self) -> entity.Entity:
         return self.entity
 
     def number(self, of):
-        if isinstance(of, str):
-            return self.area.number_of_named(of)
-        return self.area.number_of_kind(of)
-
-    def make(self, table):
-        item = self.make_item_from_table(table, creator=self.ctx.creator)
-        return [actions.AddItemArea(area=self.area, item=item)]
-
-
-class LupaItem(LupaEntity):
-    @property
-    def item(self) -> things.Item:
-        assert isinstance(self.entity, things.Item)
-        return self.entity
+        with self.area.make(carryable.Containing) as contain:
+            if isinstance(of, str):
+                return contain.number_of_named(of)
+            return contain.number_of_kind(of)
 
     def kind(self, name: str) -> kinds.Kind:
         return self.entity.get_kind(name)
 
-
-class LupaLivingCreature(LupaEntity):
     def visible(self):
-        return self.entity.make_visible()
+        with self.entity.make(mechanics.Visibility) as vis:
+            vis.make_visible()
 
     def invisible(self):
-        return self.entity.make_invisible()
+        with self.entity.make(mechanics.Visibility) as vis:
+            vis.make_invisible()
 
     def is_invisible(self):
-        return self.entity.is_invisible
+        return self.entity.make(mechanics.Visibility).is_invisible
 
     def go(self, area) -> Sequence[game.Action]:
         return [actions.Go(area=area)]
 
-    def make(self, table) -> Sequence[game.Action]:
+    def make_hands(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.entity)
         return [actions.Make(item=finders.StaticItem(item=item))]
 
-
-class LupaPerson(LupaLivingCreature):
-    @property
-    def person(self) -> animals.Person:
-        assert isinstance(self.entity, animals.Person)
-        return self.entity
-
-
-class LupaAnimal(LupaLivingCreature):
-    @property
-    def animal(self) -> animals.Animal:
-        assert isinstance(self.entity, animals.Animal)
-        return self.entity
+    def make_here(self, table):
+        item = self.make_item_from_table(table, creator=self.ctx.creator)
+        return [actions.AddItemArea(area=self.area, item=item)]

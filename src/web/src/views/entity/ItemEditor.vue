@@ -1,7 +1,7 @@
 <template>
     <div class="item-editor">
-        <div v-for="route in entity.routes" v-bind:key="route.area.key">
-            <WithEntity :entityKey="route.area.key" v-slot="withEntity">
+        <div v-if="entity.chimeras.exit" v-bind:key="entity.chimeras.exit.area.key">
+            <WithEntity :entityKey="entity.chimeras.exit.area.key" v-slot="withEntity">
                 <EntityPanel :entity="withEntity.entity" @selected="raiseSelected" />
             </WithEntity>
         </div>

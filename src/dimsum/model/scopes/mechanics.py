@@ -2,16 +2,19 @@ from typing import List, Dict, Any, Optional
 import logging
 import datetime
 import abc
-import crypto
-import properties
-import behavior
+
+import model.crypto as crypto
+import model.properties as properties
+import model.entity as entity
+
+import model.scopes.behavior as behavior
 
 log = logging.getLogger("dimsum")
 
 
-class InteractableMixin:
+class Interactable(entity.Scope):
     def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
 
     def link_activity(self, name: str, activity=True):
@@ -36,7 +39,7 @@ def get_now() -> datetime.datetime:
 
 class Observation:
     def __init__(self, time=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.time = time if time else get_now()
 
     def memorable(self) -> bool:
@@ -79,9 +82,9 @@ class Visible:
         return obs[-1].memorable()
 
 
-class VisibilityMixin:
+class Visibility(entity.Scope):
     def __init__(self, visible: Visible = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):
@@ -119,15 +122,9 @@ class Physics:
         self.mass = mass
 
 
-class PhysicsMixin:
-    def __init__(self, physics: Physics = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
-        self.physics = physics if physics else Physics()
-
-
-class MemoryMixin:
+class Memory(entity.Scope):
     def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.memory = memory if memory else {}
 
     def memorize(self, q: str, thing: Memorable):
@@ -152,16 +149,7 @@ class Wind:
         self.magnitude = magnitude
 
 
-class Weather:
+class Weather(entity.Scope):
     def __init__(self, wind: Wind = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.wind = wind
-
-
-class WeatherMixin:
-    def __init__(self, weather: Weather = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
-        self.weather = weather if weather else Weather()
-
-    def add_weather(self, weather: Weather):
-        self.weather = weather

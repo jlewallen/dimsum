@@ -1,13 +1,15 @@
 from typing import List, Sequence, Any
 import logging
 import inflect
-import entity
-import game
-import things
-import envo
-import living
-import animals
-import movement
+
+import model.entity as entity
+import model.game as game
+import model.things as things
+
+import model.scopes.movement as movement
+import model.scopes.mechanics as mechanics
+import model.scopes.occupyable as occupyable
+import model.scopes.carryable as carryable
 
 p = inflect.engine()
 log = logging.getLogger("dimsum")
@@ -26,7 +28,7 @@ class ObservedEntity(Observable):
 
 
 class ObservedItem(ObservedEntity):
-    def __init__(self, item: things.Item):
+    def __init__(self, item: entity.Entity):
         super().__init__()
         self.item = item
 
@@ -40,21 +42,34 @@ class ObservedItem(ObservedEntity):
         return str(self)
 
 
+class Activity:
+    pass
+
+
+class HoldingActivity(Activity):
+    def __init__(self, item: entity.Entity):
+        super().__init__()
+        self.item = item
+
+    def __str__(self):
+        return "holding %s" % (self.item,)
+
+
 class ObservedLiving(ObservedEntity):
-    def __init__(self, alive: living.Alive):
+    def __init__(self, alive: entity.Entity):
         super().__init__()
         self.alive = alive
-        self.activities: Sequence[living.Activity] = [
-            living.HoldingActivity(e) for e in things.expected(alive.holding)
+        self.activities: Sequence[Activity] = [
+            HoldingActivity(e) for e in alive.make(carryable.Containing).holding
         ]
 
     @property
     def holding(self):
-        return self.alive.holding
+        return self.alive.make(carryable.Containing).holding
 
     @property
     def memory(self):
-        return self.alive.memory
+        return self.alive.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.observed_living(self)
@@ -102,7 +117,7 @@ class ObservedEntities(Observable):
 
 
 class PersonalObservation(Observation):
-    def __init__(self, who: animals.Person):
+    def __init__(self, who: entity.Entity):
         super().__init__()
         self.who = ObservedPerson(who)
 
@@ -116,7 +131,7 @@ class PersonalObservation(Observation):
 
     @property
     def memory(self):
-        return self.who.memory
+        return self.who.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.personal_observation(self)
@@ -168,23 +183,30 @@ class EntitiesObservation(Observation):
 
 
 class AreaObservation(Observation):
-    def __init__(self, area: envo.Area, person: animals.Person):
+    def __init__(self, area: entity.Entity, person: entity.Entity):
         super().__init__()
         assert area
         assert person
         self.who: ObservedPerson = ObservedPerson(person)
-        self.where: envo.Area = area
+        self.where: entity.Entity = area
         self.living: List[ObservedLiving] = flatten(
-            [observe(e) for e in area.occupied if e != person]
+            [
+                observe(e)
+                for e in area.make(occupyable.Occupyable).occupied
+                if e != person
+            ]
         )
         self.items: List[ObservedEntity] = flatten(
             [
                 observe(e)
-                for e in things.expected(area.holding)
-                if not e.visible.hard_to_see or person.can_see(e.identity)
+                for e in area.make(carryable.Containing).holding
+                if not e.make(mechanics.Visibility).visible.hard_to_see
+                or person.make(mechanics.Visibility).can_see(e.identity)
             ]
         )
-        self.routes: List[movement.AreaRoute] = area.available_routes
+        self.routes: List[movement.AreaRoute] = area.make(
+            movement.Movement
+        ).available_routes
 
     @property
     def props(self):
@@ -203,17 +225,9 @@ class AreaObservation(Observation):
 
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if isinstance(entity, animals.Person):
-        if entity.is_invisible:
-            return []
-        return [ObservedPerson(entity)]
-    if isinstance(entity, animals.Animal):
-        if entity.is_invisible:
-            return []
-        return [ObservedAnimal(entity)]
-    if isinstance(entity, things.Item):
-        return [ObservedItem(entity)]
-    raise Exception("unexpected observation target: %s" % (entity,))
+    if entity.make(mechanics.Visibility).is_invisible:
+        return []
+    return [ObservedItem(entity)]
 
 
 def flatten(l):

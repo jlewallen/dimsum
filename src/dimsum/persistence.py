@@ -4,10 +4,9 @@ import logging
 import sqlite3
 import json
 
-import entity
-import crypto
-import game
-import world
+import model.entity as entity
+import model.world as world
+
 import serializing
 
 log = logging.getLogger("dimsum")

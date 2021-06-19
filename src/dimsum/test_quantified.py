@@ -1,8 +1,11 @@
 import logging
 import pytest
 
-import game
-import reply
+import model.game as game
+import model.reply as reply
+
+import model.scopes.carryable as carryable
+
 import test
 
 log = logging.getLogger("dimsum")
@@ -14,34 +17,60 @@ async def test_quantified_drop_partial_and_hold():
 
     await tw.initialize()
     await tw.success("make 20 Coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
-    assert len(tw.world.items()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 2
-    assert tw.player.holding[0].quantity == 15
-    assert tw.area.entities()[0].quantity == 5
-    assert tw.player.holding[0].key in tw.world.entities  # Meh
-    assert len(tw.world.items()) == 2
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
+    assert (
+        tw.player.make(carryable.Containing)
+        .holding[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 15
+    )
+    assert (
+        tw.area.make(carryable.Containing)
+        .entities()[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 5
+    )
+    assert (
+        tw.player.make(carryable.Containing).holding[0].key in tw.world.entities
+    )  # Meh
+    assert len(tw.world.entities) == 5
 
     await tw.success("hold coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
-    assert len(tw.world.items()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 2
-    assert len(tw.world.items()) == 2
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
+    assert len(tw.world.entities) == 5
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 2
-    assert tw.player.holding[0].quantity == 10
-    assert tw.area.entities()[0].quantity == 10
-    assert len(tw.world.items()) == 2
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
+    assert (
+        tw.player.make(carryable.Containing)
+        .holding[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 10
+    )
+    assert (
+        tw.area.make(carryable.Containing)
+        .entities()[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 10
+    )
+    assert len(tw.world.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -51,11 +80,11 @@ async def test_quantified_hold_number():
     await tw.initialize()
     await tw.success("make 20 Coin")
     await tw.success("drop 20 coin")
-    assert len(tw.player.holding) == 0
-    assert len(tw.area.entities()) == 2
+    assert len(tw.player.make(carryable.Containing).holding) == 0
+    assert len(tw.area.make(carryable.Containing).holding) == 1
     await tw.success("hold 10 coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 2
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
@@ -63,16 +92,20 @@ async def test_quantified_drop_all():
     tw = test.TestWorld()
 
     await tw.initialize()
+    assert len(tw.world.entities) == 3
     await tw.success("make 20 Coin")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
-    assert len(tw.world.items()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
+    assert len(tw.world.entities) == 4
 
     await tw.success("drop 20 coin")
-    assert len(tw.player.holding) == 0
-    assert len(tw.area.entities()) == 2
-    assert tw.area.holding[0].quantity == 20
-    assert len(tw.world.items()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 0
+    assert len(tw.area.make(carryable.Containing).holding) == 1
+    assert (
+        tw.area.make(carryable.Containing).holding[0].make(carryable.Carryable).quantity
+        == 20
+    )
+    assert len(tw.world.entities) == 4
 
 
 @pytest.mark.asyncio
@@ -81,54 +114,64 @@ async def test_quantified_drop_inflected():
 
     await tw.initialize()
 
-    assert len(tw.player.holding) == 0
+    assert len(tw.player.make(carryable.Containing).holding) == 0
     await tw.success("make 20 Coin")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
 
-    assert len(tw.area.entities()) == 1
-    await tw.success("drop 10 coins")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 2
+    assert len(tw.area.make(carryable.Containing).holding) == 0
+    await tw.success("drop 10 coin")
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
 async def test_quantified_from_recipe_holding_template(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     await tw.initialize()
     await tw.success("make Gold Coin")
     await tw.success("call this cash")
     r = await tw.success("make 4 cash")
-    assert r.item.quantity == 5
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
+    assert r.item.make(carryable.Carryable).quantity == 5
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
 
     await tw.success("look down")
-    assert tw.player.holding[0].quantity == 5
+    assert (
+        tw.player.make(carryable.Containing)
+        .holding[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 5
+    )
 
 
 @pytest.mark.asyncio
 async def test_quantified_from_recipe(caplog):
-    caplog.set_level(logging.INFO)
     tw = test.TestWorld()
 
     await tw.initialize()
     await tw.success("make Gold Coin")
     await tw.success("call this cash")
-    item = tw.player.holding[0]
+    item = tw.player.make(carryable.Containing).holding[0]
     assert item
 
     await tw.success("obliterate")
     assert item.props.destroyed
 
     await tw.success("make 20 cash")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
 
     await tw.success("make 20 cash")
-    assert len(tw.player.holding) == 1
-    assert len(tw.area.entities()) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
+    assert len(tw.area.make(carryable.Containing).holding) == 0
 
     await tw.success("look down")
-    assert tw.player.holding[0].quantity == 40
+    assert (
+        tw.player.make(carryable.Containing)
+        .holding[0]
+        .make(carryable.Carryable)
+        .quantity
+        == 40
+    )

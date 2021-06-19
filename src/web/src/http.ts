@@ -68,17 +68,22 @@ export async function http<T>(info: OurRequestInfo): Promise<T> {
     return await response.json();
 }
 
+export interface Property<T> {
+    value: T;
+}
+
 export interface Properties {
-    name: string;
-    desc: string;
-    presence: string;
+    name: Property<string>;
+    desc: Property<string>;
 }
 
 export type EntityKey = string;
 
+export type Klass = Record<string, string>;
+
 export interface EntityRef {
     key: string;
-    klass: string;
+    klass: Klass;
     name: string;
 }
 
@@ -89,43 +94,65 @@ export interface Behavior {
 
 export type Behaviors = { [index: string]: Behavior };
 
-export interface Entity {
-    key: string;
-    url: string;
-    klass: string;
-    creator: EntityRef;
-    props: Properties;
-    behaviors: Behaviors;
-    holding?: EntityRef[];
-    occuped?: EntityRef[];
-    routes?: AreaRoute[];
-    visible?: {
+export interface Occupyable {
+    occupied: EntityRef[];
+}
+
+export interface Containing {
+    holding: EntityRef[];
+}
+
+export interface Visibility {
+    visible: {
         hard_to_see: boolean;
         hidden: never;
         observations: never;
     };
-    memory?: { [index: string]: EntityRef };
+}
+
+export interface Exit {
+    area: EntityRef;
+}
+
+export interface Kind {
+    identity: unknown;
+}
+
+export interface Carryable {
+    quantity: number;
+    kind: Kind;
+}
+
+export interface Entity {
+    key: string;
+    url: string;
+    klass: Klass;
+    creator: EntityRef;
+    props: { map: Properties };
+    chimeras: {
+        containing?: Containing;
+        behaviors?: { behaviors: { map: Behaviors } };
+        occupyable?: Occupyable;
+        visibility?: Visibility;
+        carryable?: Carryable;
+        exit?: Exit;
+    };
 }
 
 export interface Person extends Entity {
-    holding: EntityRef[];
-    wearing: EntityRef[];
-    memory: { [index: string]: EntityRef };
+    ignored: boolean;
 }
 
 export interface Animal extends Entity {
-    holding: EntityRef[];
-    wearing: EntityRef[];
-    memory: { [index: string]: EntityRef };
+    ignored: boolean;
 }
 
 export interface Area extends Entity {
-    holding: EntityRef[];
-    occuped: EntityRef[];
+    ignored: boolean;
 }
 
 export interface Item extends Entity {
-    area: EntityRef;
+    ignored: boolean;
 }
 
 export interface EntityResponse {

@@ -6,23 +6,27 @@ import logging
 import inflect
 import lark
 
-import properties
-import game
-import bus
-import world
-import animals
-import reply
-import library
-import persistence
-import grammar
-import evaluator
-import actions
-import events
-import luaproxy
-import movement
-import messages
+import model.game as game
+import model.properties as properties
+import model.world as world
+import model.reply as reply
+import model.events as events
+import model.library as library
+import model.sugar
 
-import sugar
+import model.scopes.movement as movement
+import model.scopes as scopes
+
+import bus
+import persistence
+import luaproxy
+import messages
+import grammars
+
+import default.actions as actions
+import default.evaluator as evaluator
+
+import default
 import digging
 import simple
 import fallback
@@ -145,7 +149,7 @@ class GameBot:
         self.bot = bot
         self.players = {}
         self.world = None
-        self.l = grammar.create_parser()
+        self.l = grammars.create_parser()
 
         @bot.event
         async def on_ready():
@@ -419,7 +423,7 @@ modify when eaten
                 raise Exception("no player")
             return player
 
-        player = animals.Player(
+        player = scopes.alive(
             key=key,
             creator=self.world,
             props=properties.Common(author.name, desc="A discord user"),

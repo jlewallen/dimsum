@@ -6,12 +6,17 @@ import time
 import crypt
 import sys
 import logging
-import grammar
-import animals
-import actions
-import properties
-import evaluator
+
+import model.properties as properties
+import model.scopes as scopes
+
 import messages
+
+import default.evaluator as evaluator
+import default.actions as actions
+
+import grammars
+
 import rich
 import rich.console
 import rich.live
@@ -54,7 +59,7 @@ class ShellSession:
             player = world.find_by_key(key)
             return player
 
-        player = animals.Player(
+        player = scopes.alive(
             key=key,
             creator=world,
             props=properties.Common(self.name, desc="A ssh user"),

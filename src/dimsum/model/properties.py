@@ -6,8 +6,8 @@ import time
 import copy
 import re
 
-import crypto
-import kinds
+import model.crypto as crypto
+import model.kinds as kinds
 
 log = logging.getLogger("dimsum")
 
@@ -16,12 +16,9 @@ Name = "name"
 Desc = "desc"
 Created = "created"
 Touched = "touched"
-Owner = "owner"
-Password = "password"
 Frozen = "frozen"
 Destroyed = "destroyed"
 Related = "related"
-Navigable = "navigable"
 
 # TODO remove
 Worn = "worn"
@@ -100,7 +97,8 @@ class Map:
                 self.map[key] = Property(value)
 
     def update(self, changes):
-        self.map.update(changes)
+        for key, value in changes.items():
+            self.set(key, value)
 
     def replace(self, **replacing):
         self.map = replacing
@@ -123,7 +121,6 @@ class Common(Map):
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
         self.set(Touched, time.time())
-        self.set(Owner, None)
         self.set(Frozen, None)
         self.set(Destroyed, None)
         self.set(Related, {})
@@ -153,15 +150,6 @@ class Common(Map):
         self.set(Desc, value)
 
     @property
-    def owner(self):
-        return self[Owner]
-
-    @owner.setter
-    def owner(self, value):
-        assert value
-        self.set(Owner, value)
-
-    @property
     def destroyed(self) -> Optional[crypto.Identity]:
         return self[Destroyed]
 
@@ -184,16 +172,6 @@ class Common(Map):
     @related.setter
     def related(self, value: Dict[str, kinds.Kind]):
         self.set(Related, value)
-
-    @property
-    def navigable(self):
-        if Navigable in self:
-            return self[Navigable]
-        return None
-
-    @navigable.setter
-    def navigable(self, value):
-        self.set(Navigable, value)
 
     def clone(self) -> "Common":
         cloned = Common(**copy.deepcopy(self.map))  # type: ignore

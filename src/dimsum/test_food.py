@@ -1,7 +1,11 @@
 import pytest
 
-import game
-import reply
+import model.game as game
+import model.reply as reply
+
+import model.scopes.health as health
+import model.scopes.carryable as carryable
+
 import test
 
 
@@ -13,8 +17,9 @@ async def test_make_food():
     await tw.success("modify when eaten")
     await tw.success("modify protein 100")
     await tw.success("eat steak")
-    assert len(tw.player.holding) == 0
-    assert tw.player.medical.nutrition.properties["protein"] == 100
+    assert len(tw.player.make(carryable.Containing).holding) == 0
+    with tw.player.make(health.Health) as player:
+        assert player.medical.nutrition.properties["protein"] == 100
 
 
 @pytest.mark.asyncio
@@ -25,8 +30,9 @@ async def test_make_drinks():
     await tw.success("modify when drank")
     await tw.success("modify alcohol 100")
     await tw.success("drink ipa")
-    assert len(tw.player.holding) == 0
-    assert tw.player.medical.nutrition.properties["alcohol"] == 100
+    assert len(tw.player.make(carryable.Containing).holding) == 0
+    with tw.player.make(health.Health) as player:
+        assert player.medical.nutrition.properties["alcohol"] == 100
 
 
 @pytest.mark.asyncio
@@ -35,7 +41,7 @@ async def test_try_eat():
     await tw.initialize()
     await tw.success("make IPA")
     await tw.failure("drink ipa")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
@@ -44,7 +50,7 @@ async def test_try_drink():
     await tw.initialize()
     await tw.success("make IPA")
     await tw.failure("drink ipa")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
@@ -55,9 +61,9 @@ async def test_taking_multiple_bites():
     await tw.success("modify when eaten")
     await tw.success("modify servings 2")
     await tw.success("eat cake")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
     await tw.success("eat cake")
-    assert len(tw.player.holding) == 0
+    assert len(tw.player.make(carryable.Containing).holding) == 0
 
 
 @pytest.mark.asyncio
@@ -69,9 +75,9 @@ async def test_taking_multiple_sips():
     await tw.success("modify alcohol 100")
     await tw.success("modify servings 2")
     await tw.success("drink ipa")
-    assert len(tw.player.holding) == 1
+    assert len(tw.player.make(carryable.Containing).holding) == 1
     await tw.success("drink ipa")
-    assert len(tw.player.holding) == 0
+    assert len(tw.player.make(carryable.Containing).holding) == 0
 
 
 @pytest.mark.asyncio

@@ -41,7 +41,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Entity } from "@/http";
+import { Entity, Behavior as BehaviorApi } from "@/http";
 import store, { SaveEntityBehaviorAction } from "@/store";
 import { getTimeStamp } from "@/datetime";
 
@@ -79,12 +79,12 @@ export default defineComponent({
     } {
         return {
             behaviors: _.compact(
-                _.map(this.entity.behaviors, (value, key) => {
+                (_.map(this.entity.chimeras.behaviors?.behaviors.map || [], (value: BehaviorApi, key) => {
                     if (key != "py/object") {
-                        return new Behavior(key, key, value!.lua, value!.logs);
+                        return new Behavior(key, key, value!.lua, value.logs);
                     }
                     return null;
-                })
+                }) as unknown) as Behavior[]
             ),
         };
     },
