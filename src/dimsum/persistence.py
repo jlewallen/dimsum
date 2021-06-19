@@ -17,7 +17,7 @@ class SqliteDatabase:
         self.db = sqlite3.connect(path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, klass TEXT NOT NULL, identity TEXT NOT NULL, serialized TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, gid INTEGER NOT NULL, klass TEXT NOT NULL, identity TEXT NOT NULL, serialized TEXT NOT NULL)"
         )
         self.db.commit()
 
@@ -41,20 +41,22 @@ class SqliteDatabase:
         )
 
     async def update(self, entity: entity.Entity):
+        gid = entity.props.gid
         klass = entity.__class__.__name__
-        props = serializing.serialize(entity, secure=True)
+        serialized = serializing.serialize(entity, secure=True)
         identity_field = {
             "private": entity.identity.private,
             "signature": entity.identity.signature,
         }
         # log.debug("saving %s %s %s", entity.key, entity, entity.__class__.__name__)
         self.dbc.execute(
-            "INSERT INTO entities (key, klass, identity, serialized) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, serialized = EXCLUDED.serialized",
+            "INSERT INTO entities (key, gid, klass, identity, serialized) VALUES (?, ?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET klass = EXCLUDED.klass, gid = EXCLUDED.gid, serialized = EXCLUDED.serialized",
             [
                 entity.key,
+                gid,
                 klass,
                 json.dumps(identity_field),
-                props,
+                serialized,
             ],
         )
 
@@ -88,7 +90,15 @@ class SqliteDatabase:
     async def load_all(self, world: world.World):
         return await self.load_query(world, "SELECT key, serialized FROM entities", [])
 
-    async def load_entity(self, world: world.World, key: str):
+    async def load_entity_by_gid(self, world: world.World, gid: int):
+        loaded = await self.load_query(
+            world, "SELECT key, serialized FROM entities WHERE gid = ?", [gid]
+        )
+        if len(loaded) == 1:
+            return loaded[0]
+        return None
+
+    async def load_entity_by_key(self, world: world.World, key: str):
         loaded = await self.load_query(
             world, "SELECT key, serialized FROM entities WHERE key = ?", [key]
         )
