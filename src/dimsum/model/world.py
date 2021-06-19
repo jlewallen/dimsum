@@ -39,6 +39,12 @@ class EntityHooks(entity.Hooks):
 entity.hooks(EntityHooks())
 
 
+class Welcoming(entity.Scope):
+    def __init__(self, area: entity.Entity = None, **kwargs):
+        super().__init__(**kwargs)
+        self.area = area
+
+
 class World(entity.Entity, entity.Registrar):
     def __init__(self, bus: bus.EventBus, context_factory, **kwargs):
         super().__init__(
@@ -69,10 +75,12 @@ class World(entity.Entity, entity.Registrar):
         return None
 
     def welcome_area(self) -> entity.Entity:
-        for _, entity in self.entities.items():
-            if entity.has(occupyable.Occupyable):
-                return entity
-        raise Exception("no welcome area")
+        with self.make(Welcoming) as welcoming:
+            return welcoming.area
+
+    def change_welcome_area(self, area: entity.Entity):
+        with self.make(Welcoming) as welcoming:
+            welcoming.area = area
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
         log.info("finding area for %s", entity)
@@ -106,6 +114,16 @@ class World(entity.Entity, entity.Registrar):
 
         if area.key in seen:
             return
+
+        occupied = area.make(occupyable.Occupyable).occupied
+
+        with self.make(Welcoming) as welcoming:
+            if welcoming.area:
+                existing_occupied = welcoming.area.make(occupyable.Occupyable).occupied
+                if len(existing_occupied) < len(occupied):
+                    welcoming.area = area
+            else:
+                welcoming.area = area
 
         seen[area.key] = area.key
 
