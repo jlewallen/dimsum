@@ -52,11 +52,12 @@ prod-server:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
 
 graph:
-	+@for m in *.sqlite3; do                                             \
-    n=`basename $$m .sqlite3`;                                           \
-    env/bin/python3 src/dimsum/cli.py graph --path $$m;                  \
-	jq . $$n.json > $$n-pretty.json && mv $$n-pretty.json $$n.json;      \
-	dot -T png $$n.dot > $$n.png;                                        \
+	+@for m in *.sqlite3; do                                               \
+	n=`basename $$m .sqlite3`;                                             \
+	rm -f $n.json;                                                         \
+	env/bin/python3 src/dimsum/cli.py export --path $$m | jq . > $$n.json; \
+	env/bin/python3 src/dimsum/cli.py graph --path $$m;                    \
+	dot -T png $$n.dot > $$n.png;                                          \
 	done
 
 .PHONY: web
