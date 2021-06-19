@@ -251,8 +251,9 @@ class TomorrowCat(Factory):
 
 
 class CavernEntrance(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: world.World, generics: Generics, area: entity.Entity):
         area = scopes.exit(
+            area=area,
             creator=world,
             parent=generics.area,
             props=properties.Common(
@@ -271,18 +272,6 @@ class DarkCavern(Factory):
             props=properties.Common(
                 "Dark Cavern",
                 desc="It's dark",
-            ),
-        )
-
-        entrance = CavernEntrance().create(world, generics)
-
-        add_item(
-            area,
-            scopes.exit(
-                area=entrance,
-                creator=world,
-                parent=generics.thing,
-                props=properties.Common(name=movement.Direction.NORTH.exiting),
             ),
         )
 
@@ -451,7 +440,7 @@ class WelcomeArea(Factory):
         add_item(clearing, LargeMapleTree().create(world, generics))
 
         cavern = DarkCavern().create(world, generics)
-        add_item(clearing, SmallCrevice().create(world, generics, cavern))
+        add_item(clearing, CavernEntrance().create(world, generics, cavern))
         add_item(cavern, SmallCrevice().create(world, generics, clearing))
 
         museum = Museum().create(world, generics)
