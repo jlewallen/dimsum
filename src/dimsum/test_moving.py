@@ -36,7 +36,9 @@ async def test_go_adjacent():
     add_item(
         tw.area,
         scopes.exit(
-            area=another_room, creator=tw.world, props=properties.Common("Door")
+            creator=tw.world,
+            props=properties.Common("Door"),
+            initialize={movement.Exit: dict(area=another_room)},
         ),
     )
 
@@ -74,9 +76,9 @@ async def test_directional_moving():
     add_item(
         tw.area,
         scopes.exit(
-            area=park,
-            props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=tw.jacob,
+            props=properties.Common(name=movement.Direction.NORTH.exiting),
+            initialize={movement.Exit: dict(area=park)},
         ),
     )
 
@@ -94,13 +96,13 @@ class Bidirectional:
         assert there
         assert back
         goes_there = scopes.exit(
-            area=there,
             props=properties.Common(name="Exit to {0}".format(there.props.name)),
+            initialize={movement.Exit: dict(area=there)},
             **kwargs
         )
         comes_back = scopes.exit(
-            area=back,
             props=properties.Common(name="Exit to {0}".format(back.props.name)),
+            initialize={movement.Exit: dict(area=back)},
             **kwargs
         )
         with back.make(carryable.Containing) as contain:

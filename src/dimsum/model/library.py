@@ -140,10 +140,10 @@ end
 class SmallCrevice:
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         item = scopes.exit(
-            area=area,
             creator=world,
             parent=generics.thing,
             visible=mechanics.Visible(hard_to_see=True),
+            initialize={movement.Exit: dict(area=area)},
             props=properties.Common(
                 "Small Crevice",
                 desc="Whoa, how'd you even find this!?",
@@ -230,10 +230,10 @@ end
 class WoodenLadder:
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         item = scopes.exit(
-            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Wooden Ladder", desc="Seems sturdy enough."),
+            initialize={movement.Exit: dict(area=area)},
         )
         return item
 
@@ -253,13 +253,13 @@ class TomorrowCat(Factory):
 class CavernEntrance(Factory):
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         area = scopes.exit(
-            area=area,
             creator=world,
             parent=generics.area,
             props=properties.Common(
                 "Entrance to a Dark Cavern",
                 desc="It's dark, the cavern that is.",
             ),
+            initialize={movement.Exit: dict(area=area)},
         )
         return area
 
@@ -315,10 +315,10 @@ class RoomGrid(Factory):
             add_item(
                 from_cell,
                 scopes.exit(
-                    area=to_cell,
                     creator=world,
                     parent=generics.thing,
                     props=properties.Common(name=direction.exiting),
+                    initialize={movement.Exit: dict(area=to_cell)},
                 ),
             )
 
@@ -353,10 +353,10 @@ class Museum(Factory):
 class MarbleSteps:
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         item = scopes.exit(
-            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Marble Steps", desc="Marble"),
+            initialize={movement.Exit: dict(area=area)},
         )
         return item
 
@@ -379,10 +379,10 @@ class NarrowCanyon:
 class RockyPath:
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         item = scopes.exit(
-            area=area,
             creator=world,
             parent=generics.thing,
             props=properties.Common("Rocky Path", desc="Looks easy enough"),
+            initialize={movement.Exit: dict(area=area)},
         )
         return item
 
@@ -421,19 +421,19 @@ class WelcomeArea(Factory):
         add_item(
             area,
             scopes.exit(
-                area=clearing,
                 creator=world,
                 parent=generics.thing,
                 props=properties.Common("Worn Path"),
+                initialize={movement.Exit: dict(area=clearing)},
             ),
         )
         add_item(
             clearing,
             scopes.exit(
-                area=area,
                 creator=world,
                 parent=generics.thing,
                 props=properties.Common("Worn Path"),
+                initialize={movement.Exit: dict(area=area)},
             ),
         )
 

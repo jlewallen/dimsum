@@ -89,18 +89,18 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     add_item(
         one,
         scopes.exit(
-            area=two,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             creator=world,
+            initialize={movement.Exit: dict(area=two)},
         ),
     )
 
     add_item(
         two,
         scopes.exit(
-            area=one,
             props=properties.Common(name=movement.Direction.SOUTH.exiting),
             creator=world,
+            initialize={movement.Exit: dict(area=one)},
         ),
     )
 
@@ -136,10 +136,20 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     two = scopes.area(creator=world, props=properties.Common("Two"))
 
     add_item(
-        one, scopes.exit(area=two, creator=world, props=properties.Common("Item-One"))
+        one,
+        scopes.exit(
+            creator=world,
+            props=properties.Common("Item-One"),
+            initialize={movement.Exit: dict(area=two)},
+        ),
     )
     add_item(
-        two, scopes.exit(area=one, creator=world, props=properties.Common("Item-Two"))
+        two,
+        scopes.exit(
+            creator=world,
+            props=properties.Common("Item-Two"),
+            initialize={movement.Exit: dict(area=one)},
+        ),
     )
 
     assert two in one.make(movement.Movement).adjacent()

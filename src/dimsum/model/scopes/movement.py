@@ -109,8 +109,7 @@ class Exit(entity.Scope):
         self.area = area if area else None
 
     def constructed(self, area: entity.Entity = None, **kwargs):
-        if area:
-            self.area = area
+        pass
 
 
 class FindsRoute:

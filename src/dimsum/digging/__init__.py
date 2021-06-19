@@ -84,9 +84,9 @@ class Dig(actions.PersonAction):
 
         if self.linkage.there:
             goes_there = scopes.exit(
-                area=digging,
                 creator=player,
                 props=properties.Common(name=self.linkage.there.name),
+                initialize={movement.Exit: dict(area=digging)},
             )
             with area.make(carryable.Containing) as ground:
                 ground.add_item(goes_there)
@@ -94,9 +94,9 @@ class Dig(actions.PersonAction):
 
         if self.linkage.back:
             comes_back = scopes.exit(
-                area=area,
                 creator=player,
                 props=properties.Common(name=self.linkage.back.name),
+                initialize={movement.Exit: dict(area=area)},
             )
             with digging.make(carryable.Containing) as ground:
                 ground.add_item(comes_back)
