@@ -19,7 +19,7 @@ import WithRoutedEntity from "./WithRoutedEntity.vue";
 import GeneralEntityForm from "./GeneralEntityForm.vue";
 import AreaEditor from "./AreaEditor.vue";
 import ItemEditor from "./ItemEditor.vue";
-import PersonEditor from "./PersonEditor.vue";
+import AnimalEditor from "./AnimalEditor.vue";
 import { Entity } from "@/http";
 import { entityToKind } from "@/store";
 
@@ -31,8 +31,10 @@ export default defineComponent({
         GeneralEntityForm,
         AreaEditor,
         ItemEditor,
-        PersonEditor,
-        PlayerEditor: PersonEditor,
+        ExitEditor: ItemEditor,
+        AnimalEditor,
+        PersonEditor: AnimalEditor,
+        PlayerEditor: AnimalEditor,
     },
     props: {},
     data(): {} {

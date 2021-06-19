@@ -97,7 +97,8 @@ class Map:
                 self.map[key] = Property(value)
 
     def update(self, changes):
-        self.map.update(changes)
+        for key, value in changes.items():
+            self.set(key, value)
 
     def replace(self, **replacing):
         self.map = replacing

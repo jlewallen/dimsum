@@ -56,16 +56,19 @@ export default defineComponent({
         },
     },
     data(): { fields: Field[]; field: { name: string }; form: PropertyMap } {
-        const readOnly = ["py/object", "created", "touched"];
-        const fields = _.map(this.entity.props, (value, key) => {
+        const readOnly = ["gid", "created", "touched", "frozen", "destroyed"];
+        const fields = _.map(this.entity.props.map, (value, key) => {
             return {
                 name: key,
                 readOnly: readOnly.indexOf(key) >= 0,
-                numeric: _.isNumber(value),
-                bool: _.isBoolean(value),
-                complex: _.isObject(value) || _.isArray(value),
+                numeric: _.isNumber(value.value),
+                bool: _.isBoolean(value.value),
+                complex: _.isObject(value.value) || _.isArray(value.value),
             };
         }).filter((field) => !field.complex);
+
+        const values = _.mapValues(this.entity.props.map, (value) => value.value);
+
         return {
             fields: fields,
             field: {
@@ -73,7 +76,7 @@ export default defineComponent({
             },
             form: {
                 key: this.entity.key,
-                ...this.entity.props,
+                ...values,
             },
         };
     },

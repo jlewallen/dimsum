@@ -5,7 +5,7 @@
             <Entities :entityRefs="adjacent" @selected="entitySelected" />
         </div>
 
-        <div class="routes" v-if="entity.routes.length > 0">
+        <div class="routes" v-if="false && entity.routes.length > 0">
             <h4>Routes:</h4>
             <div v-for="route in entity.routes" v-bind:key="route.direction.compass" class="route">
                 <div>{{ route.direction.compass }} of here there is</div>
@@ -15,14 +15,14 @@
             </div>
         </div>
 
-        <div v-if="entity.occupied.length > 0">
+        <div v-if="entity.chimeras.occupyable.occupied.length > 0">
             <h4>Also Here:</h4>
-            <Entities :entityRefs="entity.occupied" @selected="entitySelected" />
+            <Entities :entityRefs="entity.chimeras.occupyable.occupied" @selected="entitySelected" />
         </div>
 
-        <div v-if="entity.holding.length > 0">
+        <div v-if="entity.chimeras.containing.holding.length > 0">
             <h4>Also Here:</h4>
-            <Entities :entityRefs="entity.holding" @selected="entitySelected" />
+            <Entities :entityRefs="entity.chimeras.containing.holding" @selected="entitySelected" />
         </div>
     </div>
 </template>
@@ -30,7 +30,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Area, Item, AreaRoute, Entity, EntityRef } from "@/http";
+import { Area, Item, AreaRoute, Entity, EntityRef, Exit } from "@/http";
 import Entities from "./Entities.vue";
 import WithEntity from "./WithEntity.vue";
 import EntityPanel from "./EntityPanel.vue";
@@ -51,13 +51,13 @@ export default defineComponent({
     computed: {
         adjacent(): EntityRef[] {
             return _.flatten(
-                this.entity.holding
+                (this.entity.chimeras.containing?.holding || [])
                     .map((ref: EntityRef) => store.state.entities[ref.key])
                     .filter((e: Entity | undefined) => {
-                        return e && e.routes;
+                        return e && e.chimeras.exit;
                     })
-                    .map((e: Entity) => e.routes!)
-            ).map((e: AreaRoute) => e.area);
+                    .map((e: Entity) => e.chimeras.exit!)
+            ).map((e: Exit) => e.area);
         },
     },
     methods: {

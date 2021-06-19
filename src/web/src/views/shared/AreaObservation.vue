@@ -2,9 +2,9 @@
     <div class="response area-observation card">
         <WithEntity :entityKey="reply.where.key" :force="true" v-slot="where">
             <div class="card-body">
-                <h4 class="card-title">{{ where.entity.props.name }}</h4>
-                <h6 class="card-subtitle">{{ where.entity.props.desc }}</h6>
-                <div class="routes">
+                <h4 class="card-title">{{ where.entity.props.map.name.value }}</h4>
+                <h6 class="card-subtitle">{{ where.entity.props.map.desc.value }}</h6>
+                <div class="routes" v-if="false">
                     <div v-for="(route, index) in reply.routes" v-bind:key="index" class="route">
                         <div>{{ route.direction.compass }} of here there is</div>
                         <WithEntity :entityKey="route.area.key" :force="true" v-slot="withEntity">
@@ -13,8 +13,8 @@
                     </div>
                 </div>
                 <div class="people">
-                    <div v-for="observed in reply.living" v-bind:key="observed.alive.key">
-                        <WithEntity :entityKey="observed.alive.key" :force="true" v-slot="withEntity">
+                    <div v-for="observed in reply.living" v-bind:key="observed.item.key">
+                        <WithEntity :entityKey="observed.item.key" :force="true" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>

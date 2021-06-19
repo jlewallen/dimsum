@@ -9,6 +9,8 @@ import hashlib
 
 import model.game as game
 import model.scopes.users as users
+import model.scopes.behavior as behavior
+import model.scopes as scopes
 
 import serializing
 import grammars
@@ -57,7 +59,9 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"areas": world.areas()}, unpicklable=False)
+        return serializing.serialize(
+            {"areas": world.entities_of_klass(scopes.AreaClass)}, unpicklable=False
+        )
 
     @app.route("/api/people")
     def people_index():
@@ -65,7 +69,9 @@ def create(state):
         if world is None:
             return {"loading": True}
 
-        return serializing.serialize({"people": world.people()}, unpicklable=False)
+        return serializing.serialize(
+            {"people": world.entities_of_klass(scopes.LivingClass)}, unpicklable=False
+        )
 
     @app.route("/api/entities/<string:ukey>")
     def get_entity(ukey: str):
@@ -120,7 +126,8 @@ def create(state):
             log.info("form: %s" % (form,))
 
             entity = world.find_by_key(key)
-            entity.behaviors.replace(form)
+            with entity.make(behavior.Behaviors) as behave:
+                behave.behaviors.replace(form)
             entity.touch()
             await state.save()
 

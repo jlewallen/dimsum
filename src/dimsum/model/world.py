@@ -1,4 +1,4 @@
-from typing import Any, Optional, Dict, List, Sequence, cast
+from typing import Any, Optional, Dict, List, Sequence, cast, Type
 import time
 import logging
 import inflect
@@ -51,6 +51,9 @@ class World(entity.Entity, entity.Registrar):
         self.bus = bus
         self.context_factory = context_factory
         self.register(self)
+
+    def entities_of_klass(self, klass: Type[entity.EntityClass]):
+        return [e for key, e in self.entities.items() if e.klass == klass]
 
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():

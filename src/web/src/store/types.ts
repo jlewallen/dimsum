@@ -86,12 +86,12 @@ export class AuthenticatedAction {
 }
 
 export function entityToKind(entity: Entity): string {
-    return entity.klass.replace("serializing.Root", "");
+    return entity.klass["py/type"].replace("model.scopes.", "").replace("Class", "");
 }
 
 export function entityToClass(entity: Entity): string {
     const classes: string[] = [entityToKind(entity).toLowerCase()];
-    if (entity.visible && entity.visible.hard_to_see) {
+    if (entity.chimeras.visibility && entity.chimeras.visibility.visible.hard_to_see) {
         classes.push("hard-to-see");
     }
     return classes.join(" ");

@@ -14,7 +14,6 @@ export default defineComponent({
             required: true,
         },
     },
-    computed: {},
     methods: {
         raiseSelected(entity: Entity): void {
             this.$emit("selected", entity);

@@ -1,6 +1,6 @@
 <template>
     <div class="entity-header">
-        <h3>{{ entityToKind(entity) }}: {{ entity.props.name }}</h3>
+        <h3>{{ entityToKind(entity) }}: {{ entity.props.map.name.value }}</h3>
         <div>
             <div class="btn-group" role="group" aria-label="Basic example">
                 <router-link :to="{ name: 'entity', params: { key: entity.key } }">
@@ -21,17 +21,12 @@ import { entityToKind } from "@/store";
 
 export default defineComponent({
     name: "Header",
-    components: {},
     props: {
         entity: {
             type: Object as () => Entity,
             required: true,
         },
     },
-    data(): {} {
-        return {};
-    },
-    computed: {},
     methods: {
         entityToKind: entityToKind,
     },
