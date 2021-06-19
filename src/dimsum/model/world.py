@@ -58,15 +58,6 @@ class World(entity.Entity, entity.Registrar):
         self.context_factory = context_factory
         self.register(self)
 
-    def entities_of_klass(self, klass: Type[entity.EntityClass]):
-        return [e for key, e in self.entities.items() if e.klass == klass]
-
-    def find_entity_by_name(self, name):
-        for key, e in self.entities.items():
-            if name in e.props.name:
-                return e
-        return None
-
     def welcome_area(self) -> entity.Entity:
         with self.make(Welcoming) as welcoming:
             return welcoming.area
@@ -91,15 +82,6 @@ class World(entity.Entity, entity.Registrar):
         area = self.find_entity_area(player)
         assert area
         return area
-
-    def contains(self, key) -> bool:
-        return key in self.entities
-
-    def find_by_key(self, key) -> entity.Entity:
-        return self.entities[key]
-
-    def resolve(self, keys) -> Sequence[entity.Entity]:
-        return [self.entities[key] for key in keys]
 
     def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         if seen is None:
@@ -145,11 +127,6 @@ class World(entity.Entity, entity.Registrar):
             self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
-
-    def add_entities(self, entities: List[entity.Entity]):
-        for entity in entities:
-            log.debug("add-entity: %s %s", entity.key, entity)
-            self.register(entity)
 
     def apply_item_finder(
         self, person: entity.Entity, finder, **kwargs

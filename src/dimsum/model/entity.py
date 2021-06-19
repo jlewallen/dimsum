@@ -289,6 +289,26 @@ class Registrar:
             self.numbered[assigned] = entity
             self.key_to_number[entity.key] = assigned
 
+    def contains(self, key) -> bool:
+        return key in self.entities
+
+    def find_by_key(self, key) -> Entity:
+        return self.entities[key]
+
+    def entities_of_klass(self, klass: Type[EntityClass]):
+        return [e for key, e in self.entities.items() if e.klass == klass]
+
+    def add_entities(self, entities: List[Entity]):
+        for entity in entities:
+            log.debug("add-entity: %s %s", entity.key, entity)
+            self.register(entity)
+
+    def find_entity_by_name(self, name):
+        for key, e in self.entities.items():
+            if name in e.props.name:
+                return e
+        return None
+
     def find_by_number(self, number: int) -> Optional[Entity]:
         if number in self.numbered:
             return self.numbered[number]
