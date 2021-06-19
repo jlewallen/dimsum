@@ -1,10 +1,13 @@
 from typing import Tuple, List
 
 import os
+import logging
 import hashlib
 import base64
 
 import model.entity as entity
+
+log = logging.getLogger("dimsum")
 
 
 class Auth(entity.Scope):
@@ -19,17 +22,19 @@ class Auth(entity.Scope):
             base64.b64encode(salt).decode("utf-8"),
             base64.b64encode(key).decode("utf-8"),
         ]
+        log.info("%s: password changed %s", self.ourselves.key, self.ourselves)
 
     def try_password(self, password: str, **kwargs):
-        if not self.password:
-            raise Exception("unauthenticated")
-        saltEncoded, keyEncoded = self.password
-        salt = base64.b64decode(saltEncoded)
-        key = base64.b64decode(keyEncoded)
-        actual_key = hashlib.pbkdf2_hmac(
-            "sha256", password.encode("utf-8"), salt, 100000
-        )
+        if self.password:
+            salt_encoded, key_encoded = self.password
+            salt = base64.b64decode(salt_encoded)
+            key = base64.b64decode(key_encoded)
+            actual_key = hashlib.pbkdf2_hmac(
+                "sha256", password.encode("utf-8"), salt, 100000
+            )
 
-        return {
-            "key": self.ourselves.key,
-        }
+            return {
+                "key": self.ourselves.key,
+            }
+
+        raise Exception("unauthenticated")

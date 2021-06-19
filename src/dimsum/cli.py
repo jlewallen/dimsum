@@ -4,6 +4,7 @@ import sys
 import logging
 import asyncio
 import jinja2
+import base64
 import json
 import argparse
 import os
@@ -58,7 +59,7 @@ class Repl:
             return player
 
         player = scopes.alive(
-            key=self.name,
+            key=base64.b64encode(self.name),
             creator=self.world,
             props=properties.Common(self.name, desc="A repl user"),
         )

@@ -23,7 +23,7 @@ import luaproxy
 import messages
 import grammars
 
-import default.actions
+import default.actions as actions
 import default.evaluator as evaluator
 
 import default

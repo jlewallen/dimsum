@@ -8,6 +8,8 @@ import base64
 import hashlib
 
 import model.game as game
+import model.scopes.users as users
+
 import serializing
 import grammars
 
@@ -30,9 +32,7 @@ def create(state):
         if "authorization" in quart.request.headers:
             header = quart.request.headers["authorization"]
             bearer, encoded = header.split(" ")
-            decoded = jwt.decode(
-                base64.b64decode(encoded), session_key, algorithms="HS256"
-            )
+            decoded = jwt.decode(encoded, session_key, algorithms="HS256")
             return state.world, decoded
         raise Exception("unauthorized")
 
@@ -170,10 +170,11 @@ def create(state):
         with person.make(users.Auth) as auth:
             token = auth.try_password(password)
 
-            encoded = base64.b64encode(
-                jwt.encode(token, session_key, algorithm="HS256")
-            )
-
-            return {"token": encoded.decode("utf-8"), "person": None}
+            if token:
+                jwt_token = jwt.encode(token, session_key, algorithm="HS256")
+                return {
+                    "token": jwt_token,
+                    "person": None,
+                }
 
     return app

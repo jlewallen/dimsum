@@ -50,7 +50,8 @@ class Auth(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         with player.make(users.Auth) as auth:
             auth.change(self.password)
-            return Success("done, https://mud.espial.me")
+            log.info(auth.password)
+        return Success("done, https://mud.espial.me")
 
 
 class Home(PersonAction):
