@@ -13,5 +13,5 @@ async def open_world(path: str) -> Tuple[world.World, persistence.SqliteDatabase
     w = world.World(bus, luaproxy.context_factory)
     db = persistence.SqliteDatabase()
     await db.open(path)
-    await db.load(w)
+    await db.load_all(w)
     return w, db

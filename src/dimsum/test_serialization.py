@@ -214,7 +214,7 @@ end
     await db.save(tw.world)
 
     empty = world.World(tw.bus, context_factory=None)
-    await db.load(empty)
+    await db.load_all(empty)
 
 
 @pytest.mark.asyncio
@@ -242,7 +242,7 @@ async def test_unregister_destroys(caplog):
     assert await db.number_of_entities() == 3
 
     empty = world.World(tw.bus, context_factory=None)
-    await db.load(empty)
+    await db.load_all(empty)
 
 
 @pytest.mark.asyncio

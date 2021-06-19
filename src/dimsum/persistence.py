@@ -1,4 +1,4 @@
-from typing import Dict, TextIO
+from typing import Dict, TextIO, Any
 
 import logging
 import sqlite3
@@ -85,16 +85,27 @@ class SqliteDatabase:
 
         self.db.commit()
 
-    async def load(self, world: world.World):
+    async def load_all(self, world: world.World):
+        return await self.load_query(world, "SELECT key, serialized FROM entities", [])
+
+    async def load_entity(self, world: world.World, key: str):
+        loaded = await self.load_query(
+            world, "SELECT key, serialized FROM entities WHERE key = ?", [key]
+        )
+        if len(loaded) == 1:
+            return loaded[0]
+        return None
+
+    async def load_query(self, world: world.World, query: str, args: Any):
         self.dbc = self.db.cursor()
 
         rows = {}
-        for row in self.dbc.execute("SELECT key, serialized FROM entities"):
+        for row in self.dbc.execute(query, args):
             rows[row[0]] = row[1]
 
-        entities = serializing.restore(world, rows)
+        self.db.rollback()
 
-        self.db.commit()
+        return serializing.restore(world, rows)
 
     async def write(self, stream: TextIO):
         stream.write("[\n")

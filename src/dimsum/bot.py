@@ -380,7 +380,7 @@ modify when eaten
 
         db = persistence.SqliteDatabase()
         await db.open("world.sqlite3")
-        await db.load(self.world)
+        await db.load_all(self.world)
 
         if self.world.empty():
             log.info("creating example world")

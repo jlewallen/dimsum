@@ -64,7 +64,7 @@ async def test_chimeric_entities_serialize(caplog):
     await db.save(universe)
 
     empty = world.World(bus, context_factory=universe.context_factory)
-    await db.load(empty)
+    await db.load_all(empty)
 
     assert await db.number_of_entities() == 3
 
@@ -123,6 +123,6 @@ async def test_specialization_classes(caplog):
     await db.save(universe)
 
     empty = world.World(bus, context_factory=universe.context_factory)
-    await db.load(empty)
+    await db.load_all(empty)
 
     assert await db.number_of_entities() == 3

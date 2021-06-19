@@ -31,7 +31,7 @@ async def test_library(caplog):
     await tw.world.tick()
 
     empty = world.World(tw.bus, context_factory=tw.world.context_factory)
-    await db.load(empty)
+    await db.load_all(empty)
 
     await empty.tick()
 
