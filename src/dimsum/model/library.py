@@ -250,7 +250,7 @@ class TomorrowCat(Factory):
         return animal
 
 
-class CavernEntrance(Factory):
+class CavernEntrance:
     def create(self, world: world.World, generics: Generics, area: entity.Entity):
         area = scopes.exit(
             creator=world,
