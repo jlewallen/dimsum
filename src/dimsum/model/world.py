@@ -67,13 +67,6 @@ class World(entity.Entity, entity.Registrar):
                 return e
         return None
 
-    def find_person_by_name(self, name) -> Optional[entity.Entity]:
-        for key, e in self.entities.items():
-            # TODO Check type
-            if e.props.name == name:
-                return e
-        return None
-
     def welcome_area(self) -> entity.Entity:
         with self.make(Welcoming) as welcoming:
             return welcoming.area
