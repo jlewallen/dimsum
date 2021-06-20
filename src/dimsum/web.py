@@ -14,6 +14,7 @@ import model.scopes as scopes
 
 import serializing
 import grammars
+import schema as schema_factory
 
 log = logging.getLogger("dimsum.web")
 
@@ -29,6 +30,7 @@ def create(state):
 
     session_key_string = os.getenv("SESSION_KEY")
     session_key = base64.b64decode(session_key_string)
+    schema = schema_factory.create()
 
     def authenticate():
         if "authorization" in quart.request.headers:
@@ -184,6 +186,19 @@ def create(state):
                     "token": jwt_token,
                     "person": None,
                 }
+
+    @app.route("/api/graphql", methods=["GET"])
+    async def introspection():
+        return {"data": schema.introspect()}
+
+    @app.route("/api/graphql", methods=["POST"])
+    async def graphql():
+        user = authenticate()
+        body = await quart.request.get_json()
+        variables = body["variables"] if "variables" in body else None
+        context = {"session": session, "user": user}
+        res = schema.execute(body["query"], context_value=context, variables=variables)
+        return res.to_dict()
 
     @app.route("/api/storage/entities/<string:ukey>")
     def get_storage_entity(ukey: str):
