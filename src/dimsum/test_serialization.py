@@ -1,3 +1,5 @@
+from typing import Dict, Any, List, Optional
+
 import pytest
 import logging
 
@@ -26,12 +28,12 @@ log = logging.getLogger("dimsum")
 @pytest.mark.asyncio
 async def test_serialize_empty_world(caplog):
     before = domains.Domain()
-    json = serializing.all(before.registrar)
+    json = serialize_all(before.registrar)
 
     assert len(json.items()) == 1
 
     after = domains.Domain()
-    serializing.restore(after.registrar, json)
+    restore(after.registrar, json)
 
     assert len(after.registrar.entities.items()) == 1
 
@@ -42,12 +44,12 @@ async def test_serialize_world_one_area(caplog):
     world = domain.world
     domain.add_area(scopes.area(creator=world, props=properties.Common("Area")))
 
-    json = serializing.all(domain.registrar)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 2
 
     after = domains.Domain()
-    serializing.restore(after.registrar, json)
+    restore(after.registrar, json)
 
     assert len(after.registrar.entities.items()) == 2
 
@@ -62,12 +64,12 @@ async def test_serialize_world_one_item(caplog):
 
     assert area.make(carryable.Containing).holding[0]
 
-    json = serializing.all(domain.registrar)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 3
 
     after = domains.Domain()
-    serializing.restore(after.registrar, json)
+    restore(after.registrar, json)
 
     assert after.registrar.find_entity_by_name("Area")
     assert after.registrar.find_entity_by_name("Item")
@@ -117,7 +119,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
     domain.add_area(one)
 
-    json = serializing.all(domain.registrar)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 5
 
@@ -125,7 +127,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
         log.info("%s", data)
 
     after = domains.Domain()
-    entities = serializing.restore(after.registrar, json)
+    entities = restore(after.registrar, json)
 
     one = after.registrar.find_entity_by_name("One")
     assert one
@@ -169,12 +171,12 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
 
     domain.add_area(one)
 
-    json = serializing.all(domain.registrar, indent=True)
+    json = serialize_all(domain.registrar, indent=True)
 
     assert len(json.items()) == 5
 
     after = domains.Domain()
-    entities = serializing.restore(after.registrar, json)
+    entities = restore(after.registrar, json)
 
     one = after.registrar.find_entity_by_name("One")
     assert one
@@ -289,13 +291,13 @@ async def test_serialize_preserves_owner_reference(caplog):
 
     domain.add_area(scopes.area(creator=domain.world, props=properties.Common("Area")))
 
-    json = serializing.all(domain.registrar)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 2
 
     after = domains.Domain()
 
-    serializing.restore(after.registrar, json)
+    restore(after.registrar, json)
 
     assert len(after.registrar.entities.items()) == 2
 
@@ -341,3 +343,31 @@ async def test_serialize_properties_on_entity(caplog):
 def add_item(container: entity.Entity, item: entity.Entity):
     with container.make(carryable.Containing) as contain:
         contain.add_item(item)
+
+
+def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
+    return {
+        key: serializing.serialize(entity, secure=True, **kwargs)
+        for key, entity in registrar.entities.items()
+    }
+
+
+def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
+    refs: Dict[str, entity.EntityRef] = {}
+
+    def reference(key):
+        if key not in refs:
+            refs[key] = entity.EntityRef(key)
+        return refs[key]
+
+    entities: Dict[str, entity.Entity] = {}
+    for key in rows.keys():
+        e = serializing.deserialize(rows[key], reference)
+        assert isinstance(e, entity.Entity)
+        registrar.register(e)
+        entities[key] = e
+
+    for key, baby_entity in refs.items():
+        baby_entity.__wrapped__ = entities[key]  # type: ignore
+
+    return entities

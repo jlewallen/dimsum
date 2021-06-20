@@ -128,34 +128,6 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
-    return {
-        key: serialize(entity, secure=True, **kwargs)
-        for key, entity in registrar.entities.items()
-    }
-
-
-def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
-    refs: Dict[str, entity.EntityRef] = {}
-
-    def reference(key):
-        if key not in refs:
-            refs[key] = entity.EntityRef(key)
-        return refs[key]
-
-    entities: Dict[str, entity.Entity] = {}
-    for key in rows.keys():
-        e = deserialize(rows[key], reference)
-        assert isinstance(e, entity.Entity)
-        registrar.register(e)
-        entities[key] = e
-
-    for key, baby_entity in refs.items():
-        baby_entity.__wrapped__ = entities[key]  # type: ignore
-
-    return entities
-
-
 async def materialize(
     key: str,
     registrar: entity.Registrar,
@@ -184,9 +156,9 @@ async def materialize(
     loaded = deserialize(data, reference)
     registrar.register(loaded)
 
-    for referenced_key, baby_entity in refs.items():
+    for referenced_key, proxy in refs.items():
         linked = await materialize(referenced_key, registrar, storage, depth=depth + 1)
-        baby_entity.__wrapped__ = linked  # type: ignore
+        proxy.__wrapped__ = linked  # type: ignore
 
     return loaded
 
