@@ -14,7 +14,7 @@ run:
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/python3 -m pytest src/dimsum/test_*.py
+	env/bin/python3 -m pytest src/dimsum/test_*.py src/dimsum/**/test_*.py
 
 prettier: env
 	python3 -m black .
