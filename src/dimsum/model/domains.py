@@ -50,6 +50,10 @@ class Domain:
     async def load(self):
         self.registrar.purge()
         self.world = await serializing.materialize("world", self.registrar, self.store)
+        if self.world:
+            return
+        self.world = world.World()
+        self.registrar.register(self.world)
 
     async def save(self):
         log.info("save!")
