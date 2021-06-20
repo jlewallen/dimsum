@@ -185,4 +185,8 @@ def create(state):
                     "person": None,
                 }
 
+    @app.route("/api/storage/entities/<string:ukey>")
+    def get_storage_entity(ukey: str):
+        return {}
+
     return app

@@ -12,6 +12,7 @@ import cli.repl
 import cli.graph
 import cli.export
 import cli.query
+import cli.server
 
 
 if __name__ == "__main__":
@@ -23,6 +24,7 @@ if __name__ == "__main__":
             cli.graph.commands,
             cli.export.commands,
             cli.query.commands,
+            cli.server.commands,
         ]
     )
     cli()  # type: ignore
