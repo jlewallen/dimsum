@@ -29,4 +29,4 @@ async def test_library(caplog):
 
     await reloaded.tick()
 
-    assert len(reloaded.registrar.entities) == 65
+    assert len(reloaded.registrar.entities) == 64
