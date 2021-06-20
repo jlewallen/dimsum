@@ -21,7 +21,7 @@ class EntityRef(wrapt.ObjectProxy):
         # a dummy target for the wrapped instance. Then, when we're
         # all done we fix these up.
         if isinstance(targetOrKey, str):
-            super().__init__(object())
+            super().__init__(None)
         else:
             super().__init__(targetOrKey)
 
@@ -91,10 +91,12 @@ class Entity:
         **kwargs
     ):
         super().__init__()
-
-        # Ignoring this error because we only ever have a None creator if we're the world.
-        self.creator: "Entity" = creator if creator else None  # type: ignore
-        self.parent: "Entity" = parent if parent else None  # type: ignore
+        # It's important to just assign these and avoid testing for
+        # None, as we may have a None target EntityRef that needs to
+        # be linked up later, and in that case we need to keep the
+        # wrapt Proxy object.
+        self.creator: Optional["Entity"] = creator
+        self.parent: Optional["Entity"] = parent
         self.chimeras = chimeras if chimeras else {}
         self.klass: Type[EntityClass] = klass if klass else UnknownClass
 
@@ -134,9 +136,11 @@ class Entity:
                         **kwargs
                     )
 
-        self.validate()
-
-        # log.info("entity:ctor: {0} '{1}'".format(self.key, self.props.name))
+        log.debug(
+            "entity:ctor {0} '{1}' creator={2} {3}".format(
+                self.key, self.props.name, creator, creator.key if creator else "<none>"
+            )
+        )
 
     def validate(self) -> None:
         assert self.key
@@ -145,6 +149,9 @@ class Entity:
         if RootEntityClass == self.klass:
             pass
         else:
+            if self.creator is None:
+                log.info("type %s", type(self.creator))
+                log.info("no-creator: %s %s", self, self.key)
             assert self.creator
 
     def registered(self, gid: int) -> int:
@@ -277,18 +284,10 @@ class Registrar:
 
     def register(self, entity: Union[Entity, Any]):
         if entity.key in self.entities:
-            log.info(
-                "register:noop {0} ({1}) #{2}".format(
-                    entity.key, entity, self.key_to_number[entity.key]
-                )
-            )
+            log.info("register:noop {0} '{1}'".format(entity.key, entity))
         else:
             assigned = entity.registered(self.number)
-            log.info(
-                "register:new {0} ({1}) #{2} {3}".format(
-                    entity.key, entity, assigned, self.number
-                )
-            )
+            log.info("register:new {0} '{1}'".format(entity.key, entity))
             if assigned in self.numbered:
                 assert self.numbered[assigned] == entity
             self.number = assigned + 1

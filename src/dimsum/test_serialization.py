@@ -194,7 +194,7 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
 
 
 @pytest.mark.asyncio
-async def test_serialize():
+async def test_serialize_after_create():
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -223,6 +223,7 @@ end
 """,
         )
 
+    log.info("reloading")
     after = await tw.domain.reload()
 
 
@@ -317,6 +318,13 @@ async def test_serialize_properties_directly(caplog):
     json = serializing.serialize(props)
 
     log.info(json)
+
+
+@pytest.mark.asyncio
+async def test_object_proxy():
+    proxy = entity.EntityRef("key-1")
+    log.info("%s", proxy)
+    log.info("%s", proxy.__wrapped__)
 
 
 class Example:

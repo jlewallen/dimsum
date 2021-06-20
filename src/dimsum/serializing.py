@@ -160,6 +160,8 @@ async def materialize(
         linked = await materialize(referenced_key, registrar, storage, depth=depth + 1)
         proxy.__wrapped__ = linked  # type: ignore
 
+    loaded.validate()
+
     return loaded
 
 

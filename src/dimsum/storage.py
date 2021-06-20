@@ -57,11 +57,11 @@ class InMemory(EntityStorage):
     async def update(self, updates: Dict[Keys, str]):
         for keys, data in updates.items():
             if data:
-                log.info("updating %s", keys.key)
+                log.debug("updating %s", keys.key)
                 self.by_key[keys.key] = data
                 self.by_gid[keys.gid] = data
             else:
-                log.info("deleting %s", keys.key)
+                log.debug("deleting %s", keys.key)
                 del self.by_key[keys.key]
                 del self.by_gid[keys.gid]
 
