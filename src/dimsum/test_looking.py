@@ -12,7 +12,6 @@ import model.scopes.mechanics as mechanics
 import model.scopes.carryable as carryable
 
 import serializing
-import persistence
 
 import test
 

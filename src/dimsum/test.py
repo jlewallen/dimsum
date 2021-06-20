@@ -23,7 +23,6 @@ import default.actions as actions
 import bus
 import grammars
 import serializing
-import persistence
 import luaproxy
 
 import digging
@@ -121,12 +120,3 @@ class TestWorld:
         r = await self.execute(command, **kwargs)
         assert isinstance(r, game.Failure)
         return r
-
-    async def realize(self):
-        pass
-
-    async def save(self, fn: str):
-        db = persistence.SqliteDatabase()
-        await db.open(fn)
-        await db.purge()
-        await db.save(self.registrar)

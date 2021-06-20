@@ -8,14 +8,12 @@ import model.library as library
 import model.domains as domains
 
 import serializing
-import persistence
 import test
 
 log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
-# @pytest.mark.skip(reason="fix world.everywhere")
 async def test_library(caplog):
     tw = test.TestWorld()
 
@@ -25,16 +23,10 @@ async def test_library(caplog):
     await tw.initialize(area=area)
     await tw.domain.tick()
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-    await db.save(tw.registrar)
-
     await tw.domain.tick()
 
-    empty = domains.Domain()
-    await db.load_all(empty.registrar)
+    reloaded = await tw.domain.reload()
 
-    await empty.tick()
+    await reloaded.tick()
 
-    assert await db.number_of_entities() == 65
+    assert len(reloaded.registrar.entities) == 65

@@ -16,7 +16,7 @@ import model.scopes.ownership as ownership
 import model.scopes as scopes
 
 import serializing
-import persistence
+import storage
 
 import test
 
@@ -221,13 +221,7 @@ end
 """,
         )
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-    await db.save(tw.registrar)
-
-    empty = domains.Domain()
-    await db.load_all(empty.registrar)
+    after = await tw.domain.reload()
 
 
 @pytest.mark.asyncio
@@ -235,27 +229,22 @@ async def test_unregister_destroys(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-
-    assert await db.number_of_entities() == 0
+    store = storage.InMemory()
 
     await tw.execute("make Box")
     box = tw.player.make(carryable.Containing).holding[0]
     assert not box.props.destroyed
-    await db.save(tw.registrar)
 
-    assert await db.number_of_entities() == 4
+    await store.purge()
+    await store.update(serializing.registrar(tw.registrar))
+
+    assert await store.number_of_entities() == 4
 
     await tw.execute("obliterate")
     assert box.props.destroyed
-    await db.save(tw.registrar)
+    await store.update(serializing.registrar(tw.registrar))
 
-    assert await db.number_of_entities() == 3
-
-    empty = domains.Domain()
-    await db.load_all(empty.registrar)
+    assert await store.number_of_entities() == 3
 
 
 @pytest.mark.asyncio
@@ -272,7 +261,6 @@ async def test_transients_preserved(caplog):
     await tw.success("make Mug")
     await tw.success("modify capacity 10")
     await tw.success("hold keg")
-    await tw.realize()
     await tw.success("pour from Keg")
     r = await tw.success("look in mug")
     assert len(r.entities) == 1

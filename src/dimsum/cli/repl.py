@@ -8,6 +8,7 @@ import model.properties as properties
 import model.world as world
 import model.domains as domains
 import model.scopes as scopes
+import model.library as library
 
 import default.actions as actions
 import default
@@ -20,8 +21,7 @@ import grammars
 import luaproxy
 import handlers
 import messages
-import persistence
-
+import storage
 
 log = logging.getLogger("dimsum-cli")
 
@@ -53,12 +53,12 @@ class Repl:
         self.l = grammars.create_parser()
         self.fn = fn
         self.name = name
-        self.domain = domains.Domain(storage=persistence.SqliteDatabase())
+        self.domain = domains.Domain(store=storage.SqliteStorage(fn))
         self.world = None
 
     async def get_player(self):
         if self.world is None:
-            await self.domain.load(fn=self.fn)
+            await self.domain.load()
             self.world = self.domain.world
 
         if self.domain.registrar.empty():
@@ -66,7 +66,7 @@ class Repl:
             generics, area = library.create_example_world(self.world)
             self.domain.registrar.add_entities(generics.all)
             self.domain.add_area(area)
-            await self.db.save(self.domain.registrar)
+            await self.domain.save()
 
         if self.domain.registrar.contains(self.name):
             player = self.domain.registrar.find_by_key(self.name)
@@ -83,9 +83,7 @@ class Repl:
         return player
 
     async def save(self):
-        db = persistence.SqliteDatabase()
-        await db.open(self.fn)
-        await db.save(self.domain.registrar)
+        await self.domain.save()
 
     async def read_command(self):
         return sys.stdin.readline().strip()

@@ -44,6 +44,12 @@ class Welcoming(entity.Scope):
         self.area = area
 
 
+class Remembering(entity.Scope):
+    def __init__(self, entities: List[entity.Entity] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.entities = entities if entities else []
+
+
 class World(entity.Entity):
     def __init__(self, **kwargs):
         super().__init__(
@@ -61,6 +67,10 @@ class World(entity.Entity):
     def change_welcome_area(self, area: entity.Entity):
         with self.make(Welcoming) as welcoming:
             welcoming.area = area
+
+    def remember(self, e: entity.Entity):
+        with self.make(Remembering) as remembering:
+            remembering.entities.append(e)
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
         log.info("finding area for %s", entity)

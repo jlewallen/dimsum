@@ -10,7 +10,6 @@ import model.reply as reply
 import model.scopes.carryable as carryable
 
 import serializing
-import persistence
 
 import test
 

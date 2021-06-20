@@ -9,7 +9,6 @@ import model.reply as reply
 import model.library as library
 
 import serializing
-import persistence
 import test
 
 log = logging.getLogger("dimsum")

@@ -100,6 +100,9 @@ def serialize_full(value, depth=0):
 
 
 def serialize(value, indent=None, unpicklable=True, secure=False):
+    if value is None:
+        return value
+
     prepared = serialize_full(value)
 
     return jsonpickle.encode(
@@ -156,7 +159,7 @@ def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
 async def materialize(
     key: str, registrar: entity.Registrar, storage: storage.EntityStorage
 ) -> Optional[entity.Entity]:
-    log.info("materialize %s", key)
+    log.debug("materialize %s", key)
     if registrar.contains(key):
         return registrar.find_by_key(key)
 
@@ -184,10 +187,19 @@ async def materialize(
     return loaded
 
 
-def registrar(registrar: entity.Registrar, **kwargs) -> Dict[storage.Keys, str]:
+def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:
+    if e.props.destroyed:
+        log.info("destroyed: %s", e)
+        return None
+    return e
+
+
+def registrar(
+    registrar: entity.Registrar, **kwargs
+) -> Dict[storage.Keys, Optional[str]]:
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
-            entity, secure=True, **kwargs
+            maybe_destroyed(entity), secure=True, **kwargs
         )
         for key, entity in registrar.entities.items()
     }

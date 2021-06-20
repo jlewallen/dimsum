@@ -19,10 +19,10 @@ import model.scopes.movement as movement
 import model.scopes as scopes
 
 import bus
-import persistence
 import luaproxy
 import messages
 import grammars
+import storage
 
 import default.actions as actions
 import default.evaluator as evaluator
@@ -377,19 +377,18 @@ modify when eaten
 
     async def initialize(self):
         self.bus = DiscordEventBus(self.bot)
-        self.storage = persistence.SqliteDatabase()
-        self.domain = domains.Domain(bus=self.bus, storage=self.storage)
+        self.domain = domains.Domain(
+            bus=self.bus, store=storage.SqliteStorage("world.sqlite3")
+        )
+        await self.domain.load()
         self.world = self.domain.world
-
-        await self.storage.open("world.sqlite3")
-        await self.storage.load_all(self.domain.registrar)
 
         if self.domain.registrar.empty():
             log.info("creating example world")
             generics, area = library.create_example_world(self.world)
             self.domain.registrar.add_entities(generics.all)
             self.domain.add_area(area)
-            await self.storage.save(self.domain.registrar)
+            await self.domain.save()
 
         return self.domain.world
 
@@ -398,8 +397,7 @@ modify when eaten
         await self.save()
 
     async def save(self):
-        await self.storage.open("world.sqlite3")
-        await self.storage.save(self.domain.registrar)
+        await self.domain.save()
 
     async def get_player(self, message):
         author = message.author

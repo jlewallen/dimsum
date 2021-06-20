@@ -333,5 +333,9 @@ class Registrar:
 
     def unregister(self, entity: Union[Entity, Any]):
         entity.destroy()
-        del self.entities[entity.key]
+        # del self.entities[entity.key]
         self.garbage[entity.key] = entity
+
+    @property
+    def undestroyed(self) -> List[Entity]:
+        return [e for e in self.entities.values() if e.props.destroyed is None]

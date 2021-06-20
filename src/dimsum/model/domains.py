@@ -13,33 +13,47 @@ import model.scopes.occupyable as occupyable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
+import bus
 import context
 import luaproxy
 import messages
 import handlers
-import bus
+import serializing
+import storage
 
 log = logging.getLogger("dimsum")
 scripting = behavior.ScriptEngine()
 
 
 class Domain:
-    def __init__(self, bus: bus.EventBus = None, storage=None, empty=False, **kwargs):
+    def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
         super().__init__()
         self.bus = (
             bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
         )
-        self.storage = storage
+        self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
         self.registrar = entity.Registrar()
         self.world = world.World()
         if not empty:
             self.registrar.register(self.world)
 
-    async def load(self, fn: str = None):
-        await self.storage.open(fn)
-        await self.storage.load_all(self.registrar)
-        self.world = self.registrar.find_by_key("world")
+    async def reload(self):
+        await self.store.update(serializing.registrar(self.registrar))
+
+        reloaded = Domain(empty=True, store=self.store)
+        reloaded.world = await serializing.materialize(
+            "world", reloaded.registrar, reloaded.store
+        )
+        return reloaded
+
+    async def load(self):
+        self.registrar.purge()
+        self.world = await serializing.materialize("world", self.registrar, self.store)
+
+    async def save(self):
+        log.info("save!")
+        await self.store.update(serializing.registrar(self.registrar))
 
     async def tick(self, now: Optional[float] = None):
         if now is None:

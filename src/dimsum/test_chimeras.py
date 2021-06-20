@@ -16,7 +16,6 @@ import handlers
 import messages
 import luaproxy
 import serializing
-import persistence
 
 import test
 
@@ -48,26 +47,22 @@ async def test_chimeric_entities_serialize(caplog):
         creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
     )
     domain.registrar.register(jacob)
+    universe.remember(jacob)
 
     toy = entity.Entity(
         creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
     )
     domain.registrar.register(toy)
+    universe.remember(toy)
 
     with jacob.make(SimpleHolding) as holding:
         with jacob.make(SimpleCore) as core:
             pass
         holding.add_item(toy)
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-    await db.save(domain.registrar)
+    after = await domain.reload()
 
-    empty = domains.Domain()
-    await db.load_all(empty.registrar)
-
-    assert len(empty.registrar.entities) == 3
+    assert len(after.registrar.entities) == 3
 
 
 def make_person(
@@ -114,16 +109,12 @@ async def test_specialization_classes(caplog):
 
     person = make_person(creator=universe, props=properties.Common(name="Jacob"))
     domain.registrar.register(person)
+    universe.remember(person)
 
     toy = make_thing(creator=universe, props=properties.Common(name="Toy"))
     domain.registrar.register(toy)
+    universe.remember(toy)
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-    await db.save(domain.registrar)
+    after = await domain.reload()
 
-    empty = domains.Domain()
-    await db.load_all(empty.registrar)
-
-    assert len(empty.registrar.entities) == 3
+    assert len(after.registrar.entities) == 3

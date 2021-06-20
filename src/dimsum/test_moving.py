@@ -9,7 +9,6 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes as scopes
 
-import persistence
 import test
 
 
@@ -132,8 +131,6 @@ async def test_digging_basic():
     await tw.success("dig north to 'Kitchen'")
     await tw.success("go #{0}".format(tw.area.props.gid))
 
-    await tw.save("test.sqlite3")
-
 
 @pytest.mark.asyncio
 async def test_digging_with_return():
@@ -141,7 +138,6 @@ async def test_digging_with_return():
     await tw.initialize()
 
     await tw.success("dig north|south to 'Kitchen'")
-    await tw.save("test.sqlite3")
     await tw.success("go north")
     await tw.success("go south")
 

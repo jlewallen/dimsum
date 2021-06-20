@@ -5,11 +5,10 @@ import model.domains as domains
 import luaproxy
 import handlers
 import messages
-import persistence
+import storage
 
 
 async def open_domain(path: str) -> domains.Domain:
-    domain = domains.Domain(storage=persistence.SqliteDatabase())
-    await domain.storage.open(path)
-    await domain.storage.load_all(domain.registrar)
+    domain = domains.Domain(store=storage.SqliteStorage(path))
+    await domain.load()
     return domain
