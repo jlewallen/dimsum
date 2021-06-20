@@ -12,6 +12,7 @@ import model.world as world
 import model.things as things
 import model.reply as reply
 import model.sugar as sugar
+import model.domains as domains
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
@@ -21,11 +22,8 @@ import default.actions as actions
 
 import bus
 import grammars
-import luaproxy
-import messages
-import handlers
 import serializing
-import persistence
+import luaproxy
 
 import digging
 import simple
@@ -34,13 +32,15 @@ log = logging.getLogger("dimsum")
 
 
 def create_empty_world():
-    return world.World(bus.EventBus(), luaproxy.context_factory)
+    return world.World()
 
 
 class TestWorld:
     def __init__(self):
-        self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-        self.world = world.World(self.bus, luaproxy.context_factory)
+        self.domain = domains.Domain()
+        self.world = self.domain.world
+        self.registrar = self.domain.registrar
+        self.bus = self.domain.bus
         self.jacob = scopes.alive(
             creator=self.world,
             props=properties.Common("Jacob", desc="Curly haired bastard."),
@@ -54,8 +54,8 @@ class TestWorld:
         with door.make(movement.Movement) as nav:
             nav.link_area(area)
         self.add_item(door)
-        self.world.register(door)
-        self.world.register(area)
+        self.registrar.register(door)
+        self.registrar.register(area)
         return area
 
     async def add_carla(self):
@@ -63,14 +63,14 @@ class TestWorld:
             creator=self.world,
             props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
-        return await self.world.perform(actions.Join(), self.carla)
+        return await self.domain.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
         self.tomi = scopes.alive(
             creator=self.world,
             props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )
-        return await self.world.perform(actions.Join(), self.tomi)
+        return await self.domain.perform(actions.Join(), self.tomi)
 
     async def initialize(self, area=None, **kwargs):
         self.area = area
@@ -78,15 +78,15 @@ class TestWorld:
             self.area = scopes.area(
                 creator=self.player, props=properties.Common("Living room")
             )
-            self.world.register(self.area)
-        self.world.add_area(self.area)
-        await self.world.perform(actions.Join(), self.jacob)
+            self.registrar.register(self.area)
+        self.domain.add_area(self.area)
+        await self.domain.perform(actions.Join(), self.jacob)
 
     def get_default_area(self):
         return self.area
 
     def add_item(self, item):
-        self.world.register(item)
+        self.registrar.register(item)
         with self.area.make(carryable.Containing) as ground:
             ground.add_item(item)
         return item
@@ -104,7 +104,7 @@ class TestWorld:
         action = tree_eval.transform(tree)
         assert action
         assert isinstance(action, game.Action)
-        response = await self.world.perform(action, person)
+        response = await self.domain.perform(action, person)
         log.info("response: %s" % (response,))
         return response
 
@@ -120,12 +120,3 @@ class TestWorld:
         r = await self.execute(command, **kwargs)
         assert isinstance(r, game.Failure)
         return r
-
-    async def realize(self):
-        pass
-
-    async def save(self, fn: str):
-        db = persistence.SqliteDatabase()
-        await db.open(fn)
-        await db.purge()
-        await db.save(self.world)

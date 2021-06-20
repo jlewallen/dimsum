@@ -170,7 +170,8 @@ def create(state):
         name = form["name"]
         password = form["password"]
 
-        person = world.find_person_by_name(name)
+        key = base64.b64encode(name).decode("utf-8")
+        person = world.find_entity_by_key(key)
         if not person:
             raise Exception("no way")
 
@@ -183,5 +184,9 @@ def create(state):
                     "token": jwt_token,
                     "person": None,
                 }
+
+    @app.route("/api/storage/entities/<string:ukey>")
+    def get_storage_entity(ukey: str):
+        return {}
 
     return app

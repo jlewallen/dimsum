@@ -6,7 +6,9 @@ import sys
 import model.sugar as sugar
 import model.properties as properties
 import model.world as world
+import model.domains as domains
 import model.scopes as scopes
+import model.library as library
 
 import default.actions as actions
 import default
@@ -19,8 +21,7 @@ import grammars
 import luaproxy
 import handlers
 import messages
-import persistence
-
+import storage
 
 log = logging.getLogger("dimsum-cli")
 
@@ -35,7 +36,7 @@ def commands():
     "--path",
     required=True,
     help="Database to open in a repl.",
-    type=click.Path(exists=True),
+    type=click.Path(),
 )
 async def repl(path: str):
     """Allow easy one-person interaction with a world."""
@@ -52,41 +53,38 @@ class Repl:
         self.l = grammars.create_parser()
         self.fn = fn
         self.name = name
+        self.domain = domains.Domain(store=storage.SqliteStorage(fn), empty=True)
         self.world = None
-        self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-        self.db = persistence.SqliteDatabase()
 
     async def get_player(self):
         if self.world is None:
-            self.world = world.World(self.bus, luaproxy.context_factory)
-            await self.db.open(self.fn)
-            await self.db.load(self.world)
+            await self.domain.load()
+            self.world = self.domain.world
+            assert self.world
 
-        if self.world.empty():
+        if self.domain.registrar.empty():
             log.info("creating example world")
             generics, area = library.create_example_world(self.world)
-            self.world.add_entities(generics.all)
-            self.world.add_area(area)
-            await self.db.save(self.world)
-
-        if self.world.contains(self.name):
-            player = self.world.find_by_key(self.name)
-            return player
+            self.domain.registrar.add_entities(generics.all)
+            self.domain.add_area(area)
+            await self.domain.save()
 
         key = base64.b64encode(self.name.encode("utf-8")).decode("utf-8")
+        if self.domain.registrar.contains(key):
+            player = self.domain.registrar.find_by_key(key)
+            return player
+
         player = scopes.alive(
             key=key,
             creator=self.world,
             props=properties.Common(self.name, desc="A repl user"),
         )
-        await self.world.perform(actions.Join(), player)
+        await self.domain.perform(actions.Join(), player)
         await self.save()
         return player
 
     async def save(self):
-        db = persistence.SqliteDatabase()
-        await db.open(self.fn)
-        await db.save(self.world)
+        await self.domain.save()
 
     async def read_command(self):
         return sys.stdin.readline().strip()
@@ -107,7 +105,7 @@ class Repl:
         log.info(str(tree))
         action = tree_eval.transform(tree)
 
-        reply = await self.world.perform(action, player)
+        reply = await self.domain.perform(action, player)
         await self.save()
 
         visitor = messages.ReplyVisitor()

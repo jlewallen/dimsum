@@ -1,17 +1,14 @@
 from typing import Tuple
 
-import model.world as world
+import model.domains as domains
 
 import luaproxy
 import handlers
 import messages
-import persistence
+import storage
 
 
-async def open_world(path: str) -> Tuple[world.World, persistence.SqliteDatabase]:
-    bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-    w = world.World(bus, luaproxy.context_factory)
-    db = persistence.SqliteDatabase()
-    await db.open(path)
-    await db.load_all(w)
-    return w, db
+async def open_domain(path: str) -> domains.Domain:
+    domain = domains.Domain(store=storage.SqliteStorage(path))
+    await domain.load()
+    return domain

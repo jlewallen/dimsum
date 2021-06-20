@@ -9,7 +9,6 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes as scopes
 
-import persistence
 import test
 
 
@@ -42,7 +41,7 @@ async def test_go_adjacent():
         ),
     )
 
-    tw.world.add_area(another_room)
+    tw.domain.add_area(another_room)
 
     area_before = tw.world.find_player_area(tw.player)
     await tw.success("go door")
@@ -72,7 +71,7 @@ async def test_directional_moving():
 
     park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
 
-    tw.world.add_area(park)
+    tw.domain.add_area(park)
     add_item(
         tw.area,
         scopes.exit(
@@ -121,7 +120,7 @@ async def test_programmatic_basic_entrances_and_exits():
 
     await tw.initialize(earth)
 
-    tw.world.add_area(asteroid)
+    tw.domain.add_area(asteroid)
 
 
 @pytest.mark.asyncio
@@ -132,8 +131,6 @@ async def test_digging_basic():
     await tw.success("dig north to 'Kitchen'")
     await tw.success("go #{0}".format(tw.area.props.gid))
 
-    await tw.save("test.sqlite3")
-
 
 @pytest.mark.asyncio
 async def test_digging_with_return():
@@ -141,7 +138,6 @@ async def test_digging_with_return():
     await tw.initialize()
 
     await tw.success("dig north|south to 'Kitchen'")
-    await tw.save("test.sqlite3")
     await tw.success("go north")
     await tw.success("go south")
 

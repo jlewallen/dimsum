@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 
 import copy
 import jsonpickle
@@ -7,9 +7,10 @@ import logging
 
 import model.crypto as crypto
 import model.entity as entity
-import model.world as world
 
 import model.scopes.movement as movement
+
+import storage
 
 log = logging.getLogger("dimsum")
 
@@ -99,6 +100,9 @@ def serialize_full(value, depth=0):
 
 
 def serialize(value, indent=None, unpicklable=True, secure=False):
+    if value is None:
+        return value
+
     prepared = serialize_full(value)
 
     return jsonpickle.encode(
@@ -124,62 +128,65 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(world: world.World, **kwargs):
-    return {
-        key: serialize(entity, secure=True, **kwargs)
-        for key, entity in world.entities.items()
-    }
+async def materialize(
+    key: str,
+    registrar: entity.Registrar,
+    storage: storage.EntityStorage,
+    depth: int = 0,
+) -> Optional[entity.Entity]:
+    log.debug("[%d] materialize %s", depth, key)
 
+    if registrar.contains(key):
+        return registrar.find_by_key(key)
 
-def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
-    refs: Dict[str, Dict] = {}
+    refs: Dict[str, entity.EntityRef] = {}
 
     def reference(key):
+        if registrar.contains(key):
+            return registrar.find_by_key(key)
+
         if key not in refs:
             refs[key] = entity.EntityRef(key)
         return refs[key]
 
-    entities: Dict[str, entity.Entity] = {}
-    for key in rows.keys():
-        e = deserialize(rows[key], reference)
-        assert isinstance(e, entity.Entity)
-        registrar.register(e)
-        entities[key] = e
+    data = await storage.load_by_key(key)
+    if data is None:
+        return None
 
-    for key, baby_entity in refs.items():
-        baby_entity.__wrapped__ = entities[key]  # type: ignore
+    loaded = deserialize(data, reference)
+    registrar.register(loaded)
 
-    return entities
+    for referenced_key, proxy in refs.items():
+        linked = await materialize(referenced_key, registrar, storage, depth=depth + 1)
+        proxy.__wrapped__ = linked  # type: ignore
+
+    loaded.validate()
+
+    return loaded
 
 
-"""
-Graveyard for failed approaches. Keeping around just in case.
+def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:
+    if e.props.destroyed:
+        log.info("destroyed: %s", e)
+        return None
+    return e
 
-@jsonpickle.handlers.register(entity.EntityRef)
-class EntityRefHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        log.info("entityref: restore")
-        return self.context.lookup(obj["key"])
 
-    def flatten(self, obj, data):
-        log.info("entityref: flatten")
-        data["key"] = obj.key
-        data["kind"] = obj.__class__.__name__
-        data["name"] = obj.props.name
-        return data
+def registrar(
+    registrar: entity.Registrar, **kwargs
+) -> Dict[storage.Keys, Optional[str]]:
+    return {
+        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
+            maybe_destroyed(entity), secure=True, **kwargs
+        )
+        for key, entity in registrar.entities.items()
+    }
 
-https://docs.python.org/3/library/pickle.html#object.__reduce__
-https://www.slideshare.net/GrahamDumpleton/hear-no-evil-see-no-evil-patch-no-evil-or-how-to-monkeypatch-safely
-http://blog.dscpl.com.au/2018/01/the-pattern-versus-python-package.html
-https://readthedocs.org/projects/wrapt/downloads/pdf/latest/
 
-@wrapt.patch_function_wrapper("entity", "EntityRef.__reduce_ex__")
-def entity_ref_reduce_ex_wrapper(wrapped, instance, args, kwargs):
-    log.info("%s, %s %s %s", instance.key, instance, args, kwargs)
-
-    return (
-        entity.EntityRef,
-        (instance.key,),
-    )
-
-"""
+def for_update(entities: List[entity.Entity], **kwargs) -> Dict[storage.Keys, str]:
+    return {
+        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
+            entity, secure=True, **kwargs
+        )
+        for entity in entities
+    }

@@ -1,3 +1,5 @@
+from typing import Dict, Any, List, Optional
+
 import pytest
 import logging
 
@@ -7,6 +9,7 @@ import model.properties as properties
 import model.things as things
 import model.world as world
 import model.library as library
+import model.domains as domains
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
@@ -15,7 +18,7 @@ import model.scopes.ownership as ownership
 import model.scopes as scopes
 
 import serializing
-import persistence
+import storage
 
 import test
 
@@ -24,64 +27,74 @@ log = logging.getLogger("dimsum")
 
 @pytest.mark.asyncio
 async def test_serialize_empty_world(caplog):
-    before = test.create_empty_world()
-    json = serializing.all(before)
+    before = domains.Domain()
+    json = serialize_all(before.registrar)
 
     assert len(json.items()) == 1
 
-    after = test.create_empty_world()
-    serializing.restore(after, json)
+    after = domains.Domain()
+    restore(after.registrar, json)
 
-    assert len(after.entities.items()) == 1
+    assert len(after.registrar.entities.items()) == 1
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_one_area(caplog):
-    world = test.create_empty_world()
-    world.add_area(scopes.area(creator=world, props=properties.Common("Area")))
+    domain = domains.Domain()
+    world = domain.world
+    domain.add_area(scopes.area(creator=world, props=properties.Common("Area")))
 
-    json = serializing.all(world)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 2
 
-    after = test.create_empty_world()
-    serializing.restore(after, json)
+    after = domains.Domain()
+    restore(after.registrar, json)
 
-    assert len(after.entities.items()) == 2
+    assert len(after.registrar.entities.items()) == 2
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_one_item(caplog):
-    caplog.set_level(logging.INFO)
-    world = test.create_empty_world()
+    domain = domains.Domain()
+    world = domain.world
     area = scopes.area(creator=world, props=properties.Common("Area"))
     add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
-    world.add_area(area)
+    domain.add_area(area)
 
     assert area.make(carryable.Containing).holding[0]
 
-    json = serializing.all(world)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 3
 
-    after = test.create_empty_world()
-    serializing.restore(after, json)
+    after = domains.Domain()
+    restore(after.registrar, json)
 
-    assert after.find_entity_by_name("Area")
-    assert after.find_entity_by_name("Item")
+    assert after.registrar.find_entity_by_name("Area")
+    assert after.registrar.find_entity_by_name("Item")
 
     assert (
-        len(after.find_entity_by_name("Area").make(carryable.Containing).holding) == 1
+        len(
+            after.registrar.find_entity_by_name("Area")
+            .make(carryable.Containing)
+            .holding
+        )
+        == 1
     )
-    assert after.find_entity_by_name("Area").make(carryable.Containing).holding[0]
+    assert (
+        after.registrar.find_entity_by_name("Area")
+        .make(carryable.Containing)
+        .holding[0]
+    )
 
-    assert len(after.entities.items()) == 3
+    assert len(after.registrar.entities.items()) == 3
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_directional(caplog):
-    caplog.set_level(logging.INFO)
-    world = test.create_empty_world()
+    domain = domains.Domain()
+    world = domain.world
 
     two = scopes.area(creator=world, props=properties.Common("Two"))
     one = scopes.area(creator=world, props=properties.Common("One"))
@@ -104,33 +117,34 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
         ),
     )
 
-    world.add_area(one)
+    domain.add_area(one)
 
-    json = serializing.all(world)
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 5
 
     for key, data in json.items():
         log.info("%s", data)
 
-    after = test.create_empty_world()
-    entities = serializing.restore(after, json)
+    after = domains.Domain()
+    entities = restore(after.registrar, json)
 
-    one = after.find_entity_by_name("One")
+    one = after.registrar.find_entity_by_name("One")
     assert one
 
-    two = after.find_entity_by_name("Two")
+    two = after.registrar.find_entity_by_name("Two")
     assert two
 
     assert two in one.make(movement.Movement).adjacent()
     assert one in two.make(movement.Movement).adjacent()
 
-    assert len(after.entities.items()) == 5
+    assert len(after.registrar.entities.items()) == 5
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_items(caplog):
-    world = test.create_empty_world()
+    domain = domains.Domain()
+    world = domain.world
 
     one = scopes.area(creator=world, props=properties.Common("One"))
     two = scopes.area(creator=world, props=properties.Common("Two"))
@@ -155,19 +169,19 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert two in one.make(movement.Movement).adjacent()
     assert one in two.make(movement.Movement).adjacent()
 
-    world.add_area(one)
+    domain.add_area(one)
 
-    json = serializing.all(world, indent=True)
+    json = serialize_all(domain.registrar, indent=True)
 
     assert len(json.items()) == 5
 
-    after = test.create_empty_world()
-    entities = serializing.restore(after, json)
+    after = domains.Domain()
+    entities = restore(after.registrar, json)
 
-    one = after.find_entity_by_name("One")
+    one = after.registrar.find_entity_by_name("One")
     assert one
 
-    two = after.find_entity_by_name("Two")
+    two = after.registrar.find_entity_by_name("Two")
     assert two
 
     assert one.make(carryable.Containing).holding[0].make(movement.Exit).area
@@ -176,11 +190,11 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert two in one.make(movement.Movement).adjacent()
     assert one in two.make(movement.Movement).adjacent()
 
-    assert len(after.entities.items()) == 5
+    assert len(after.registrar.entities.items()) == 5
 
 
 @pytest.mark.asyncio
-async def test_serialize():
+async def test_serialize_after_create():
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -194,6 +208,7 @@ async def test_serialize():
 
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -208,13 +223,8 @@ end
 """,
         )
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-    await db.save(tw.world)
-
-    empty = world.World(tw.bus, context_factory=None)
-    await db.load_all(empty)
+    log.info("reloading")
+    after = await tw.domain.reload()
 
 
 @pytest.mark.asyncio
@@ -222,27 +232,22 @@ async def test_unregister_destroys(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    db = persistence.SqliteDatabase()
-    await db.open("test.sqlite3")
-    await db.purge()
-
-    assert await db.number_of_entities() == 0
+    store = storage.InMemory()
 
     await tw.execute("make Box")
     box = tw.player.make(carryable.Containing).holding[0]
     assert not box.props.destroyed
-    await db.save(tw.world)
 
-    assert await db.number_of_entities() == 4
+    await store.purge()
+    await store.update(serializing.registrar(tw.registrar))
+
+    assert await store.number_of_entities() == 4
 
     await tw.execute("obliterate")
     assert box.props.destroyed
-    await db.save(tw.world)
+    await store.update(serializing.registrar(tw.registrar))
 
-    assert await db.number_of_entities() == 3
-
-    empty = world.World(tw.bus, context_factory=None)
-    await db.load_all(empty)
+    assert await store.number_of_entities() == 3
 
 
 @pytest.mark.asyncio
@@ -259,7 +264,6 @@ async def test_transients_preserved(caplog):
     await tw.success("make Mug")
     await tw.success("modify capacity 10")
     await tw.success("hold keg")
-    await tw.realize()
     await tw.success("pour from Keg")
     r = await tw.success("look in mug")
     assert len(r.entities) == 1
@@ -273,10 +277,10 @@ async def test_serialize_library(caplog):
     await tw.initialize()
 
     generics, area = library.create_example_world(tw.world)
-    tw.world.add_area(area)
+    tw.domain.add_area(area)
 
     json = serializing.serialize(
-        {"entities": tw.world.entities}, unpicklable=False, indent=4
+        {"entities": tw.registrar.entities}, unpicklable=False, indent=4
     )
 
     assert "py/id" not in json
@@ -284,35 +288,43 @@ async def test_serialize_library(caplog):
 
 @pytest.mark.asyncio
 async def test_serialize_preserves_owner_reference(caplog):
-    world = test.create_empty_world()
-    world.add_area(scopes.area(creator=world, props=properties.Common("Area")))
+    domain = domains.Domain()
 
-    json = serializing.all(world)
+    domain.add_area(scopes.area(creator=domain.world, props=properties.Common("Area")))
+
+    json = serialize_all(domain.registrar)
 
     assert len(json.items()) == 2
 
-    after = test.create_empty_world()
+    after = domains.Domain()
 
-    serializing.restore(after, json)
+    restore(after.registrar, json)
 
-    assert len(after.entities.items()) == 2
+    assert len(after.registrar.entities.items()) == 2
 
-    for key, e in after.entities.items():
+    for key, e in after.registrar.entities.items():
         with e.make(ownership.Ownership) as props:
             assert isinstance(props.owner, entity.Entity)
 
 
 @pytest.mark.asyncio
 async def test_serialize_properties_directly(caplog):
-    world = test.create_empty_world()
+    domain = domains.Domain()
 
     props = properties.Common("Area")
 
-    props.owner = world
+    props.owner = domain.world
 
     json = serializing.serialize(props)
 
     log.info(json)
+
+
+@pytest.mark.asyncio
+async def test_object_proxy():
+    proxy = entity.EntityRef("key-1")
+    log.info("%s", proxy)
+    log.info("%s", proxy.__wrapped__)
 
 
 class Example:
@@ -339,3 +351,31 @@ async def test_serialize_properties_on_entity(caplog):
 def add_item(container: entity.Entity, item: entity.Entity):
     with container.make(carryable.Containing) as contain:
         contain.add_item(item)
+
+
+def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
+    return {
+        key: serializing.serialize(entity, secure=True, **kwargs)
+        for key, entity in registrar.entities.items()
+    }
+
+
+def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
+    refs: Dict[str, entity.EntityRef] = {}
+
+    def reference(key):
+        if key not in refs:
+            refs[key] = entity.EntityRef(key)
+        return refs[key]
+
+    entities: Dict[str, entity.Entity] = {}
+    for key in rows.keys():
+        e = serializing.deserialize(rows[key], reference)
+        assert isinstance(e, entity.Entity)
+        registrar.register(e)
+        entities[key] = e
+
+    for key, baby_entity in refs.items():
+        baby_entity.__wrapped__ = entities[key]  # type: ignore
+
+    return entities

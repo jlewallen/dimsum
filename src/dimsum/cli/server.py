@@ -3,6 +3,16 @@ import asyncclick as click
 import os
 import sys
 
+import quart
+import quart_cors
+
+from hypercorn.config import Config
+from hypercorn.asyncio import serve
+
+import asyncio
+
+import web
+
 import model.world as world
 import model.entity as entity
 import model.scopes as scopes
@@ -24,8 +34,10 @@ def commands():
     help="Database to export from.",
     type=click.Path(exists=True),
 )
-async def export(path: str):
-    """Exporting entities from a database."""
-    domain = await utils.open_domain(path)
-    name = os.path.splitext(path)[0]
-    await domain.store.write(sys.stdout)
+async def server(path: str):
+    """Serve a database."""
+    # domain = await utils.open_domain(path)
+
+    config = Config()
+    config.bind = ["0.0.0.0:5000"]
+    await serve(web.create(None), config)

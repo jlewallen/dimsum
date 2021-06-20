@@ -7,6 +7,8 @@ import time
 import asyncio
 import lupa
 
+import context
+
 import model.properties as properties
 import model.entity as entity
 
@@ -170,6 +172,12 @@ class BehaviorMap(properties.Map):
         return super().replace(**typed)
 
 
+class BehaviorCollection(entity.Scope):
+    def __init__(self, entities=None, **kwargs):
+        super().__init__(**kwargs)
+        self.entities: List[entity.Entity] = entities if entities else []
+
+
 class Behaviors(entity.Scope):
     def __init__(self, behaviors: BehaviorMap = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
@@ -183,5 +191,7 @@ class Behaviors(entity.Scope):
                     returning.append(Behavior(lua=rb.behavior.lua, logs=[]))
         return returning
 
-    def add_behavior(self, name, **kwargs):
+    def add_behavior(self, world: entity.Entity, name, **kwargs):
+        with world.make(BehaviorCollection) as world_behaviors:
+            world_behaviors.entities.append(self.ourselves)
         return self.behaviors.add(name, **kwargs)

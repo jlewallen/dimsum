@@ -8,7 +8,6 @@ import model.world as world
 import model.reply as reply
 
 import serializing
-import persistence
 
 import test
 

@@ -3,6 +3,8 @@ from typing import List, Any
 import abc
 import bus
 
+import context
+
 import model.events as events
 import model.entity as entity
 
@@ -39,15 +41,15 @@ class Occupyable(entity.Scope):
     def occupying(self, living: entity.Entity) -> bool:
         return living in self.occupied
 
-    async def entered(self, bus: bus.EventBus, player: entity.Entity):
+    async def entered(self, player: entity.Entity):
         assert player not in self.occupied
         self.add_living(player)
-        await bus.publish(LivingEnteredArea(living=player, area=self))
+        await context.get().publish(LivingEnteredArea(living=player, area=self))
 
-    async def left(self, bus: bus.EventBus, player: entity.Entity):
+    async def left(self, player: entity.Entity):
         assert player in self.occupied
         self.occupied.remove(player)
-        await bus.publish(LivingLeftArea(living=player, area=self))
+        await context.get().publish(LivingLeftArea(living=player, area=self))
 
 
 class LivingEnteredArea(events.Event):

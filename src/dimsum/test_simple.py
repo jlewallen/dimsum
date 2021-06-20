@@ -13,7 +13,6 @@ import model.scopes.carryable as carryable
 import model.scopes.ownership as ownership
 
 import serializing
-import persistence
 
 import test
 

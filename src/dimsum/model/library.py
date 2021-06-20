@@ -74,6 +74,7 @@ class LargeMapleTree(Factory):
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
+                world,
                 "b:drop-leaf:tick",
                 lua="""
 function(s, world, area, item)
@@ -87,6 +88,7 @@ end
 """,
             )
             behave.add_behavior(
+                world,
                 "b:drop-branch:tick",
                 lua="""
 function(s, world, area, item)
@@ -110,6 +112,7 @@ class LargeOakTree(Factory):
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
+                world,
                 "b:drop-leaf:tick",
                 lua="""
 function(s, world, area, item)
@@ -123,6 +126,7 @@ end
 """,
             )
             behave.add_behavior(
+                world,
                 "b:drop-branch:tick",
                 lua="""
 function(s, world, area, item)
@@ -164,6 +168,7 @@ class MysteriousBox(Factory):
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
+                world,
                 "b:mystery:shake",
                 lua="""
 function(s, world, area, item)
@@ -185,6 +190,7 @@ class LargeSteepCliff(Factory):
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
+                world,
                 "b:make:stone",
                 lua="""
 function(s, world, area, item)
@@ -218,6 +224,7 @@ class Guitar(Factory):
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
+                world,
                 "b:music:play",
                 lua="""
 function(s, world, area, item)

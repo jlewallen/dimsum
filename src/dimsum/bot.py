@@ -12,16 +12,17 @@ import model.world as world
 import model.reply as reply
 import model.events as events
 import model.library as library
+import model.domains as domains
 import model.sugar
 
 import model.scopes.movement as movement
 import model.scopes as scopes
 
 import bus
-import persistence
 import luaproxy
 import messages
 import grammars
+import storage
 
 import default.actions as actions
 import default.evaluator as evaluator
@@ -376,29 +377,27 @@ modify when eaten
 
     async def initialize(self):
         self.bus = DiscordEventBus(self.bot)
-        self.world = world.World(self.bus, luaproxy.context_factory)
+        self.domain = domains.Domain(
+            bus=self.bus, store=storage.SqliteStorage("world.sqlite3")
+        )
+        await self.domain.load()
+        self.world = self.domain.world
 
-        db = persistence.SqliteDatabase()
-        await db.open("world.sqlite3")
-        await db.load_all(self.world)
-
-        if self.world.empty():
+        if self.domain.registrar.empty():
             log.info("creating example world")
             generics, area = library.create_example_world(self.world)
-            self.world.add_entities(generics.all)
-            self.world.add_area(area)
-            await db.save(self.world)
+            self.domain.registrar.add_entities(generics.all)
+            self.domain.add_area(area)
+            await self.domain.save()
 
-        return self.world
+        return self.domain.world
 
     async def tick(self):
-        await self.world.tick()
+        await self.domain.tick()
         await self.save()
 
     async def save(self):
-        db = persistence.SqliteDatabase()
-        await db.open("world.sqlite3")
-        await db.save(self.world)
+        await self.domain.save()
 
     async def get_player(self, message):
         author = message.author
@@ -429,6 +428,6 @@ modify when eaten
             props=properties.Common(author.name, desc="A discord user"),
         )
         self.players[key] = BotPlayer(player, channel)
-        await self.world.perform(actions.Join(), player)
+        await self.domain.perform(actions.Join(), player)
         await self.save()
         return player

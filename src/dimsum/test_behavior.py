@@ -26,6 +26,7 @@ async def test_drop_hammer_funny_gold(caplog):
 
     with hammer.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:drop:after",
             lua="""
 function(s, world, area, player)
@@ -64,6 +65,7 @@ async def test_wear_cape(caplog):
 
     with cape.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:wear:after",
             lua="""
 function(s, world, area, player)
@@ -73,6 +75,7 @@ end
 """,
         )
         behave.add_behavior(
+            tw.world,
             "b:test:remove:after",
             lua="""
 function(s, world, area, player)
@@ -133,6 +136,7 @@ async def test_behavior_create_item(caplog):
     )
     with box.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:shake:after",
             lua="""
 function(s, world, area, player)
@@ -164,6 +168,7 @@ async def test_behavior_create_quantified_item(caplog):
     )
     with box.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:shake:after",
             lua="""
 function(s, world, area, player)
@@ -207,6 +212,7 @@ async def test_behavior_time_passing(caplog):
     )
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -220,13 +226,13 @@ end
 """,
         )
 
-    await tw.world.tick(0)
+    await tw.domain.tick(0)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.world.entities) == 5
+    assert len(tw.registrar.entities) == 5
 
-    await tw.world.tick(1)
+    await tw.domain.tick(1)
     assert len(tw.area.make(carryable.Containing).holding) == 3
-    assert len(tw.world.entities) == 6
+    assert len(tw.registrar.entities) == 6
 
 
 @pytest.mark.asyncio
@@ -239,6 +245,7 @@ async def test_behavior_create_kind(caplog):
     )
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -252,15 +259,15 @@ end
 """,
         )
 
-    await tw.world.tick(0)
+    await tw.domain.tick(0)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.world.entities) == 5
-    await tw.world.tick(1)
+    assert len(tw.registrar.entities) == 5
+    await tw.domain.tick(1)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.world.entities) == 5
-    await tw.world.tick(2)
+    assert len(tw.registrar.entities) == 5
+    await tw.domain.tick(2)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.world.entities) == 5
+    assert len(tw.registrar.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -273,6 +280,7 @@ async def test_behavior_random(caplog):
     )
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -281,7 +289,7 @@ end
 """,
         )
 
-    await tw.world.tick(0)
+    await tw.domain.tick(0)
 
 
 @pytest.mark.asyncio
@@ -294,6 +302,7 @@ async def test_behavior_numbering_by_kind(caplog):
     )
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -316,9 +325,9 @@ end
 """,
         )
 
-    await tw.world.tick(0)
+    await tw.domain.tick(0)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    await tw.world.tick(1)
+    await tw.domain.tick(1)
     assert len(tw.area.make(carryable.Containing).holding) == 3
 
 
@@ -333,6 +342,7 @@ async def test_behavior_numbering_person_by_name(caplog):
 
     with tree.make(behavior.Behaviors) as behave:
         behave.add_behavior(
+            tw.world,
             "b:test:tick",
             lua="""
 function(s, world, area, item)
@@ -348,7 +358,7 @@ end
 """,
         )
 
-    await tw.world.tick(0)
+    await tw.domain.tick(0)
     assert len(tw.area.make(carryable.Containing).holding) == 2
-    await tw.world.tick(1)
+    await tw.domain.tick(1)
     assert len(tw.area.make(carryable.Containing).holding) == 2
