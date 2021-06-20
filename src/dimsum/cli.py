@@ -13,6 +13,7 @@ import cli.graph
 import cli.export
 import cli.query
 import cli.server
+import cli.dummy
 
 
 @click.group()
@@ -31,6 +32,7 @@ if __name__ == "__main__":
         cli.export.commands,
         cli.query.commands,
         cli.server.commands,
+        cli.dummy.commands,
     ]
     for g in sources:
         for n, c in g.commands.items():
