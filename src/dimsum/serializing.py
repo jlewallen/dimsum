@@ -7,7 +7,6 @@ import logging
 
 import model.crypto as crypto
 import model.entity as entity
-import model.world as world
 
 import model.scopes.movement as movement
 
@@ -124,10 +123,10 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(world: world.World, **kwargs):
+def all(registrar: entity.Registrar, **kwargs):
     return {
         key: serialize(entity, secure=True, **kwargs)
-        for key, entity in world.entities.items()
+        for key, entity in registrar.entities.items()
     }
 
 

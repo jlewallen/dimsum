@@ -19,7 +19,7 @@ async def test_quantified_drop_partial_and_hold():
     await tw.success("make 20 Coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
     assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.world.entities) == 4
+    assert len(tw.registrar.entities) == 4
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
@@ -39,19 +39,19 @@ async def test_quantified_drop_partial_and_hold():
         == 5
     )
     assert (
-        tw.player.make(carryable.Containing).holding[0].key in tw.world.entities
+        tw.player.make(carryable.Containing).holding[0].key in tw.registrar.entities
     )  # Meh
-    assert len(tw.world.entities) == 5
+    assert len(tw.registrar.entities) == 5
 
     await tw.success("hold coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
     assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.world.entities) == 4
+    assert len(tw.registrar.entities) == 4
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
     assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert len(tw.world.entities) == 5
+    assert len(tw.registrar.entities) == 5
 
     await tw.success("drop 5 coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
@@ -70,7 +70,7 @@ async def test_quantified_drop_partial_and_hold():
         .quantity
         == 10
     )
-    assert len(tw.world.entities) == 5
+    assert len(tw.registrar.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -92,11 +92,11 @@ async def test_quantified_drop_all():
     tw = test.TestWorld()
 
     await tw.initialize()
-    assert len(tw.world.entities) == 3
+    assert len(tw.registrar.entities) == 3
     await tw.success("make 20 Coin")
     assert len(tw.player.make(carryable.Containing).holding) == 1
     assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.world.entities) == 4
+    assert len(tw.registrar.entities) == 4
 
     await tw.success("drop 20 coin")
     assert len(tw.player.make(carryable.Containing).holding) == 0
@@ -105,7 +105,7 @@ async def test_quantified_drop_all():
         tw.area.make(carryable.Containing).holding[0].make(carryable.Carryable).quantity
         == 20
     )
-    assert len(tw.world.entities) == 4
+    assert len(tw.registrar.entities) == 4
 
 
 @pytest.mark.asyncio

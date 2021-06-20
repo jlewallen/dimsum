@@ -26,6 +26,6 @@ def commands():
 )
 async def export(path: str):
     """Exporting entities from a database."""
-    world, db = await utils.open_world(path)
+    domain = await utils.open_domain(path)
     name = os.path.splitext(path)[0]
-    await db.write(sys.stdout)
+    await domain.storage.write(sys.stdout)

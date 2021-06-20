@@ -5,6 +5,7 @@ import model.entity as entity
 import model.game as game
 import model.world as world
 import model.library as library
+import model.domains as domains
 
 import serializing
 import persistence
@@ -14,27 +15,26 @@ log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
+# @pytest.mark.skip(reason="fix world.everywhere")
 async def test_library(caplog):
     tw = test.TestWorld()
 
     generics, area = library.create_example_world(tw.world)
-    tw.world.add_entities(generics.all)
+    tw.registrar.add_entities(generics.all)
 
     await tw.initialize(area=area)
-    await tw.world.tick()
+    await tw.domain.tick()
 
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
     await db.purge()
-    await db.save(tw.world)
+    await db.save(tw.registrar)
 
-    await tw.world.tick()
+    await tw.domain.tick()
 
-    empty = world.World(tw.bus, context_factory=tw.world.context_factory)
-    await db.load_all(empty)
+    empty = domains.Domain()
+    await db.load_all(empty.registrar)
 
     await empty.tick()
-
-    await db.save(empty)
 
     assert await db.number_of_entities() == 65

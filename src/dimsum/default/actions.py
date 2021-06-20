@@ -72,13 +72,13 @@ class AddItemArea(PersonAction):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
         with self.area.make(carryable.Containing) as ground:
             after_add = ground.add_item(self.item)
-            world.register(after_add)
+            ctx.register(after_add)
 
             # We do this after because we may consolidate this Item and
             # this keeps us from having to unregister the item.
-            world.register(after_add)
+            ctx.register(after_add)
 
-        await world.bus.publish(ItemsAppeared(area=self.area, items=[self.item]))
+        await ctx.publish(ItemsAppeared(area=self.area, items=[self.item]))
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
 
@@ -111,10 +111,10 @@ class Make(PersonAction):
             after_hold = contain.hold(item)
             # We do this after because we may consolidate this Item and
             # this keeps us from having to unregister the item.
-            world.register(after_hold)
+            ctx.register(after_hold)
 
         area = world.find_player_area(player)
-        await world.bus.publish(ItemsMade(person=player, area=area, items=[after_hold]))
+        await ctx.publish(ItemsMade(person=player, area=area, items=[after_hold]))
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
@@ -221,11 +221,13 @@ class Join(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        world.register(player)
-        await world.bus.publish(PlayerJoined(player=player))
+        ctx.register(player)
+        await ctx.publish(PlayerJoined(player=player))
         await ctx.hook("entered:before")
         with world.welcome_area().make(occupyable.Occupyable) as area:
-            await area.entered(world.bus, player)
+            log.info("welcome area: %s", world.welcome_area())
+            await area.entered(player)
+            log.info("%s", player.chimeras)
         await ctx.hook("entered:after")
         return Success("welcome!")
 
@@ -328,7 +330,7 @@ class Drop(PersonAction):
             )
             if dropped:
                 area = world.find_player_area(player)
-                await world.bus.publish(
+                await ctx.publish(
                     ItemsDropped(person=player, area=area, dropped=dropped)
                 )
                 await ctx.extend(dropped=dropped).hook("drop:after")
@@ -362,18 +364,16 @@ class Hold(PersonAction):
                             self.quantity, creator=player, owner=player, ctx=ctx
                         )
                         if hands.quantity == 0:
-                            world.unregister(item)
+                            ctx.unregister(item)
                             ground.drop(item)
                     item = removed[0]
                 else:
                     ground.unhold(item)
 
                 after_hold = pockets.hold(item)
-                if after_hold != item:
-                    world.unregister(item)
-                await world.bus.publish(
-                    ItemHeld(person=player, area=area, hold=[after_hold])
-                )
+                if after_hold != item and item:
+                    ctx.unregister(item)
+                await ctx.publish(ItemHeld(person=player, area=area, hold=[after_hold]))
                 await ctx.extend(hold=[after_hold]).hook("hold:after")
                 return Success("you picked up %s" % (after_hold,), item=after_hold)
 
@@ -582,11 +582,11 @@ class MovingAction(PersonAction):
         with destination.make(occupyable.Occupyable) as entering:
             with area.make(occupyable.Occupyable) as leaving:
                 await ctx.extend(area=area).hook("left:before")
-                await leaving.left(world.bus, player)
+                await leaving.left(player)
                 await ctx.extend(area=area).hook("left:after")
 
                 await ctx.extend(area=destination).hook("entered:before")
-                await entering.entered(world.bus, player)
+                await entering.entered(player)
                 await ctx.extend(area=destination).hook("entered:after")
 
         return AreaObservation(world.find_player_area(player), player)
@@ -621,10 +621,8 @@ class Obliterate(PersonAction):
             item.try_modify()
 
         for item in items:
-            world.unregister(item)
-            await world.bus.publish(
-                ItemObliterated(person=player, area=area, item=item)
-            )
+            ctx.unregister(item)
+            await ctx.publish(ItemObliterated(person=player, area=area, item=item))
 
         await ctx.extend(obliterate=items).hook("obliterate:after")
 
@@ -658,7 +656,7 @@ class CallThis(PersonAction):
         )
         with recipe.make(Recipe) as makes:
             makes.template = template
-        world.register(recipe)
+        ctx.register(recipe)
         with player.make(mechanics.Memory) as brain:
             brain.memorize("r:" + self.name, recipe)
         return Success(

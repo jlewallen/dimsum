@@ -24,4 +24,4 @@ async def test_area_weather_blows_small_items():
 
     assert await tw.success("go rocky")
 
-    await tw.world.tick(1)
+    await tw.domain.tick(1)

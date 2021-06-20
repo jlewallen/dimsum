@@ -12,7 +12,11 @@ log = logging.getLogger("dimsum")
 
 class Ctx:
     @abc.abstractmethod
-    def registrar(self) -> entity.Registrar:
+    def register(self, entity: entity.Entity) -> entity.Entity:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def unregister(self, entity: entity.Entity) -> entity.Entity:
         raise NotImplementedError
 
     @abc.abstractmethod

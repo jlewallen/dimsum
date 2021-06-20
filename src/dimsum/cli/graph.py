@@ -34,11 +34,15 @@ def get_color(e: entity.Entity) -> str:
 )
 async def graph(path: str):
     """Graph the entities in a database."""
-    world, db = await utils.open_world(path)
+    domain = await utils.open_domain(path)
     name = os.path.splitext(path)[0]
     template_loader = jinja2.FileSystemLoader(searchpath="./")
     template_env = jinja2.Environment(loader=template_loader)
     template = template_env.get_template("graph.template")
     with open("{0}.dot".format(name), "w") as file:
-        file.write(template.render(world=world, get_color=get_color))
+        file.write(
+            template.render(
+                registrar=domain.registrar, world=domain.world, get_color=get_color
+            )
+        )
         file.write("\n\n")

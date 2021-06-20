@@ -90,7 +90,7 @@ class Dig(actions.PersonAction):
             )
             with area.make(carryable.Containing) as ground:
                 ground.add_item(goes_there)
-            world.register(goes_there)
+            ctx.register(goes_there)
 
         if self.linkage.back:
             comes_back = scopes.exit(
@@ -100,9 +100,9 @@ class Dig(actions.PersonAction):
             )
             with digging.make(carryable.Containing) as ground:
                 ground.add_item(comes_back)
-            world.register(comes_back)
+            ctx.register(comes_back)
 
-        world.register(digging)
+        ctx.register(digging)
 
         return Success("dug and done", created=[area])
 

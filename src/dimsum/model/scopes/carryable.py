@@ -188,7 +188,7 @@ class Carryable(entity.Scope):
             **kwargs,
         )
 
-        ctx.registrar().register(item)
+        ctx.register(item)
 
         return [item]
 
@@ -196,6 +196,12 @@ class Carryable(entity.Scope):
 class Producer:
     def produce_item(self, **kwargs) -> entity.Entity:
         raise NotImplementedError
+
+
+class Location(entity.Scope):
+    def __init__(self, container: entity.Entity = None, **kwargs):
+        super().__init__(**kwargs)
+        self.container = container
 
 
 class Containing(Openable):
@@ -219,8 +225,8 @@ class Containing(Openable):
 
             producer = self.produces[verb]
             log.info("%s produces %s", self, producer)
-            item = cast(Carryable, producer.produce_item(**kwargs))
-            context.get().registrar().register(item)
+            item = producer.produce_item(**kwargs)
+            context.get().register(item)
             return into.hold(item)
 
     def adjust_capacity(self, capacity):
@@ -240,6 +246,8 @@ class Containing(Openable):
 
     def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:
         self.holding.remove(e)
+        with e.make(Location) as location:
+            location.container = None
         return e
 
     def place_inside(self, item: entity.Entity, **kwargs):
@@ -272,6 +280,8 @@ class Containing(Openable):
                         return already
 
         self.holding.append(item)
+        with item.make(Location) as location:
+            location.container = self.ourselves
         return item
 
     def drop_all(self) -> List[entity.Entity]:
@@ -308,7 +318,7 @@ class Containing(Openable):
                 log.info("separated: %s (%d)", dropped, quantity)
                 assert dropped
                 if dropping.quantity == 0:
-                    context.get().registrar().unregister(item)
+                    context.get().unregister(item)
                     self.drop(item)
         else:
             if item:
@@ -322,14 +332,16 @@ class Containing(Openable):
             with area.make(Containing) as ground:
                 after_add = ground.add_item(item)
                 if after_add != item:
-                    context.get().registrar().unregister(item)
+                    context.get().unregister(item)
 
         return dropped, None
 
-    def drop(self, item: entity.Entity) -> List[entity.Entity]:
-        if item in self.holding:
-            self.holding.remove(item)
-            return [item]
+    def drop(self, e: entity.Entity) -> List[entity.Entity]:
+        if e in self.holding:
+            self.holding.remove(e)
+            with e.make(Location) as location:
+                location.container = None
+            return [e]
         return []
 
     def entities(self) -> List[entity.Entity]:

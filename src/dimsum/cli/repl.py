@@ -6,6 +6,7 @@ import sys
 import model.sugar as sugar
 import model.properties as properties
 import model.world as world
+import model.domains as domains
 import model.scopes as scopes
 
 import default.actions as actions
@@ -52,25 +53,24 @@ class Repl:
         self.l = grammars.create_parser()
         self.fn = fn
         self.name = name
+        self.domain = domains.Domain(storage=persistence.SqliteDatabase())
         self.world = None
-        self.bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-        self.db = persistence.SqliteDatabase()
 
     async def get_player(self):
         if self.world is None:
-            self.world = world.World(self.bus, luaproxy.context_factory)
-            await self.db.open(self.fn)
-            await self.db.load(self.world)
+            await self.domain.storage.open(self.fn)
+            await self.domain.storage.load_all(self.domain.registrar)
+            self.world = self.domain.world
 
-        if self.world.empty():
+        if self.domain.registrar.empty():
             log.info("creating example world")
             generics, area = library.create_example_world(self.world)
-            self.world.add_entities(generics.all)
-            self.world.add_area(area)
-            await self.db.save(self.world)
+            self.domain.registrar.add_entities(generics.all)
+            self.domain.add_area(area)
+            await self.db.save(self.domain.registrar)
 
-        if self.world.contains(self.name):
-            player = self.world.find_by_key(self.name)
+        if self.domain.registrar.contains(self.name):
+            player = self.domain.registrar.find_by_key(self.name)
             return player
 
         key = base64.b64encode(self.name.encode("utf-8")).decode("utf-8")
@@ -79,7 +79,7 @@ class Repl:
             creator=self.world,
             props=properties.Common(self.name, desc="A repl user"),
         )
-        await self.world.perform(actions.Join(), player)
+        await self.domain.perform(actions.Join(), player)
         await self.save()
         return player
 

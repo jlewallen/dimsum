@@ -21,15 +21,15 @@ class SqliteDatabase:
         )
         self.db.commit()
 
-    async def save(self, world: world.World):
+    async def save(self, registrar: entity.Registrar):
         self.dbc = self.db.cursor()
 
-        for key, entity in world.garbage.items():
+        for key, entity in registrar.garbage.items():
             await self.destroy(entity)
 
-        log.info("deleted %d entities in garbage", len(world.garbage.keys()))
+        log.info("deleted %d entities in garbage", len(registrar.garbage.keys()))
 
-        for key, entity in world.entities.items():
+        for key, entity in registrar.entities.items():
             try:
                 if entity.props.destroyed:
                     await self.destroy(entity)
@@ -44,7 +44,7 @@ class SqliteDatabase:
                 )
                 raise
 
-        log.info("saved %d entities", len(world.entities.keys()))
+        log.info("saved %d entities", len(registrar.entities.keys()))
 
         self.db.commit()
 

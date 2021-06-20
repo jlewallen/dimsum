@@ -33,9 +33,8 @@ class ObjectNumber(things.ItemFinder):
         super().__init__()
         self.number = number
 
-    def find_item(self, world: world.World = None, **kwargs) -> Optional[entity.Entity]:
-        assert world
-        return world.find_by_number(self.number)
+    def find_item(self, **kwargs) -> Optional[entity.Entity]:
+        return context.get().find_item(number=self.number, **kwargs)
 
 
 class AnyItem(things.ItemFinder):

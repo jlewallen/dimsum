@@ -8,6 +8,7 @@ import model.crypto as crypto
 import model.entity as entity
 import model.properties as properties
 import model.world as world
+import model.domains as domains
 
 import model.scopes.ownership as ownership
 
@@ -40,18 +41,18 @@ class SimpleHolding(entity.Scope):
 
 @pytest.mark.asyncio
 async def test_chimeric_entities_serialize(caplog):
-    bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-    universe = world.World(bus, luaproxy.context_factory)
+    domain = domains.Domain()
+    universe = domain.world
 
     jacob = entity.Entity(
         creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
     )
-    universe.register(jacob)
+    domain.registrar.register(jacob)
 
     toy = entity.Entity(
         creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
     )
-    universe.register(toy)
+    domain.registrar.register(toy)
 
     with jacob.make(SimpleHolding) as holding:
         with jacob.make(SimpleCore) as core:
@@ -61,12 +62,12 @@ async def test_chimeric_entities_serialize(caplog):
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
     await db.purge()
-    await db.save(universe)
+    await db.save(domain.registrar)
 
-    empty = world.World(bus, context_factory=universe.context_factory)
-    await db.load_all(empty)
+    empty = domains.Domain()
+    await db.load_all(empty.registrar)
 
-    assert await db.number_of_entities() == 3
+    assert len(empty.registrar.entities) == 3
 
 
 def make_person(
@@ -108,21 +109,21 @@ def make_thing(
 
 @pytest.mark.asyncio
 async def test_specialization_classes(caplog):
-    bus = messages.TextBus(handlers=[handlers.WhateverHandlers])
-    universe = world.World(bus, luaproxy.context_factory)
+    domain = domains.Domain()
+    universe = domain.world
 
     person = make_person(creator=universe, props=properties.Common(name="Jacob"))
-    universe.register(person)
+    domain.registrar.register(person)
 
     toy = make_thing(creator=universe, props=properties.Common(name="Toy"))
-    universe.register(toy)
+    domain.registrar.register(toy)
 
     db = persistence.SqliteDatabase()
     await db.open("test.sqlite3")
     await db.purge()
-    await db.save(universe)
+    await db.save(domain.registrar)
 
-    empty = world.World(bus, context_factory=universe.context_factory)
-    await db.load_all(empty)
+    empty = domains.Domain()
+    await db.load_all(empty.registrar)
 
-    assert await db.number_of_entities() == 3
+    assert len(empty.registrar.entities) == 3
