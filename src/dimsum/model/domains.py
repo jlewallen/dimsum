@@ -36,6 +36,60 @@ class Domain:
         if not empty:
             self.registrar.register(self.world)
 
+    async def load(self, fn: str = None):
+        await self.storage.open(fn)
+        await self.storage.load_all(self.registrar)
+        self.world = self.registrar.find_by_key("world")
+
+    async def tick(self, now: Optional[float] = None):
+        if now is None:
+            now = time.time()
+        await self.everywhere(world.TickHook, time=now)
+        await self.everywhere(world.WindHook, time=now)
+        return now
+
+    async def everywhere(self, name: str, **kwargs):
+        log.info("everywhere:%s %s", name, kwargs)
+        everything: List[entity.Entity] = []
+        with self.world.make(behavior.BehaviorCollection) as world_behaviors:
+            everything = world_behaviors.entities
+        for entity in everything:
+            with entity.make(behavior.Behaviors) as behave:
+                behaviors = behave.get_behaviors(name)
+                if len(behaviors) > 0:
+                    log.info("everywhere: %s", entity)
+                    area = self.world.find_entity_area(entity)
+                    assert area
+                    with WorldCtx(
+                        self.context_factory,
+                        domain=self,
+                        world=self.world,
+                        area=area,
+                        entity=entity,
+                        registrar=self.registrar,
+                        **kwargs
+                    ) as ctx:
+                        await ctx.hook(name)
+
+    async def perform(
+        self, action, person: Optional[entity.Entity], **kwargs
+    ) -> game.Reply:
+        assert self.world
+        area = self.world.find_entity_area(person) if person else None
+        with WorldCtx(
+            self.context_factory,
+            domain=self,
+            world=self.world,
+            person=person,
+            area=area,
+            registrar=self.registrar,
+            **kwargs
+        ) as ctx:
+            try:
+                return await action.perform(ctx, self.world, person)
+            except entity.EntityFrozen:
+                return game.Failure("whoa, that's frozen")
+
     def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         if seen is None:
             seen = {}
@@ -80,54 +134,6 @@ class Domain:
             self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
-
-    async def tick(self, now: Optional[float] = None):
-        if now is None:
-            now = time.time()
-        await self.everywhere(world.TickHook, time=now)
-        await self.everywhere(world.WindHook, time=now)
-        return now
-
-    async def everywhere(self, name: str, **kwargs):
-        log.info("everywhere:%s %s", name, kwargs)
-        everything: List[entity.Entity] = []
-        with self.world.make(behavior.BehaviorCollection) as world_behaviors:
-            everything = world_behaviors.entities
-        for entity in everything:
-            with entity.make(behavior.Behaviors) as behave:
-                behaviors = behave.get_behaviors(name)
-                if len(behaviors) > 0:
-                    log.info("everywhere: %s", entity)
-                    area = self.world.find_entity_area(entity)
-                    assert area
-                    with WorldCtx(
-                        self.context_factory,
-                        domain=self,
-                        world=self.world,
-                        area=area,
-                        entity=entity,
-                        registrar=self.registrar,
-                        **kwargs
-                    ) as ctx:
-                        await ctx.hook(name)
-
-    async def perform(
-        self, action, person: Optional[entity.Entity], **kwargs
-    ) -> game.Reply:
-        area = self.world.find_entity_area(person) if person else None
-        with WorldCtx(
-            self.context_factory,
-            domain=self,
-            world=self,
-            person=person,
-            area=area,
-            registrar=self.registrar,
-            **kwargs
-        ) as ctx:
-            try:
-                return await action.perform(ctx, self.world, person)
-            except entity.EntityFrozen:
-                return game.Failure("whoa, that's frozen")
 
 
 class WorldCtx(context.Ctx):

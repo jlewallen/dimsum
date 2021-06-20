@@ -58,8 +58,7 @@ class Repl:
 
     async def get_player(self):
         if self.world is None:
-            await self.domain.storage.open(self.fn)
-            await self.domain.storage.load_all(self.domain.registrar)
+            await self.domain.load(fn=self.fn)
             self.world = self.domain.world
 
         if self.domain.registrar.empty():
@@ -86,7 +85,7 @@ class Repl:
     async def save(self):
         db = persistence.SqliteDatabase()
         await db.open(self.fn)
-        await db.save(self.world)
+        await db.save(self.domain.registrar)
 
     async def read_command(self):
         return sys.stdin.readline().strip()
@@ -107,7 +106,7 @@ class Repl:
         log.info(str(tree))
         action = tree_eval.transform(tree)
 
-        reply = await self.world.perform(action, player)
+        reply = await self.domain.perform(action, player)
         await self.save()
 
         visitor = messages.ReplyVisitor()
