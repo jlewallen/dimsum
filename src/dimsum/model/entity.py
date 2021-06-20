@@ -91,7 +91,6 @@ class Entity:
         self,
         key: str = None,
         version: Version = None,
-        kind: kinds.Kind = None,
         creator: "Entity" = None,
         parent: "Entity" = None,
         klass: Type[EntityClass] = None,
@@ -288,6 +287,9 @@ class Registrar:
         self.numbered: Dict[int, entity.Entity] = {}
         self.key_to_number: Dict[str, int] = {}
         self.number: int = 0
+
+    def number_of_entities(self):
+        return len(self.entities)
 
     def purge(self):
         self.entities = {}

@@ -42,14 +42,17 @@ class Domain:
         await self.store.update(serializing.registrar(self.registrar))
 
         reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await serializing.materialize(
-            "world", reloaded.registrar, reloaded.store
-        )
+        reloaded.world = await reloaded.materialize("world")
         return reloaded
+
+    async def materialize(self, key: str) -> Optional[entity.Entity]:
+        entity = await serializing.materialize(key, self.registrar, self.store)
+        # assert entity
+        return entity
 
     async def load(self):
         self.registrar.purge()
-        self.world = await serializing.materialize("world", self.registrar, self.store)
+        self.world = await self.materialize("world")
         if self.world:
             return
         self.world = world.World()

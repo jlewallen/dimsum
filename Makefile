@@ -51,6 +51,9 @@ prod-image:
 prod-server:
 	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
 
+server:
+	uvicorn --app-dir src/dimsum --log-config logging.yml --reload dimsum:app
+
 graph:
 	+@for m in *.sqlite3; do                                               \
 	n=`basename $$m .sqlite3`;                                             \

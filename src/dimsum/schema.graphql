@@ -1,0 +1,31 @@
+schema {
+  query: Query
+}
+
+scalar Entity
+scalar Reply
+scalar Key
+scalar Token
+
+input LanguageQueryCriteria {
+  text: String!
+  evaluator: Key!
+}
+
+type Evaluation {
+  reply: Reply!
+  entities: [Entity!]
+}
+
+input Credentials {
+  username: String!
+  password: String!
+}
+
+type Query {
+	size: Int!
+	world: Entity!
+    entities(key: Key): [Entity!]
+    language(criteria: LanguageQueryCriteria!): Evaluation!
+    login(credentials: Credentials): Token!
+}

@@ -227,7 +227,6 @@ class Join(PersonAction):
         with world.welcome_area().make(occupyable.Occupyable) as area:
             log.info("welcome area: %s", world.welcome_area())
             await area.entered(player)
-            log.info("%s", player.chimeras)
         await ctx.hook("entered:after")
         return Success("welcome!")
 

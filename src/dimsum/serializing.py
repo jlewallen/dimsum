@@ -24,6 +24,12 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         )
 
     def flatten(self, obj, data):
+        if self.context.reproducible:
+            data["public"] = "<public>"
+            data["signature"] = "<signature>"
+            data["private"] = "<private>"
+            return
+
         data["public"] = obj.public
         data["signature"] = obj.signature
         if self.context.secure:
@@ -60,9 +66,10 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):
-    def __init__(self, secure=False, **kwargs):
+    def __init__(self, secure=False, reproducible=False, **kwargs):
         super().__init__(**kwargs)
         self.secure = secure
+        self.reproducible = reproducible
 
 
 class CustomUnpickler(jsonpickle.unpickler.Unpickler):
@@ -94,6 +101,9 @@ def serialize_full(value, depth=0):
         }
 
     if value.__class__ in classes:
+        log.debug(
+            "swap class: %s -> %s (%s)", type(value), classes[value.__class__], value
+        )
         attrs = copy.copy(value.__dict__)
         if "hooks" in attrs:
             del attrs["hooks"]
@@ -102,18 +112,25 @@ def serialize_full(value, depth=0):
     return value
 
 
-def serialize(value, indent=None, unpicklable=True, secure=False):
+def serialize(
+    value, indent=None, unpicklable=True, secure=False, full=True, reproducible=False
+):
     if value is None:
         return value
 
-    prepared = serialize_full(value)
+    prepared = serialize_full(value) if full else value
 
     return jsonpickle.encode(
         prepared,
         indent=indent,
         unpicklable=unpicklable,
         make_refs=False,
-        context=SecurePickler(secure=secure, unpicklable=unpicklable, make_refs=False),
+        context=SecurePickler(
+            secure=secure,
+            unpicklable=unpicklable,
+            reproducible=reproducible,
+            make_refs=False,
+        ),
     )
 
 

@@ -59,9 +59,3 @@ def generate_identity() -> Identity:
 
 def generate_identity_from(other: Identity):
     return other.sign(generate_identity())
-
-
-def test():
-    keys = generate_identity()
-    print(keys.public)
-    print(keys.private)

@@ -19,6 +19,7 @@ import model.scopes as scopes
 DefaultMoveVerb = "walk"
 TickHook = "tick"
 WindHook = "wind"
+Key = "world"
 log = logging.getLogger("dimsum")
 p = inflect.engine()
 
@@ -53,7 +54,7 @@ class Remembering(entity.Scope):
 class World(entity.Entity):
     def __init__(self, key=None, klass=None, props=None, **kwargs):
         super().__init__(
-            key="world",
+            key=Key,
             klass=entity.RootEntityClass,
             props=props
             if props
