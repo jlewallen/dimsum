@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 
 import copy
 import jsonpickle
@@ -9,6 +9,8 @@ import model.crypto as crypto
 import model.entity as entity
 
 import model.scopes.movement as movement
+
+import storage
 
 log = logging.getLogger("dimsum")
 
@@ -123,7 +125,7 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-def all(registrar: entity.Registrar, **kwargs):
+def all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
     return {
         key: serialize(entity, secure=True, **kwargs)
         for key, entity in registrar.entities.items()
@@ -131,7 +133,7 @@ def all(registrar: entity.Registrar, **kwargs):
 
 
 def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
-    refs: Dict[str, Dict] = {}
+    refs: Dict[str, entity.EntityRef] = {}
 
     def reference(key):
         if key not in refs:
@@ -151,34 +153,50 @@ def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
     return entities
 
 
-"""
-Graveyard for failed approaches. Keeping around just in case.
+async def materialize(
+    key: str, registrar: entity.Registrar, storage: storage.EntityStorage
+) -> Optional[entity.Entity]:
+    log.info("materialize %s", key)
+    if registrar.contains(key):
+        return registrar.find_by_key(key)
 
-@jsonpickle.handlers.register(entity.EntityRef)
-class EntityRefHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        log.info("entityref: restore")
-        return self.context.lookup(obj["key"])
+    refs: Dict[str, entity.EntityRef] = {}
 
-    def flatten(self, obj, data):
-        log.info("entityref: flatten")
-        data["key"] = obj.key
-        data["kind"] = obj.__class__.__name__
-        data["name"] = obj.props.name
-        return data
+    def reference(key):
+        if registrar.contains(key):
+            return registrar.find_by_key(key)
 
-https://docs.python.org/3/library/pickle.html#object.__reduce__
-https://www.slideshare.net/GrahamDumpleton/hear-no-evil-see-no-evil-patch-no-evil-or-how-to-monkeypatch-safely
-http://blog.dscpl.com.au/2018/01/the-pattern-versus-python-package.html
-https://readthedocs.org/projects/wrapt/downloads/pdf/latest/
+        if key not in refs:
+            refs[key] = entity.EntityRef(key)
+        return refs[key]
 
-@wrapt.patch_function_wrapper("entity", "EntityRef.__reduce_ex__")
-def entity_ref_reduce_ex_wrapper(wrapped, instance, args, kwargs):
-    log.info("%s, %s %s %s", instance.key, instance, args, kwargs)
+    data = await storage.load_by_key(key)
+    if data is None:
+        return None
 
-    return (
-        entity.EntityRef,
-        (instance.key,),
-    )
+    loaded = deserialize(data, reference)
+    registrar.register(loaded)
 
-"""
+    for referenced_key, baby_entity in refs.items():
+        linked = await materialize(referenced_key, registrar, storage)
+        baby_entity.__wrapped__ = linked  # type: ignore
+
+    return loaded
+
+
+def registrar(registrar: entity.Registrar, **kwargs) -> Dict[storage.Keys, str]:
+    return {
+        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
+            entity, secure=True, **kwargs
+        )
+        for key, entity in registrar.entities.items()
+    }
+
+
+def for_update(entities: List[entity.Entity], **kwargs) -> Dict[storage.Keys, str]:
+    return {
+        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
+            entity, secure=True, **kwargs
+        )
+        for entity in entities
+    }

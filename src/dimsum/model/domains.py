@@ -24,7 +24,7 @@ scripting = behavior.ScriptEngine()
 
 
 class Domain:
-    def __init__(self, bus: bus.EventBus = None, storage=None, **kwargs):
+    def __init__(self, bus: bus.EventBus = None, storage=None, empty=False, **kwargs):
         super().__init__()
         self.bus = (
             bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
@@ -33,7 +33,8 @@ class Domain:
         self.context_factory = luaproxy.context_factory
         self.registrar = entity.Registrar()
         self.world = world.World()
-        self.registrar.register(self.world)
+        if not empty:
+            self.registrar.register(self.world)
 
     def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         if seen is None:

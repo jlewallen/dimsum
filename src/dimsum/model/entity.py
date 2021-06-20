@@ -268,6 +268,13 @@ class Registrar:
         self.key_to_number: Dict[str, int] = {}
         self.number: int = 0
 
+    def purge(self):
+        self.entities = {}
+        self.garbage = {}
+        self.numbered = {}
+        self.key_to_number = {}
+        self.number = 0
+
     def register(self, entity: Union[Entity, Any]):
         if entity.key in self.entities:
             log.info(
