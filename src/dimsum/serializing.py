@@ -157,9 +157,13 @@ def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
 
 
 async def materialize(
-    key: str, registrar: entity.Registrar, storage: storage.EntityStorage
+    key: str,
+    registrar: entity.Registrar,
+    storage: storage.EntityStorage,
+    depth: int = 0,
 ) -> Optional[entity.Entity]:
-    log.debug("materialize %s", key)
+    log.debug("[%d] materialize %s", depth, key)
+
     if registrar.contains(key):
         return registrar.find_by_key(key)
 
@@ -181,7 +185,7 @@ async def materialize(
     registrar.register(loaded)
 
     for referenced_key, baby_entity in refs.items():
-        linked = await materialize(referenced_key, registrar, storage)
+        linked = await materialize(referenced_key, registrar, storage, depth=depth + 1)
         baby_entity.__wrapped__ = linked  # type: ignore
 
     return loaded
