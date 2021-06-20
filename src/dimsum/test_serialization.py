@@ -231,7 +231,6 @@ end
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="broken due to larger than necessary world persistence")
 async def test_unregister_destroys(caplog):
     tw = test.TestWorld()
     await tw.initialize()
@@ -255,8 +254,8 @@ async def test_unregister_destroys(caplog):
 
     assert await db.number_of_entities() == 3
 
-    empty = world.World(tw.bus, context_factory=None)
-    await db.load_all(empty)
+    empty = domains.Domain()
+    await db.load_all(empty.registrar)
 
 
 @pytest.mark.asyncio
