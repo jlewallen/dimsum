@@ -75,10 +75,22 @@ class UnknownClass(EntityClass):
     pass
 
 
+class Version:
+    def __init__(self, i: int = 0):
+        super().__init__()
+        self.i = i
+        self.o = i
+
+    def inc(self):
+        if self.i == self.o:
+            self.i += 1
+
+
 class Entity:
     def __init__(
         self,
         key: str = None,
+        version: Version = None,
         kind: kinds.Kind = None,
         creator: "Entity" = None,
         parent: "Entity" = None,
@@ -91,6 +103,7 @@ class Entity:
         **kwargs
     ):
         super().__init__()
+        self.version = version if version else Version()
         # It's important to just assign these and avoid testing for
         # None, as we may have a None target EntityRef that needs to
         # be linked up later, and in that case we need to keep the
@@ -178,6 +191,7 @@ class Entity:
 
     def try_modify(self) -> None:
         if self.can_modify():
+            self.version.inc()
             return
         raise EntityFrozen()
 
