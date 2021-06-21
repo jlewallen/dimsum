@@ -354,8 +354,8 @@ modify when eaten
         async def op():
             player = await self.get_player(ctx.message)
             action = self.parse_as(self.world, player, full_command, q)
-            reply = await self.world.perform(action, player)
-            await self.save()
+            reply = await self.domain.perform(action, player)
+            await self.domain.save()
             return reply
 
         reply = await self.translate(op)
@@ -367,7 +367,7 @@ modify when eaten
             return await mutation()
         except Exception as err:
             log.error("error", exc_info=True)
-            return reply.Failure("oops, %s" % (err,))
+            return game.Failure("oops, %s" % (err,))
 
     def run(self):
         self.bot.run(self.token)
@@ -394,16 +394,12 @@ modify when eaten
 
     async def tick(self):
         await self.domain.tick()
-        await self.save()
-
-    async def save(self):
         await self.domain.save()
 
     async def get_player(self, message):
         author = message.author
         channel = message.channel
-        raw_key = str(author.id)
-        key = base64.b64encode(bytes(raw_key, "utf-8")).decode("utf-8")
+        key = base64.b64encode(bytes(author.name, "utf-8")).decode("utf-8")
 
         if not self.world:
             raise Exception("initializing")
@@ -415,8 +411,8 @@ modify when eaten
                 raise Exception("no player")
             return player
 
-        if self.world.contains(key):
-            player = self.world.find_by_key(key)
+        if self.domain.registrar.contains(key):
+            player = self.domain.registrar.find_by_key(key)
             self.players[key] = BotPlayer(player, channel)
             if not player:
                 raise Exception("no player")
@@ -429,5 +425,5 @@ modify when eaten
         )
         self.players[key] = BotPlayer(player, channel)
         await self.domain.perform(actions.Join(), player)
-        await self.save()
+        await self.domain.save()
         return player
