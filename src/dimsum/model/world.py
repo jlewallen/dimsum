@@ -51,11 +51,13 @@ class Remembering(entity.Scope):
 
 
 class World(entity.Entity):
-    def __init__(self, **kwargs):
+    def __init__(self, key=None, klass=None, props=None, **kwargs):
         super().__init__(
             key="world",
             klass=entity.RootEntityClass,
-            props=properties.Common("World", desc="Ya know, everything"),
+            props=props
+            if props
+            else properties.Common("World", desc="Ya know, everything"),
             scopes=scopes.World,
             **kwargs
         )

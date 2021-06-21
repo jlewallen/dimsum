@@ -7,6 +7,7 @@ import logging
 
 import model.crypto as crypto
 import model.entity as entity
+import model.world as world
 
 import model.scopes.movement as movement
 
@@ -46,6 +47,7 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
 
 
 @jsonpickle.handlers.register(entity.Entity)
+@jsonpickle.handlers.register(world.World)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return self.context.lookup(obj["key"])
@@ -76,6 +78,7 @@ def derive_from(klass):
 
 allowed = [
     entity.Entity,
+    world.World,
 ]
 classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
@@ -154,6 +157,7 @@ async def materialize(
         return None
 
     loaded = deserialize(data, reference)
+    assert loaded
     registrar.register(loaded)
 
     for referenced_key, proxy in refs.items():
