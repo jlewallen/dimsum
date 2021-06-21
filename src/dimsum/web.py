@@ -38,7 +38,7 @@ def create(state):
             bearer, encoded = header.split(" ")
             decoded = jwt.decode(encoded, session_key, algorithms="HS256")
             return state.world, decoded
-        raise Exception("unauthorized")
+        raise quart.abort(401)
 
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
