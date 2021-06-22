@@ -5,6 +5,7 @@ import os.path
 import model.world as world
 import model.domains as domains
 import model.game as game
+import model.scopes as scopes
 
 import serializing
 import grammars
@@ -64,6 +65,24 @@ async def resolve_entities(obj, info, key):
             entities = [loaded]
 
     log.info("ariadne:entities entities=%s", entities)
+    return [serialize_entity(e) for e in entities]
+
+
+@query.field("areas")
+async def resolve_areas(obj, info):
+    domain = info.context.domain
+    log.info("ariadne:areas")
+    entities = domain.registrar.entities_of_klass(scopes.AreaClass)
+    log.info("ariadne:areas entities=%s", entities)
+    return [serialize_entity(e) for e in entities]
+
+
+@query.field("people")
+async def resolve_people(obj, info):
+    domain = info.context.domain
+    log.info("ariadne:people")
+    entities = domain.registrar.entities_of_klass(scopes.LivingClass)
+    log.info("ariadne:people entities=%s", entities)
     return [serialize_entity(e) for e in entities]
 
 

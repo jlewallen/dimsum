@@ -110,3 +110,47 @@ async def test_graphql_language_basic(snapshot):
     snapshot.assert_match(
         "\n".join(actual["data"]["language"]["entities"]), "entities.json"
     )
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_entities_areas(snapshot):
+    domain = domains.Domain()
+    welcome = scopes.area(
+        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
+    )
+    domain.add_area(welcome)
+    jacob = scopes.alive(
+        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
+    )
+    domain.registrar.register(jacob)
+    await domain.perform(actions.Join(), jacob)
+
+    data = {"query": "{ areas }"}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=AriadneContext(domain)
+    )
+    assert ok
+    snapshot.assert_match("\n".join(actual["data"]["areas"]), "areas.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_entities_people(snapshot):
+    domain = domains.Domain()
+    welcome = scopes.area(
+        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
+    )
+    domain.add_area(welcome)
+    jacob = scopes.alive(
+        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
+    )
+    domain.registrar.register(jacob)
+    await domain.perform(actions.Join(), jacob)
+
+    data = {"query": "{ people }"}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=AriadneContext(domain)
+    )
+    assert ok
+    snapshot.assert_match("\n".join(actual["data"]["people"]), "people.json")

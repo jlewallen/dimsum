@@ -23,9 +23,11 @@ input Credentials {
 }
 
 type Query {
-	size: Int!
-	world: Entity!
-    entities(key: Key): [Entity!]
-    language(criteria: LanguageQueryCriteria!): Evaluation!
-    login(credentials: Credentials): Token!
+  size: Int!
+  world: Entity!
+  entities(key: Key): [Entity!]
+  language(criteria: LanguageQueryCriteria!): Evaluation!
+  login(credentials: Credentials): Token!
+  areas: [Entity!]
+  people: [Entity!]
 }
