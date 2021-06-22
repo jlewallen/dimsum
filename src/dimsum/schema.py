@@ -1,37 +1,82 @@
 import logging
 import ariadne
 import os.path
+import dataclasses
+import base64
+import jwt
 
 import model.world as world
 import model.domains as domains
 import model.game as game
 import model.scopes as scopes
+import model.scopes.users as users
 
 import serializing
 import grammars
 import storage
+import config
 
 log = logging.getLogger("dimsum")
 
-entity_scalar = ariadne.ScalarType("Entity")
+entity = ariadne.ScalarType("Entity")
 
 
-@entity_scalar.serializer
+@entity.serializer
 def serialize_entity(value):
     log.debug("ariadne:entity")
     return serializing.serialize(value, indent=True, reproducible=True)
 
 
-reply_scalar = ariadne.ScalarType("Reply")
+reply = ariadne.ScalarType("Reply")
 
 
-@reply_scalar.serializer
+@reply.serializer
 def serialize_reply(value):
     log.debug("ariadne:reply")
     return serializing.serialize(value, indent=True, reproducible=True)
 
 
+@dataclasses.dataclass
+class Credentials:
+    username: str
+    password: str
+
+
+credentials = ariadne.ScalarType("Credentials")
+
+
+@credentials.value_parser
+def parse_credentials_value(value):
+    log.info("ariadne:credentials: %s", value)
+    return value
+
+
 query = ariadne.QueryType()
+
+
+@query.field("login")
+async def login(obj, info, credentials):
+    domain = info.context.domain
+    creds = Credentials(**credentials)
+    log.info("ariadne:login username=%s", creds.username)
+    if not domain.registrar.contains(creds.username):
+        raise ValueError("bad username or password")
+
+    try:
+        person = domain.registrar.find_by_key(creds.username)
+        if person:
+            with person.make(users.Auth) as auth:
+                token = auth.try_password(creds.password)
+
+                if token:
+                    jwt_token = jwt.encode(
+                        token, info.context.cfg.session_key, algorithm="HS256"
+                    )
+                    return jwt_token
+    except:
+        log.exception("login")
+
+    raise ValueError("bad username or password")
 
 
 @query.field("size")
@@ -140,12 +185,12 @@ def create():
     raise Exception("unable to find schema.graphql")
 
 
+@dataclasses.dataclass
 class AriadneContext:
-    def __init__(self, domain):
-        super().__init__()
-        self.domain = domain
+    domain: domains.Domain
+    cfg: config.Configuration
 
 
 def context(request):
     log.info("ariadne:context %s", request)
-    return AriadneContext(domains.Domain())
+    return AriadneContext(domain=domains.Domain(), cfg=config.Configuration())

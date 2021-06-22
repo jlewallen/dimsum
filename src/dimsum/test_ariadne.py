@@ -2,18 +2,26 @@ import pytest
 import freezegun
 import logging
 import ariadne
+import base64
 
-import model.domains as domains
 import model.properties as properties
-import model.scopes as scopes
 import model.world as world
+import model.domains as domains
+import model.scopes as scopes
+import model.scopes.users as users
 import default.actions as actions
+
+import config
 
 import schema as schema_factory
 from schema import AriadneContext
 
 
 log = logging.getLogger("dimsum")
+
+
+def get_test_context(domain: domains.Domain, **kwargs):
+    return AriadneContext(domain, config.Configuration("test.sqlite3", "session-key"))
 
 
 @pytest.mark.asyncio
@@ -53,7 +61,7 @@ async def test_graphql_size(snapshot):
 
     data = {"query": "{ size }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     assert actual == {"data": {"size": 1}}
@@ -66,7 +74,7 @@ async def test_graphql_world(snapshot):
 
     data = {"query": "{ world }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match(actual["data"]["world"], "world.json")
@@ -79,7 +87,7 @@ async def test_graphql_world_by_key(snapshot):
 
     data = {"query": '{ entities(key: "%s") }' % (world.Key)}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match("\n".join(actual["data"]["entities"]), "world.json")
@@ -104,7 +112,7 @@ async def test_graphql_language_basic(snapshot):
         % jacob.key
     }
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match(
@@ -128,7 +136,7 @@ async def test_graphql_entities_areas(snapshot):
 
     data = {"query": "{ areas }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match("\n".join(actual["data"]["areas"]), "areas.json")
@@ -150,7 +158,36 @@ async def test_graphql_entities_people(snapshot):
 
     data = {"query": "{ people }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=AriadneContext(domain)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match("\n".join(actual["data"]["people"]), "people.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_login():
+    domain = domains.Domain()
+    welcome = scopes.area(
+        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
+    )
+    domain.add_area(welcome)
+    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+    jacob = scopes.alive(
+        key=jacob_key, props=properties.Common(name="Jacob"), creator=domain.world
+    )
+
+    with jacob.make(users.Auth) as auth:
+        auth.change("asdfasdf")
+
+    domain.registrar.register(jacob)
+    await domain.perform(actions.Join(), jacob)
+
+    data = {
+        "query": '{ login(credentials: { username: "%s", password: "asdfasdf" }) }'
+        % (jacob_key,)
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok

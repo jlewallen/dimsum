@@ -10,6 +10,7 @@ import json
 @dataclasses.dataclass
 class Configuration:
     database: str
+    session_key: str
 
 
 class ConfigurationException(Exception):
