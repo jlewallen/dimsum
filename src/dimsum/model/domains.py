@@ -45,10 +45,14 @@ class Session:
         return self.registrar.unregister(entity)
 
     async def materialize(
-        self, key: str = None, json: str = None
+        self, key: str = None, gid: int = None, json: str = None
     ) -> Optional[entity.Entity]:
         return await serializing.materialize(
-            registrar=self.registrar, store=self.domain.store, key=key, json=json
+            registrar=self.registrar,
+            store=self.domain.store,
+            key=key,
+            gid=gid,
+            json=json,
         )
 
     async def perform(
@@ -174,17 +178,6 @@ class Domain:
             )  # TODO Move to Session
             return reloaded
 
-    async def load(self, create=False):
-        self.registrar.purge()
-        log.info("loading %s", self.store)
-        with self.session() as session:
-            self.world = await session.materialize(key=world.Key)  # TODO Remove
-        if self.world:
-            return
-        if create:
-            self.world = world.World()
-            self.registrar.register(self.world)
-
 
 class WorldCtx(context.Ctx):
     def __init__(
@@ -283,7 +276,7 @@ class WorldCtx(context.Ctx):
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(
-            "find-item: number=%s candidates=%s exclude=%s scopes=%s kw=%s",
+            "find-item: gid=%s candidates=%s exclude=%s scopes=%s kw=%s",
             number,
             candidates,
             exclude,
@@ -292,7 +285,7 @@ class WorldCtx(context.Ctx):
         )
 
         if number:
-            return self.registrar.find_by_number(number)
+            return self.registrar.find_by_gid(number)
 
         if len(candidates) == 0:
             return None

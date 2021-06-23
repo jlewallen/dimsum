@@ -46,11 +46,6 @@ async def query(config: str, database: str):
             return configuration.get(config)
         return configuration.Configuration(database=database, session_key="session-key")
 
-    cfg = get_config()
-    domain = domains.Domain(empty=True, store=cfg.make_store())
-
-    await domain.load()
-
     body = None
     try:
         unparsed_body = sys.stdin.read()
@@ -59,8 +54,10 @@ async def query(config: str, database: str):
         sys.stdout.write(json.dumps(make_error("parsing")))
         return
 
-    schema = schema_factory.create()
+    cfg = get_config()
+    domain = domains.Domain(empty=True, store=cfg.make_store())
     context = AriadneContext(domain, cfg)
+    schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 
     sys.stdout.write(serializing.serialize(actual, indent=True))

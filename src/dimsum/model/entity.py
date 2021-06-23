@@ -314,9 +314,6 @@ class Registrar:
     def contains(self, key) -> bool:
         return key in self.entities
 
-    def find_by_key(self, key) -> Entity:
-        return self.entities[key]
-
     def entities_of_klass(self, klass: Type[EntityClass]):
         return [e for key, e in self.entities.items() if e.klass == klass]
 
@@ -325,16 +322,21 @@ class Registrar:
             log.debug("add-entity: %s %s", entity.key, entity)
             self.register(entity)
 
+    def find_by_gid(self, gid: int) -> Optional[Entity]:
+        if gid in self.numbered:
+            return self.numbered[gid]
+        return None
+
+    def find_by_key(self, key) -> Optional[Entity]:
+        if key in self.entities:
+            return self.entities[key]
+        return None
+
+    # TODO Move to tests.
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
             if name in e.props.name:
                 return e
-        return None
-
-    def find_by_number(self, number: int) -> Optional[Entity]:
-        if number in self.numbered:
-            return self.numbered[number]
-        log.info("register:miss {0}".format(number))
         return None
 
     def empty(self) -> bool:

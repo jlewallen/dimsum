@@ -152,23 +152,35 @@ async def materialize(
     registrar: entity.Registrar = None,
     store: storage.EntityStorage = None,
     key: str = None,
+    gid: int = None,
     json: str = None,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
     assert registrar
     assert store
-    if key and registrar.contains(key):
-        log.info("[%d] materialize fbk %s %s", depth, key, registrar)
-        return registrar.find_by_key(key)
 
+    found = None
     if key:
-        log.info("[%d] materialize %s", depth, key)
+        log.info("[%d] materialize key=%s", depth, key)
+        found = registrar.find_by_key(key)
+        if found:
+            return found
+
         json = await store.load_by_key(key)
         if json is None:
-            log.info("[%d] %s missing %s", depth, store, key)
+            log.info("[%d] %s missing key=%s", depth, store, key)
             return None
-    else:
-        log.info("[%d] materialize", depth)
+
+    if gid is not None:
+        log.info("[%d] materialize gid=%d", depth, gid)
+        found = registrar.find_by_gid(gid)
+        if found:
+            return found
+
+        json = await store.load_by_gid(gid)
+        if json is None:
+            log.info("[%d] %s missing gid=%d", depth, store, gid)
+            return None
 
     refs: Dict[str, entity.EntityRef] = {}
 
@@ -180,6 +192,7 @@ async def materialize(
             refs[key] = entity.EntityRef(key)
         return refs[key]
 
+    assert json
     loaded = deserialize(json, reference)
     assert loaded
     registrar.register(loaded)

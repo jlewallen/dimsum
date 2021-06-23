@@ -76,34 +76,29 @@ async def resolve_world(obj, info):
 @query.field("entitiesByKey")
 async def resolve_entities_by_key(obj, info, key):
     domain = info.context.domain
-    log.info("ariadne:entities key=%s", key)
-    entities = []
-    if domain.registrar.contains(key):
-        entities = [domain.registrar.find_by_key(key)]
-    else:
-        loaded = await domain.store.load_by_key(key)
+    log.info("ariadne:entities-by-key key=%s", key)
+    with domain.session() as session:
+        entities = []
+        loaded = await session.materialize(key=key)
         if loaded:
             entities = [loaded]
 
-    log.info("ariadne:entities entities=%s", entities)
-    return [serialize_entity(e) for e in entities]
+        log.info("ariadne:entities-by-key entities=%s", entities)
+        return [serialize_entity(e) for e in entities]
 
 
 @query.field("entitiesByGid")
 async def resolve_entities_by_gid(obj, info, gid):
     domain = info.context.domain
-    log.info("ariadne:entities gid=%s", gid)
-    entities = []
-    loaded = domain.registrar.find_by_number(gid)
-    if loaded:
-        entities = [loaded]
-    else:
-        loaded = await domain.store.load_by_gid(gid)
+    log.info("ariadne:entities-by-gid gid=%s", gid)
+    with domain.session() as session:
+        entities = []
+        loaded = await session.materialize(gid=gid)
         if loaded:
             entities = [loaded]
 
-    log.info("ariadne:entities entities=%s", entities)
-    return [serialize_entity(e) for e in entities]
+        log.info("ariadne:entities-by-gid entities=%s", entities)
+        return [serialize_entity(e) for e in entities]
 
 
 @query.field("areas")
