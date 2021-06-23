@@ -13,7 +13,7 @@ import model.scopes.carryable as carryable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 
 def add_item(container: entity.Entity, item: entity.Entity):

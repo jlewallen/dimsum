@@ -2,7 +2,7 @@ from typing import Any
 import logging
 
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 
 class Event:

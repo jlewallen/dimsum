@@ -9,7 +9,7 @@ import model.entity as entity
 import model.scopes.carryable as carryable
 import model.scopes as scopes
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 p = inflect.engine()
 
 

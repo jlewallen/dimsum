@@ -11,7 +11,7 @@ import model.scopes.carryable as carryable
 import model.scopes.mechanics as mechanics
 import model.scopes.apparel as apparel
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 
 class FindNone(things.ItemFinder):

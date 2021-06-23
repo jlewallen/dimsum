@@ -21,7 +21,7 @@ import handlers
 import serializing
 import storage
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
 
 

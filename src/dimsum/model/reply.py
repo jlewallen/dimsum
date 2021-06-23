@@ -12,7 +12,7 @@ import model.scopes.occupyable as occupyable
 import model.scopes.carryable as carryable
 
 p = inflect.engine()
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 
 class Observable:

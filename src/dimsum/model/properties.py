@@ -9,7 +9,7 @@ import re
 import model.crypto as crypto
 import model.kinds as kinds
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 GlobalId = "gid"
 Name = "name"

@@ -20,7 +20,7 @@ DefaultMoveVerb = "walk"
 TickHook = "tick"
 WindHook = "wind"
 Key = "world"
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 p = inflect.engine()
 
 

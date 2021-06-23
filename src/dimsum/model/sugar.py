@@ -8,7 +8,7 @@ import model.scopes.behavior as behavior
 import model.scopes.mechanics as mechanics
 import model.scopes.occupyable as occupyable
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.model")
 
 
 @behavior.conditional(world.WindHook)
