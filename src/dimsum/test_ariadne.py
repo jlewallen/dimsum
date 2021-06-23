@@ -113,15 +113,20 @@ async def test_graphql_world_by_gid(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_language_basic(snapshot):
     domain = domains.Domain()
-    welcome = scopes.area(
-        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
-    )
-    domain.add_area(welcome)
-    jacob = scopes.alive(
-        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
-    )
-    domain.registrar.register(jacob)
-    await domain.perform(actions.Join(), jacob)
+    with domain.session() as session:
+        welcome = scopes.area(
+            key="welcome",
+            props=properties.Common(name="welcome"),
+            creator=session.world,
+        )
+        session.add_area(welcome)
+        jacob = scopes.alive(
+            key="jlewallen",
+            props=properties.Common(name="Jacob"),
+            creator=session.world,
+        )
+        session.registrar.register(jacob)
+        await session.perform(actions.Join(), jacob)
 
     data = {
         "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities } }'

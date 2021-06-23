@@ -226,13 +226,14 @@ end
 """,
         )
 
-    await tw.domain.tick(0)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.registrar.entities) == 5
+    with tw.domain.session() as session:
+        await session.tick(0)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        assert len(tw.registrar.entities) == 5
 
-    await tw.domain.tick(1)
-    assert len(tw.area.make(carryable.Containing).holding) == 3
-    assert len(tw.registrar.entities) == 6
+        await session.tick(1)
+        assert len(tw.area.make(carryable.Containing).holding) == 3
+        assert len(tw.registrar.entities) == 6
 
 
 @pytest.mark.asyncio
@@ -259,15 +260,16 @@ end
 """,
         )
 
-    await tw.domain.tick(0)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.registrar.entities) == 5
-    await tw.domain.tick(1)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.registrar.entities) == 5
-    await tw.domain.tick(2)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    assert len(tw.registrar.entities) == 5
+    with tw.domain.session() as session:
+        await session.tick(0)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        assert len(tw.registrar.entities) == 5
+        await session.tick(1)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        assert len(tw.registrar.entities) == 5
+        await session.tick(2)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        assert len(tw.registrar.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -289,7 +291,8 @@ end
 """,
         )
 
-    await tw.domain.tick(0)
+    with tw.domain.session() as session:
+        await session.tick(0)
 
 
 @pytest.mark.asyncio
@@ -325,10 +328,11 @@ end
 """,
         )
 
-    await tw.domain.tick(0)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    await tw.domain.tick(1)
-    assert len(tw.area.make(carryable.Containing).holding) == 3
+    with tw.domain.session() as session:
+        await session.tick(0)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        await session.tick(1)
+        assert len(tw.area.make(carryable.Containing).holding) == 3
 
 
 @pytest.mark.asyncio
@@ -358,7 +362,8 @@ end
 """,
         )
 
-    await tw.domain.tick(0)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
-    await tw.domain.tick(1)
-    assert len(tw.area.make(carryable.Containing).holding) == 2
+    with tw.domain.session() as session:
+        await session.tick(0)
+        assert len(tw.area.make(carryable.Containing).holding) == 2
+        await session.tick(1)
+        assert len(tw.area.make(carryable.Containing).holding) == 2

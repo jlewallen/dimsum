@@ -65,14 +65,16 @@ class TestWorld:
             creator=self.world,
             props=properties.Common("Carla", desc="Chief Salad Officer."),
         )
-        return await self.domain.perform(actions.Join(), self.carla)
+        with self.domain.session() as session:
+            return await session.perform(actions.Join(), self.carla)
 
     async def add_tomi(self):
         self.tomi = scopes.alive(
             creator=self.world,
             props=properties.Common("Tomi", desc="Chief Crying Officer."),
         )
-        return await self.domain.perform(actions.Join(), self.tomi)
+        with self.domain.session() as session:
+            return await session.perform(actions.Join(), self.tomi)
 
     async def initialize(self, area=None, **kwargs):
         self.area = area
@@ -80,9 +82,9 @@ class TestWorld:
             self.area = scopes.area(
                 creator=self.player, props=properties.Common("Living room")
             )
-            self.registrar.register(self.area)
-        self.domain.add_area(self.area)
-        await self.domain.perform(actions.Join(), self.jacob)
+        with self.domain.session() as session:
+            session.add_area(self.area)
+            await session.perform(actions.Join(), self.jacob)
 
     def get_default_area(self):
         return self.area
@@ -106,8 +108,9 @@ class TestWorld:
         action = tree_eval.transform(tree)
         assert action
         assert isinstance(action, game.Action)
-        response = await self.domain.perform(action, person)
-        log.info("response: %s" % (response,))
+        with self.domain.session() as session:
+            response = await session.perform(action, person)
+            log.info("response: %s" % (response,))
         return response
 
     async def success(self, *commands: str, **kwargs):
@@ -138,9 +141,9 @@ async def make_simple_domain(password: str = None, store=None) -> domains.Domain
         with jacob.make(users.Auth) as auth:
             auth.change(password)
 
-    domain.add_area(welcome)
-    domain.registrar.register(jacob)
-
-    await domain.perform(actions.Join(), jacob)
+    with domain.session() as session:
+        session.add_area(welcome)
+        session.registrar.register(jacob)
+        await session.perform(actions.Join(), jacob)
 
     return domain

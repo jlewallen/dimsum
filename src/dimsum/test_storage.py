@@ -28,7 +28,10 @@ async def test_storage_materialize_reference():
     store = storage.InMemory()
     domain = domains.Domain(storage=store)
 
-    domain.add_area(scopes.area(creator=domain.world, props=properties.Common("Area")))
+    with domain.session() as session:
+        session.add_area(
+            scopes.area(creator=domain.world, props=properties.Common("Area"))
+        )
 
     await store.update(serializing.registrar(domain.registrar))
 

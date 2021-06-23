@@ -137,22 +137,23 @@ async def resolve_language(obj, info, criteria):
     log.info("ariadne:language criteria=%s", criteria)
 
     l = grammars.create_parser()
-    w = await domain.materialize(key=world.Key)
-    assert w
-    player = await domain.materialize(key=criteria["evaluator"])
-    assert player
-    tree, create_evaluator = l.parse(criteria["text"].strip())
-    tree_eval = create_evaluator(w, player)
-    action = tree_eval.transform(tree)
-    reply = await domain.perform(action, player)
+    with domain.session() as session:
+        w = await session.materialize(key=world.Key)
+        assert w
+        player = await session.materialize(key=criteria["evaluator"])
+        assert player
+        tree, create_evaluator = l.parse(criteria["text"].strip())
+        tree_eval = create_evaluator(w, player)
+        action = tree_eval.transform(tree)
+        reply = await session.perform(action, player)
 
-    log.info("reply: %s", reply)
-    await domain.save()
+        log.info("reply: %s", reply)
+        await domain.save()
 
-    return Evaluation(
-        serialize_reply(reply),
-        [serialize_entity(e) for e in domain.registrar.entities.values()],
-    )
+        return Evaluation(
+            serialize_reply(reply),
+            [serialize_entity(e) for e in domain.registrar.entities.values()],
+        )
 
 
 evaluation = ariadne.ObjectType("Evaluation")
@@ -223,8 +224,9 @@ async def makeSample(obj, info):
         domain.world = world.World()
 
     generics, area = library.create_example_world(domain.world)
-    domain.registrar.add_entities(generics.all)
-    domain.add_area(area)
+    with domain.session() as session:
+        session.registrar.add_entities(generics.all)
+        session.add_area(area)
 
     await domain.save()
 

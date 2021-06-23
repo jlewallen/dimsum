@@ -42,7 +42,8 @@ async def test_serialize_empty_world(caplog):
 async def test_serialize_world_one_area(caplog):
     domain = domains.Domain()
     world = domain.world
-    domain.add_area(scopes.area(creator=world, props=properties.Common("Area")))
+    with domain.session() as session:
+        session.add_area(scopes.area(creator=world, props=properties.Common("Area")))
 
     json = serialize_all(domain.registrar)
 
@@ -60,7 +61,8 @@ async def test_serialize_world_one_item(caplog):
     world = domain.world
     area = scopes.area(creator=world, props=properties.Common("Area"))
     add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
-    domain.add_area(area)
+    with domain.session() as session:
+        session.add_area(area)
 
     assert area.make(carryable.Containing).holding[0]
 
@@ -117,7 +119,8 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
         ),
     )
 
-    domain.add_area(one)
+    with domain.session() as session:
+        session.add_area(one)
 
     json = serialize_all(domain.registrar)
 
@@ -169,7 +172,8 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert two in one.make(movement.Movement).adjacent()
     assert one in two.make(movement.Movement).adjacent()
 
-    domain.add_area(one)
+    with domain.session() as session:
+        session.add_area(one)
 
     json = serialize_all(domain.registrar, indent=True)
 
@@ -277,7 +281,8 @@ async def test_serialize_library(caplog):
     await tw.initialize()
 
     generics, area = library.create_example_world(tw.world)
-    tw.domain.add_area(area)
+    with tw.domain.session() as session:
+        session.add_area(area)
 
     json = serializing.serialize(
         {"entities": tw.registrar.entities}, unpicklable=False, indent=4
@@ -290,7 +295,10 @@ async def test_serialize_library(caplog):
 async def test_serialize_preserves_owner_reference(caplog):
     domain = domains.Domain()
 
-    domain.add_area(scopes.area(creator=domain.world, props=properties.Common("Area")))
+    with domain.session() as session:
+        session.add_area(
+            scopes.area(creator=domain.world, props=properties.Common("Area"))
+        )
 
     json = serialize_all(domain.registrar)
 

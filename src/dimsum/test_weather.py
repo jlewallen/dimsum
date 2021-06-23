@@ -23,4 +23,5 @@ async def test_area_weather_blows_small_items():
 
     assert await tw.success("go rocky")
 
-    await tw.domain.tick(1)
+    with tw.domain.session() as session:
+        await session.tick(1)

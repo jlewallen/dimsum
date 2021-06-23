@@ -25,50 +25,44 @@ log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
 
 
-class Domain:
-    def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
+class Session:
+    def __init__(self, domain: "Domain"):
         super().__init__()
-        self.bus = (
-            bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
-        )
-        self.store = store if store else storage.InMemory()
-        self.context_factory = luaproxy.context_factory
-        self.registrar = entity.Registrar()
-        self.world = None
-        if not empty:
-            self.world = world.World()
-            self.registrar.register(self.world)
+        self.domain = domain
+        self.registrar = domain.registrar
+        self.world = domain.world
 
-    async def reload(self):
-        await self.store.update(serializing.registrar(self.registrar))
+    def __enter__(self):
+        return self
 
-        reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await reloaded.materialize(key=world.Key)
-        return reloaded
+    def __exit__(self, type, value, traceback):
+        return False
 
     async def materialize(
         self, key: str = None, json: str = None
     ) -> Optional[entity.Entity]:
         return await serializing.materialize(
-            registrar=self.registrar, store=self.store, key=key, json=json
+            registrar=self.registrar, store=self.domain.store, key=key, json=json
         )
 
-    async def purge(self):
-        self.registrar.purge()
-
-    async def load(self, create=False):
-        self.registrar.purge()
-        log.info("loading %s", self.store)
-        self.world = await self.materialize(key=world.Key)
-        if self.world:
-            return
-        if create:
-            self.world = world.World()
-            self.registrar.register(self.world)
-
-    async def save(self):
-        log.info("saving %s", self.store)
-        await self.store.update(serializing.registrar(self.registrar))
+    async def perform(
+        self, action, person: Optional[entity.Entity], **kwargs
+    ) -> game.Reply:
+        assert self.world
+        area = self.world.find_entity_area(person) if person else None
+        with WorldCtx(
+            self.domain.context_factory,
+            session=self,
+            world=self.world,
+            person=person,
+            area=area,
+            registrar=self.registrar,
+            **kwargs
+        ) as ctx:
+            try:
+                return await action.perform(ctx, self.world, person)
+            except entity.EntityFrozen:
+                return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
         if now is None:
@@ -91,8 +85,8 @@ class Domain:
                     area = self.world.find_entity_area(entity)
                     assert area
                     with WorldCtx(
-                        self.context_factory,
-                        domain=self,
+                        self.domain.context_factory,
+                        session=self,
                         world=self.world,
                         area=area,
                         entity=entity,
@@ -100,25 +94,6 @@ class Domain:
                         **kwargs
                     ) as ctx:
                         await ctx.hook(name)
-
-    async def perform(
-        self, action, person: Optional[entity.Entity], **kwargs
-    ) -> game.Reply:
-        assert self.world
-        area = self.world.find_entity_area(person) if person else None
-        with WorldCtx(
-            self.context_factory,
-            domain=self,
-            world=self.world,
-            person=person,
-            area=area,
-            registrar=self.registrar,
-            **kwargs
-        ) as ctx:
-            try:
-                return await action.perform(ctx, self.world, person)
-            except entity.EntityFrozen:
-                return game.Failure("whoa, that's frozen")
 
     def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         assert self.world
@@ -168,24 +143,74 @@ class Domain:
         log.debug("area-done:%d %s", depth, area.key)
 
 
+class Domain:
+    def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
+        super().__init__()
+        self.bus = (
+            bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
+        )
+        self.store = store if store else storage.InMemory()
+        self.context_factory = luaproxy.context_factory
+        self.registrar = entity.Registrar()
+        self.world = None
+        if not empty:
+            self.world = world.World()
+            self.registrar.register(self.world)
+
+    def session(self) -> Session:
+        return Session(self)
+
+    async def reload(self):
+        await self.store.update(serializing.registrar(self.registrar))
+
+        reloaded = Domain(empty=True, store=self.store)
+        reloaded.world = await reloaded.materialize(key=world.Key)
+        return reloaded
+
+    async def materialize(
+        self, key: str = None, json: str = None
+    ) -> Optional[entity.Entity]:
+        return await serializing.materialize(
+            registrar=self.registrar, store=self.store, key=key, json=json
+        )
+
+    async def purge(self):
+        self.registrar.purge()
+
+    async def load(self, create=False):
+        self.registrar.purge()
+        log.info("loading %s", self.store)
+        self.world = await self.materialize(key=world.Key)
+        if self.world:
+            return
+        if create:
+            self.world = world.World()
+            self.registrar.register(self.world)
+
+    async def save(self):
+        log.info("saving %s", self.store)
+        await self.store.update(serializing.registrar(self.registrar))
+
+
 class WorldCtx(context.Ctx):
     # This should eventually get worked out. Just return Ctx from this function?
     def __init__(
         self,
         context_factory,
-        domain: Domain = None,
+        session: Session = None,
         registrar: entity.Registrar = None,
         world: world.World = None,
         person: entity.Entity = None,
         **kwargs
     ):
         super().__init__()
-        assert domain
+        assert session
         assert world
         assert registrar
         self.se = scripting
-        self.domain = domain
-        self.bus = domain.bus
+        self.session = session
+        self.domain = session.domain
+        self.bus = self.domain.bus
         self.world = world
         self.context_factory = context_factory
         self.registrar = registrar
@@ -253,7 +278,7 @@ class WorldCtx(context.Ctx):
                 actions = self.se.execute(thunk, prepared, b)
                 if actions:
                     for action in actions:
-                        await self.domain.perform(action, self.person)
+                        await self.session.perform(action, self.person)
                         log.info("performing: %s", action)
 
     def create_item(
