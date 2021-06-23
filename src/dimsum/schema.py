@@ -244,8 +244,10 @@ class AriadneContext:
 
 
 def context(cfg):
+    domain = cfg.make_domain()
+
     def wrap(request):
         log.info("ariadne:context %s", request)
-        return AriadneContext(domain=domains.Domain(), cfg=cfg)
+        return AriadneContext(domain=domain, cfg=cfg)
 
     return wrap

@@ -6,6 +6,8 @@ import os
 import os.path
 import json
 
+import model.domains as domains
+
 import storage
 
 
@@ -16,6 +18,9 @@ class Configuration:
 
     def make_store(self):
         return storage.SqliteStorage(self.database)
+
+    def make_domain(self):
+        return domains.Domain(store=self.make_store())
 
 
 class ConfigurationException(Exception):
