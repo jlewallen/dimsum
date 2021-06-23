@@ -41,24 +41,28 @@ class SimpleHolding(entity.Scope):
 @pytest.mark.asyncio
 async def test_chimeric_entities_serialize(caplog):
     domain = domains.Domain()
-    universe = domain.world
 
-    jacob = entity.Entity(
-        creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
-    )
-    domain.registrar.register(jacob)
-    universe.remember(jacob)
+    with domain.session() as session:
+        universe = session.world
 
-    toy = entity.Entity(
-        creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
-    )
-    domain.registrar.register(toy)
-    universe.remember(toy)
+        jacob = entity.Entity(
+            creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
+        )
+        session.register(jacob)
+        universe.remember(jacob)
 
-    with jacob.make(SimpleHolding) as holding:
-        with jacob.make(SimpleCore) as core:
-            pass
-        holding.add_item(toy)
+        toy = entity.Entity(
+            creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
+        )
+        session.register(toy)
+        universe.remember(toy)
+
+        with jacob.make(SimpleHolding) as holding:
+            with jacob.make(SimpleCore) as core:
+                pass
+            holding.add_item(toy)
+
+        await session.save()
 
     after = await domain.reload()
 
@@ -105,15 +109,18 @@ def make_thing(
 @pytest.mark.asyncio
 async def test_specialization_classes(caplog):
     domain = domains.Domain()
-    universe = domain.world
 
-    person = make_person(creator=universe, props=properties.Common(name="Jacob"))
-    domain.registrar.register(person)
-    universe.remember(person)
+    with domain.session() as session:
+        universe = session.world
+        person = make_person(creator=universe, props=properties.Common(name="Jacob"))
+        session.register(person)
+        universe.remember(person)
 
-    toy = make_thing(creator=universe, props=properties.Common(name="Toy"))
-    domain.registrar.register(toy)
-    universe.remember(toy)
+        toy = make_thing(creator=universe, props=properties.Common(name="Toy"))
+        session.register(toy)
+        universe.remember(toy)
+
+        await session.save()
 
     after = await domain.reload()
 

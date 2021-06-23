@@ -23,12 +23,13 @@ async def test_library(caplog):
     await tw.initialize(area=area)
     with tw.domain.session() as session:
         await session.tick()
-
         await session.tick()
+        await session.save()
 
     reloaded = await tw.domain.reload()
 
     with reloaded.session() as session:
         await session.tick()
+        await session.save()
 
         assert len(session.registrar.entities) == 64

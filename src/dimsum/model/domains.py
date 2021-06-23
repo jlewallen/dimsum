@@ -38,6 +38,12 @@ class Session:
     def __exit__(self, type, value, traceback):
         return False
 
+    def register(self, entity: entity.Entity) -> entity.Entity:
+        return self.registrar.register(entity)
+
+    def unregister(self, entity: entity.Entity) -> entity.Entity:
+        return self.registrar.unregister(entity)
+
     async def materialize(
         self, key: str = None, json: str = None
     ) -> Optional[entity.Entity]:
@@ -51,12 +57,10 @@ class Session:
         assert self.world
         area = self.world.find_entity_area(person) if person else None
         with WorldCtx(
-            self.domain.context_factory,
-            session=self,
-            world=self.world,
             person=person,
             area=area,
-            registrar=self.registrar,
+            session=self,
+            context_factory=self.domain.context_factory,
             **kwargs
         ) as ctx:
             try:
@@ -85,12 +89,10 @@ class Session:
                     area = self.world.find_entity_area(entity)
                     assert area
                     with WorldCtx(
-                        self.domain.context_factory,
-                        session=self,
-                        world=self.world,
                         area=area,
                         entity=entity,
-                        registrar=self.registrar,
+                        session=self,
+                        context_factory=self.domain.context_factory,
                         **kwargs
                     ) as ctx:
                         await ctx.hook(name)
@@ -165,11 +167,11 @@ class Domain:
         return Session(self)
 
     async def reload(self):
-        await self.store.update(serializing.registrar(self.registrar))
-
         reloaded = Domain(empty=True, store=self.store)
         with reloaded.session() as session:
-            reloaded.world = await session.materialize(key=world.Key)  # TODO Remove
+            reloaded.world = await session.materialize(
+                key=world.Key
+            )  # TODO Move to Session
             return reloaded
 
     async def load(self, create=False):
@@ -185,28 +187,24 @@ class Domain:
 
 
 class WorldCtx(context.Ctx):
-    # This should eventually get worked out. Just return Ctx from this function?
     def __init__(
         self,
-        context_factory,
         session: Session = None,
-        registrar: entity.Registrar = None,
-        world: world.World = None,
         person: entity.Entity = None,
+        context_factory=None,
         **kwargs
     ):
         super().__init__()
         assert session
         assert world
-        assert registrar
+        self.person = person
         self.se = scripting
         self.session = session
         self.domain = session.domain
-        self.bus = self.domain.bus
-        self.world = world
+        self.world = session.world
+        self.registrar = session.registrar
+        self.bus = session.domain.bus
         self.context_factory = context_factory
-        self.registrar = registrar
-        self.person = person
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
 
     def __enter__(self):
@@ -235,10 +233,10 @@ class WorldCtx(context.Ctx):
         return get_entities_inside(self.scope.values())
 
     def register(self, entity: entity.Entity) -> entity.Entity:
-        return self.registrar.register(entity)
+        return self.session.register(entity)
 
     def unregister(self, entity: entity.Entity) -> entity.Entity:
-        return self.registrar.unregister(entity)
+        return self.session.unregister(entity)
 
     async def publish(self, *args, **kwargs):
         for arg in args:
