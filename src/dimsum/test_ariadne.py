@@ -202,7 +202,7 @@ async def test_graphql_update():
         "query": """
 mutation UpdateEntities($entities: [Entity!]) {
     update(entities: $entities) {
-        saved
+        affected
     }
 }
 """,
@@ -211,7 +211,7 @@ mutation UpdateEntities($entities: [Entity!]) {
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
     assert ok
-    assert actual == {"data": {"update": {"saved": 1}}}
+    assert actual == {"data": {"update": {"affected": 1}}}
 
 
 @pytest.mark.asyncio
@@ -226,7 +226,7 @@ async def test_graphql_update_and_requery(snapshot):
         "query": """
 mutation UpdateEntities($entities: [Entity!]) {
     update(entities: $entities) {
-        saved
+        affected
     }
 }
 """,
@@ -235,7 +235,7 @@ mutation UpdateEntities($entities: [Entity!]) {
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
     assert ok
-    assert actual == {"data": {"update": {"saved": 1}}}
+    assert actual == {"data": {"update": {"affected": 1}}}
 
     data = {"query": "{ world }"}
     ok, actual = await ariadne.graphql(
@@ -254,13 +254,13 @@ async def test_graphql_make_sample(snapshot):
 
     data = {
         "variables": {"entities": [serialized]},
-        "query": "mutation { makeSample { saved } }",
+        "query": "mutation { makeSample { affected } }",
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
     assert ok
-    assert actual == {"data": {"makeSample": {"saved": 59}}}
+    assert actual == {"data": {"makeSample": {"affected": 59}}}
 
     data = {"query": "{ world }"}
     ok, actual = await ariadne.graphql(

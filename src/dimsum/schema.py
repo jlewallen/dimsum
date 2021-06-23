@@ -190,7 +190,9 @@ async def login(obj, info, credentials):
 async def purge(obj, info):
     domain = info.context.domain
     log.info("ariadne:purge")
+    number_before = domain.registrar.number_of_entities()
     await domain.purge()
+    return {"affected": number_before}
 
 
 @mutation.field("makeSample")
@@ -209,9 +211,9 @@ async def makeSample(obj, info):
 
     await domain.save()
 
-    saved = domain.registrar.number_of_entities() - number_before
+    affected = domain.registrar.number_of_entities() - number_before
 
-    return {"saved": saved}
+    return {"affected": affected}
 
 
 @mutation.field("update")
@@ -224,7 +226,7 @@ async def update(obj, info, entities):
     if new_world:
         domain.world = world
     await domain.save()
-    return {"saved": len(instantiated)}
+    return {"affected": len(instantiated)}
 
 
 def create():
