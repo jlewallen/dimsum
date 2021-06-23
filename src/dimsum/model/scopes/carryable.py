@@ -9,7 +9,7 @@ import model.crypto as crypto
 import model.kinds as kinds
 import model.entity as entity
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 class Key(entity.Scope):

@@ -9,7 +9,7 @@ import model.entity as entity
 
 import model.scopes.behavior as behavior
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 class Interactable(entity.Scope):

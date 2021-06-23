@@ -8,7 +8,7 @@ import model.events as events
 
 import model.scopes.carryable as carryable
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 NutritionFields = [

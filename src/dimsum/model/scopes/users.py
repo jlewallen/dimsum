@@ -7,7 +7,7 @@ import base64
 
 import model.entity as entity
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 class Auth(entity.Scope):

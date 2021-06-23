@@ -12,7 +12,7 @@ import context
 import model.properties as properties
 import model.entity as entity
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 class ConditionalBehavior:

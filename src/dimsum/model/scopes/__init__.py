@@ -10,7 +10,7 @@ import model.scopes.occupyable as occupyable
 import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 Alive = [
     ownership.Ownership,

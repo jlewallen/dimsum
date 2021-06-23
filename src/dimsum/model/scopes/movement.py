@@ -8,7 +8,7 @@ import model.entity as entity
 import model.scopes.carryable as carryable
 
 DefaultMoveVerb = "walk"
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.scopes")
 
 
 class Direction(enum.Enum):
