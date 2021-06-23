@@ -148,7 +148,7 @@ async def resolve_language(obj, info, criteria):
         reply = await session.perform(action, player)
 
         log.info("reply: %s", reply)
-        await domain.save()
+        await session.save()
 
         return Evaluation(
             serialize_reply(reply),
@@ -227,8 +227,7 @@ async def makeSample(obj, info):
     with domain.session() as session:
         session.registrar.add_entities(generics.all)
         session.add_area(area)
-
-    await domain.save()
+        await session.save()
 
     affected = domain.registrar.number_of_entities() - number_before
 
@@ -240,12 +239,14 @@ async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
     # TODO Parallel
-    instantiated = [await domain.materialize(json=e) for e in entities]
-    new_world = [e for e in instantiated if e.key == world.Key]
-    if new_world:
-        domain.world = world
-    await domain.save()
-    return {"affected": len(instantiated)}
+    with domain.session() as session:
+        instantiated = [await session.materialize(json=e) for e in entities]
+        new_world = [e for e in instantiated if e.key == world.Key]
+        if new_world:
+            session.world = world
+            domain.world = world  # TODO Remove
+        await session.save()
+        return {"affected": len(instantiated)}
 
 
 def create():

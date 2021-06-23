@@ -145,5 +145,6 @@ async def make_simple_domain(password: str = None, store=None) -> domains.Domain
         session.add_area(welcome)
         session.registrar.register(jacob)
         await session.perform(actions.Join(), jacob)
+        await session.save()
 
     return domain

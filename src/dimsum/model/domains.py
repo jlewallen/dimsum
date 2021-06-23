@@ -142,6 +142,10 @@ class Session:
 
         log.debug("area-done:%d %s", depth, area.key)
 
+    async def save(self):
+        log.info("saving %s", self.domain.store)
+        await self.domain.store.update(serializing.registrar(self.registrar))
+
 
 class Domain:
     def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
@@ -164,15 +168,9 @@ class Domain:
         await self.store.update(serializing.registrar(self.registrar))
 
         reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await reloaded.materialize(key=world.Key)
-        return reloaded
-
-    async def materialize(
-        self, key: str = None, json: str = None
-    ) -> Optional[entity.Entity]:
-        return await serializing.materialize(
-            registrar=self.registrar, store=self.store, key=key, json=json
-        )
+        with reloaded.session() as session:
+            reloaded.world = await session.materialize(key=world.Key)  # TODO Remove
+            return reloaded
 
     async def purge(self):
         self.registrar.purge()
@@ -180,16 +178,13 @@ class Domain:
     async def load(self, create=False):
         self.registrar.purge()
         log.info("loading %s", self.store)
-        self.world = await self.materialize(key=world.Key)
+        with self.session() as session:
+            self.world = await session.materialize(key=world.Key)  # TODO Remove
         if self.world:
             return
         if create:
             self.world = world.World()
             self.registrar.register(self.world)
-
-    async def save(self):
-        log.info("saving %s", self.store)
-        await self.store.update(serializing.registrar(self.registrar))
 
 
 class WorldCtx(context.Ctx):
