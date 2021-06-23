@@ -10,6 +10,7 @@ import model.domains as domains
 import model.game as game
 import model.scopes as scopes
 import model.scopes.users as users
+import model.library as library
 
 import serializing
 import grammars
@@ -196,6 +197,21 @@ async def purge(obj, info):
 async def makeSample(obj, info):
     domain = info.context.domain
     log.info("ariadne:make-sample")
+
+    number_before = domain.registrar.number_of_entities()
+
+    if domain.world is None:
+        domain.world = world.World()
+
+    generics, area = library.create_example_world(domain.world)
+    domain.registrar.add_entities(generics.all)
+    domain.add_area(area)
+
+    await domain.save()
+
+    saved = domain.registrar.number_of_entities() - number_before
+
+    return {"saved": saved}
 
 
 @mutation.field("update")

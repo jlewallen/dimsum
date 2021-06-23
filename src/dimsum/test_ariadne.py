@@ -243,3 +243,27 @@ mutation UpdateEntities($entities: [Entity!]) {
     )
     assert ok
     snapshot.assert_match(actual["data"]["world"], "world.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_make_sample(snapshot):
+    domain = domains.Domain(empty=True)
+
+    serialized = serializing.serialize(world.World(), secure=True)
+
+    data = {
+        "variables": {"entities": [serialized]},
+        "query": "mutation { makeSample { saved } }",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+    )
+    assert ok
+    assert actual == {"data": {"makeSample": {"saved": 59}}}
+
+    data = {"query": "{ world }"}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+    )
+    assert ok
