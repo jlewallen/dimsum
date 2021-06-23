@@ -11,7 +11,7 @@ import model.entity as entity
 
 import storage
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.storage")
 
 
 @dataclasses.dataclass(frozen=True)

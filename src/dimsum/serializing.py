@@ -182,6 +182,8 @@ async def materialize(
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
+    log.debug("json: %s", json)
+
     refs: Dict[str, entity.EntityRef] = {}
 
     def reference(key):
@@ -190,6 +192,7 @@ async def materialize(
 
         if key not in refs:
             refs[key] = entity.EntityRef(key)
+            # log.info("ref: %s = %s", key, refs[key])
         return refs[key]
 
     assert json
