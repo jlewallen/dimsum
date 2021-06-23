@@ -41,4 +41,6 @@ if __name__ == "__main__":
 else:
     cfg = config.get(None)
     schema = schema_factory.create()
-    app = ariadne.asgi.GraphQL(schema, context_value=schema_factory.context, debug=True)
+    app = ariadne.asgi.GraphQL(
+        schema, context_value=schema_factory.context(cfg), debug=True
+    )

@@ -191,6 +191,9 @@ class AriadneContext:
     cfg: config.Configuration
 
 
-def context(request):
-    log.info("ariadne:context %s", request)
-    return AriadneContext(domain=domains.Domain(), cfg=config.Configuration())
+def context(cfg):
+    def wrap(request):
+        log.info("ariadne:context %s", request)
+        return AriadneContext(domain=domains.Domain(), cfg=cfg)
+
+    return wrap
