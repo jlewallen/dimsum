@@ -11,7 +11,7 @@ import model.properties as properties
 import model.crypto as crypto
 import model.kinds as kinds
 
-log = logging.getLogger("dimsum.model")
+log = logging.getLogger("dimsum.model.entity")
 p = inflect.engine()
 
 
