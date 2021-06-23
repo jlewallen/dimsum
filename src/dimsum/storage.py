@@ -43,6 +43,7 @@ class EntityStorage:
 class InMemory(EntityStorage):
     def __init__(self):
         super().__init__()
+        log.info("%s constructed!", self)
         self.by_key = {}
         self.by_gid = {}
 
@@ -50,6 +51,7 @@ class InMemory(EntityStorage):
         return len(self.by_key)
 
     async def purge(self):
+        log.info("%s purge!", self)
         self.by_key = {}
         self.by_gid = {}
 
