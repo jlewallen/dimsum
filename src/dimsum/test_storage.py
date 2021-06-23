@@ -16,11 +16,11 @@ log = logging.getLogger("dimsum")
 async def test_storage_materialize_world():
     store = storage.InMemory()
     domain = domains.Domain(storage=store, empty=True)
-    assert not await serializing.materialize("world", domain.registrar, store)
+    assert not await serializing.materialize(domain.registrar, store, key="world")
 
     await store.update(serializing.for_update([world.World()]))
 
-    assert await serializing.materialize("world", domain.registrar, store)
+    assert await serializing.materialize(domain.registrar, store, key="world")
 
 
 @pytest.mark.asyncio
@@ -36,6 +36,6 @@ async def test_storage_materialize_reference():
 
     assert domain.registrar.number == 0
 
-    assert await serializing.materialize("world", domain.registrar, store)
+    assert await serializing.materialize(domain.registrar, store, key="world")
 
     assert domain.registrar.number == 2

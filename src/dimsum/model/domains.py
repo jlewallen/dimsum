@@ -43,14 +43,15 @@ class Domain:
         await self.store.update(serializing.registrar(self.registrar))
 
         reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await reloaded.materialize(world.Key)
+        reloaded.world = await reloaded.materialize(key=world.Key)
         return reloaded
 
-    async def materialize(self, key: str) -> Optional[entity.Entity]:
-        return await serializing.materialize(key, self.registrar, self.store)
-
-    async def materialize_json(self, data: str) -> Optional[entity.Entity]:
-        return await serializing.materialize_json(data, self.registrar, self.store)
+    async def materialize(
+        self, key: str = None, json: str = None
+    ) -> Optional[entity.Entity]:
+        return await serializing.materialize(
+            registrar=self.registrar, store=self.store, key=key, json=json
+        )
 
     async def purge(self):
         self.registrar.purge()
@@ -58,7 +59,7 @@ class Domain:
     async def load(self, create=False):
         self.registrar.purge()
         log.info("loading %s", self.store)
-        self.world = await self.materialize(world.Key)
+        self.world = await self.materialize(key=world.Key)
         if self.world:
             return
         if create:

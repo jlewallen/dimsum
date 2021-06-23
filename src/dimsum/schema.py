@@ -133,9 +133,9 @@ async def resolve_language(obj, info, criteria):
     log.info("ariadne:language criteria=%s", criteria)
 
     l = grammars.create_parser()
-    w = await domain.materialize(world.Key)
+    w = await domain.materialize(key=world.Key)
     assert w
-    player = await domain.materialize(criteria["evaluator"])
+    player = await domain.materialize(key=criteria["evaluator"])
     assert player
     tree, create_evaluator = l.parse(criteria["text"].strip())
     tree_eval = create_evaluator(w, player)
@@ -234,7 +234,7 @@ async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
     # TODO Parallel
-    instantiated = [await domain.materialize_json(e) for e in entities]
+    instantiated = [await domain.materialize(json=e) for e in entities]
     new_world = [e for e in instantiated if e.key == world.Key]
     if new_world:
         domain.world = world
