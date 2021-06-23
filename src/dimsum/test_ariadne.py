@@ -7,6 +7,7 @@ import base64
 import model.properties as properties
 import model.world as world
 import model.domains as domains
+import model.scopes.users as users
 import model.scopes as scopes
 import default.actions as actions
 
@@ -15,7 +16,7 @@ import test
 
 import schema as schema_factory
 from schema import AriadneContext
-
+from graphql import GraphQLError
 
 log = logging.getLogger("dimsum")
 
@@ -153,10 +154,48 @@ async def test_graphql_login():
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
     data = {
-        "query": '{ login(credentials: { username: "%s", password: "asdfasdf" }) }'
+        "query": 'mutation { login(credentials: { username: "%s", password: "asdfasdf" }) }'
         % (jacob_key,)
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
+
+
+def rethrow(error, debug):
+    log.warning("rethrow %s", type(error))
+    raise error
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_login_failed():
+    domain = await test.make_simple_domain(password="asdfasdf")
+    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+
+    data = {
+        "query": 'mutation { login(credentials: { username: "%s", password: "badbadbad" }) }'
+        % (jacob_key,)
+    }
+
+    with pytest.raises(GraphQLError):
+        ok, actual = await ariadne.graphql(
+            schema,
+            data,
+            context_value=get_test_context(domain),
+            error_formatter=rethrow,
+        )
+        assert not ok
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_update():
+    domain = await test.make_simple_domain(password="asdfasdf")
+    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+
+    data = {"query": "mutation { update(entities: []) { saved } }"}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )

@@ -1,11 +1,11 @@
 schema {
   query: Query
+  mutation: Mutation
 }
 
 scalar Entity
 scalar Reply
 scalar Key
-scalar Token
 
 input LanguageQueryCriteria {
   text: String!
@@ -17,17 +17,29 @@ type Evaluation {
   entities: [Entity!]
 }
 
-input Credentials {
-  username: String!
-  password: String!
-}
-
 type Query {
   size: Int!
   world: Entity!
   entities(key: Key): [Entity!]
   language(criteria: LanguageQueryCriteria!): Evaluation!
-  login(credentials: Credentials!): Token!
   areas: [Entity!]
   people: [Entity!]
+}
+
+scalar Token
+
+input Credentials {
+  username: String!
+  password: String!
+}
+
+type EntitiesUpdated {
+  saved: Int!
+}
+
+type Mutation {
+  login(credentials: Credentials!): Token!
+  makeSample: EntitiesUpdated
+  update(entities: [Entity!]): EntitiesUpdated
+  purge: EntitiesUpdated
 }

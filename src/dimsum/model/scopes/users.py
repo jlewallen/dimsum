@@ -32,9 +32,8 @@ class Auth(entity.Scope):
             actual_key = hashlib.pbkdf2_hmac(
                 "sha256", password.encode("utf-8"), salt, 100000
             )
-
-            return {
-                "key": self.ourselves.key,
-            }
-
-        raise Exception("unauthenticated")
+            if actual_key == key:
+                return {
+                    "key": self.ourselves.key,
+                }
+        return None

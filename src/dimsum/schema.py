@@ -54,31 +54,6 @@ def parse_credentials_value(value):
 query = ariadne.QueryType()
 
 
-@query.field("login")
-async def login(obj, info, credentials):
-    domain = info.context.domain
-    creds = Credentials(**credentials)
-    log.info("ariadne:login username=%s", creds.username)
-    if not domain.registrar.contains(creds.username):
-        raise ValueError("bad username or password")
-
-    try:
-        person = domain.registrar.find_by_key(creds.username)
-        if person:
-            with person.make(users.Auth) as auth:
-                token = auth.try_password(creds.password)
-
-                if token:
-                    jwt_token = jwt.encode(
-                        token, info.context.cfg.session_key, algorithm="HS256"
-                    )
-                    return jwt_token
-    except:
-        log.exception("login")
-
-    raise ValueError("bad username or password")
-
-
 @query.field("size")
 async def resolve_size(_, info):
     domain = info.context.domain
@@ -177,11 +152,57 @@ async def resolve_evaluation_entities(obj, info):
     return []
 
 
+mutation = ariadne.MutationType()
+
+
+class UsernamePasswordError(ValueError):
+    pass
+
+
+@mutation.field("login")
+async def login(obj, info, credentials):
+    domain = info.context.domain
+    creds = Credentials(**credentials)
+    log.info("ariadne:login username=%s", creds.username)
+    if not domain.registrar.contains(creds.username):
+        raise UsernamePasswordError()
+
+    try:
+        person = domain.registrar.find_by_key(creds.username)
+        if person:
+            with person.make(users.Auth) as auth:
+                token = auth.try_password(creds.password)
+
+                if token:
+                    log.info("successful login %s", token)
+                    jwt_token = jwt.encode(
+                        token, info.context.cfg.session_key, algorithm="HS256"
+                    )
+                    return jwt_token
+    except:
+        log.exception("login")
+
+    raise UsernamePasswordError()
+
+
+@mutation.field("makeSample")
+async def makeSample(obj, info):
+    domain = info.context.domain
+    creds = Credentials(**credentials)
+    log.info("ariadne:make-sample")
+
+
+@mutation.field("update")
+async def update(obj, info, entities):
+    domain = info.context.domain
+    log.info("ariadne:update entities=%s", entities)
+
+
 def create():
     for path in ["src/dimsum/schema.graphql", "schema.graphql"]:
         if os.path.exists(path):
             type_defs = ariadne.load_schema_from_path(path)
-            return ariadne.make_executable_schema(type_defs, query)
+            return ariadne.make_executable_schema(type_defs, [query, mutation])
     raise Exception("unable to find schema.graphql")
 
 
