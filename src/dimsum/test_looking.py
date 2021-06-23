@@ -64,8 +64,8 @@ async def test_look_people_invisible():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.add_tomi()
-    await tw.add_carla()
-    with tw.carla.make(mechanics.Visibility) as vis:
+    carla = await tw.add_carla()
+    with carla.make(mechanics.Visibility) as vis:
         vis.make_invisible()
 
     r = await tw.success("look")

@@ -43,7 +43,7 @@ async def test_chimeric_entities_serialize(caplog):
     domain = domains.Domain()
 
     with domain.session() as session:
-        universe = session.world
+        universe = await session.prepare()
 
         jacob = entity.Entity(
             creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
@@ -111,7 +111,8 @@ async def test_specialization_classes(caplog):
     domain = domains.Domain()
 
     with domain.session() as session:
-        universe = session.world
+        universe = await session.prepare()
+
         person = make_person(creator=universe, props=properties.Common(name="Jacob"))
         session.register(person)
         universe.remember(person)

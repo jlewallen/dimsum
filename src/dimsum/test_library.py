@@ -17,11 +17,16 @@ log = logging.getLogger("dimsum")
 async def test_library(caplog):
     tw = test.TestWorld()
 
-    generics, area = library.create_example_world(tw.world)
-    tw.registrar.add_entities(generics.all)
-
-    await tw.initialize(area=area)
     with tw.domain.session() as session:
+        world = await session.prepare()
+
+        generics, area = library.create_example_world(session.world)
+        tw.domain.registrar.add_entities(generics.all)
+
+        await session.add_area(area)
+
+        await tw.add_jacob()
+
         await session.tick()
         await session.tick()
         await session.save()

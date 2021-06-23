@@ -42,16 +42,29 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
 
     await tw.success("dig Door|Door to 'Kitchen'")
 
-    area_before = tw.world.find_player_area(tw.player)
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_before = world.find_player_area(tw.player)
 
     await tw.success("go Door")
-    area_after = tw.world.find_player_area(tw.player)
+
+    area_area = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_after = world.find_player_area(tw.player)
+
     assert area_after != area_before
 
     await tw.success("look down")
 
     await tw.success("go Door")
-    area_after = tw.world.find_player_area(tw.player)
+
+    area_after = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_after = session.world.find_player_area(tw.player)
+
     assert area_after == area_before
 
 
@@ -62,14 +75,27 @@ async def test_dig_wall_and_climb_wall(caplog):
 
     await tw.success("dig Wall|Wall to 'A High Ledge'")
 
-    area_before = tw.world.find_player_area(tw.player)
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_before = world.find_player_area(tw.player)
 
     await tw.success("climb wall")
-    area_after = tw.world.find_player_area(tw.player)
+
+    area_after = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_after = world.find_player_area(tw.player)
+
     assert area_after != area_before
 
     await tw.success("look")
 
     await tw.success("climb wall")
-    area_after = tw.world.find_player_area(tw.player)
+
+    area_after = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        area_after = world.find_player_area(tw.player)
+
     assert area_after == area_before

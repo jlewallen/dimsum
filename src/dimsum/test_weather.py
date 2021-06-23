@@ -18,8 +18,9 @@ log = logging.getLogger("dimsum")
 async def test_area_weather_blows_small_items():
     tw = test.TestWorld()
 
-    generics, area = library.create_example_world(tw.world)
-    await tw.initialize(area=area)
+    w = world.World()
+    generics, area = library.create_example_world(w)
+    await tw.initialize(world=w, area=area)
 
     assert await tw.success("go rocky")
 

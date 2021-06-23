@@ -34,16 +34,18 @@ async def test_storage_materialize_reference():
     domain = domains.Domain(store=store)
 
     with domain.session() as session:
-        await session.prepare()
+        w = await session.prepare()
 
-        await session.add_area(
-            scopes.area(creator=session.world, props=properties.Common("Area"))
-        )
+        await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
 
         await session.save()
 
     with domain.session() as session:
+        session.registrar.purge()
+
         assert session.registrar.number_of_entities() == 0
+
+        await session.prepare()
 
         assert await serializing.materialize(
             registrar=session.registrar, store=store, key=world.Key

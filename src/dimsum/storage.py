@@ -66,9 +66,14 @@ class InMemory(EntityStorage):
                 self.by_key[keys.key] = data
                 self.by_gid[keys.gid] = data
             else:
-                log.debug("deleting %s", keys.key)
-                del self.by_key[keys.key]
-                del self.by_gid[keys.gid]
+                if keys.key in self.by_key:
+                    log.debug("deleting %s", keys.key)
+                    del self.by_key[keys.key]
+                else:
+                    log.warning("delete:noop %s", keys.key)
+
+                if keys.gid in self.by_gid:
+                    del self.by_gid[keys.gid]
 
     async def load_by_gid(self, gid: int):
         if gid in self.by_gid:

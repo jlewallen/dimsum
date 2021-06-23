@@ -67,7 +67,11 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     assert len(tw.player.make(carryable.Containing).holding) == 1
     await tw.success("look down")
     assert (
-        len(tw.registrar.find_entity_by_name("Box").make(carryable.Containing).holding)
+        len(
+            tw.domain.registrar.find_entity_by_name("Box")
+            .make(carryable.Containing)
+            .holding
+        )
         == 1
     )
     await tw.success("close box")
@@ -75,7 +79,11 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     await tw.success("open box")
     await tw.success("take coin out of box")
     assert (
-        len(tw.registrar.find_entity_by_name("Box").make(carryable.Containing).holding)
+        len(
+            tw.domain.registrar.find_entity_by_name("Box")
+            .make(carryable.Containing)
+            .holding
+        )
         == 0
     )
     assert len(tw.player.make(carryable.Containing).holding) == 2
@@ -169,7 +177,7 @@ async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     assert len(r.entities) == 1
     assert "Alai" in r.entities[0].props.name
     assert r.entities[0].make(carryable.Carryable).loose
-    assert tw.registrar.find_by_key(r.entities[0].key)
+    assert tw.domain.registrar.find_by_key(r.entities[0].key)
 
 
 @pytest.mark.asyncio

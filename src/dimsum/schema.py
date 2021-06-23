@@ -70,7 +70,8 @@ async def resolve_size(_, info):
 async def resolve_world(obj, info):
     domain = info.context.domain
     log.info("ariadne:world")
-    return serialize_entity(domain.world)
+    with domain.session() as session:
+        return serialize_entity(await session.prepare())
 
 
 @query.field("entitiesByKey")
@@ -211,18 +212,18 @@ async def makeSample(obj, info):
     domain = info.context.domain
     log.info("ariadne:make-sample")
 
-    number_before = domain.registrar.number_of_entities()
-
-    if domain.world is None:
-        domain.world = world.World()
-
-    generics, area = library.create_example_world(domain.world)
     with domain.session() as session:
+        world = await session.prepare()
+
+        number_before = domain.registrar.number_of_entities()
+
+        generics, area = library.create_example_world(session.world)
         session.registrar.add_entities(generics.all)
-        session.add_area(area)
+
+        await session.add_area(area)
         await session.save()
 
-    affected = domain.registrar.number_of_entities() - number_before
+        affected = domain.registrar.number_of_entities() - number_before
 
     return {"affected": affected}
 
@@ -233,11 +234,13 @@ async def update(obj, info, entities):
     log.info("ariadne:update entities=%d", len(entities))
     # TODO Parallel
     with domain.session() as session:
+        await session.prepare()
+
         instantiated = [await session.materialize(json=e) for e in entities]
         new_world = [e for e in instantiated if e.key == world.Key]
         if new_world:
-            session.world = world
-            domain.world = world  # TODO Remove
+            session.world = new_world
+            domain.world = new_world  # TODO Remove
         await session.save()
         return {"affected": len(instantiated)}
 

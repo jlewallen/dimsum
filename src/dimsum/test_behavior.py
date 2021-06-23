@@ -20,15 +20,18 @@ async def test_drop_hammer_funny_gold(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("Hammer"))
-    )
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    with hammer.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:drop:after",
-            lua="""
+        hammer = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("Hammer"))
+        )
+
+        with hammer.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:drop:after",
+                lua="""
 function(s, world, area, player)
     if not player.gold then
         player.gold = { total = 0 }
@@ -41,7 +44,7 @@ function(s, world, area, player)
     debug("ok")
 end
 """,
-        )
+            )
 
     await tw.success("look")
     await tw.success("hold hammer")
@@ -51,7 +54,7 @@ end
     await tw.success("hold hammer")
     await tw.success("drop")
 
-    assert tw.jacob.props["gold"]["total"] == 2
+    assert tw.player.props["gold"]["total"] == 2
 
 
 @pytest.mark.asyncio
@@ -59,37 +62,40 @@ async def test_wear_cape(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    cape = tw.add_item(scopes.item(creator=tw.jacob, props=properties.Common("Cape")))
-    with cape.make(mechanics.Interactable) as inaction:
-        inaction.link_activity("worn")
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    with cape.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:wear:after",
-            lua="""
+        cape = tw.add_item(scopes.item(creator=world, props=properties.Common("Cape")))
+        with cape.make(mechanics.Interactable) as inaction:
+            inaction.link_activity("worn")
+
+        with cape.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:wear:after",
+                lua="""
 function(s, world, area, player)
     player.invisible()
     debug(player.is_invisible())
 end
 """,
-        )
-        behave.add_behavior(
-            tw.world,
-            "b:test:remove:after",
-            lua="""
+            )
+            behave.add_behavior(
+                world,
+                "b:test:remove:after",
+                lua="""
 function(s, world, area, player)
     player.visible()
 end
 """,
-        )
+            )
 
     await tw.success("look")
     await tw.success("hold cape")
     await tw.success("wear cape")
-    assert tw.jacob.make(mechanics.Visibility).is_invisible
+    assert tw.player.make(mechanics.Visibility).is_invisible
     await tw.success("remove cape")
-    assert not tw.jacob.make(mechanics.Visibility).is_invisible
+    assert not tw.player.make(mechanics.Visibility).is_invisible
     await tw.success("drop")
 
 
@@ -99,24 +105,27 @@ async def test_behavior_move(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    mystery_area = entity.Entity(
-        creator=tw.player, props=properties.Common("A Mystery Area")
-    )
-    tw.world.register(mystery_area)
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    cape = tw.add_item(scopes.item(creator=tw.jacob, props=properties.Common("Cape")))
-    with cape.make(mechanics.Interactable) as inaction:
-        inaction.link_activity("worn", mystery_area)
-    with cape.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            "b:test:wear:after",
-            lua="""
+        mystery_area = entity.Entity(
+            creator=tw.player, props=properties.Common("A Mystery Area")
+        )
+        await session.add_area(mystery_area)
+
+        cape = tw.add_item(scopes.item(creator=world, props=properties.Common("Cape")))
+        with cape.make(mechanics.Interactable) as inaction:
+            inaction.link_activity("worn", mystery_area)
+        with cape.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                "b:test:wear:after",
+                lua="""
 function(s, world, area, player)
     debug('wear[0].worn', wear[0].interactions.worn)
     return player.go(wear[0].interactions.worn)
 end
 """,
-        )
+            )
 
     await tw.success("look")
     await tw.success("hold cape")
@@ -131,14 +140,17 @@ async def test_behavior_create_item(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    box = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Colorful Box"))
-    )
-    with box.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:shake:after",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        box = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Colorful Box"))
+        )
+        with box.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:shake:after",
+                lua="""
 function(s, world, area, player)
     debug(area)
     return player.make_hands({
@@ -147,7 +159,7 @@ function(s, world, area, player)
     })
 end
 """,
-        )
+            )
 
     await tw.success("look")
     await tw.success("hold box")
@@ -163,14 +175,16 @@ async def test_behavior_create_quantified_item(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    box = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Colorful Box"))
-    )
-    with box.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:shake:after",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        box = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Colorful Box"))
+        )
+        with box.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:shake:after",
+                lua="""
 function(s, world, area, player)
     debug(area)
     return area.make_here({
@@ -180,7 +194,7 @@ function(s, world, area, player)
     })
 end
 """,
-        )
+            )
 
     await tw.success("look")
     await tw.success("hold box")
@@ -207,14 +221,17 @@ async def test_behavior_time_passing(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        )
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:tick",
+                lua="""
 function(s, world, area, item)
     debug("ok", area, item, time)
     return area.make_here({
@@ -224,16 +241,16 @@ function(s, world, area, item)
     })
 end
 """,
-        )
+            )
 
     with tw.domain.session() as session:
         await session.tick(0)
         assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.registrar.entities) == 5
+        assert len(tw.domain.registrar.entities) == 5
 
         await session.tick(1)
         assert len(tw.area.make(carryable.Containing).holding) == 3
-        assert len(tw.registrar.entities) == 6
+        assert len(tw.domain.registrar.entities) == 6
 
 
 @pytest.mark.asyncio
@@ -241,14 +258,16 @@ async def test_behavior_create_kind(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        )
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:tick",
+                lua="""
 function(s, world, area, item)
     return area.make_here({
         kind = item.kind("petals"),
@@ -258,18 +277,18 @@ function(s, world, area, item)
     })
 end
 """,
-        )
+            )
 
     with tw.domain.session() as session:
         await session.tick(0)
         assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.registrar.entities) == 5
+        assert len(tw.domain.registrar.entities) == 5
         await session.tick(1)
         assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.registrar.entities) == 5
+        assert len(tw.domain.registrar.entities) == 5
         await session.tick(2)
         assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.registrar.entities) == 5
+        assert len(tw.domain.registrar.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -277,19 +296,22 @@ async def test_behavior_random(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        )
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:tick",
+                lua="""
 function(s, world, area, item)
     debug("random", math.random())
 end
 """,
-        )
+            )
 
     with tw.domain.session() as session:
         await session.tick(0)
@@ -300,14 +322,17 @@ async def test_behavior_numbering_by_kind(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        )
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:tick",
+                lua="""
 function(s, world, area, item)
     if area.number(item.kind("petals")) == 0 then
         return area.make_here({
@@ -326,7 +351,7 @@ function(s, world, area, item)
     end
 end
 """,
-        )
+            )
 
     with tw.domain.session() as session:
         await session.tick(0)
@@ -340,15 +365,18 @@ async def test_behavior_numbering_person_by_name(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        )
+
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                world,
+                "b:test:tick",
+                lua="""
 function(s, world, area, item)
     if area.number("Jacob") == 0 then
         return area.make_here({
@@ -360,7 +388,7 @@ function(s, world, area, item)
     end
 end
 """,
-        )
+            )
 
     with tw.domain.session() as session:
         await session.tick(0)

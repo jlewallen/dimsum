@@ -30,12 +30,13 @@ class Session:
         super().__init__()
         self.domain = domain
         self.registrar = domain.registrar
-        self.world = domain.world
+        self.world: Optional[world.World] = None
 
     def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
+        # TODO Warn on unsaved changes?
         return False
 
     def register(self, entity: entity.Entity) -> entity.Entity:
@@ -55,10 +56,27 @@ class Session:
             json=json,
         )
 
+    async def prepare(self):
+        if self.world:
+            return self.world
+
+        self.world = await self.materialize(key=world.Key)
+        if self.world:
+            return self.world
+
+        log.info("creating new world")
+        self.world = world.World()
+        self.register(self.world)
+        return self.world
+
     async def perform(
         self, action, person: Optional[entity.Entity], **kwargs
     ) -> game.Reply:
+
+        await self.prepare()
+
         assert self.world
+
         area = self.world.find_entity_area(person) if person else None
         with WorldCtx(
             person=person,
@@ -73,14 +91,19 @@ class Session:
                 return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
+        await self.prepare()
+
         if now is None:
             now = time.time()
+
         await self.everywhere(world.TickHook, time=now)
         await self.everywhere(world.WindHook, time=now)
+
         return now
 
     async def everywhere(self, name: str, **kwargs):
         assert self.world
+
         log.info("everywhere:%s %s", name, kwargs)
         everything: List[entity.Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
@@ -102,6 +125,8 @@ class Session:
                         await ctx.hook(name)
 
     async def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+        await self.prepare()
+
         assert self.world
 
         if seen is None:
@@ -155,11 +180,7 @@ class Session:
 
 class Domain:
     def __init__(
-        self,
-        bus: bus.EventBus = None,
-        store: storage.EntityStorage = None,
-        empty=False,
-        **kwargs
+        self, bus: bus.EventBus = None, store: storage.EntityStorage = None, **kwargs
     ):
         super().__init__()
         self.bus = (
@@ -168,10 +189,6 @@ class Domain:
         self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
         self.registrar = entity.Registrar()
-        self.world = None
-        if not empty:
-            self.world = world.World()
-            self.registrar.register(self.world)
 
     def session(self) -> "Session":
         log.info("session:new")

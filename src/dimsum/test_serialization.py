@@ -28,6 +28,11 @@ log = logging.getLogger("dimsum")
 @pytest.mark.asyncio
 async def test_serialize_empty_world(caplog):
     before = domains.Domain()
+
+    with before.session() as session:
+        await session.prepare()
+        await session.save()
+
     json = serialize_all(before.registrar)
 
     assert len(json.items()) == 1
@@ -41,8 +46,9 @@ async def test_serialize_empty_world(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_one_area(caplog):
     domain = domains.Domain()
-    world = domain.world
+
     with domain.session() as session:
+        world = await session.prepare()
         await session.add_area(
             scopes.area(creator=world, props=properties.Common("Area"))
         )
@@ -60,17 +66,20 @@ async def test_serialize_world_one_area(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_one_item(caplog):
     domain = domains.Domain()
-    world = domain.world
-    area = scopes.area(creator=world, props=properties.Common("Area"))
-    add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
+
     with domain.session() as session:
-        await session.add_area(area)
+        world = await session.prepare()
 
-    assert area.make(carryable.Containing).holding[0]
+        area = scopes.area(creator=world, props=properties.Common("Area"))
+        add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
+        with domain.session() as session:
+            await session.add_area(area)
 
-    json = serialize_all(domain.registrar)
+        assert area.make(carryable.Containing).holding[0]
 
-    assert len(json.items()) == 3
+        json = serialize_all(domain.registrar)
+
+        assert len(json.items()) == 3
 
     after = domains.Domain()
     restore(after.registrar, json)
@@ -98,30 +107,31 @@ async def test_serialize_world_one_item(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_directional(caplog):
     domain = domains.Domain()
-    world = domain.world
-
-    two = scopes.area(creator=world, props=properties.Common("Two"))
-    one = scopes.area(creator=world, props=properties.Common("One"))
-
-    add_item(
-        one,
-        scopes.exit(
-            props=properties.Common(name=movement.Direction.NORTH.exiting),
-            creator=world,
-            initialize={movement.Exit: dict(area=two)},
-        ),
-    )
-
-    add_item(
-        two,
-        scopes.exit(
-            props=properties.Common(name=movement.Direction.SOUTH.exiting),
-            creator=world,
-            initialize={movement.Exit: dict(area=one)},
-        ),
-    )
 
     with domain.session() as session:
+        world = await session.prepare()
+
+        two = scopes.area(creator=world, props=properties.Common("Two"))
+        one = scopes.area(creator=world, props=properties.Common("One"))
+
+        add_item(
+            one,
+            scopes.exit(
+                props=properties.Common(name=movement.Direction.NORTH.exiting),
+                creator=world,
+                initialize={movement.Exit: dict(area=two)},
+            ),
+        )
+
+        add_item(
+            two,
+            scopes.exit(
+                props=properties.Common(name=movement.Direction.SOUTH.exiting),
+                creator=world,
+                initialize={movement.Exit: dict(area=one)},
+            ),
+        )
+
         await session.add_area(one)
 
     json = serialize_all(domain.registrar)
@@ -149,32 +159,33 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_items(caplog):
     domain = domains.Domain()
-    world = domain.world
-
-    one = scopes.area(creator=world, props=properties.Common("One"))
-    two = scopes.area(creator=world, props=properties.Common("Two"))
-
-    add_item(
-        one,
-        scopes.exit(
-            creator=world,
-            props=properties.Common("Item-One"),
-            initialize={movement.Exit: dict(area=two)},
-        ),
-    )
-    add_item(
-        two,
-        scopes.exit(
-            creator=world,
-            props=properties.Common("Item-Two"),
-            initialize={movement.Exit: dict(area=one)},
-        ),
-    )
-
-    assert two in one.make(movement.Movement).adjacent()
-    assert one in two.make(movement.Movement).adjacent()
 
     with domain.session() as session:
+        world = await session.prepare()
+
+        one = scopes.area(creator=world, props=properties.Common("One"))
+        two = scopes.area(creator=world, props=properties.Common("Two"))
+
+        add_item(
+            one,
+            scopes.exit(
+                creator=world,
+                props=properties.Common("Item-One"),
+                initialize={movement.Exit: dict(area=two)},
+            ),
+        )
+        add_item(
+            two,
+            scopes.exit(
+                creator=world,
+                props=properties.Common("Item-Two"),
+                initialize={movement.Exit: dict(area=one)},
+            ),
+        )
+
+        assert two in one.make(movement.Movement).adjacent()
+        assert one in two.make(movement.Movement).adjacent()
+
         await session.add_area(one)
 
     json = serialize_all(domain.registrar, indent=True)
@@ -204,30 +215,34 @@ async def test_serialize_after_create():
     tw = test.TestWorld()
     await tw.initialize()
 
-    tree = tw.add_item(
-        scopes.item(creator=tw.jacob, props=properties.Common("A Lovely Tree"))
-    )
-    clearing = tw.add_simple_area_here("Door", "Clearing")
-    tree.get_kind("petals")
-    with tree.make(movement.Movement) as nav:
-        nav.link_area(clearing)
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    with tree.make(behavior.Behaviors) as behave:
-        behave.add_behavior(
-            tw.world,
-            "b:test:tick",
-            lua="""
-function(s, world, area, item)
-    debug("ok", area, item, time)
-    return area.make({
-        kind = item.kind("petals"),
-        name = "Flower Petal",
-        quantity = 10,
-        color = "red",
-    })
-end
-""",
+        tree = tw.add_item(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
         )
+        clearing = tw.add_simple_area_here("Door", "Clearing")
+        tree.get_kind("petals")
+        with tree.make(movement.Movement) as nav:
+            nav.link_area(clearing)
+
+        with tree.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                session.world,
+                "b:test:tick",
+                lua="""
+    function(s, world, area, item)
+        debug("ok", area, item, time)
+        return area.make({
+            kind = item.kind("petals"),
+            name = "Flower Petal",
+            quantity = 10,
+            color = "red",
+        })
+    end
+    """,
+            )
+        await session.save()
 
     log.info("reloading")
     after = await tw.domain.reload()
@@ -245,13 +260,13 @@ async def test_unregister_destroys(caplog):
     assert not box.props.destroyed
 
     await store.purge()
-    await store.update(serializing.registrar(tw.registrar))
+    await store.update(serializing.registrar(tw.domain.registrar))
 
     assert await store.number_of_entities() == 4
 
     await tw.execute("obliterate")
     assert box.props.destroyed
-    await store.update(serializing.registrar(tw.registrar))
+    await store.update(serializing.registrar(tw.domain.registrar))
 
     assert await store.number_of_entities() == 3
 
@@ -282,12 +297,14 @@ async def test_serialize_library(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    generics, area = library.create_example_world(tw.world)
     with tw.domain.session() as session:
+        world = await session.prepare()
+
+        generics, area = library.create_example_world(world)
         await session.add_area(area)
 
     json = serializing.serialize(
-        {"entities": tw.registrar.entities}, unpicklable=False, indent=4
+        {"entities": tw.domain.registrar.entities}, unpicklable=False, indent=4
     )
 
     assert "py/id" not in json
@@ -298,9 +315,10 @@ async def test_serialize_preserves_owner_reference(caplog):
     domain = domains.Domain()
 
     with domain.session() as session:
-        session.add_area(
-            scopes.area(creator=domain.world, props=properties.Common("Area"))
+        await session.add_area(
+            scopes.area(creator=session.world, props=properties.Common("Area"))
         )
+        await session.save()
 
     json = serialize_all(domain.registrar)
 
@@ -322,7 +340,7 @@ async def test_serialize_properties_directly(caplog):
     domain = domains.Domain()
     with domain.session() as session:
         props = properties.Common("Area")
-        props.owner = domain.world
+        props.owner = session.world
         json = serializing.serialize(props)
         log.info(json)
 

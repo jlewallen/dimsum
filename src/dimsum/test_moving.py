@@ -17,10 +17,13 @@ async def test_go_unknown():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before = tw.world.find_player_area(tw.player)
-    await tw.failure("go door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_before == area_after
+    with tw.domain.session() as session:
+        await session.prepare()
+
+        area_before = session.world.find_player_area(tw.player)
+        await tw.failure("go door")
+        area_after = session.world.find_player_area(tw.player)
+        assert area_before == area_after
 
 
 @pytest.mark.asyncio
@@ -28,27 +31,31 @@ async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()
 
-    another_room = scopes.area(
-        creator=tw.world, props=properties.Common("Another Room")
-    )
+    with tw.domain.session() as session:
+        another_room = scopes.area(
+            creator=session.world, props=properties.Common("Another Room")
+        )
 
-    add_item(
-        tw.area,
-        scopes.exit(
-            creator=tw.world,
-            props=properties.Common("Door"),
-            initialize={movement.Exit: dict(area=another_room)},
-        ),
-    )
+        add_item(
+            tw.area,
+            scopes.exit(
+                creator=session.world,
+                props=properties.Common("Door"),
+                initialize={movement.Exit: dict(area=another_room)},
+            ),
+        )
 
     with tw.domain.session() as session:
         await session.add_area(another_room)
 
-    area_before = tw.world.find_player_area(tw.player)
-    await tw.success("go door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-    assert area_after == another_room
+    with tw.domain.session() as session:
+        await session.prepare()
+
+        area_before = session.world.find_player_area(tw.player)
+        await tw.success("go door")
+        area_after = session.world.find_player_area(tw.player)
+        assert area_after != area_before
+        assert area_after == another_room
 
 
 @pytest.mark.asyncio
@@ -56,10 +63,13 @@ async def test_directional_moving_nowhere():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before = tw.world.find_player_area(tw.player)
-    await tw.failure("go north")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_before == area_after
+    with tw.domain.session() as session:
+        await session.prepare()
+
+        area_before = session.world.find_player_area(tw.player)
+        await tw.failure("go north")
+        area_after = session.world.find_player_area(tw.player)
+        assert area_before == area_after
 
 
 @pytest.mark.asyncio
@@ -70,24 +80,29 @@ async def test_directional_moving():
     obs = await tw.success("look")
     assert obs
 
-    park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
-
     with tw.domain.session() as session:
+        world = await session.prepare()
+
+        park = scopes.area(props=properties.Common("North Park"), creator=world)
+
         await session.add_area(park)
+
         add_item(
             tw.area,
             scopes.exit(
-                creator=tw.jacob,
+                creator=world,
                 props=properties.Common(name=movement.Direction.NORTH.exiting),
                 initialize={movement.Exit: dict(area=park)},
             ),
         )
 
-    area_before = tw.world.find_player_area(tw.player)
-    await tw.success("go north")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-    assert area_after == park
+        area_before = session.world.find_player_area(tw.player)
+
+        await tw.success("go north")
+
+        area_after = session.world.find_player_area(tw.player)
+        assert area_after != area_before
+        assert area_after == park
 
 
 class Bidirectional:
@@ -116,13 +131,15 @@ class Bidirectional:
 async def test_programmatic_basic_entrances_and_exits():
     tw = test.TestWorld()
 
-    earth = scopes.area(creator=tw.jacob, props=properties.Common(name="Earth"))
-    asteroid = scopes.area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
-    Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
-
-    await tw.initialize(earth)
+    await tw.initialize()
 
     with tw.domain.session() as session:
+        world = await session.prepare()
+
+        earth = scopes.area(creator=world, props=properties.Common(name="Earth"))
+        asteroid = scopes.area(creator=world, props=properties.Common(name="Asteroid"))
+        Bidirectional(there=asteroid, back=earth, creator=world)
+
         await session.add_area(asteroid)
 
 
