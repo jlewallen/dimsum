@@ -34,11 +34,10 @@ class Domain:
         self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
         self.registrar = entity.Registrar()
+        self.world = None
         if not empty:
             self.world = world.World()
             self.registrar.register(self.world)
-        else:
-            self.world = None
 
     async def reload(self):
         await self.store.update(serializing.registrar(self.registrar))
@@ -70,6 +69,7 @@ class Domain:
         return now
 
     async def everywhere(self, name: str, **kwargs):
+        assert self.world
         log.info("everywhere:%s %s", name, kwargs)
         everything: List[entity.Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
@@ -112,6 +112,8 @@ class Domain:
                 return game.Failure("whoa, that's frozen")
 
     def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+        assert self.world
+
         if seen is None:
             seen = {}
 
