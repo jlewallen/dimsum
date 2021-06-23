@@ -172,9 +172,6 @@ class Domain:
             reloaded.world = await session.materialize(key=world.Key)  # TODO Remove
             return reloaded
 
-    async def purge(self):
-        self.registrar.purge()
-
     async def load(self, create=False):
         self.registrar.purge()
         log.info("loading %s", self.store)

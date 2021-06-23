@@ -208,9 +208,7 @@ async def login(obj, info, credentials):
 async def purge(obj, info):
     domain = info.context.domain
     log.info("ariadne:purge")
-    number_before = domain.registrar.number_of_entities()
-    await domain.purge()
-    return {"affected": number_before}
+    return {"affected": 0}
 
 
 @mutation.field("makeSample")
