@@ -87,12 +87,25 @@ async def test_graphql_world(snapshot):
 async def test_graphql_world_by_key(snapshot):
     domain = domains.Domain()
 
-    data = {"query": '{ entities(key: "%s") }' % (world.Key)}
+    data = {"query": '{ entitiesByKey(key: "%s") }' % (world.Key)}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match("\n".join(actual["data"]["entities"]), "world.json")
+    snapshot.assert_match("\n".join(actual["data"]["entitiesByKey"]), "world.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_world_by_gid(snapshot):
+    domain = domains.Domain()
+
+    data = {"query": "{ entitiesByGid(gid: %d) }" % (0)}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match("\n".join(actual["data"]["entitiesByGid"]), "world.json")
 
 
 @pytest.mark.asyncio

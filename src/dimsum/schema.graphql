@@ -20,7 +20,8 @@ type Evaluation {
 type Query {
   size: Int!
   world: Entity!
-  entities(key: Key): [Entity!]
+  entitiesByKey(key: Key): [Entity!]
+  entitiesByGid(gid: Int): [Entity!]
   language(criteria: LanguageQueryCriteria!): Evaluation!
   areas: [Entity!]
   people: [Entity!]

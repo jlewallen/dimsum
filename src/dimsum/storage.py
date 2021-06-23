@@ -1,5 +1,8 @@
 from typing import Dict, Any, TextIO, Optional
 
+from gql import gql, Client
+from gql.transport.aiohttp import AIOHTTPTransport
+
 import logging
 import dataclasses
 import sqlite3
@@ -200,4 +203,60 @@ class SqliteStorage:
 
 
 class HttpStorage:
-    pass
+    def __init__(self, url: str):
+        super().__init__()
+        self.url = url
+        self.transport = AIOHTTPTransport(url=self.url)
+
+    def session(self):
+        return Client(transport=self.transport, fetch_schema_from_transport=True)
+
+    async def number_of_entities(self):
+        async with self.session() as session:
+            query = gql("query { size }")
+            response = await session.execute(query)
+            return response["size"]
+
+    async def purge(self):
+        async with self.session() as session:
+            query = gql("mutation { purge { affected } }")
+            response = await session.execute(query)
+            return response["purge"]["affected"]
+
+    async def destroy(self, keys: Keys):
+        pass
+
+    async def update(self, updates: Dict[Keys, Optional[str]]):
+        async with self.session() as session:
+            query = gql(
+                """
+        mutation {
+            update(entities: $entities) {
+                affected
+            }
+        }
+    """
+            )
+            entities = updates.values()
+            response = await session.execute(
+                query, variable_values={"entities": entities}
+            )
+            return response["update"]["affected"]
+
+    async def load_by_gid(self, gid: int):
+        async with self.session() as session:
+            query = gql("query entityByGid($gid: Int!) { entitiesByGid(gid: $gid) }")
+            response = await session.execute(query, variable_values={"gid": gid})
+            return response["affected"]
+
+    async def load_by_key(self, key: str):
+        async with self.session() as session:
+            query = gql("query entityByKey($key: Key!) { entitiesByKey(key: $key) }")
+            response = await session.execute(query, variable_values={"key": key})
+            return response
+
+    def __repr__(self):
+        return "Http<%s>" % (self.url,)
+
+    def __str__(self):
+        return "Http<%s>" % (self.url,)

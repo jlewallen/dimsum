@@ -73,8 +73,8 @@ async def resolve_world(obj, info):
     return serialize_entity(domain.world)
 
 
-@query.field("entities")
-async def resolve_entities(obj, info, key):
+@query.field("entitiesByKey")
+async def resolve_entities_by_key(obj, info, key):
     domain = info.context.domain
     log.info("ariadne:entities key=%s", key)
     entities = []
@@ -84,6 +84,19 @@ async def resolve_entities(obj, info, key):
         loaded = await domain.store.load_by_key(key)
         if loaded:
             entities = [loaded]
+
+    log.info("ariadne:entities entities=%s", entities)
+    return [serialize_entity(e) for e in entities]
+
+
+@query.field("entitiesByGid")
+async def resolve_entities_by_gid(obj, info, gid):
+    domain = info.context.domain
+    log.info("ariadne:entities gid=%s", gid)
+    entities = []
+    loaded = await domain.store.load_by_gid(gid)
+    if loaded:
+        entities = [loaded]
 
     log.info("ariadne:entities entities=%s", entities)
     return [serialize_entity(e) for e in entities]

@@ -45,6 +45,6 @@ async def test_routing_process_target_query_entity(snapshot):
             )
         ]
     )
-    query = '{entities(key: "world")}'
+    query = '{ entitiesByKey(key: "world") }'
     reply = await router.handle(json.dumps({"query": query}))
     snapshot.assert_match(reply, "stdout.json")
