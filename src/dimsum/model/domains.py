@@ -101,7 +101,7 @@ class Session:
                     ) as ctx:
                         await ctx.hook(name)
 
-    def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+    async def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         assert self.world
 
         if seen is None:
@@ -136,15 +136,15 @@ class Session:
             maybe_area = item.make(movement.Exit).area
             if maybe_area:
                 log.debug("linked-via-ex[%s] %s", depth, maybe_area)
-                self.add_area(maybe_area, depth=depth + 1, seen=seen)
+                await self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
             for linked in item.make(movement.Movement).adjacent():
                 log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                self.add_area(linked, depth=depth + 1, seen=seen)
+                await self.add_area(linked, depth=depth + 1, seen=seen)
 
         for linked in area.make(movement.Movement).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
-            self.add_area(linked, depth=depth + 1, seen=seen)
+            await self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
 
@@ -279,7 +279,7 @@ class WorldCtx(context.Ctx):
             initialize = {carryable.Carryable: dict(quantity=quantity)}
         return scopes.item(initialize=initialize, **kwargs)
 
-    def find_item(
+    async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(

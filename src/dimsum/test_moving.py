@@ -42,7 +42,7 @@ async def test_go_adjacent():
     )
 
     with tw.domain.session() as session:
-        session.add_area(another_room)
+        await session.add_area(another_room)
 
     area_before = tw.world.find_player_area(tw.player)
     await tw.success("go door")
@@ -73,7 +73,7 @@ async def test_directional_moving():
     park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
 
     with tw.domain.session() as session:
-        session.add_area(park)
+        await session.add_area(park)
         add_item(
             tw.area,
             scopes.exit(
@@ -123,7 +123,7 @@ async def test_programmatic_basic_entrances_and_exits():
     await tw.initialize(earth)
 
     with tw.domain.session() as session:
-        session.add_area(asteroid)
+        await session.add_area(asteroid)
 
 
 @pytest.mark.asyncio

@@ -119,13 +119,13 @@ async def test_graphql_language_basic(snapshot):
             props=properties.Common(name="welcome"),
             creator=session.world,
         )
-        session.add_area(welcome)
+        await session.add_area(welcome)
         jacob = scopes.alive(
             key="jlewallen",
             props=properties.Common(name="Jacob"),
             creator=session.world,
         )
-        session.registrar.register(jacob)
+        session.register(jacob)
         await session.perform(actions.Join(), jacob)
 
     data = {

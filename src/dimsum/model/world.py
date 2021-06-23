@@ -92,14 +92,14 @@ class World(entity.Entity):
         assert area
         return area
 
-    def apply_item_finder(
+    async def apply_item_finder(
         self, person: entity.Entity, finder, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
         assert finder
         area = self.find_player_area(person)
         log.info("applying finder:%s %s", finder, kwargs)
-        found = finder.find_item(area=area, person=person, world=self, **kwargs)
+        found = await finder.find_item(area=area, person=person, world=self, **kwargs)
         if found:
             log.info("found: {0}".format(found))
         else:

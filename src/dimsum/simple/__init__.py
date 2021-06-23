@@ -41,7 +41,7 @@ class Plant(SimpleVerb):
 
 class Swing(SimpleVerb):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = world.apply_item_finder(player, self.item)
+        item = await world.apply_item_finder(player, self.item)
         if self.item:
             return Failure("swing what?")
         await ctx.extend(swing=item).hook("swing")
@@ -50,7 +50,7 @@ class Swing(SimpleVerb):
 
 class Shake(SimpleVerb):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = world.apply_item_finder(player, self.item)
+        item = await world.apply_item_finder(player, self.item)
         if not item:
             return Failure("shake what?")
         await ctx.extend(shake=item).hook("shake")
@@ -83,7 +83,7 @@ class Kiss(SimpleVerb):
 
 class Kick(SimpleVerb):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = world.apply_item_finder(player, self.item)
+        item = await world.apply_item_finder(player, self.item)
         if not item:
             return Failure("what?")
         await ctx.extend(kick=item).hook("kick:after")
@@ -108,7 +108,7 @@ class Poke(SimpleVerb):
 
 class Hit(SimpleVerb):
     async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = world.apply_item_finder(player, self.item)
+        item = await world.apply_item_finder(player, self.item)
         if not item:
             return Failure("hit what?")
         await ctx.extend(swing=item).hook("hit")

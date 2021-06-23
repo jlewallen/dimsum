@@ -83,7 +83,7 @@ class TestWorld:
                 creator=self.player, props=properties.Common("Living room")
             )
         with self.domain.session() as session:
-            session.add_area(self.area)
+            await session.add_area(self.area)
             await session.perform(actions.Join(), self.jacob)
 
     def get_default_area(self):
@@ -142,7 +142,7 @@ async def make_simple_domain(password: str = None, store=None) -> domains.Domain
             auth.change(password)
 
     with domain.session() as session:
-        session.add_area(welcome)
+        await session.add_area(welcome)
         session.registrar.register(jacob)
         await session.perform(actions.Join(), jacob)
         await session.save()

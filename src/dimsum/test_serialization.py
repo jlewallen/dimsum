@@ -43,7 +43,9 @@ async def test_serialize_world_one_area(caplog):
     domain = domains.Domain()
     world = domain.world
     with domain.session() as session:
-        session.add_area(scopes.area(creator=world, props=properties.Common("Area")))
+        await session.add_area(
+            scopes.area(creator=world, props=properties.Common("Area"))
+        )
 
     json = serialize_all(domain.registrar)
 
@@ -62,7 +64,7 @@ async def test_serialize_world_one_item(caplog):
     area = scopes.area(creator=world, props=properties.Common("Area"))
     add_item(area, scopes.item(creator=world, props=properties.Common("Item")))
     with domain.session() as session:
-        session.add_area(area)
+        await session.add_area(area)
 
     assert area.make(carryable.Containing).holding[0]
 
@@ -120,7 +122,7 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
     )
 
     with domain.session() as session:
-        session.add_area(one)
+        await session.add_area(one)
 
     json = serialize_all(domain.registrar)
 
@@ -173,7 +175,7 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
     assert one in two.make(movement.Movement).adjacent()
 
     with domain.session() as session:
-        session.add_area(one)
+        await session.add_area(one)
 
     json = serialize_all(domain.registrar, indent=True)
 
@@ -282,7 +284,7 @@ async def test_serialize_library(caplog):
 
     generics, area = library.create_example_world(tw.world)
     with tw.domain.session() as session:
-        session.add_area(area)
+        await session.add_area(area)
 
     json = serializing.serialize(
         {"entities": tw.registrar.entities}, unpicklable=False, indent=4
@@ -318,14 +320,11 @@ async def test_serialize_preserves_owner_reference(caplog):
 @pytest.mark.asyncio
 async def test_serialize_properties_directly(caplog):
     domain = domains.Domain()
-
-    props = properties.Common("Area")
-
-    props.owner = domain.world
-
-    json = serializing.serialize(props)
-
-    log.info(json)
+    with domain.session() as session:
+        props = properties.Common("Area")
+        props.owner = domain.world
+        json = serializing.serialize(props)
+        log.info(json)
 
 
 @pytest.mark.asyncio
