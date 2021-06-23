@@ -154,7 +154,13 @@ class Session:
 
 
 class Domain:
-    def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
+    def __init__(
+        self,
+        bus: bus.EventBus = None,
+        store: storage.EntityStorage = None,
+        empty=False,
+        **kwargs
+    ):
         super().__init__()
         self.bus = (
             bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
@@ -167,7 +173,8 @@ class Domain:
             self.world = world.World()
             self.registrar.register(self.world)
 
-    def session(self) -> Session:
+    def session(self) -> "Session":
+        log.info("session:new")
         return Session(self)
 
     async def reload(self):
@@ -284,8 +291,8 @@ class WorldCtx(context.Ctx):
             kwargs,
         )
 
-        if number:
-            return self.registrar.find_by_gid(number)
+        if number is not None:
+            return await self.session.materialize(gid=number)
 
         if len(candidates) == 0:
             return None

@@ -30,7 +30,7 @@ class EntityStorage:
     async def destroy(self, keys: Keys):
         raise NotImplementedError
 
-    async def update(self, updates: Dict[Keys, str]):
+    async def update(self, updates: Dict[Keys, Optional[str]]):
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int):
@@ -57,7 +57,7 @@ class InMemory(EntityStorage):
         del self.by_gid[keys.gid]
         del self.by_key[keys.key]
 
-    async def update(self, updates: Dict[Keys, str]):
+    async def update(self, updates: Dict[Keys, Optional[str]]):
         for keys, data in updates.items():
             if data:
                 log.debug("updating %s", keys.key)
@@ -79,7 +79,7 @@ class InMemory(EntityStorage):
         return None
 
 
-class SqliteStorage:
+class SqliteStorage(EntityStorage):
     def __init__(self, path: str):
         super().__init__()
         self.path = path
@@ -202,7 +202,7 @@ class SqliteStorage:
         return "Sqlite<%s>" % (self.path,)
 
 
-class HttpStorage:
+class HttpStorage(EntityStorage):
     def __init__(self, url: str):
         super().__init__()
         self.url = url
