@@ -49,13 +49,16 @@ class ProcessTarget(Target):
         with subprocess.Popen(
             self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         ) as proc:
-            log.info("process-target: writing %s", query)
+            log.info("process-target: writing %d bytes", len(query))
             proc.stdin.write(query.encode("utf-8"))
             proc.stdin.close()
 
             raw_reply = proc.stdout.read().decode("utf-8")
-            log.info("process-target: read %s", raw_reply)
+            log.info("process-target: read %d bytes", len(raw_reply))
             return raw_reply
+
+    def __str__(self):
+        return "Process<%s>" % (self.command,)
 
 
 class HttpTarget(Target):

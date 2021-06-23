@@ -93,6 +93,8 @@ class SqliteStorage:
         )
         self.db.commit()
 
+        log.info("%s opened", self.path)
+
     async def load_query(self, query: str, args: Any):
         await self.open_if_necessary()
         assert self.db
@@ -152,6 +154,8 @@ class SqliteStorage:
         await self.open_if_necessary()
         assert self.db
 
+        log.debug("applying %d updates", len(updates))
+
         self.dbc = self.db.cursor()
         for keys, data in updates.items():
             if data:
@@ -170,7 +174,6 @@ class SqliteStorage:
                         keys.key,
                     ],
                 )
-
         self.db.commit()
 
     async def load_by_gid(self, gid: int):
@@ -188,6 +191,12 @@ class SqliteStorage:
         if len(loaded) == 1:
             return loaded[0]
         return None
+
+    def __repr__(self):
+        return "Sqlite<%s>" % (self.path,)
+
+    def __str__(self):
+        return "Sqlite<%s>" % (self.path,)
 
 
 class HttpStorage:

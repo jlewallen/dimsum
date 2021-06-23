@@ -13,6 +13,8 @@ import model.domains as domains
 import cli.utils as utils
 
 import ariadne
+import config as configuration
+import serializing
 
 import schema as schema_factory
 from schema import AriadneContext
@@ -26,8 +28,28 @@ def commands():
 
 
 @commands.command()
-async def query():
+@click.option(
+    "--config",
+    help="Path to configuration file.",
+    type=click.Path(exists=True),
+)
+@click.option(
+    "--database",
+    help="Path to database file.",
+    type=click.Path(exists=True),
+)
+async def query(config: str, database: str):
     """Execute a standard query."""
+
+    def get_config():
+        if config:
+            return configuration.get(config)
+        return configuration.Configuration(database=database, session_key="session-key")
+
+    cfg = get_config()
+    domain = domains.Domain(empty=True, store=cfg.make_store())
+
+    await domain.load()
 
     body = None
     try:
@@ -38,14 +60,10 @@ async def query():
         return
 
     schema = schema_factory.create()
-    domain = domains.Domain()
-    ok, actual = await ariadne.graphql(
-        schema,
-        data=body,
-        context_value=AriadneContext(domain),
-    )
+    context = AriadneContext(domain, cfg)
+    ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 
-    sys.stdout.write(json.dumps(actual))
+    sys.stdout.write(serializing.serialize(actual, indent=True))
 
 
 def make_error(message: str):

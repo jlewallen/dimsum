@@ -8,10 +8,10 @@ import model.properties as properties
 import model.world as world
 import model.domains as domains
 import model.scopes as scopes
-import model.scopes.users as users
 import default.actions as actions
 
 import config
+import test
 
 import schema as schema_factory
 from schema import AriadneContext
@@ -123,16 +123,7 @@ async def test_graphql_language_basic(snapshot):
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_entities_areas(snapshot):
-    domain = domains.Domain()
-    welcome = scopes.area(
-        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
-    )
-    domain.add_area(welcome)
-    jacob = scopes.alive(
-        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
-    )
-    domain.registrar.register(jacob)
-    await domain.perform(actions.Join(), jacob)
+    domain = await test.make_simple_domain()
 
     data = {"query": "{ areas }"}
     ok, actual = await ariadne.graphql(
@@ -145,16 +136,7 @@ async def test_graphql_entities_areas(snapshot):
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_entities_people(snapshot):
-    domain = domains.Domain()
-    welcome = scopes.area(
-        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
-    )
-    domain.add_area(welcome)
-    jacob = scopes.alive(
-        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
-    )
-    domain.registrar.register(jacob)
-    await domain.perform(actions.Join(), jacob)
+    domain = await test.make_simple_domain()
 
     data = {"query": "{ people }"}
     ok, actual = await ariadne.graphql(
@@ -167,21 +149,8 @@ async def test_graphql_entities_people(snapshot):
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_login():
-    domain = domains.Domain()
-    welcome = scopes.area(
-        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
-    )
-    domain.add_area(welcome)
+    domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
-    jacob = scopes.alive(
-        key=jacob_key, props=properties.Common(name="Jacob"), creator=domain.world
-    )
-
-    with jacob.make(users.Auth) as auth:
-        auth.change("asdfasdf")
-
-    domain.registrar.register(jacob)
-    await domain.perform(actions.Join(), jacob)
 
     data = {
         "query": '{ login(credentials: { username: "%s", password: "asdfasdf" }) }'

@@ -1,12 +1,8 @@
 from typing import Dict, List, Optional
 
-import os
-import sys
-import abc
 import json
 import logging
 import pytest
-import freezegun
 
 from routing import *
 
@@ -32,20 +28,3 @@ async def test_routing_process_target_cat():
     router = Router(targets=[ProcessTarget(command=["/bin/cat"])])
     reply = await router.handle("{}")
     assert reply == "{}"
-
-
-@pytest.mark.asyncio
-@pytest.mark.skip(reason="time in subprocess")
-async def test_routing_process_target_query_fail_no_query(snapshot):
-    router = Router(targets=[ProcessTarget(command=["src/dimsum/cli.py", "query"])])
-    reply = await router.handle("{}")
-    snapshot.assert_match(reply, "stdout.json")
-
-
-@pytest.mark.asyncio
-@pytest.mark.skip(reason="time in subprocess")
-async def test_routing_process_target_query_entity(snapshot):
-    router = Router(targets=[ProcessTarget(command=["src/dimsum/cli.py", "query"])])
-    query = '{entities(key: "world")}'
-    reply = await router.handle(json.dumps({"query": query}))
-    snapshot.assert_match(reply, "stdout.json")

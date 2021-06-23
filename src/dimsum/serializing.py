@@ -151,12 +151,13 @@ def deserialize(encoded, lookup):
 async def materialize(
     key: str,
     registrar: entity.Registrar,
-    storage: storage.EntityStorage,
+    store: storage.EntityStorage,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
-    log.debug("[%d] materialize %s", depth, key)
+    log.info("[%d] materialize %s", depth, key)
 
     if registrar.contains(key):
+        log.debug("[%d] return fbk", depth)
         return registrar.find_by_key(key)
 
     refs: Dict[str, entity.EntityRef] = {}
@@ -169,8 +170,9 @@ async def materialize(
             refs[key] = entity.EntityRef(key)
         return refs[key]
 
-    data = await storage.load_by_key(key)
+    data = await store.load_by_key(key)
     if data is None:
+        log.info("[%d] %s missing %s", depth, store, key)
         return None
 
     loaded = deserialize(data, reference)
@@ -178,7 +180,7 @@ async def materialize(
     registrar.register(loaded)
 
     for referenced_key, proxy in refs.items():
-        linked = await materialize(referenced_key, registrar, storage, depth=depth + 1)
+        linked = await materialize(referenced_key, registrar, store, depth=depth + 1)
         proxy.__wrapped__ = linked  # type: ignore
 
     loaded.validate()

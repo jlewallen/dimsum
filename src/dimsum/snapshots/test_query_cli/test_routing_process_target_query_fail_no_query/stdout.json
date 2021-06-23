@@ -1,0 +1,9 @@
+{
+ "errors": [
+  {
+   "message": "The query must be a string.",
+   "locations": null,
+   "path": null
+  }
+ ]
+}

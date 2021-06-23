@@ -4,6 +4,7 @@ import asyncio
 import logging
 import sys
 import lark
+import base64
 
 import model.entity as entity
 import model.properties as properties
@@ -16,6 +17,7 @@ import model.domains as domains
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
+import model.scopes.users as users
 import model.scopes as scopes
 
 import default.actions as actions
@@ -120,3 +122,25 @@ class TestWorld:
         r = await self.execute(command, **kwargs)
         assert isinstance(r, game.Failure)
         return r
+
+
+async def make_simple_domain(password: str = None, store=None) -> domains.Domain:
+    domain = domains.Domain(store=store)
+    welcome = scopes.area(
+        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
+    )
+    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+    jacob = scopes.alive(
+        key=jacob_key, props=properties.Common(name="Jacob"), creator=domain.world
+    )
+
+    if password:
+        with jacob.make(users.Auth) as auth:
+            auth.change(password)
+
+    domain.add_area(welcome)
+    domain.registrar.register(jacob)
+
+    await domain.perform(actions.Join(), jacob)
+
+    return domain

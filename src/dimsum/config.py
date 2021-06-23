@@ -6,11 +6,16 @@ import os
 import os.path
 import json
 
+import storage
+
 
 @dataclasses.dataclass
 class Configuration:
     database: str
     session_key: str
+
+    def make_store(self):
+        return storage.SqliteStorage(self.database)
 
 
 class ConfigurationException(Exception):

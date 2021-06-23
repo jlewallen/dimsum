@@ -34,32 +34,32 @@ class Domain:
         self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
         self.registrar = entity.Registrar()
-        self.world = world.World()
         if not empty:
+            self.world = world.World()
             self.registrar.register(self.world)
+        else:
+            self.world = None
 
     async def reload(self):
         await self.store.update(serializing.registrar(self.registrar))
 
         reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await reloaded.materialize("world")
+        reloaded.world = await reloaded.materialize(world.Key)
         return reloaded
 
     async def materialize(self, key: str) -> Optional[entity.Entity]:
-        entity = await serializing.materialize(key, self.registrar, self.store)
-        # assert entity
-        return entity
+        return await serializing.materialize(key, self.registrar, self.store)
 
-    async def load(self):
+    async def load(self, create=False):
         self.registrar.purge()
-        self.world = await self.materialize("world")
+        self.world = await self.materialize(world.Key)
         if self.world:
             return
-        self.world = world.World()
-        self.registrar.register(self.world)
+        if create:
+            self.world = world.World()
+            self.registrar.register(self.world)
 
     async def save(self):
-        log.info("save!")
         await self.store.update(serializing.registrar(self.registrar))
 
     async def tick(self, now: Optional[float] = None):
