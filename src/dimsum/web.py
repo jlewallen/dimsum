@@ -34,10 +34,13 @@ def create(state):
 
     def authenticate():
         if "authorization" in quart.request.headers:
-            header = quart.request.headers["authorization"]
-            bearer, encoded = header.split(" ")
-            decoded = jwt.decode(encoded, session_key, algorithms="HS256")
-            return state.world, decoded
+            try:
+                header = quart.request.headers["authorization"]
+                bearer, encoded = header.split(" ")
+                decoded = jwt.decode(encoded, session_key, algorithms="HS256")
+                return state.world, decoded
+            except:
+                log.exception("bad token")
         raise quart.abort(401)
 
     @app.route("/", defaults={"path": ""})
@@ -62,7 +65,8 @@ def create(state):
             return {"loading": True}
 
         return serializing.serialize(
-            {"areas": world.entities_of_klass(scopes.AreaClass)}, unpicklable=False
+            {"areas": state.domain.registrar.entities_of_klass(scopes.AreaClass)},
+            unpicklable=False,
         )
 
     @app.route("/api/people")
@@ -72,7 +76,8 @@ def create(state):
             return {"loading": True}
 
         return serializing.serialize(
-            {"people": world.entities_of_klass(scopes.LivingClass)}, unpicklable=False
+            {"people": state.domain.registrar.entities_of_klass(scopes.LivingClass)},
+            unpicklable=False,
         )
 
     @app.route("/api/entities/<string:ukey>")
@@ -84,8 +89,8 @@ def create(state):
         key = url_key(ukey)
         log.info("key: %s" % (key,))
 
-        if world.contains(key):
-            entity = world.find_by_key(key)
+        if state.domain.registrar.contains(key):
+            entity = state.domain.registrar.find_by_key(key)
             return serializing.serialize({"entity": entity})
 
         return {"entity": None}
@@ -99,16 +104,16 @@ def create(state):
         key = url_key(ukey)
         log.info("key: %s" % (key,))
 
-        if world.contains(key):
+        if state.domain.registrar.contains(key):
             form = await quart.request.get_json()
             log.info("form: %s" % (form,))
 
             del form["key"]
 
-            entity = world.find_by_key(key)
+            entity = state.domain.registrar.find_by_key(key)
             entity.props.update(form)
             entity.touch()
-            await state.save()
+            await state.domain.save()
 
             return serializing.serialize({"entity": entity})
 
@@ -123,15 +128,15 @@ def create(state):
         key = url_key(ukey)
         log.info("key: %s" % (key,))
 
-        if world.contains(key):
+        if state.domain.registrar.contains(key):
             form = await quart.request.get_json()
             log.info("form: %s" % (form,))
 
-            entity = world.find_by_key(key)
+            entity = state.domain.registrar.find_by_key(key)
             with entity.make(behavior.Behaviors) as behave:
                 behave.behaviors.replace(form)
             entity.touch()
-            await state.save()
+            await state.domain.save()
 
             return serializing.serialize({"entity": entity})
 
@@ -149,7 +154,7 @@ def create(state):
         l = grammars.create_parser()
 
         person_key = token["key"]
-        player = world.find_by_key(person_key)
+        player = state.domain.registrar.find_by_key(person_key)
 
         tree, create_evaluator = l.parse(command.strip())
         tree_eval = create_evaluator(world, player)
@@ -157,7 +162,7 @@ def create(state):
         action = tree_eval.transform(tree)
 
         reply = await world.perform(action, player)
-        await state.save()
+        await state.domain.save()
 
         return serializing.serialize({"id": uuid.uuid1(), "reply": reply})
 
@@ -172,10 +177,14 @@ def create(state):
         name = form["name"]
         password = form["password"]
 
-        key = base64.b64encode(name).decode("utf-8")
-        person = world.find_entity_by_key(key)
-        if not person:
-            raise Exception("no way")
+        key = base64.b64encode(name.encode("utf-8")).decode("utf-8")
+        if not state.domain.registrar.contains(key):
+            log.info("no entity: %s", key)
+            quart.abort(400)
+            return
+
+        person = state.domain.registrar.find_by_key(key)
+        assert person
 
         with person.make(users.Auth) as auth:
             token = auth.try_password(password)
@@ -195,10 +204,8 @@ def create(state):
     async def graphql():
         user = authenticate()
         body = await quart.request.get_json()
-        variables = body["variables"] if "variables" in body else None
-        context = {"session": session, "user": user}
-        res = schema.execute(body["query"], context_value=context, variables=variables)
-        return res.to_dict()
+        ok, response = schema.execute(body, context_value=AriadneContext(state.domain))
+        return response.to_dict()
 
     @app.route("/api/storage/entities/<string:ukey>")
     def get_storage_entity(ukey: str):
