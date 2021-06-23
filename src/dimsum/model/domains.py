@@ -49,8 +49,15 @@ class Domain:
     async def materialize(self, key: str) -> Optional[entity.Entity]:
         return await serializing.materialize(key, self.registrar, self.store)
 
+    async def materialize_json(self, data: str) -> Optional[entity.Entity]:
+        return await serializing.materialize_json(data, self.registrar, self.store)
+
+    async def purge(self):
+        self.registrar.purge()
+
     async def load(self, create=False):
         self.registrar.purge()
+        log.info("loading %s", self.store)
         self.world = await self.materialize(world.Key)
         if self.world:
             return
@@ -59,6 +66,7 @@ class Domain:
             self.registrar.register(self.world)
 
     async def save(self):
+        log.info("saving %s", self.store)
         await self.store.update(serializing.registrar(self.registrar))
 
     async def tick(self, now: Optional[float] = None):

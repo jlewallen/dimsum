@@ -148,17 +148,13 @@ def deserialize(encoded, lookup):
     return decoded
 
 
-async def materialize(
-    key: str,
+async def materialize_json(
+    data: str,
     registrar: entity.Registrar,
     store: storage.EntityStorage,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
-    log.info("[%d] materialize %s", depth, key)
-
-    if registrar.contains(key):
-        log.debug("[%d] return fbk", depth)
-        return registrar.find_by_key(key)
+    log.info("[%d] materialize", depth)
 
     refs: Dict[str, entity.EntityRef] = {}
 
@@ -169,11 +165,6 @@ async def materialize(
         if key not in refs:
             refs[key] = entity.EntityRef(key)
         return refs[key]
-
-    data = await store.load_by_key(key)
-    if data is None:
-        log.info("[%d] %s missing %s", depth, store, key)
-        return None
 
     loaded = deserialize(data, reference)
     assert loaded
@@ -186,6 +177,26 @@ async def materialize(
     loaded.validate()
 
     return loaded
+
+
+async def materialize(
+    key: str,
+    registrar: entity.Registrar,
+    store: storage.EntityStorage,
+    depth: int = 0,
+) -> Optional[entity.Entity]:
+    log.info("[%d] materialize %s", depth, key)
+
+    if registrar.contains(key):
+        log.debug("[%d] return fbk", depth)
+        return registrar.find_by_key(key)
+
+    data = await store.load_by_key(key)
+    if data is None:
+        log.info("[%d] %s missing %s", depth, store, key)
+        return None
+
+    return await materialize_json(data, registrar=registrar, store=store, depth=depth)
 
 
 def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:

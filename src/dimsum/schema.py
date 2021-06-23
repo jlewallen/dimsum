@@ -185,17 +185,30 @@ async def login(obj, info, credentials):
     raise UsernamePasswordError()
 
 
+@mutation.field("purge")
+async def purge(obj, info):
+    domain = info.context.domain
+    log.info("ariadne:purge")
+    await domain.purge()
+
+
 @mutation.field("makeSample")
 async def makeSample(obj, info):
     domain = info.context.domain
-    creds = Credentials(**credentials)
     log.info("ariadne:make-sample")
 
 
 @mutation.field("update")
 async def update(obj, info, entities):
     domain = info.context.domain
-    log.info("ariadne:update entities=%s", entities)
+    log.info("ariadne:update entities=%d", len(entities))
+    # TODO Parallel
+    instantiated = [await domain.materialize_json(e) for e in entities]
+    new_world = [e for e in instantiated if e.key == world.Key]
+    if new_world:
+        domain.world = world
+    await domain.save()
+    return {"saved": len(instantiated)}
 
 
 def create():

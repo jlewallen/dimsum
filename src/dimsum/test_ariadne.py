@@ -11,6 +11,7 @@ import model.scopes.users as users
 import model.scopes as scopes
 import default.actions as actions
 
+import serializing
 import config
 import test
 
@@ -192,10 +193,53 @@ async def test_graphql_login_failed():
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_update():
-    domain = await test.make_simple_domain(password="asdfasdf")
-    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+    domain = domains.Domain(empty=True)
 
-    data = {"query": "mutation { update(entities: []) { saved } }"}
+    serialized = serializing.serialize(world.World(), secure=True)
+
+    data = {
+        "variables": {"entities": [serialized]},
+        "query": """
+mutation UpdateEntities($entities: [Entity!]) {
+    update(entities: $entities) {
+        saved
+    }
+}
+""",
+    }
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain)
+        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
+    assert ok
+    assert actual == {"data": {"update": {"saved": 1}}}
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_update_and_requery(snapshot):
+    domain = domains.Domain(empty=True)
+
+    serialized = serializing.serialize(world.World(), secure=True)
+
+    data = {
+        "variables": {"entities": [serialized]},
+        "query": """
+mutation UpdateEntities($entities: [Entity!]) {
+    update(entities: $entities) {
+        saved
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+    )
+    assert ok
+    assert actual == {"data": {"update": {"saved": 1}}}
+
+    data = {"query": "{ world }"}
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+    )
+    assert ok
+    snapshot.assert_match(actual["data"]["world"], "world.json")
