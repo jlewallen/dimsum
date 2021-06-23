@@ -99,6 +99,7 @@ async def test_graphql_world_by_key(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_world_by_gid(snapshot):
     domain = domains.Domain()
+    assert domain.world.props.gid == 0
 
     data = {"query": "{ entitiesByGid(gid: %d) }" % (0)}
     ok, actual = await ariadne.graphql(

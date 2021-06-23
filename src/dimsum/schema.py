@@ -94,9 +94,13 @@ async def resolve_entities_by_gid(obj, info, gid):
     domain = info.context.domain
     log.info("ariadne:entities gid=%s", gid)
     entities = []
-    loaded = await domain.store.load_by_gid(gid)
+    loaded = domain.registrar.find_by_number(gid)
     if loaded:
         entities = [loaded]
+    else:
+        loaded = await domain.store.load_by_gid(gid)
+        if loaded:
+            entities = [loaded]
 
     log.info("ariadne:entities entities=%s", entities)
     return [serialize_entity(e) for e in entities]
