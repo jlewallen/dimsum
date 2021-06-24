@@ -107,9 +107,6 @@ class Exit(entity.Scope):
         super().__init__(**kwargs)
         self.area = area if area else None
 
-    def constructed(self, area: entity.Entity = None, **kwargs):
-        pass
-
 
 class FindsRoute:
     async def find_route(

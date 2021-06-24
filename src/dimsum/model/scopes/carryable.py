@@ -157,11 +157,6 @@ class Carryable(entity.Scope):
         self.quantity = quantity if quantity else 1
         self.loose = loose
 
-    def constructed(self, quantity: float = None, **kwargs):
-        log.warning("deprecated constructed %s %s", quantity, kwargs)
-        if quantity:
-            self.quantity = quantity
-
     def increase_quantity(self, q: float):
         self.quantity += q
         return self

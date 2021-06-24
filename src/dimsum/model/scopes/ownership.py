@@ -6,7 +6,7 @@ import model.entity as entity
 class Ownership(entity.Scope):
     def __init__(self, owner: entity.Entity = None, **kwargs):
         super().__init__(**kwargs)
-        self.owner = owner if owner else None
-
-    def constructed(self, creator: entity.Entity = None, **kwargs):
-        self.owner = creator if creator else self.ourselves
+        default_creator = (
+            self.ourselves.creator if self.ourselves.creator else self.ourselves
+        )
+        self.owner = owner if owner else default_creator

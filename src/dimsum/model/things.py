@@ -72,13 +72,29 @@ class Recipe(entity.Scope, ItemFactory):
         super().__init__(**kwargs)
         self.template = template if template else None
 
-    def create_item(self, **kwargs) -> entity.Entity:
+    def create_item(
+        self, quantity: float = None, initialize=None, **kwargs
+    ) -> entity.Entity:
         assert self.template
 
-        log.info("%s create-item %s %s", self, self.template, kwargs)
+        if quantity:
+            assert not initialize
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
+
+        log.info(
+            "%s create-item %s %s initialize=%s",
+            self,
+            self.template,
+            kwargs,
+            initialize,
+        )
         updated = copy.deepcopy(self.template.__dict__)
         updated.update(
-            key=None, identity=None, props=self.template.props.clone(), **kwargs
+            key=None,
+            identity=None,
+            props=self.template.props.clone(),
+            initialize=initialize,
+            **kwargs
         )
         cloned = scopes.item(**updated)
         return cloned
