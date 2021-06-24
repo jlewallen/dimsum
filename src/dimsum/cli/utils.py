@@ -9,6 +9,4 @@ import storage
 
 
 async def open_domain(path: str) -> domains.Domain:
-    domain = domains.Domain(store=storage.SqliteStorage(path))
-    await domain.load()
-    return domain
+    return domains.Domain(store=storage.SqliteStorage(path))

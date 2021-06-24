@@ -25,6 +25,9 @@ class EntityRef(wrapt.ObjectProxy):
         else:
             super().__init__(targetOrKey)
 
+    def __deepcopy__(self, memo):
+        return copy.deepcopy(self.__wrapped__, memo)
+
 
 class IgnoreExtraConstructorArguments:
     """
@@ -149,9 +152,22 @@ class Entity:
                     )
 
         log.debug(
-            "entity:ctor {0} '{1}' creator={2} {3}".format(
-                self.key, self.props.name, creator, creator.key if creator else "<none>"
+            "entity:ctor {0} '{1}' creator={2} {3} id={4} props={5}".format(
+                self.key,
+                self.props.name,
+                creator,
+                creator.key if creator else "<none>",
+                self.props,
+                id(self),
             )
+        )
+
+        log.info(
+            "entity:ctor %s id=%s chimeras=%s props=%s",
+            self.key,
+            id(self),
+            self.chimeras,
+            self.props,
         )
 
     def validate(self) -> None:
@@ -236,7 +252,7 @@ class Entity:
         if key in self.chimeras:
             chargs.update(**self.chimeras[key])
 
-        log.debug("%s splitting chimera: %s", self.key, key)
+        log.debug("%s splitting chimera: %s %s", self.key, key, chargs)
         child = ctor(chimera=self, **chargs)
         return child
 
@@ -279,9 +295,14 @@ class Scope:
         self.chimera.update(self)
 
 
+class RegistrationException(Exception):
+    pass
+
+
 class Registrar:
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        log.info("registrar:ctor")
         self.entities: Dict[str, entity.Entity] = {}
         self.garbage: Dict[str, entity.Entity] = {}
         self.numbered: Dict[int, entity.Entity] = {}
@@ -305,17 +326,23 @@ class Registrar:
             assigned = entity.registered(self.number)
             log.info("register:new {0} '{1}'".format(entity.key, entity))
             if assigned in self.numbered:
-                assert self.numbered[assigned] == entity
-            self.number = assigned + 1
+                already = self.numbered[assigned]
+                if already.key != entity.key:
+                    raise RegistrationException(
+                        "gid {0} already assigned to {1} (gave={2})".format(
+                            assigned, already.key, self.number
+                        )
+                    )
+            # We can instantiate entities in any order, so we need to
+            # be sure this is always the greatest gid we've seen.
+            if assigned + 1 > self.number:
+                self.number = assigned + 1
             self.entities[entity.key] = entity
             self.numbered[assigned] = entity
             self.key_to_number[entity.key] = assigned
 
     def contains(self, key) -> bool:
         return key in self.entities
-
-    def find_by_key(self, key) -> Entity:
-        return self.entities[key]
 
     def entities_of_klass(self, klass: Type[EntityClass]):
         return [e for key, e in self.entities.items() if e.klass == klass]
@@ -325,16 +352,21 @@ class Registrar:
             log.debug("add-entity: %s %s", entity.key, entity)
             self.register(entity)
 
+    def find_by_gid(self, gid: int) -> Optional[Entity]:
+        if gid in self.numbered:
+            return self.numbered[gid]
+        return None
+
+    def find_by_key(self, key) -> Optional[Entity]:
+        if key in self.entities:
+            return self.entities[key]
+        return None
+
+    # TODO Move to tests.
     def find_entity_by_name(self, name):
         for key, e in self.entities.items():
             if name in e.props.name:
                 return e
-        return None
-
-    def find_by_number(self, number: int) -> Optional[Entity]:
-        if number in self.numbered:
-            return self.numbered[number]
-        log.info("register:miss {0}".format(number))
         return None
 
     def empty(self) -> bool:

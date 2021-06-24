@@ -18,9 +18,18 @@ log = logging.getLogger("dimsum")
 async def test_area_weather_blows_small_items():
     tw = test.TestWorld()
 
-    generics, area = library.create_example_world(tw.world)
-    await tw.initialize(area=area)
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        generics, area = library.create_example_world(world)
+        session.registrar.add_entities(generics.all)
+
+        await session.add_area(area)
+        await session.save()
+
+    await tw.add_jacob()
 
     assert await tw.success("go rocky")
 
-    await tw.domain.tick(1)
+    with tw.domain.session() as session:
+        await session.tick(1)

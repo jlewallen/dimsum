@@ -3,8 +3,10 @@ import pytest
 
 import model.game as game
 import model.reply as reply
+import model.things as things
 
 import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
 
 import test
 
@@ -17,60 +19,86 @@ async def test_quantified_drop_partial_and_hold():
 
     await tw.initialize()
     await tw.success("make 20 Coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.registrar.entities) == 4
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+        assert len(session.registrar.entities) == 4
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert (
-        tw.player.make(carryable.Containing)
-        .holding[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 15
-    )
-    assert (
-        tw.area.make(carryable.Containing)
-        .entities()[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 5
-    )
-    assert (
-        tw.player.make(carryable.Containing).holding[0].key in tw.registrar.entities
-    )  # Meh
-    assert len(tw.registrar.entities) == 5
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 15
+        )
+        assert (
+            area.make(carryable.Containing)
+            .entities()[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 5
+        )
+        assert (
+            jacob.make(carryable.Containing).holding[0].key
+            in session.registrar.entities
+        )  # Meh
+        assert len(session.registrar.entities) == 5
 
     await tw.success("hold coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.registrar.undestroyed) == 4
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+        assert len(session.registrar.undestroyed) == 4
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert len(tw.registrar.undestroyed) == 5
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
+        assert len(session.registrar.undestroyed) == 5
 
     await tw.success("drop 5 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert (
-        tw.player.make(carryable.Containing)
-        .holding[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 10
-    )
-    assert (
-        tw.area.make(carryable.Containing)
-        .entities()[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 10
-    )
-    assert len(tw.registrar.undestroyed) == 5
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 10
+        )
+        assert (
+            area.make(carryable.Containing)
+            .entities()[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 10
+        )
+        assert len(session.registrar.undestroyed) == 5
 
 
 @pytest.mark.asyncio
@@ -80,11 +108,22 @@ async def test_quantified_hold_number():
     await tw.initialize()
     await tw.success("make 20 Coin")
     await tw.success("drop 20 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 0
-    assert len(tw.area.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 0
+        assert len(area.make(carryable.Containing).holding) == 1
+
     await tw.success("hold 10 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
@@ -92,20 +131,35 @@ async def test_quantified_drop_all():
     tw = test.TestWorld()
 
     await tw.initialize()
-    assert len(tw.registrar.entities) == 3
+
+    assert await tw.domain.store.number_of_entities() == 3
+
     await tw.success("make 20 Coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
-    assert len(tw.registrar.entities) == 4
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+        assert len(session.registrar.entities) == 4
 
     await tw.success("drop 20 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 0
-    assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert (
-        tw.area.make(carryable.Containing).holding[0].make(carryable.Carryable).quantity
-        == 20
-    )
-    assert len(tw.registrar.undestroyed) == 4
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 0
+        assert len(area.make(carryable.Containing).holding) == 1
+        assert (
+            area.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 20
+        )
+        assert len(session.registrar.undestroyed) == 4
 
 
 @pytest.mark.asyncio
@@ -114,14 +168,30 @@ async def test_quantified_drop_inflected():
 
     await tw.initialize()
 
-    assert len(tw.player.make(carryable.Containing).holding) == 0
-    await tw.success("make 20 Coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 0
 
-    assert len(tw.area.make(carryable.Containing).holding) == 0
+    await tw.success("make 20 Coin")
+
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(area.make(carryable.Containing).holding) == 0
+
     await tw.success("drop 10 coin")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
 
 
 @pytest.mark.asyncio
@@ -133,17 +203,27 @@ async def test_quantified_from_recipe_holding_template(caplog):
     await tw.success("call this cash")
     r = await tw.success("make 4 cash")
     assert r.item.make(carryable.Carryable).quantity == 5
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
 
     await tw.success("look down")
-    assert (
-        tw.player.make(carryable.Containing)
-        .holding[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 5
-    )
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 5
+        )
 
 
 @pytest.mark.asyncio
@@ -153,25 +233,58 @@ async def test_quantified_from_recipe(caplog):
     await tw.initialize()
     await tw.success("make Gold Coin")
     await tw.success("call this cash")
-    item = tw.player.make(carryable.Containing).holding[0]
-    assert item
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        item = jacob.make(carryable.Containing).holding[0]
+        assert item
+        brain = jacob.make(mechanics.Memory)
+        assert "r:cash" in brain.memory
+        coins = brain.memory["r:cash"]
+        assert coins.make(things.Recipe).template
 
     await tw.success("obliterate")
-    assert item.props.destroyed
+
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 0
 
     await tw.success("make 20 cash")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+        coins = jacob.make(carryable.Containing).holding[0]
+        assert coins.make(carryable.Carryable).quantity == 20
 
     await tw.success("make 20 cash")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 40
+        )
 
     await tw.success("look down")
-    assert (
-        tw.player.make(carryable.Containing)
-        .holding[0]
-        .make(carryable.Carryable)
-        .quantity
-        == 40
-    )
+
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 40
+        )

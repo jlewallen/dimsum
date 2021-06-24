@@ -49,6 +49,9 @@ class ProcessTarget(Target):
         with subprocess.Popen(
             self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         ) as proc:
+            assert proc.stdin
+            assert proc.stdout
+
             log.info("process-target: writing %d bytes", len(query))
             proc.stdin.write(query.encode("utf-8"))
             proc.stdin.close()

@@ -15,27 +15,40 @@ log = logging.getLogger("dimsum")
 @pytest.mark.asyncio
 async def test_storage_materialize_world():
     store = storage.InMemory()
-    domain = domains.Domain(storage=store, empty=True)
-    assert not await serializing.materialize(domain.registrar, store, key="world")
+    domain = domains.Domain(storage=store)
+    with domain.session() as session:
+        assert not await serializing.materialize(
+            session.registrar, store, key=world.Key
+        )
 
-    await store.update(serializing.for_update([world.World()]))
+        await store.update(serializing.for_update([world.World()]))
 
-    assert await serializing.materialize(domain.registrar, store, key="world")
+        assert await serializing.materialize(
+            registrar=session.registrar, store=store, key=world.Key
+        )
 
 
 @pytest.mark.asyncio
 async def test_storage_materialize_reference():
     store = storage.InMemory()
-    domain = domains.Domain(storage=store)
+    domain = domains.Domain(store=store)
 
-    domain.add_area(scopes.area(creator=domain.world, props=properties.Common("Area")))
+    with domain.session() as session:
+        w = await session.prepare()
 
-    await store.update(serializing.registrar(domain.registrar))
+        await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
 
-    domain.registrar.purge()
+        await session.save()
 
-    assert domain.registrar.number == 0
+    with domain.session() as session:
+        session.registrar.purge()
 
-    assert await serializing.materialize(domain.registrar, store, key="world")
+        assert session.registrar.number_of_entities() == 0
 
-    assert domain.registrar.number == 2
+        await session.prepare()
+
+        assert await serializing.materialize(
+            registrar=session.registrar, store=store, key=world.Key
+        )
+
+        assert session.registrar.number_of_entities() == 2

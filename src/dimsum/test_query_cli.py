@@ -10,15 +10,15 @@ import model.domains as domains
 import storage
 
 
-import routing.routing as routing
+import routing
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_fail_no_query(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
+    await store.purge()
     domain = await test.make_simple_domain(store=store)
-    await domain.save()
 
     router = routing.Router(
         targets=[
@@ -35,8 +35,8 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_entity(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
+    await store.purge()
     domain = await test.make_simple_domain(store=store)
-    await domain.save()
 
     router = routing.Router(
         targets=[

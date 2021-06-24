@@ -36,7 +36,7 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
         raise NotImplementedError
 
 

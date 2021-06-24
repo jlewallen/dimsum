@@ -11,7 +11,7 @@ import model.entity as entity
 
 import storage
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.storage")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -30,7 +30,7 @@ class EntityStorage:
     async def destroy(self, keys: Keys):
         raise NotImplementedError
 
-    async def update(self, updates: Dict[Keys, str]):
+    async def update(self, updates: Dict[Keys, Optional[str]]):
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int):
@@ -43,6 +43,7 @@ class EntityStorage:
 class InMemory(EntityStorage):
     def __init__(self):
         super().__init__()
+        log.info("%s constructed!", self)
         self.by_key = {}
         self.by_gid = {}
 
@@ -50,6 +51,7 @@ class InMemory(EntityStorage):
         return len(self.by_key)
 
     async def purge(self):
+        log.info("%s purge!", self)
         self.by_key = {}
         self.by_gid = {}
 
@@ -57,16 +59,21 @@ class InMemory(EntityStorage):
         del self.by_gid[keys.gid]
         del self.by_key[keys.key]
 
-    async def update(self, updates: Dict[Keys, str]):
+    async def update(self, updates: Dict[Keys, Optional[str]]):
         for keys, data in updates.items():
             if data:
                 log.debug("updating %s", keys.key)
                 self.by_key[keys.key] = data
                 self.by_gid[keys.gid] = data
             else:
-                log.debug("deleting %s", keys.key)
-                del self.by_key[keys.key]
-                del self.by_gid[keys.gid]
+                if keys.key in self.by_key:
+                    log.debug("deleting %s", keys.key)
+                    del self.by_key[keys.key]
+                else:
+                    log.warning("delete:noop %s", keys.key)
+
+                if keys.gid in self.by_gid:
+                    del self.by_gid[keys.gid]
 
     async def load_by_gid(self, gid: int):
         if gid in self.by_gid:
@@ -79,7 +86,7 @@ class InMemory(EntityStorage):
         return None
 
 
-class SqliteStorage:
+class SqliteStorage(EntityStorage):
     def __init__(self, path: str):
         super().__init__()
         self.path = path
@@ -202,7 +209,7 @@ class SqliteStorage:
         return "Sqlite<%s>" % (self.path,)
 
 
-class HttpStorage:
+class HttpStorage(EntityStorage):
     def __init__(self, url: str):
         super().__init__()
         self.url = url

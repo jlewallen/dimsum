@@ -2,11 +2,11 @@ from typing import List, Any
 
 import abc
 import bus
-
-import context
+import logging
 
 import model.events as events
 import model.entity as entity
+import context
 
 """
 One thing I've considered is to use this as a place for a way to
@@ -18,6 +18,8 @@ So, being able to decorate with something like
 
 And then using that to maintain our state.
 """
+
+log = logging.getLogger("dimsum.scopes")
 
 
 class Occupying(entity.Scope):
@@ -33,6 +35,7 @@ class Occupyable(entity.Scope):
         self.occupancy: int = 100
 
     def add_living(self, living: entity.Entity) -> entity.Entity:
+        assert isinstance(living, entity.Entity)
         self.occupied.append(living)
         with living.make(Occupying) as occupying:
             occupying.area = self.ourselves

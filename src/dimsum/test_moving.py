@@ -17,10 +17,19 @@ async def test_go_unknown():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before = tw.world.find_player_area(tw.player)
+    area_before = None
+    with tw.domain.session() as session:
+        await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = session.world.find_player_area(jacob).key
+
     await tw.failure("go door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_before == area_after
+
+    with tw.domain.session() as session:
+        await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = session.world.find_player_area(jacob).key
+        assert area_before == area_after
 
 
 @pytest.mark.asyncio
@@ -28,26 +37,37 @@ async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()
 
-    another_room = scopes.area(
-        creator=tw.world, props=properties.Common("Another Room")
-    )
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    add_item(
-        tw.area,
-        scopes.exit(
-            creator=tw.world,
+        another_room = scopes.area(
+            creator=session.world, props=properties.Common("Another Room")
+        )
+
+        exit = scopes.exit(
+            creator=session.world,
             props=properties.Common("Door"),
             initialize={movement.Exit: dict(area=another_room)},
-        ),
-    )
+        )
+        add_item(world.welcome_area(), exit)
+        await session.add_area(another_room)
+        session.register(exit)
+        await session.save()
 
-    tw.domain.add_area(another_room)
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = session.world.find_player_area(jacob).key
 
-    area_before = tw.world.find_player_area(tw.player)
     await tw.success("go door")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-    assert area_after == another_room
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = session.world.find_player_area(jacob).key
+        assert area_after != area_before
+        assert area_after == another_room.key
 
 
 @pytest.mark.asyncio
@@ -55,10 +75,19 @@ async def test_directional_moving_nowhere():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before = tw.world.find_player_area(tw.player)
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = session.world.find_player_area(jacob).key
+
     await tw.failure("go north")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_before == area_after
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = session.world.find_player_area(jacob).key
+        assert area_before == area_after
 
 
 @pytest.mark.asyncio
@@ -66,26 +95,37 @@ async def test_directional_moving():
     tw = test.TestWorld()
     await tw.initialize()
 
-    obs = await tw.success("look")
-    assert obs
+    await tw.success("look")
 
-    park = scopes.area(props=properties.Common("North Park"), creator=tw.jacob)
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
 
-    tw.domain.add_area(park)
-    add_item(
-        tw.area,
-        scopes.exit(
-            creator=tw.jacob,
+        park = scopes.area(props=properties.Common("North Park"), creator=world)
+
+        await session.add_area(park)
+
+        exit = scopes.exit(
+            creator=world,
             props=properties.Common(name=movement.Direction.NORTH.exiting),
             initialize={movement.Exit: dict(area=park)},
-        ),
-    )
+        )
+        add_item(world.welcome_area(), exit)
+        session.register(exit)
 
-    area_before = tw.world.find_player_area(tw.player)
+        area_before = session.world.find_player_area(jacob).key
+        await session.save()
+
     await tw.success("go north")
-    area_after = tw.world.find_player_area(tw.player)
-    assert area_after != area_before
-    assert area_after == park
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = session.world.find_player_area(jacob).key
+        assert area_after != area_before
+        assert area_after == park.key
 
 
 class Bidirectional:
@@ -114,13 +154,16 @@ class Bidirectional:
 async def test_programmatic_basic_entrances_and_exits():
     tw = test.TestWorld()
 
-    earth = scopes.area(creator=tw.jacob, props=properties.Common(name="Earth"))
-    asteroid = scopes.area(creator=tw.jacob, props=properties.Common(name="Asteroid"))
-    Bidirectional(there=asteroid, back=earth, creator=tw.jacob)
+    await tw.initialize()
 
-    await tw.initialize(earth)
+    with tw.domain.session() as session:
+        world = await session.prepare()
 
-    tw.domain.add_area(asteroid)
+        earth = scopes.area(creator=world, props=properties.Common(name="Earth"))
+        asteroid = scopes.area(creator=world, props=properties.Common(name="Asteroid"))
+        Bidirectional(there=asteroid, back=earth, creator=world)
+
+        await session.add_area(asteroid)
 
 
 @pytest.mark.asyncio
@@ -129,7 +172,13 @@ async def test_digging_basic():
     await tw.initialize()
 
     await tw.success("dig north to 'Kitchen'")
-    await tw.success("go #{0}".format(tw.area.props.gid))
+
+    gid = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        gid = world.welcome_area().props.gid
+
+    await tw.success("go #{0}".format(gid))
 
 
 @pytest.mark.asyncio

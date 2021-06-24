@@ -60,6 +60,9 @@ schema = schema_factory.create()
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_size(snapshot):
     domain = domains.Domain()
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
 
     data = {"query": "{ size }"}
     ok, actual = await ariadne.graphql(
@@ -73,6 +76,9 @@ async def test_graphql_size(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_world(snapshot):
     domain = domains.Domain()
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
 
     data = {"query": "{ world }"}
     ok, actual = await ariadne.graphql(
@@ -86,6 +92,9 @@ async def test_graphql_world(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_world_by_key(snapshot):
     domain = domains.Domain()
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
 
     data = {"query": '{ entitiesByKey(key: "%s") }' % (world.Key)}
     ok, actual = await ariadne.graphql(
@@ -99,7 +108,11 @@ async def test_graphql_world_by_key(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_world_by_gid(snapshot):
     domain = domains.Domain()
-    assert domain.world.props.gid == 0
+
+    with domain.session() as session:
+        world = await session.prepare()
+        assert world.props.gid == 0
+        await session.save()
 
     data = {"query": "{ entitiesByGid(gid: %d) }" % (0)}
     ok, actual = await ariadne.graphql(
@@ -113,15 +126,23 @@ async def test_graphql_world_by_gid(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_language_basic(snapshot):
     domain = domains.Domain()
-    welcome = scopes.area(
-        key="welcome", props=properties.Common(name="welcome"), creator=domain.world
-    )
-    domain.add_area(welcome)
-    jacob = scopes.alive(
-        key="jlewallen", props=properties.Common(name="Jacob"), creator=domain.world
-    )
-    domain.registrar.register(jacob)
-    await domain.perform(actions.Join(), jacob)
+    with domain.session() as session:
+        world = await session.prepare()
+
+        welcome = scopes.area(
+            key="welcome",
+            props=properties.Common(name="welcome"),
+            creator=world,
+        )
+        await session.add_area(welcome)
+        jacob = scopes.alive(
+            key="jlewallen",
+            props=properties.Common(name="Jacob"),
+            creator=world,
+        )
+        session.register(jacob)
+        await session.perform(actions.Join(), jacob)
+        await session.save()
 
     data = {
         "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities } }'
@@ -207,7 +228,7 @@ async def test_graphql_login_failed():
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_update():
-    domain = domains.Domain(empty=True)
+    domain = domains.Domain()
 
     serialized = serializing.serialize(world.World(), secure=True)
 
@@ -231,7 +252,7 @@ mutation UpdateEntities($entities: [Entity!]) {
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_update_and_requery(snapshot):
-    domain = domains.Domain(empty=True)
+    domain = domains.Domain()
 
     serialized = serializing.serialize(world.World(), secure=True)
 

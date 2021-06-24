@@ -25,60 +25,95 @@ log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
 
 
-class Domain:
-    def __init__(self, bus: bus.EventBus = None, store=None, empty=False, **kwargs):
+class Session:
+    def __init__(self, domain: "Domain"):
         super().__init__()
-        self.bus = (
-            bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
-        )
-        self.store = store if store else storage.InMemory()
-        self.context_factory = luaproxy.context_factory
+        self.domain = domain
         self.registrar = entity.Registrar()
-        self.world = None
-        if not empty:
-            self.world = world.World()
-            self.registrar.register(self.world)
+        self.world: Optional[world.World] = None
 
-    async def reload(self):
-        await self.store.update(serializing.registrar(self.registrar))
+    def __enter__(self):
+        return self
 
-        reloaded = Domain(empty=True, store=self.store)
-        reloaded.world = await reloaded.materialize(key=world.Key)
-        return reloaded
+    def __exit__(self, type, value, traceback):
+        # TODO Warn on unsaved changes?
+        return False
+
+    def register(self, entity: entity.Entity) -> entity.Entity:
+        return self.registrar.register(entity)
+
+    def unregister(self, entity: entity.Entity) -> entity.Entity:
+        return self.registrar.unregister(entity)
 
     async def materialize(
-        self, key: str = None, json: str = None
+        self, key: str = None, gid: int = None, json: str = None
     ) -> Optional[entity.Entity]:
         return await serializing.materialize(
-            registrar=self.registrar, store=self.store, key=key, json=json
+            registrar=self.registrar,
+            store=self.domain.store,
+            key=key,
+            gid=gid,
+            json=json,
         )
 
-    async def purge(self):
-        self.registrar.purge()
+    async def prepare(self):
+        if self.world:
+            assert self.world in self.registrar.entities.values()
+            return self.world
 
-    async def load(self, create=False):
-        self.registrar.purge()
-        log.info("loading %s", self.store)
         self.world = await self.materialize(key=world.Key)
         if self.world:
-            return
-        if create:
-            self.world = world.World()
-            self.registrar.register(self.world)
+            assert self.world in self.registrar.entities.values()
+            return self.world
 
-    async def save(self):
-        log.info("saving %s", self.store)
-        await self.store.update(serializing.registrar(self.registrar))
+        log.info("creating new world")
+        self.world = world.World()
+        self.register(self.world)
+        assert self.world in self.registrar.entities.values()
+        return self.world
+
+    async def perform(
+        self, action, person: Optional[entity.Entity], **kwargs
+    ) -> game.Reply:
+
+        log.info("-" * 100)
+        log.info("%s", action)
+        log.info("-" * 100)
+
+        await self.prepare()
+
+        assert self.world
+
+        area = self.world.find_entity_area(person) if person else None
+
+        with WorldCtx(
+            person=person,
+            area=area,
+            session=self,
+            context_factory=self.domain.context_factory,
+            **kwargs
+        ) as ctx:
+            try:
+                return await action.perform(ctx, self.world, person)
+            except entity.EntityFrozen:
+                return game.Failure("whoa, that's frozen")
+
+        log.info("-" * 100)
 
     async def tick(self, now: Optional[float] = None):
+        await self.prepare()
+
         if now is None:
             now = time.time()
+
         await self.everywhere(world.TickHook, time=now)
         await self.everywhere(world.WindHook, time=now)
+
         return now
 
     async def everywhere(self, name: str, **kwargs):
         assert self.world
+
         log.info("everywhere:%s %s", name, kwargs)
         everything: List[entity.Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
@@ -91,36 +126,18 @@ class Domain:
                     area = self.world.find_entity_area(entity)
                     assert area
                     with WorldCtx(
-                        self.context_factory,
-                        domain=self,
-                        world=self.world,
                         area=area,
                         entity=entity,
-                        registrar=self.registrar,
+                        session=self,
+                        context_factory=self.domain.context_factory,
                         **kwargs
                     ) as ctx:
                         await ctx.hook(name)
 
-    async def perform(
-        self, action, person: Optional[entity.Entity], **kwargs
-    ) -> game.Reply:
-        assert self.world
-        area = self.world.find_entity_area(person) if person else None
-        with WorldCtx(
-            self.context_factory,
-            domain=self,
-            world=self.world,
-            person=person,
-            area=area,
-            registrar=self.registrar,
-            **kwargs
-        ) as ctx:
-            try:
-                return await action.perform(ctx, self.world, person)
-            except entity.EntityFrozen:
-                return game.Failure("whoa, that's frozen")
+    async def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+        await self.prepare()
 
-    def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+        assert area
         assert self.world
 
         if seen is None:
@@ -135,8 +152,12 @@ class Domain:
             if welcoming.area:
                 existing_occupied = welcoming.area.make(occupyable.Occupyable).occupied
                 if len(existing_occupied) < len(occupied):
+                    log.info("updating welcome-area")
+                    assert area
                     welcoming.area = area
             else:
+                log.info("updating welcome-area")
+                assert area
                 welcoming.area = area
 
         seen[area.key] = area.key
@@ -155,41 +176,66 @@ class Domain:
             maybe_area = item.make(movement.Exit).area
             if maybe_area:
                 log.debug("linked-via-ex[%s] %s", depth, maybe_area)
-                self.add_area(maybe_area, depth=depth + 1, seen=seen)
+                await self.add_area(maybe_area, depth=depth + 1, seen=seen)
 
             for linked in item.make(movement.Movement).adjacent():
                 log.debug("linked-via-item[%d]: %s (%s)", depth, linked, item)
-                self.add_area(linked, depth=depth + 1, seen=seen)
+                await self.add_area(linked, depth=depth + 1, seen=seen)
 
         for linked in area.make(movement.Movement).adjacent():
             log.debug("linked-adj[%d]: %s", depth, linked)
-            self.add_area(linked, depth=depth + 1, seen=seen)
+            await self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
 
+    async def save(self):
+        log.info("saving %s", self.domain.store)
+        await self.domain.store.update(serializing.registrar(self.registrar))
+
+
+class Domain:
+    def __init__(
+        self, bus: bus.EventBus = None, store: storage.EntityStorage = None, **kwargs
+    ):
+        super().__init__()
+        self.bus = (
+            bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
+        )
+        self.store = store if store else storage.InMemory()
+        self.context_factory = luaproxy.context_factory
+
+    def session(self) -> "Session":
+        log.info("session:new")
+        return Session(self)
+
+    async def reload(self):
+        reloaded = Domain(empty=True, store=self.store)
+        with reloaded.session() as session:
+            reloaded.world = await session.materialize(
+                key=world.Key
+            )  # TODO Move to Session
+            return reloaded
+
 
 class WorldCtx(context.Ctx):
-    # This should eventually get worked out. Just return Ctx from this function?
     def __init__(
         self,
-        context_factory,
-        domain: Domain = None,
-        registrar: entity.Registrar = None,
-        world: world.World = None,
+        session: Session = None,
         person: entity.Entity = None,
+        context_factory=None,
         **kwargs
     ):
         super().__init__()
-        assert domain
+        assert session
         assert world
-        assert registrar
-        self.se = scripting
-        self.domain = domain
-        self.bus = domain.bus
-        self.world = world
-        self.context_factory = context_factory
-        self.registrar = registrar
         self.person = person
+        self.se = scripting
+        self.session = session
+        self.domain = session.domain
+        self.world = session.world
+        self.registrar = session.registrar
+        self.bus = session.domain.bus
+        self.context_factory = context_factory
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
 
     def __enter__(self):
@@ -218,10 +264,10 @@ class WorldCtx(context.Ctx):
         return get_entities_inside(self.scope.values())
 
     def register(self, entity: entity.Entity) -> entity.Entity:
-        return self.registrar.register(entity)
+        return self.session.register(entity)
 
     def unregister(self, entity: entity.Entity) -> entity.Entity:
-        return self.registrar.unregister(entity)
+        return self.session.unregister(entity)
 
     async def publish(self, *args, **kwargs):
         for arg in args:
@@ -253,7 +299,7 @@ class WorldCtx(context.Ctx):
                 actions = self.se.execute(thunk, prepared, b)
                 if actions:
                     for action in actions:
-                        await self.domain.perform(action, self.person)
+                        await self.session.perform(action, self.person)
                         log.info("performing: %s", action)
 
     def create_item(
@@ -264,11 +310,11 @@ class WorldCtx(context.Ctx):
             initialize = {carryable.Carryable: dict(quantity=quantity)}
         return scopes.item(initialize=initialize, **kwargs)
 
-    def find_item(
+    async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
     ) -> Optional[entity.Entity]:
         log.info(
-            "find-item: number=%s candidates=%s exclude=%s scopes=%s kw=%s",
+            "find-item: gid=%s candidates=%s exclude=%s scopes=%s kw=%s",
             number,
             candidates,
             exclude,
@@ -276,8 +322,8 @@ class WorldCtx(context.Ctx):
             kwargs,
         )
 
-        if number:
-            return self.registrar.find_by_number(number)
+        if number is not None:
+            return await self.session.materialize(gid=number)
 
         if len(candidates) == 0:
             return None

@@ -58,7 +58,6 @@ class Repl:
 
     async def get_player(self):
         if self.world is None:
-            await self.domain.load()
             self.world = self.domain.world
             assert self.world
 

@@ -128,7 +128,7 @@ class FindNamedRoute(FindsRoute):
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
         with area.make(carryable.Containing) as contain:
-            navigable = context.get().find_item(
+            navigable = await context.get().find_item(
                 candidates=contain.holding, scopes=[Exit], q=self.name
             )
             if navigable:
@@ -148,7 +148,7 @@ class FindDirectionalRoute(FindsRoute):
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
         with area.make(carryable.Containing) as contain:
-            navigable = context.get().find_item(
+            navigable = await context.get().find_item(
                 candidates=contain.holding, scopes=[Exit], q=self.direction.exiting
             )
             if navigable:
@@ -168,6 +168,6 @@ class FindNavigableItem(FindsRoute):
     async def find_route(
         self, area: entity.Entity, person, **kwargs
     ) -> Optional[AreaRoute]:
-        area = self.finder.find_item(**kwargs)
+        area = await self.finder.find_item(**kwargs)
         assert area
         return AreaRoute(area=area)

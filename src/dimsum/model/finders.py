@@ -15,7 +15,7 @@ log = logging.getLogger("dimsum.model")
 
 
 class FindNone(things.ItemFinder):
-    def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
         return None
 
 
@@ -24,7 +24,7 @@ class StaticItem(things.ItemFinder):
         super().__init__()
         self.item = item
 
-    def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
         return self.item
 
 
@@ -33,8 +33,8 @@ class ObjectNumber(things.ItemFinder):
         super().__init__()
         self.number = number
 
-    def find_item(self, **kwargs) -> Optional[entity.Entity]:
-        return context.get().find_item(number=self.number, **kwargs)
+    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+        return await context.get().find_item(number=self.number, **kwargs)
 
 
 class AnyItem(things.ItemFinder):
@@ -43,7 +43,7 @@ class AnyItem(things.ItemFinder):
         assert q
         self.q = q
 
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
@@ -51,7 +51,7 @@ class AnyItem(things.ItemFinder):
 
         log.info("%s finding wearing", self)
         with person.make(apparel.Apparel) as wearing:
-            item = context.get().find_item(
+            item = await context.get().find_item(
                 candidates=wearing.wearing, q=self.q, **kwargs
             )
             if item:
@@ -65,7 +65,7 @@ class AnyItem(things.ItemFinder):
 
         log.info("%s finding pockets", self)
         with person.make(carryable.Containing) as pockets:
-            item = context.get().find_item(
+            item = await context.get().find_item(
                 candidates=pockets.holding, q=self.q, **kwargs
             )
             if item:
@@ -73,7 +73,7 @@ class AnyItem(things.ItemFinder):
 
         log.info("%s finding ground", self)
         with area.make(carryable.Containing) as ground:
-            item = context.get().find_item(
+            item = await context.get().find_item(
                 candidates=ground.holding, q=self.q, **kwargs
             )
             if item:
@@ -92,7 +92,7 @@ class UnheldItem(things.ItemFinder):
         assert q
         self.q = q
 
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
@@ -100,13 +100,13 @@ class UnheldItem(things.ItemFinder):
 
         log.info("%s finding area", self)
         with area.make(carryable.Containing) as contain:
-            item = context.get().find_item(candidates=contain.holding, q=self.q)
+            item = await context.get().find_item(candidates=contain.holding, q=self.q)
             if item:
                 return item
 
         log.info("%s finding pockets", self)
         with person.make(carryable.Containing) as pockets:
-            item = context.get().find_item(candidates=pockets.holding, q=self.q)
+            item = await context.get().find_item(candidates=pockets.holding, q=self.q)
             if item:
                 return item
 
@@ -114,14 +114,14 @@ class UnheldItem(things.ItemFinder):
 
 
 class AnyHeldItem(things.ItemFinder):
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
         with person.make(carryable.Containing) as pockets:
-            return context.get().find_item(candidates=pockets.holding, **kwargs)
+            return await context.get().find_item(candidates=pockets.holding, **kwargs)
 
 
 class HeldItem(things.ItemFinder):
@@ -133,14 +133,14 @@ class HeldItem(things.ItemFinder):
         assert q
         self.q = q
 
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
         with person.make(carryable.Containing) as pockets:
-            item = context.get().find_item(
+            item = await context.get().find_item(
                 candidates=pockets.holding, q=self.q, **kwargs
             )
             if item:
@@ -150,14 +150,14 @@ class HeldItem(things.ItemFinder):
 
 
 class FindHeldContainer(things.ItemFinder):
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
         log.info("%s finding pockets", self)
         with person.make(carryable.Containing) as pockets:
-            item = context.get().find_item(candidates=pockets.holding, **kwargs)
+            item = await context.get().find_item(candidates=pockets.holding, **kwargs)
             if item:
                 return item
 
@@ -170,7 +170,7 @@ class ContainedItem(things.ItemFinder):
         assert q
         self.q = q
 
-    def find_item(
+    async def find_item(
         self, person: entity.Entity = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person

@@ -14,7 +14,6 @@ run:
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/python3 -m pytest src/dimsum/routing/test_*.py
 	env/bin/python3 -m pytest src/dimsum/test_*.py
 
 prettier: env

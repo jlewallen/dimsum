@@ -1,6 +1,7 @@
 import pytest
 import logging
 import freezegun
+import json
 
 import model.game as game
 import model.entity as entity
@@ -10,6 +11,7 @@ import model.reply as reply
 
 import model.scopes.mechanics as mechanics
 import model.scopes.carryable as carryable
+import model.scopes.occupyable as occupyable
 
 import serializing
 
@@ -55,6 +57,31 @@ async def test_look_living():
     await tw.add_carla()
     r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
+
+    log.info("------------------------------------------------------------------")
+    log.info("------------------------------------------------------------------")
+    log.info("------------------------------------------------------------------")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        with world.welcome_area().make(occupyable.Occupyable) as here:
+            log.info("%s", here.occupied)
+            for o in here.occupied:
+                log.info("%s %s", o.key, o)
+
+        # await session.save()
+
+    log.info("executing success.look")
+    r = await tw.success("look")
+    log.info("done executing success.look")
+
+    if False:
+        for key, doc in tw.domain.store.by_key.items():
+            log.info(
+                "%s %s", key, json.dumps(json.loads(doc), sort_keys=True, indent=4)
+            )
+
     assert len(r.items) == 0
     assert len(r.living) == 1
 
@@ -65,8 +92,13 @@ async def test_look_people_invisible():
     await tw.initialize()
     await tw.add_tomi()
     await tw.add_carla()
-    with tw.carla.make(mechanics.Visibility) as vis:
-        vis.make_invisible()
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        carla = await session.materialize(key=tw.carla_key)
+        with carla.make(mechanics.Visibility) as vis:
+            vis.make_invisible()
+        await session.save()
 
     r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
@@ -90,15 +122,34 @@ async def test_making_item_hard_to_see(caplog):
     await tw.add_carla()
     await tw.success("make Box")
     await tw.success("drop")
-    assert len(tw.area.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(area.make(carryable.Containing).holding) == 1
+
     r = await tw.success("look")
+
     assert len(r.items) == 1
 
     await tw.success("make Orb")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+
     await tw.success("modify hard to see")
     await tw.success("drop")
-    assert len(tw.area.make(carryable.Containing).holding) == 2
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(area.make(carryable.Containing).holding) == 2
+
     r = await tw.success("look")
     assert len(r.items) == 1
 
@@ -122,3 +173,7 @@ async def test_making_item_hard_to_see(caplog):
         log.info(tw.dumps(orb))
 
         assert len(r.items) == 1
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]
