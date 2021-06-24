@@ -165,7 +165,7 @@ class TestWorld:
 
             log.info("response: %s" % (response,))
             if isinstance(response, game.Failure):
-                log.warning("unsaved!")
+                log.info("unsaved!")
             else:
                 await session.save()
 
