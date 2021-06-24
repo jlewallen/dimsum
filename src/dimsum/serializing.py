@@ -78,6 +78,10 @@ class CustomUnpickler(jsonpickle.unpickler.Unpickler):
         self.lookup = lookup
 
 
+class SerializationException(Exception):
+    pass
+
+
 def derive_from(klass):
     name = klass.__name__
     return type("Root" + name, (klass,), {})
@@ -161,25 +165,25 @@ async def materialize(
 
     found = None
     if key:
-        log.info("[%d] materialize key=%s", depth, key)
+        log.debug("[%d] materialize key=%s", depth, key)
         found = registrar.find_by_key(key)
         if found:
             return found
 
         json = await store.load_by_key(key)
         if json is None:
-            log.info("[%d] %s missing key=%s", depth, store, key)
+            log.warning("[%d] %s missing key=%s", depth, store, key)
             return None
 
     if gid is not None:
-        log.info("[%d] materialize gid=%d", depth, gid)
+        log.debug("[%d] materialize gid=%d", depth, gid)
         found = registrar.find_by_gid(gid)
         if found:
             return found
 
         json = await store.load_by_gid(gid)
         if json is None:
-            log.info("[%d] %s missing gid=%d", depth, store, gid)
+            log.warning("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
     log.debug("json: %s", json)
@@ -192,10 +196,13 @@ async def materialize(
 
         if key not in refs:
             refs[key] = entity.EntityRef(key)
-            # log.info("ref: %s = %s", key, refs[key])
         return refs[key]
 
+    if not json:
+        raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
+
     assert json
+
     loaded = deserialize(json, reference)
     assert loaded
     registrar.register(loaded)

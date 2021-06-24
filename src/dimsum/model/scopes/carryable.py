@@ -158,6 +158,7 @@ class Carryable(entity.Scope):
         self.loose = loose
 
     def constructed(self, quantity: float = None, **kwargs):
+        log.warning("deprecated constructed %s %s", quantity, kwargs)
         if quantity:
             self.quantity = quantity
 

@@ -449,6 +449,7 @@ class Lock(PersonAction):
 
                 assert locking.is_locked()
                 hands.hold(locked_with)
+                ctx.register(locked_with)
 
         return Success("done")
 
@@ -473,9 +474,11 @@ class Unlock(PersonAction):
         log.info("finding key %s", self.key)
         maybe_key = await world.apply_item_finder(player, self.key, exclude=[item])
         log.info("maybe key: %s", maybe_key)
+
         with item.make(carryable.Containing) as unlocking:
             if unlocking.unlock(key=maybe_key, **kwargs):
                 return Success("done")
+
         return Failure("nope")
 
 
@@ -655,7 +658,13 @@ class CallThis(PersonAction):
             kind=item.make(carryable.Carryable).kind,
         )
         with recipe.make(Recipe) as makes:
-            makes.template = template
+            updated = copy.deepcopy(template.__dict__)
+            updated.update(key=None, identity=None, props=template.props.clone())
+            log.info("updated = %s", updated)
+            cloned = scopes.item(**updated)
+            makes.template = cloned
+            ctx.register(cloned)
+
         ctx.register(recipe)
         with player.make(mechanics.Memory) as brain:
             brain.memorize("r:" + self.name, recipe)

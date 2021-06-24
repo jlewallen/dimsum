@@ -29,44 +29,50 @@ log = logging.getLogger("dimsum")
 async def test_serialize_empty_world(caplog):
     before = domains.Domain()
 
+    json = None
     with before.session() as session:
         await session.prepare()
         await session.save()
 
-    json = serialize_all(before.registrar)
+        json = serialize_all(session.registrar)
 
     assert len(json.items()) == 1
 
     after = domains.Domain()
-    restore(after.registrar, json)
 
-    assert len(after.registrar.entities.items()) == 1
+    with after.session() as session:
+        restore(session.registrar, json)
+
+        assert len(session.registrar.entities.items()) == 1
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_one_area(caplog):
     domain = domains.Domain()
 
+    json = None
     with domain.session() as session:
         world = await session.prepare()
         await session.add_area(
             scopes.area(creator=world, props=properties.Common("Area"))
         )
 
-    json = serialize_all(domain.registrar)
+        json = serialize_all(session.registrar)
 
     assert len(json.items()) == 2
 
     after = domains.Domain()
-    restore(after.registrar, json)
+    with after.session() as session:
+        restore(session.registrar, json)
 
-    assert len(after.registrar.entities.items()) == 2
+        assert len(session.registrar.entities.items()) == 2
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_one_item(caplog):
     domain = domains.Domain()
 
+    json = None
     with domain.session() as session:
         world = await session.prepare()
 
@@ -77,37 +83,39 @@ async def test_serialize_world_one_item(caplog):
 
         assert area.make(carryable.Containing).holding[0]
 
-        json = serialize_all(domain.registrar)
+        json = serialize_all(session.registrar)
 
         assert len(json.items()) == 3
 
     after = domains.Domain()
-    restore(after.registrar, json)
+    with after.session() as session:
+        restore(session.registrar, json)
 
-    assert after.registrar.find_entity_by_name("Area")
-    assert after.registrar.find_entity_by_name("Item")
+        assert session.registrar.find_entity_by_name("Area")
+        assert session.registrar.find_entity_by_name("Item")
 
-    assert (
-        len(
-            after.registrar.find_entity_by_name("Area")
-            .make(carryable.Containing)
-            .holding
+        assert (
+            len(
+                session.registrar.find_entity_by_name("Area")
+                .make(carryable.Containing)
+                .holding
+            )
+            == 1
         )
-        == 1
-    )
-    assert (
-        after.registrar.find_entity_by_name("Area")
-        .make(carryable.Containing)
-        .holding[0]
-    )
+        assert (
+            session.registrar.find_entity_by_name("Area")
+            .make(carryable.Containing)
+            .holding[0]
+        )
 
-    assert len(after.registrar.entities.items()) == 3
+        assert len(session.registrar.entities.items()) == 3
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_directional(caplog):
     domain = domains.Domain()
 
+    json = None
     with domain.session() as session:
         world = await session.prepare()
 
@@ -134,32 +142,31 @@ async def test_serialize_world_two_areas_linked_via_directional(caplog):
 
         await session.add_area(one)
 
-    json = serialize_all(domain.registrar)
+        json = serialize_all(session.registrar)
 
     assert len(json.items()) == 5
 
-    for key, data in json.items():
-        log.info("%s", data)
-
     after = domains.Domain()
-    entities = restore(after.registrar, json)
+    with after.session() as session:
+        entities = restore(session.registrar, json)
 
-    one = after.registrar.find_entity_by_name("One")
-    assert one
+        one = session.registrar.find_entity_by_name("One")
+        assert one
 
-    two = after.registrar.find_entity_by_name("Two")
-    assert two
+        two = session.registrar.find_entity_by_name("Two")
+        assert two
 
-    assert two in one.make(movement.Movement).adjacent()
-    assert one in two.make(movement.Movement).adjacent()
+        assert two in one.make(movement.Movement).adjacent()
+        assert one in two.make(movement.Movement).adjacent()
 
-    assert len(after.registrar.entities.items()) == 5
+        assert len(session.registrar.entities.items()) == 5
 
 
 @pytest.mark.asyncio
 async def test_serialize_world_two_areas_linked_via_items(caplog):
     domain = domains.Domain()
 
+    json = None
     with domain.session() as session:
         world = await session.prepare()
 
@@ -188,26 +195,27 @@ async def test_serialize_world_two_areas_linked_via_items(caplog):
 
         await session.add_area(one)
 
-    json = serialize_all(domain.registrar, indent=True)
+        json = serialize_all(session.registrar, indent=True)
 
     assert len(json.items()) == 5
 
     after = domains.Domain()
-    entities = restore(after.registrar, json)
+    with after.session() as session:
+        entities = restore(session.registrar, json)
 
-    one = after.registrar.find_entity_by_name("One")
-    assert one
+        one = session.registrar.find_entity_by_name("One")
+        assert one
 
-    two = after.registrar.find_entity_by_name("Two")
-    assert two
+        two = session.registrar.find_entity_by_name("Two")
+        assert two
 
-    assert one.make(carryable.Containing).holding[0].make(movement.Exit).area
-    assert two.make(carryable.Containing).holding[0].make(movement.Exit).area
+        assert one.make(carryable.Containing).holding[0].make(movement.Exit).area
+        assert two.make(carryable.Containing).holding[0].make(movement.Exit).area
 
-    assert two in one.make(movement.Movement).adjacent()
-    assert one in two.make(movement.Movement).adjacent()
+        assert two in one.make(movement.Movement).adjacent()
+        assert one in two.make(movement.Movement).adjacent()
 
-    assert len(after.registrar.entities.items()) == 5
+        assert len(session.registrar.entities.items()) == 5
 
 
 @pytest.mark.asyncio
@@ -218,10 +226,11 @@ async def test_serialize_after_create():
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
-        clearing = tw.add_simple_area_here("Door", "Clearing")
+        clearing = await tw.add_simple_area_here("Door", "Clearing")
         tree.get_kind("petals")
         with tree.make(movement.Movement) as nav:
             nav.link_area(clearing)
@@ -253,22 +262,13 @@ async def test_unregister_destroys(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    store = storage.InMemory()
-
     await tw.execute("make Box")
-    box = tw.player.make(carryable.Containing).holding[0]
-    assert not box.props.destroyed
 
-    await store.purge()
-    await store.update(serializing.registrar(tw.domain.registrar))
-
-    assert await store.number_of_entities() == 4
+    assert await tw.domain.store.number_of_entities() == 4
 
     await tw.execute("obliterate")
-    assert box.props.destroyed
-    await store.update(serializing.registrar(tw.domain.registrar))
 
-    assert await store.number_of_entities() == 3
+    assert await tw.domain.store.number_of_entities() == 3
 
 
 @pytest.mark.asyncio
@@ -303,36 +303,38 @@ async def test_serialize_library(caplog):
         generics, area = library.create_example_world(world)
         await session.add_area(area)
 
-    json = serializing.serialize(
-        {"entities": tw.domain.registrar.entities}, unpicklable=False, indent=4
-    )
+        json = serializing.serialize(
+            {"entities": session.registrar.entities}, unpicklable=False, indent=4
+        )
 
-    assert "py/id" not in json
+        assert "py/id" not in json
 
 
 @pytest.mark.asyncio
 async def test_serialize_preserves_owner_reference(caplog):
     domain = domains.Domain()
 
+    json = None
     with domain.session() as session:
         await session.add_area(
             scopes.area(creator=session.world, props=properties.Common("Area"))
         )
         await session.save()
 
-    json = serialize_all(domain.registrar)
+        json = serialize_all(session.registrar)
 
     assert len(json.items()) == 2
 
     after = domains.Domain()
 
-    restore(after.registrar, json)
+    with after.session() as session:
+        restore(session.registrar, json)
 
-    assert len(after.registrar.entities.items()) == 2
+        assert len(session.registrar.entities.items()) == 2
 
-    for key, e in after.registrar.entities.items():
-        with e.make(ownership.Ownership) as props:
-            assert isinstance(props.owner, entity.Entity)
+        for key, e in session.registrar.entities.items():
+            with e.make(ownership.Ownership) as props:
+                assert isinstance(props.owner, entity.Entity)
 
 
 @pytest.mark.asyncio

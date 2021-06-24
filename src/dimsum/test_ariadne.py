@@ -111,8 +111,8 @@ async def test_graphql_world_by_gid(snapshot):
 
     with domain.session() as session:
         world = await session.prepare()
-
         assert world.props.gid == 0
+        await session.save()
 
     data = {"query": "{ entitiesByGid(gid: %d) }" % (0)}
     ok, actual = await ariadne.graphql(
@@ -142,6 +142,7 @@ async def test_graphql_language_basic(snapshot):
         )
         session.register(jacob)
         await session.perform(actions.Join(), jacob)
+        await session.save()
 
     data = {
         "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities } }'

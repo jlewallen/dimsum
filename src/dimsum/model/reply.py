@@ -189,13 +189,12 @@ class AreaObservation(Observation):
         assert person
         self.who: ObservedPerson = ObservedPerson(person)
         self.where: entity.Entity = area
+
+        occupied = area.make(occupyable.Occupyable).occupied
         self.living: List[ObservedLiving] = flatten(
-            [
-                observe(e)
-                for e in area.make(occupyable.Occupyable).occupied
-                if e != person
-            ]
+            [observe(e) for e in occupied if e != person]
         )
+
         self.items: List[ObservedEntity] = flatten(
             [
                 observe(e)

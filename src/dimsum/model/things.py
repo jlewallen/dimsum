@@ -29,7 +29,9 @@ class MaybeItem(ItemFactory):
         self.name = name
 
     def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
-        log.debug("create-item: {0} quantity={1}".format(kwargs, quantity))
+        log.info(
+            "%s create-item '%s' %s quantity=%s", self, self.name, kwargs, quantity
+        )
         initialize = {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
@@ -44,6 +46,7 @@ class RecipeItem(ItemFactory):
         self.recipe = recipe
 
     def create_item(self, **kwargs) -> entity.Entity:
+        log.info("%s create-item recipe=%s %s", self, self.recipe, kwargs)
         return self.recipe.make(Recipe).create_item(**kwargs)
 
 
@@ -54,6 +57,13 @@ class MaybeQuantifiedItem(ItemFactory):
         self.quantity: float = quantity
 
     def create_item(self, **kwargs) -> entity.Entity:
+        log.info(
+            "%s create-item template=%s quantity=%s %s",
+            self,
+            self.template,
+            self.quantity,
+            kwargs,
+        )
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
@@ -62,15 +72,13 @@ class Recipe(entity.Scope, ItemFactory):
         super().__init__(**kwargs)
         self.template = template if template else None
 
-    def constructed(self, template=None, **kwargs):
-        if template:
-            self.template = template
-
     def create_item(self, **kwargs) -> entity.Entity:
         assert self.template
 
-        log.info("recipe:creating %s %s (todo:sign)", self.template, kwargs)
+        log.info("%s create-item %s %s", self, self.template, kwargs)
         updated = copy.deepcopy(self.template.__dict__)
-        updated.update(props=self.template.props.clone(), **kwargs)
+        updated.update(
+            key=None, identity=None, props=self.template.props.clone(), **kwargs
+        )
         cloned = scopes.item(**updated)
         return cloned

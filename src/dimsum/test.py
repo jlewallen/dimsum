@@ -17,6 +17,7 @@ import model.domains as domains
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
+import model.scopes.occupyable as occupyable
 import model.scopes.users as users
 import model.scopes as scopes
 
@@ -42,21 +43,27 @@ class TestWorld:
         self.domain = domains.Domain()
         self.bus = self.domain.bus
         self.l = grammars.create_parser()
+        self.carla_key = None
+        self.jacob_key = None
+        self.tomi_key = None
 
-    def add_simple_area_here(self, door, name):
+    async def add_simple_area_here(self, door, name):
         with self.domain.session() as session:
-            assert self.player
-            door = scopes.item(creator=self.player, props=properties.Common(door))
-            area = scopes.area(creator=self.player, props=properties.Common(name))
+            world = await session.prepare()
+            door = scopes.item(creator=world, props=properties.Common(door))
+            area = scopes.area(creator=world, props=properties.Common(name))
             with door.make(movement.Movement) as nav:
                 nav.link_area(area)
-            with self.area.make(carryable.Containing) as ground:
+            with area.make(carryable.Containing) as ground:
                 ground.add_item(door)
             session.register(door)
             session.register(area)
             return area
 
     async def add_carla(self):
+        if self.carla_key:
+            return self.carla_key
+
         log.info("adding carla")
         with self.domain.session() as session:
             world = await session.prepare()
@@ -67,9 +74,13 @@ class TestWorld:
             )
             await session.perform(actions.Join(), carla)
             await session.save()
+            self.carla_key = carla.key
             return carla
 
     async def add_tomi(self):
+        if self.tomi_key:
+            return self.tomi_key
+
         log.info("adding tomi")
         with self.domain.session() as session:
             world = await session.prepare()
@@ -80,10 +91,14 @@ class TestWorld:
             )
             await session.perform(actions.Join(), tomi)
             await session.save()
+            self.tomi_key = tomi.key
             return tomi
 
     async def add_jacob(self):
-        log.info("adding carla")
+        if self.jacob_key:
+            return self.jacob_key
+
+        log.info("adding jacob")
         with self.domain.session() as session:
             world = await session.prepare()
 
@@ -94,6 +109,7 @@ class TestWorld:
 
             await session.perform(actions.Join(), jacob)
             await session.save()
+            self.jacob_key = jacob.key
             return jacob
 
     async def initialize(self, world=None, area=None, **kwargs):
@@ -104,46 +120,56 @@ class TestWorld:
             else:
                 world = await session.prepare()
 
-            self.area = area
-
-            if not self.area:
-                self.area = scopes.area(
+            if not area:
+                area = scopes.area(
                     creator=world, props=properties.Common("Living room")
                 )
 
-            await session.add_area(self.area)
+            await session.add_area(area)
             await session.save()
 
-        self.player = await self.add_jacob()
+        await self.add_jacob()
 
-    def get_default_area(self):
-        return self.area
-
-    def add_item(self, item):
-        self.domain.registrar.register(item)
-        with self.area.make(carryable.Containing) as ground:
-            ground.add_item(item)
+    def add_item_to_welcome_area(self, item, session=None):
+        assert session
+        session.register(item)
+        with session.world.make(world.Welcoming) as welcoming:
+            with welcoming.area.make(carryable.Containing) as ground:
+                ground.add_item(item)
         return item
 
     def dumps(self, item) -> str:
         return serializing.serialize(item, indent=4)
 
     async def execute(self, command: str, person=None, **kwargs):
-        if not person:
-            person = self.player
         log.info("executing: %s" % (command,))
         tree, create_evaluator = self.l.parse(command)
+
+        log.info("=" * 100)
         log.info("parsed: %s" % (tree,))
+        log.info("=" * 100)
+
         with self.domain.session() as session:
-            tree_eval = create_evaluator(session.world, person)
+            world = await session.prepare()
+
+            tree_eval = create_evaluator(world, person)
             action = tree_eval.transform(tree)
             assert action
             assert isinstance(action, game.Action)
 
+            assert self.jacob_key
+            person = await session.materialize(
+                key=self.jacob_key if person is None else person
+            )
             response = await session.perform(action, person)
+
             log.info("response: %s" % (response,))
-            await session.save()
-        return response
+            if isinstance(response, game.Failure):
+                log.warning("unsaved!")
+            else:
+                await session.save()
+
+            return response
 
     async def success(self, *commands: str, **kwargs):
         for command in commands:

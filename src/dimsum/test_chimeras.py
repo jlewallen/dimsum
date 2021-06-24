@@ -66,7 +66,7 @@ async def test_chimeric_entities_serialize(caplog):
 
     after = await domain.reload()
 
-    assert len(after.registrar.entities) == 3
+    assert await after.store.number_of_entities() == 3
 
 
 def make_person(
@@ -125,4 +125,4 @@ async def test_specialization_classes(caplog):
 
     after = await domain.reload()
 
-    assert len(after.registrar.entities) == 3
+    assert await after.store.number_of_entities() == 3

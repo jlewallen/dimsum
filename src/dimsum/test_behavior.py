@@ -4,6 +4,7 @@ import pytest
 
 import model.game as game
 import model.properties as properties
+import model.world as world
 
 import model.scopes.mechanics as mechanics
 import model.scopes.carryable as carryable
@@ -14,6 +15,8 @@ import default.actions
 
 import test
 
+log = logging.getLogger("dimsum.tests")
+
 
 @pytest.mark.asyncio
 async def test_drop_hammer_funny_gold(caplog):
@@ -23,8 +26,9 @@ async def test_drop_hammer_funny_gold(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        hammer = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("Hammer"))
+        hammer = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("Hammer")),
+            session=session,
         )
 
         with hammer.make(behavior.Behaviors) as behave:
@@ -46,6 +50,8 @@ end
 """,
             )
 
+        await session.save()
+
     await tw.success("look")
     await tw.success("hold hammer")
     await tw.success("drop")
@@ -54,7 +60,10 @@ end
     await tw.success("hold hammer")
     await tw.success("drop")
 
-    assert tw.player.props["gold"]["total"] == 2
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert jacob.props["gold"]["total"] == 2
 
 
 @pytest.mark.asyncio
@@ -65,7 +74,9 @@ async def test_wear_cape(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        cape = tw.add_item(scopes.item(creator=world, props=properties.Common("Cape")))
+        cape = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("Cape")), session=session
+        )
         with cape.make(mechanics.Interactable) as inaction:
             inaction.link_activity("worn")
 
@@ -90,12 +101,24 @@ end
 """,
             )
 
+        await session.save()
+
     await tw.success("look")
     await tw.success("hold cape")
     await tw.success("wear cape")
-    assert tw.player.make(mechanics.Visibility).is_invisible
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert jacob.make(mechanics.Visibility).is_invisible
+
     await tw.success("remove cape")
-    assert not tw.player.make(mechanics.Visibility).is_invisible
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert not jacob.make(mechanics.Visibility).is_invisible
+
     await tw.success("drop")
 
 
@@ -141,14 +164,15 @@ async def test_behavior_create_item(caplog):
     await tw.initialize()
 
     with tw.domain.session() as session:
-        world = await session.prepare()
+        w = await session.prepare()
 
-        box = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Colorful Box"))
+        box = tw.add_item_to_welcome_area(
+            scopes.item(creator=w, props=properties.Common("A Colorful Box")),
+            session=session,
         )
         with box.make(behavior.Behaviors) as behave:
             behave.add_behavior(
-                world,
+                w,
                 "b:test:shake:after",
                 lua="""
 function(s, world, area, player)
@@ -161,12 +185,24 @@ end
 """,
             )
 
+        await session.save()
+
     await tw.success("look")
     await tw.success("hold box")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+
     await tw.success("shake box")
-    assert len(tw.player.make(carryable.Containing).holding) == 2
-    assert tw.player.make(carryable.Containing).holding[1].creator == tw.player
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 2
+        assert jacob.make(carryable.Containing).holding[1].creator == jacob
+
     await tw.success("look")
 
 
@@ -177,8 +213,9 @@ async def test_behavior_create_quantified_item(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        box = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Colorful Box"))
+        box = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Colorful Box")),
+            session=session,
         )
         with box.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -196,18 +233,37 @@ end
 """,
             )
 
+        await session.save()
+
     await tw.success("look")
     await tw.success("hold box")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 0
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 0
+
     await tw.success("shake box")
-    assert len(tw.player.make(carryable.Containing).holding) == 1
-    assert len(tw.area.make(carryable.Containing).holding) == 1
-    assert tw.area.make(carryable.Containing).holding[0].creator == box
-    assert (
-        tw.area.make(carryable.Containing).holding[0].make(carryable.Carryable).quantity
-        == 10
-    )
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+        assert len(area.make(carryable.Containing).holding) == 1
+
+        log.warning("entity equality is broken, comparing top level entity to proxy?")
+        assert area.make(carryable.Containing).holding[0].creator.key == box.key
+        assert (
+            area.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 10
+        )
+
     await tw.success("look")
 
 
@@ -224,8 +280,9 @@ async def test_behavior_time_passing(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
         with tree.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -242,15 +299,20 @@ function(s, world, area, item)
 end
 """,
             )
+        await session.save()
 
     with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+
         await session.tick(0)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.domain.registrar.entities) == 5
+        assert len(area.make(carryable.Containing).holding) == 2
+        assert len(session.registrar.entities) == 5
 
         await session.tick(1)
-        assert len(tw.area.make(carryable.Containing).holding) == 3
-        assert len(tw.domain.registrar.entities) == 6
+        assert len(area.make(carryable.Containing).holding) == 3
+        assert len(session.registrar.entities) == 6
 
 
 @pytest.mark.asyncio
@@ -260,8 +322,9 @@ async def test_behavior_create_kind(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
         with tree.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -278,17 +341,22 @@ function(s, world, area, item)
 end
 """,
             )
+        await session.save()
 
     with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+
         await session.tick(0)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.domain.registrar.entities) == 5
+        assert len(area.make(carryable.Containing).holding) == 2
+        assert len(session.registrar.entities) == 5
         await session.tick(1)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.domain.registrar.entities) == 5
+        assert len(area.make(carryable.Containing).holding) == 2
+        assert len(session.registrar.entities) == 5
         await session.tick(2)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
-        assert len(tw.domain.registrar.entities) == 5
+        assert len(area.make(carryable.Containing).holding) == 2
+        assert len(session.registrar.entities) == 5
 
 
 @pytest.mark.asyncio
@@ -299,8 +367,9 @@ async def test_behavior_random(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
         with tree.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -313,8 +382,11 @@ end
 """,
             )
 
+        await session.save()
+
     with tw.domain.session() as session:
         await session.tick(0)
+        await session.save()
 
 
 @pytest.mark.asyncio
@@ -325,8 +397,9 @@ async def test_behavior_numbering_by_kind(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
         with tree.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -353,11 +426,18 @@ end
 """,
             )
 
+        await session.save()
+
     with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = world.find_entity_area(jacob)
+
         await session.tick(0)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
+        assert len(area.make(carryable.Containing).holding) == 2
+
         await session.tick(1)
-        assert len(tw.area.make(carryable.Containing).holding) == 3
+        assert len(area.make(carryable.Containing).holding) == 3
 
 
 @pytest.mark.asyncio
@@ -366,15 +446,16 @@ async def test_behavior_numbering_person_by_name(caplog):
     await tw.initialize()
 
     with tw.domain.session() as session:
-        world = await session.prepare()
+        w = await session.prepare()
 
-        tree = tw.add_item(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree"))
+        tree = tw.add_item_to_welcome_area(
+            scopes.item(creator=w, props=properties.Common("A Lovely Tree")),
+            session=session,
         )
 
         with tree.make(behavior.Behaviors) as behave:
             behave.add_behavior(
-                world,
+                w,
                 "b:test:tick",
                 lua="""
 function(s, world, area, item)
@@ -390,8 +471,22 @@ end
 """,
             )
 
+        await session.save()
+
     with tw.domain.session() as session:
         await session.tick(0)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
+        await session.save()
+
+    with tw.domain.session() as session:
+        w = await session.prepare()
+        area = w.make(world.Welcoming).area
+        assert len(area.make(carryable.Containing).holding) == 2
+
+    with tw.domain.session() as session:
         await session.tick(1)
-        assert len(tw.area.make(carryable.Containing).holding) == 2
+        await session.save()
+
+    with tw.domain.session() as session:
+        w = await session.prepare()
+        area = w.make(world.Welcoming).area
+        assert len(area.make(carryable.Containing).holding) == 2

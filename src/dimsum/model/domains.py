@@ -29,7 +29,7 @@ class Session:
     def __init__(self, domain: "Domain"):
         super().__init__()
         self.domain = domain
-        self.registrar = domain.registrar
+        self.registrar = entity.Registrar()
         self.world: Optional[world.World] = None
 
     def __enter__(self):
@@ -58,26 +58,34 @@ class Session:
 
     async def prepare(self):
         if self.world:
+            assert self.world in self.registrar.entities.values()
             return self.world
 
         self.world = await self.materialize(key=world.Key)
         if self.world:
+            assert self.world in self.registrar.entities.values()
             return self.world
 
         log.info("creating new world")
         self.world = world.World()
         self.register(self.world)
+        assert self.world in self.registrar.entities.values()
         return self.world
 
     async def perform(
         self, action, person: Optional[entity.Entity], **kwargs
     ) -> game.Reply:
 
+        log.info("-" * 100)
+        log.info("%s", action)
+        log.info("-" * 100)
+
         await self.prepare()
 
         assert self.world
 
         area = self.world.find_entity_area(person) if person else None
+
         with WorldCtx(
             person=person,
             area=area,
@@ -89,6 +97,8 @@ class Session:
                 return await action.perform(ctx, self.world, person)
             except entity.EntityFrozen:
                 return game.Failure("whoa, that's frozen")
+
+        log.info("-" * 100)
 
     async def tick(self, now: Optional[float] = None):
         await self.prepare()
@@ -127,6 +137,7 @@ class Session:
     async def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
         await self.prepare()
 
+        assert area
         assert self.world
 
         if seen is None:
@@ -141,8 +152,12 @@ class Session:
             if welcoming.area:
                 existing_occupied = welcoming.area.make(occupyable.Occupyable).occupied
                 if len(existing_occupied) < len(occupied):
+                    log.info("updating welcome-area")
+                    assert area
                     welcoming.area = area
             else:
+                log.info("updating welcome-area")
+                assert area
                 welcoming.area = area
 
         seen[area.key] = area.key
@@ -188,7 +203,6 @@ class Domain:
         )
         self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
-        self.registrar = entity.Registrar()
 
     def session(self) -> "Session":
         log.info("session:new")

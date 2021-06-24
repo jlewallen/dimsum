@@ -76,15 +76,21 @@ class World(entity.Entity):
             remembering.entities.append(e)
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
-        log.info("finding area for %s", entity)
         if entity.has(occupyable.Occupyable):
+            log.info("finding area for %s (self)", entity)
             return entity
+
+        log.info("finding area for %s", entity)
         with entity.make_and_discard(occupyable.Occupying) as occupying:
             if occupying.area:
+                log.info("finding area for %s (occupying)", entity)
                 return occupying.area
+
         with entity.make_and_discard(carryable.Location) as location:
             if location.container:
+                log.info("finding area for %s (container)", entity)
                 return location.container
+
         return None
 
     def find_player_area(self, player: entity.Entity) -> entity.Entity:

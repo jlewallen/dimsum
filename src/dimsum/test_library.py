@@ -20,13 +20,16 @@ async def test_library(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        generics, area = library.create_example_world(session.world)
-        tw.domain.registrar.add_entities(generics.all)
+        generics, area = library.create_example_world(world)
+        session.registrar.add_entities(generics.all)
 
         await session.add_area(area)
+        await session.save()
 
-        await tw.add_jacob()
+    await tw.add_jacob()
 
+    with tw.domain.session() as session:
+        world = await session.prepare()
         await session.tick()
         await session.tick()
         await session.save()

@@ -59,11 +59,12 @@ query = ariadne.QueryType()
 async def resolve_size(_, info):
     domain = info.context.domain
     store = await domain.store.number_of_entities()
-    registrar = domain.registrar.number_of_entities()
-    log.info("ariadne:size store=%d registrar=%d", store, registrar)
-    if registrar > store:
-        return registrar
-    return store
+    with domain.session() as session:
+        registrar = session.registrar.number_of_entities()
+        log.info("ariadne:size store=%d registrar=%d", store, registrar)
+        if registrar > store:
+            return registrar
+        return store
 
 
 @query.field("world")
@@ -106,18 +107,22 @@ async def resolve_entities_by_gid(obj, info, gid):
 async def resolve_areas(obj, info):
     domain = info.context.domain
     log.info("ariadne:areas")
-    entities = domain.registrar.entities_of_klass(scopes.AreaClass)
-    log.info("ariadne:areas entities=%s", entities)
-    return [serialize_entity(e) for e in entities]
+    with domain.session() as session:
+        await session.prepare()
+        entities = session.registrar.entities_of_klass(scopes.AreaClass)
+        log.info("ariadne:areas entities=%s", entities)
+        return [serialize_entity(e) for e in entities]
 
 
 @query.field("people")
 async def resolve_people(obj, info):
     domain = info.context.domain
     log.info("ariadne:people")
-    entities = domain.registrar.entities_of_klass(scopes.LivingClass)
-    log.info("ariadne:people entities=%s", entities)
-    return [serialize_entity(e) for e in entities]
+    with domain.session() as session:
+        await session.prepare()
+        entities = session.registrar.entities_of_klass(scopes.LivingClass)
+        log.info("ariadne:people entities=%s", entities)
+        return [serialize_entity(e) for e in entities]
 
 
 class Evaluation:
@@ -148,7 +153,7 @@ async def resolve_language(obj, info, criteria):
 
         return Evaluation(
             serialize_reply(reply),
-            [serialize_entity(e) for e in domain.registrar.entities.values()],
+            [serialize_entity(e) for e in session.registrar.entities.values()],
         )
 
 
@@ -179,25 +184,26 @@ async def login(obj, info, credentials):
     domain = info.context.domain
     creds = Credentials(**credentials)
     log.info("ariadne:login username=%s", creds.username)
-    if not domain.registrar.contains(creds.username):
+    with domain.session() as session:
+        if not session.registrar.contains(creds.username):
+            raise UsernamePasswordError()
+
+        try:
+            person = session.registrar.find_by_key(creds.username)
+            if person:
+                with person.make(users.Auth) as auth:
+                    token = auth.try_password(creds.password)
+
+                    if token:
+                        log.info("successful login %s", token)
+                        jwt_token = jwt.encode(
+                            token, info.context.cfg.session_key, algorithm="HS256"
+                        )
+                        return jwt_token
+        except:
+            log.exception("login")
+
         raise UsernamePasswordError()
-
-    try:
-        person = domain.registrar.find_by_key(creds.username)
-        if person:
-            with person.make(users.Auth) as auth:
-                token = auth.try_password(creds.password)
-
-                if token:
-                    log.info("successful login %s", token)
-                    jwt_token = jwt.encode(
-                        token, info.context.cfg.session_key, algorithm="HS256"
-                    )
-                    return jwt_token
-    except:
-        log.exception("login")
-
-    raise UsernamePasswordError()
 
 
 @mutation.field("purge")
@@ -215,7 +221,7 @@ async def makeSample(obj, info):
     with domain.session() as session:
         world = await session.prepare()
 
-        number_before = domain.registrar.number_of_entities()
+        number_before = session.registrar.number_of_entities()
 
         generics, area = library.create_example_world(session.world)
         session.registrar.add_entities(generics.all)
@@ -223,7 +229,7 @@ async def makeSample(obj, info):
         await session.add_area(area)
         await session.save()
 
-        affected = domain.registrar.number_of_entities() - number_before
+        affected = session.registrar.number_of_entities() - number_before
 
     return {"affected": affected}
 
