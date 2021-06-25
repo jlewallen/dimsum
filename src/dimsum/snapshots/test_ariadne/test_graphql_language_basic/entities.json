@@ -9,7 +9,12 @@
  "parent": null,
  "chimeras": {
   "ownership": {
-   "owner": "$world"
+   "owner": {
+    "py/object": "model.world.World",
+    "key": "world",
+    "klass": "RootEntityClass",
+    "name": "World"
+   }
   },
   "welcoming": {
    "area": {

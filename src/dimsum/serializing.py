@@ -173,7 +173,7 @@ async def materialize(
 
         json = await store.load_by_key(key)
         if json is None:
-            log.warning("[%d] %s missing key=%s", depth, store, key)
+            log.info("[%d] %s missing key=%s", depth, store, key)
             return None
 
     if gid is not None:
@@ -184,7 +184,7 @@ async def materialize(
 
         json = await store.load_by_gid(gid)
         if json is None:
-            log.warning("[%d] %s missing gid=%d", depth, store, gid)
+            log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
     log.debug("json: %s", json)

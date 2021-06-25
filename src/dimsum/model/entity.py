@@ -142,14 +142,15 @@ class Entity:
 
                 log.debug("scope %s %s %s", scope, kwargs, args)
                 with self.make(scope, **args) as change:
-                    change.constructed(
-                        key=self.key,
-                        identity=self.identity,
-                        parent=self.parent,
-                        creator=self.creator,
-                        props=self.props,
-                        **kwargs
-                    )
+                    if False:
+                        change.constructed(
+                            key=self.key,
+                            identity=self.identity,
+                            parent=self.parent,
+                            creator=self.creator,
+                            props=self.props,
+                            **kwargs
+                        )
 
         log.debug(
             "entity:ctor {0} '{1}' creator={2} {3} id={4} props={5}".format(
@@ -163,11 +164,12 @@ class Entity:
         )
 
         log.info(
-            "entity:ctor %s id=%s chimeras=%s props=%s",
+            "entity:ctor %s id=%s chimeras=%s props=%s initialize=%s",
             self.key,
             id(self),
             self.chimeras,
             self.props,
+            initialize,
         )
 
     def validate(self) -> None:
@@ -248,9 +250,10 @@ class Entity:
     def make(self, ctor, **kwargs):
         key = get_ctor_key(ctor)
 
-        chargs = kwargs
+        chargs = {}
         if key in self.chimeras:
-            chargs.update(**self.chimeras[key])
+            chargs = self.chimeras[key]
+        chargs.update(**kwargs)
 
         log.debug("%s splitting chimera: %s %s", self.key, key, chargs)
         child = ctor(chimera=self, **chargs)

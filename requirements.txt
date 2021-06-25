@@ -11,6 +11,7 @@ asyncssh==2.6.0
 attrs==21.2.0
 black==21.6b0
 blinker==1.4
+boltons==21.0.0
 certifi==2021.5.30
 cffi==1.14.5
 chardet==4.0.0
