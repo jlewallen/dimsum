@@ -3,6 +3,7 @@ __pycache__
 .env
 .log
 *.sqlite3
+*.json
 
 web/dist
 web/node_modules

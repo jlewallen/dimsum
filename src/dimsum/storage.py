@@ -85,6 +85,15 @@ class InMemory(EntityStorage):
             return self.by_key[key]
         return None
 
+    async def write(self, stream: TextIO):
+        stream.write("[\n")
+        prefix = ""
+        for key, item in self.by_key.items():
+            stream.write(prefix)
+            stream.write(item)
+            prefix = ","
+        stream.write("]\n")
+
 
 class SqliteStorage(EntityStorage):
     def __init__(self, path: str):
@@ -92,6 +101,7 @@ class SqliteStorage(EntityStorage):
         self.path = path
         self.db: Optional[sqlite3.Connection] = None
         self.dbc: Optional[sqlite3.Cursor] = None
+        self.saves = 0
 
     async def open_if_necessary(self):
         if self.db:

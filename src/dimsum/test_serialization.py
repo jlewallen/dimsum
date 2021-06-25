@@ -347,13 +347,6 @@ async def test_serialize_properties_directly(caplog):
         log.info(json)
 
 
-@pytest.mark.asyncio
-async def test_object_proxy():
-    proxy = entity.EntityRef("key-1")
-    log.info("%s", proxy)
-    log.info("%s", proxy.__wrapped__)
-
-
 class Example:
     def __init__(self, world: world.World = None):
         self.one = scopes.area(creator=world, props=properties.Common("Area"))
@@ -388,12 +381,12 @@ def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
 
 
 def restore(registrar: entity.Registrar, rows: Dict[str, Any]):
-    refs: Dict[str, entity.EntityRef] = {}
+    refs: Dict[str, entity.EntityProxy] = {}
 
-    def reference(key):
-        if key not in refs:
-            refs[key] = entity.EntityRef(key)
-        return refs[key]
+    def reference(ref: entity.EntityRef):
+        if ref.key not in refs:
+            refs[ref.key] = entity.EntityProxy(ref)
+        return refs[ref.key]
 
     entities: Dict[str, entity.Entity] = {}
     for key in rows.keys():

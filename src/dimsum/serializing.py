@@ -52,11 +52,39 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
+entity_types = {"model.entity.Entity": entity.Entity, "model.world.World": world.World}
+
+
+# From stackoverflow
+def fullname(klass):
+    module = klass.__module__
+    if module == "builtins":
+        return klass.__qualname__  # avoid outputs like 'builtins.str'
+    return module + "." + klass.__qualname__
+
+
+@jsonpickle.handlers.register(entity.EntityRef)
+class EntityRefHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        raise NotImplementedError
+
+    def flatten(self, obj, data):
+        assert obj.pyObject
+        data["py/object"] = fullname(obj.pyObject)
+        data["key"] = obj.key
+        data["klass"] = obj.klass
+        data["name"] = obj.name
+        return data
+
+
 @jsonpickle.handlers.register(entity.Entity)
 @jsonpickle.handlers.register(world.World)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        return self.context.lookup(obj["key"])
+        pyObject = entity_types[obj["py/object"]]
+        ref = entity.EntityRef.make(pyObject=pyObject, **obj)
+        log.debug("entity-handler: %s", ref)
+        return self.context.lookup(ref)
 
     def flatten(self, obj, data):
         data["key"] = obj.key
@@ -187,17 +215,18 @@ async def materialize(
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
-    log.debug("json: %s", json)
+    log.info("json: %s", json)
 
-    refs: Dict[str, entity.EntityRef] = {}
+    refs: Dict[str, entity.EntityProxy] = {}
 
-    def reference(key):
-        if registrar.contains(key):
-            return registrar.find_by_key(key)
+    def reference(ref: entity.EntityRef):
+        assert registrar
+        if registrar.contains(ref.key):
+            return registrar.find_by_key(ref.key)
 
-        if key not in refs:
-            refs[key] = entity.EntityRef(key)
-        return refs[key]
+        if ref.key not in refs:
+            refs[ref.key] = entity.EntityProxy(ref)
+        return refs[ref.key]
 
     if not json:
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
@@ -213,6 +242,7 @@ async def materialize(
     if reach:
         choice = reach(loaded, depth)
         if choice < 0:
+            log.info("reach! reach! reach!")
             deeper = False
         else:
             new_depth += choice

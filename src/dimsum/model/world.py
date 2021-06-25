@@ -39,6 +39,12 @@ class EntityHooks(entity.Hooks):
 entity.hooks(EntityHooks())
 
 
+class Identifiers(entity.Scope):
+    def __init__(self, gid: int = 0, **kwargs):
+        super().__init__(**kwargs)
+        self.gid = gid
+
+
 class Welcoming(entity.Scope):
     def __init__(self, area: entity.Entity = None, **kwargs):
         super().__init__(**kwargs)
@@ -62,6 +68,14 @@ class World(entity.Entity):
             scopes=scopes.World,
             **kwargs
         )
+
+    def gid(self) -> int:
+        with self.make(Identifiers) as ids:
+            return ids.gid
+
+    def update_gid(self, gid: int):
+        with self.make(Identifiers) as ids:
+            ids.gid = gid
 
     def welcome_area(self) -> entity.Entity:
         with self.make(Welcoming) as welcoming:

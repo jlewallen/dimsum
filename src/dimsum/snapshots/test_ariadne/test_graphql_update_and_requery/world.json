@@ -15,6 +15,9 @@
     "klass": "RootEntityClass",
     "name": "World"
    }
+  },
+  "identifiers": {
+   "gid": 0
   }
  },
  "klass": {

@@ -38,6 +38,9 @@ async def test_materialize_infinite_reach(caplog):
     reloaded = await tw.domain.reload()
 
     with reloaded.session() as session:
+        assert len(session.registrar.entities) == 0
+        await session.prepare(reach=domains.infinite_reach)
+
         await session.tick()
         await session.save()
 
@@ -46,7 +49,6 @@ async def test_materialize_infinite_reach(caplog):
 
 @pytest.mark.asyncio
 async def test_materialize_reach_1(caplog):
-    caplog.set_level(logging.WARNING)
     tw = test.TestWorld()
 
     with tw.domain.session() as session:
@@ -60,7 +62,6 @@ async def test_materialize_reach_1(caplog):
 
     await tw.add_jacob()
 
-    caplog.set_level(logging.INFO)
     with tw.domain.session() as session:
 
         def reach(entity, depth):

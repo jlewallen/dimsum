@@ -23,6 +23,9 @@
     "klass": "AreaClass",
     "name": "welcome"
    }
+  },
+  "identifiers": {
+   "gid": 3
   }
  },
  "klass": {

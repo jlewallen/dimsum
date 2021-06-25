@@ -2,6 +2,7 @@ from typing import Optional, Type, List, Union, Any, Dict, Sequence, cast
 
 import abc
 import logging
+import dataclasses
 import time
 import copy
 import wrapt
@@ -15,15 +16,31 @@ log = logging.getLogger("dimsum.model.entity")
 p = inflect.engine()
 
 
-class EntityRef(wrapt.ObjectProxy):
-    def __init__(self, targetOrKey: Union["Entity", str]):
-        # If we've been given a key, then we're deserializing and use
-        # a dummy target for the wrapped instance. Then, when we're
-        # all done we fix these up.
-        if isinstance(targetOrKey, str):
-            super().__init__(None)
-        else:
-            super().__init__(targetOrKey)
+@dataclasses.dataclass(frozen=True)
+class EntityRef:
+    key: str
+    klass: str
+    name: str
+    pyObject: Any
+
+    @staticmethod
+    def make(key=None, klass=None, name=None, pyObject=None, **kwargs):
+        assert key
+        assert klass
+        assert name
+        assert pyObject
+        return EntityRef(key, klass, name, pyObject)
+
+
+class EntityProxy(wrapt.ObjectProxy):
+    def __init__(self, ref: EntityRef):
+        super().__init__(ref)
+        self._self_ref = ref
+
+    def __getattr__(self, *arg):
+        if self.__wrapped__ is None:
+            log.info("self.None __getattr__: %s %s", arg, self._self_ref)
+        return super().__getattr__(*arg)
 
     def __deepcopy__(self, memo):
         return copy.deepcopy(self.__wrapped__, memo)
@@ -107,7 +124,7 @@ class Entity:
         super().__init__()
         self.version = version if version else Version()
         # It's important to just assign these and avoid testing for
-        # None, as we may have a None target EntityRef that needs to
+        # None, as we may have a None target EntityProxy that needs to
         # be linked up later, and in that case we need to keep the
         # wrapt Proxy object.
         self.creator: Optional["Entity"] = creator
@@ -121,6 +138,12 @@ class Entity:
             # If we have an creator and no identity then we generate one
             # based on them, forming a chain.
             if self.creator:
+                if isinstance(self.creator, str):
+                    log.info("WTF: %s", self.creator)
+                    log.info("key = %s", key)
+                    log.info("klass = %s", klass)
+                    log.info("chimeras = %s", chimeras)
+                    assert False
                 self.identity = crypto.generate_identity_from(self.creator.identity)
             else:
                 self.identity = crypto.generate_identity()

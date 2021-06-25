@@ -245,8 +245,7 @@ async def update(obj, info, entities):
         instantiated = [await session.materialize(json=e) for e in entities]
         new_world = [e for e in instantiated if e.key == world.Key]
         if new_world:
-            session.world = new_world
-            domain.world = new_world  # TODO Remove
+            session.world = new_world[0]
         await session.save()
         return {"affected": len(instantiated)}
 

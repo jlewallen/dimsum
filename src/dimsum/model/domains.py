@@ -25,6 +25,18 @@ log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
 
 
+def infinite_reach(entity, depth):
+    return 0
+
+
+def default_reach(entity, depth):
+    if depth == 3:
+        return -1
+    if entity.klass == scopes.AreaClass:
+        return 1
+    return 0
+
+
 class Session:
     def __init__(self, domain: "Domain"):
         super().__init__()
@@ -58,23 +70,23 @@ class Session:
             key=key,
             gid=gid,
             json=json,
-            reach=reach,
+            reach=reach if reach else default_reach,
         )
 
     async def prepare(self, reach=None):
         if self.world:
-            assert self.world in self.registrar.entities.values()
             return self.world
 
-        self.world = await self.materialize(key=world.Key, reach=reach)
+        self.world = await self.materialize(
+            key=world.Key, reach=reach if reach else None
+        )
         if self.world:
-            assert self.world in self.registrar.entities.values()
+            self.registrar.number = self.world.gid()
             return self.world
 
         log.info("creating new world")
         self.world = world.World()
         self.register(self.world)
-        assert self.world in self.registrar.entities.values()
         return self.world
 
     async def perform(
@@ -195,6 +207,8 @@ class Session:
 
     async def save(self):
         log.info("saving %s", self.domain.store)
+        assert isinstance(self.world, world.World)
+        self.world.update_gid(self.registrar.number)
         await self.domain.store.update(serializing.registrar(self.registrar))
 
 
@@ -214,12 +228,7 @@ class Domain:
         return Session(self)
 
     async def reload(self):
-        reloaded = Domain(empty=True, store=self.store)
-        with reloaded.session() as session:
-            reloaded.world = await session.materialize(
-                key=world.Key
-            )  # TODO Move to Session
-            return reloaded
+        return Domain(empty=True, store=self.store)
 
 
 class WorldCtx(context.Ctx):
@@ -238,6 +247,7 @@ class WorldCtx(context.Ctx):
         self.session = session
         self.domain = session.domain
         self.world = session.world
+        assert isinstance(self.world, world.World)
         self.registrar = session.registrar
         self.bus = session.domain.bus
         self.context_factory = context_factory
