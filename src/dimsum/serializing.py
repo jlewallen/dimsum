@@ -158,6 +158,7 @@ async def materialize(
     key: str = None,
     gid: int = None,
     json: str = None,
+    reach=None,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
     assert registrar
@@ -207,11 +208,25 @@ async def materialize(
     assert loaded
     registrar.register(loaded)
 
-    for referenced_key, proxy in refs.items():
-        linked = await materialize(
-            registrar=registrar, store=store, key=referenced_key, depth=depth + 1
-        )
-        proxy.__wrapped__ = linked  # type: ignore
+    deeper = True
+    new_depth = depth
+    if reach:
+        choice = reach(loaded, depth)
+        if choice < 0:
+            deeper = False
+        else:
+            new_depth += choice
+
+    if deeper:
+        for referenced_key, proxy in refs.items():
+            linked = await materialize(
+                registrar=registrar,
+                store=store,
+                key=referenced_key,
+                reach=reach,
+                depth=new_depth,
+            )
+            proxy.__wrapped__ = linked  # type: ignore
 
     loaded.validate()
 

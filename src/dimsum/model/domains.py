@@ -46,7 +46,11 @@ class Session:
         return self.registrar.unregister(entity)
 
     async def materialize(
-        self, key: str = None, gid: int = None, json: str = None
+        self,
+        key: str = None,
+        gid: int = None,
+        json: str = None,
+        reach=None,
     ) -> Optional[entity.Entity]:
         return await serializing.materialize(
             registrar=self.registrar,
@@ -54,14 +58,15 @@ class Session:
             key=key,
             gid=gid,
             json=json,
+            reach=reach,
         )
 
-    async def prepare(self):
+    async def prepare(self, reach=None):
         if self.world:
             assert self.world in self.registrar.entities.values()
             return self.world
 
-        self.world = await self.materialize(key=world.Key)
+        self.world = await self.materialize(key=world.Key, reach=reach)
         if self.world:
             assert self.world in self.registrar.entities.values()
             return self.world
