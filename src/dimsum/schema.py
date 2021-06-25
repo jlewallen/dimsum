@@ -3,6 +3,7 @@ import ariadne
 import os.path
 import dataclasses
 import base64
+import starlette.requests
 import jwt
 
 import model.world as world
@@ -35,21 +36,6 @@ reply = ariadne.ScalarType("Reply")
 def serialize_reply(value):
     log.debug("ariadne:reply")
     return serializing.serialize(value, indent=True, reproducible=True)
-
-
-@dataclasses.dataclass
-class Credentials:
-    username: str
-    password: str
-
-
-credentials = ariadne.ScalarType("Credentials")
-
-
-@credentials.value_parser
-def parse_credentials_value(value):
-    log.info("ariadne:credentials: %s", value)
-    return value
 
 
 query = ariadne.QueryType()
@@ -179,6 +165,12 @@ class UsernamePasswordError(ValueError):
     pass
 
 
+@dataclasses.dataclass
+class Credentials:
+    username: str
+    password: str
+
+
 @mutation.field("login")
 async def login(obj, info, credentials):
     domain = info.context.domain
@@ -251,17 +243,18 @@ async def update(obj, info, entities):
 
 
 def create():
-    for path in ["src/dimsum/schema.graphql", "schema.graphql"]:
+    for path in ["src/dimsum/dimsum.graphql", "dimsum.graphql"]:
         if os.path.exists(path):
             type_defs = ariadne.load_schema_from_path(path)
             return ariadne.make_executable_schema(type_defs, [query, mutation])
-    raise Exception("unable to find schema.graphql")
+    raise Exception("unable to find dimsum.graphql")
 
 
 @dataclasses.dataclass
 class AriadneContext:
     domain: domains.Domain
     cfg: config.Configuration
+    request: starlette.requests.Request
 
 
 def context(cfg):
@@ -269,6 +262,6 @@ def context(cfg):
 
     def wrap(request):
         log.info("ariadne:context %s", request)
-        return AriadneContext(domain=domain, cfg=cfg)
+        return AriadneContext(domain=domain, cfg=cfg, request=request)
 
     return wrap

@@ -2,15 +2,15 @@ SHELL := /bin/bash
 
 default: checks test
 
+uvicorn:
+	uvicorn --app-dir src/dimsum --log-config logging.json --reload dimsum:app
+
 checks: env
 	env/bin/mypy src/dimsum/*.py --ignore-missing-imports
 
 clean:
 	rm -rf env
 	rm -rf src/web/node_modules
-
-run:
-	env/bin/python3 src/dimsum/dimsum.py
 
 test: env
 	rm -f test*.sqlite3
@@ -37,22 +37,6 @@ src/web/node_modules:
 
 web: src/web/node_modules src/web/src/config
 	cd src/web && yarn serve
-
-image:
-	docker build -t jlewallen/dimsum .
-
-image-test:
-	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 jlewallen/dimsum
-
-prod-image:
-	cp src/web/src/config.ts.prod src/web/src/config.ts
-	docker build -t jlewallen/dimsum .
-
-prod-server:
-	docker run --name mud --env-file .env --rm -p 5000:5000 -v `pwd`/world.sqlite3:/app/world.sqlite3 -d jlewallen/dimsum
-
-server:
-	uvicorn --app-dir src/dimsum --log-config logging.yml --reload dimsum:app
 
 graph:
 	+@for m in *.sqlite3; do                                               \

@@ -56,7 +56,7 @@ async def query(config: str, database: str):
 
     cfg = get_config()
     domain = domains.Domain(empty=True, store=cfg.make_store())
-    context = AriadneContext(domain, cfg)
+    context = AriadneContext(domain, cfg, None)  # type:ignore
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 

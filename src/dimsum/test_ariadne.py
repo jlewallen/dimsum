@@ -23,7 +23,9 @@ log = logging.getLogger("dimsum")
 
 
 def get_test_context(domain: domains.Domain, **kwargs):
-    return AriadneContext(domain, config.Configuration("test.sqlite3", "session-key"))
+    return AriadneContext(
+        domain, config.Configuration("test.sqlite3", "session-key"), None  # type:ignore
+    )
 
 
 @pytest.mark.asyncio

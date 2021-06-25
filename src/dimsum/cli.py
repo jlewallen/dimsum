@@ -2,11 +2,11 @@
 
 import sys
 import logging
+import logging.config
 import asyncio
 import asyncclick as click
+import json
 import os
-
-log = logging.getLogger("dimsum-cli")
 
 import cli.repl
 import cli.graph
@@ -15,14 +15,19 @@ import cli.query
 import cli.server
 import cli.dummy
 
+log = logging.getLogger("dimsum.cli")
+
+
+def configure_logging():
+    with open("logging.json", "r") as file:
+        config = json.loads(file.read())
+        logging.config.dictConfig(config)
+
 
 @click.group()
 @click.option("--debug/--no-debug", default=False)
 def command_line(debug: bool):
-    if debug:
-        logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-    else:
-        logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+    configure_logging()
 
 
 if __name__ == "__main__":

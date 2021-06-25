@@ -1,0 +1,32 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+scalar Token
+
+type Query {
+  targets: [Target!]
+}
+
+type Target {
+  name: String!
+}
+
+input ProcessTargetConfig {
+  command: String!
+}
+
+input HttpTargetConfig {
+  url: String!
+}
+
+input TargetConfiguration {
+  name: String!
+  process: ProcessTargetConfig
+  http: HttpTargetConfig
+}
+
+type Mutation {
+  provision(config: TargetConfiguration!): Target!
+}

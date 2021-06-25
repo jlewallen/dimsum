@@ -1,4 +1,4 @@
-from typing import Any, List, Union
+from typing import Any, List, Union, TextIO
 
 import asyncio
 import asyncssh
@@ -6,16 +6,6 @@ import time
 import crypt
 import sys
 import logging
-
-import model.properties as properties
-import model.scopes as scopes
-
-import messages
-
-import default.evaluator as evaluator
-import default.actions as actions
-
-import grammars
 
 import rich
 import rich.console
@@ -25,9 +15,10 @@ import rich.table
 
 log = logging.getLogger("dimsum.sshd")
 
-passwords = {
-    "jlewallen": "",
-}
+
+class CommandHandler:
+    async def handle(self, line: str, back: TextIO):
+        raise NotImplementedError
 
 
 class WrapStandardOut:
@@ -45,33 +36,12 @@ class WrapStandardOut:
 class ShellSession:
     others: List["ShellSession"] = []
 
-    def __init__(self, state, process):
+    def __init__(self, process, handler_factory):
         super().__init__()
-        self.l = grammar.create_parser()
-        self.state = state
         self.process = process
-        self.name = self.process.get_extra_info("username")
-
-    async def get_player(self):
-        key = self.name
-        world = self.state.world
-        if world.contains(key):
-            player = world.find_by_key(key)
-            return player
-
-        player = scopes.alive(
-            key=key,
-            creator=world,
-            props=properties.Common(self.name, desc="A ssh user"),
-        )
-        await world.perform(actions.Join(), player)
-        await self.state.save()
-        return player
-
-    def parse_as(self, evaluator, full):
-        tree = self.l.parse(full.strip())
-        log.info(str(tree))
-        return evaluator.transform(tree)
+        self.username = process.get_extra_info("username")
+        self.handler = handler_factory(self.username)
+        assert self.handler
 
     async def iteration(self):
         command = await self.read_command()
@@ -82,33 +52,10 @@ class ShellSession:
         if command == "":
             return True
 
-        world = self.state.world
-        player = await self.get_player()
-        action = self.parse_as(evaluator.create(world, player), command)
-        reply = await world.perform(action, player)
-        await self.state.save()
-
-        visitor = messages.ReplyVisitor()
-        visual = reply.accept(visitor)
-        log.info(
-            "%s" % (visual),
-        )
-
-        self.write("\n", end="")
-
-        if "title" in visual:
-            self.write(visual["title"], end="")
-            self.write("\n", end="")
-
-        if "text" in visual:
-            self.write(visual["text"], end="")
-            self.write("\n", end="")
-
-        if "description" in visual:
-            self.write("\n", end="")
-            self.write(visual["description"], end="")
-
-        self.write("\n", end="")
+        try:
+            await self.handler.handle(command, self)
+        except:
+            log.exception("error", exc_info=True)
 
         return True
 
@@ -119,14 +66,14 @@ class ShellSession:
                 if not safe:
                     break
             except asyncssh.TerminalSizeChanged as exc:
-                log.info("%s: terminal size changed %s" % (self.name, str(exc)))
+                log.info("%s: terminal size changed %s" % (self.username, str(exc)))
                 self.recreate_console()
                 self.write("\n", end="")
 
     def recreate_console(self):
         term_type = self.process.get_terminal_type()
         width, height, width_pixels, height_pixels = self.process.get_terminal_size()
-        log.info("%s: recreating (%d x %d)" % (self.name, width, height))
+        log.info("%s: recreating (%d x %d)" % (self.username, width, height))
         self.console = rich.console.Console(
             file=WrapStandardOut(self.process.stdout),
             force_terminal=True,
@@ -135,29 +82,11 @@ class ShellSession:
         )
 
     async def run(self):
-        self.name = self.process.get_extra_info("username")
+        self.username = self.process.get_extra_info("username")
 
         self.recreate_console()
 
-        log.info("%s: connected" % (self.name))
-
-        if not self.state.world:
-            self.print("\ninitializing...\n")
-            self.process.exit(0)
-            return
-
-        if False:
-            table = rich.table.Table()
-            table.add_column("Row ID")
-            table.add_column("Description")
-            table.add_column("Level")
-
-            with rich.live.Live(table, refresh_per_second=4, console=self.console):
-                for row in range(12):
-                    time.sleep(0.4)
-                    table.add_row(f"{row}", f"description {row}", "[red]ERROR")
-
-        player = await self.get_player()
+        log.info("%s: connected" % (self.username))
 
         self.others.append(self)
 
@@ -169,20 +98,20 @@ class ShellSession:
                     for key, value in self.process.env.items():
                         self.process.stdout.write("%s=%s\n" % (key, value))
 
-            self.print("Welcome to the party, %s!" % (self.name,))
+            self.print("Welcome to the party, %s!" % (self.username,))
             self.print("%d other users are connected." % len(self.others))
             self.print("\n", end="")
 
-            self.write_everyone_else("*** %s has joined" % self.name)
+            self.write_everyone_else("*** %s has joined" % self.username)
 
             try:
                 await self.repl()
             except asyncssh.BreakReceived:
-                log.info("%s: brk" % (self.name,))
+                log.info("%s: brk" % (self.username,))
 
-            log.info("%s: disconnected" % (self.name,))
+            log.info("%s: disconnected" % (self.username,))
 
-            self.write_everyone_else("*** %s has left" % self.name)
+            self.write_everyone_else("*** %s has left" % self.username)
         finally:
             self.others.remove(self)
             self.process.exit(0)
@@ -216,9 +145,8 @@ class ShellSession:
 
 
 class Server(asyncssh.SSHServer):
-    def __init__(self, state):
+    def __init__(self):
         super().__init__()
-        self.state = state
 
     def connection_made(self, conn):
         log.info("connection from %s" % conn.get_extra_info("peername")[0])
@@ -230,22 +158,21 @@ class Server(asyncssh.SSHServer):
             log.info("connection closed")
 
     def begin_auth(self, username: str) -> bool:
-        return passwords.get(username) != ""
+        return False
 
     def password_auth_supported(self):
         return True
 
     def validate_password(self, username: str, password: str) -> bool:
-        pw = passwords.get(username, "*")
-        return crypt.crypt(password, pw) == pw
+        return True
 
 
-async def start_server(state):
+async def start_server(handler_factory):
     def create_server():
-        return Server(state)
+        return Server()
 
     async def handle_process(process):
-        await ShellSession(state, process).run()
+        await ShellSession(process, handler_factory).run()
 
     await asyncssh.create_server(
         create_server,
