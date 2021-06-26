@@ -188,7 +188,7 @@ async def materialize(
     json: List[entity.Serialized] = None,
     reach=None,
     depth: int = 0,
-    cache: Dict[str, str] = None,
+    cache: Dict[str, List[entity.Serialized]] = None,
 ) -> Optional[entity.Entity]:
     assert registrar
     assert store
@@ -201,10 +201,13 @@ async def materialize(
         if found:
             return found
 
-        json = await store.load_by_key(key)
-        if len(json) == 0:
-            log.info("[%d] %s missing key=%s", depth, store, key)
-            return None
+        if key in cache:
+            json = cache[key]
+        else:
+            json = await store.load_by_key(key)
+            if len(json) == 0:
+                log.info("[%d] %s missing key=%s", depth, store, key)
+                return None
 
     if gid is not None:
         log.debug("[%d] materialize gid=%d", depth, gid)
@@ -233,36 +236,35 @@ async def materialize(
     if not json or len(json) == 0:
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
 
-    loaded = None
-    for row in json[:1]:
-        deserialized = deserialize(row.serialized, reference)
-        registrar.register(deserialized)
-        if loaded is None:
-            loaded = deserialized
+    cache.update(**{se.key: [se] for se in json})
 
-        deeper = True
-        new_depth = depth
-        if reach:
-            choice = reach(loaded, depth)
-            if choice < 0:
-                log.debug("reach! reach! reach!")
-                deeper = False
-            else:
-                new_depth += choice
+    deserialized = deserialize(json[0].serialized, reference)
+    registrar.register(deserialized)
+    loaded = deserialized
 
-        if deeper:
-            for referenced_key, proxy in refs.items():
-                linked = await materialize(
-                    registrar=registrar,
-                    store=store,
-                    key=referenced_key,
-                    reach=reach,
-                    depth=new_depth,
-                    cache=cache,
-                )
-                proxy.__wrapped__ = linked  # type: ignore
+    deeper = True
+    new_depth = depth
+    if reach:
+        choice = reach(loaded, depth)
+        if choice < 0:
+            log.debug("reach! reach! reach!")
+            deeper = False
+        else:
+            new_depth += choice
 
-        loaded.validate()
+    if deeper:
+        for referenced_key, proxy in refs.items():
+            linked = await materialize(
+                registrar=registrar,
+                store=store,
+                key=referenced_key,
+                reach=reach,
+                depth=new_depth,
+                cache=cache,
+            )
+            proxy.__wrapped__ = linked  # type: ignore
+
+    loaded.validate()
 
     return loaded
 
