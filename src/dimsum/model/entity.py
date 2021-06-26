@@ -7,6 +7,7 @@ import time
 import copy
 import wrapt
 import inflect
+import shortuuid
 
 import model.properties as properties
 import model.crypto as crypto
@@ -154,7 +155,7 @@ class Entity:
             else:
                 self.identity = crypto.generate_identity()
             # If we aren't given a key, the default one is our public key.
-            self.key = self.identity.public
+            self.key = shortuuid.uuid()
 
         if key:
             self.key = key
