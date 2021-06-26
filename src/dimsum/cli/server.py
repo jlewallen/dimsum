@@ -19,6 +19,12 @@ import routing
 import schema as schema_factory
 
 import model.domains as domains
+import model.scopes as scopes
+import model.properties as properties
+import model.world as world
+import model.library as library
+import grammars
+import default
 
 log = logging.getLogger("dimsum-cli")
 
@@ -29,13 +35,50 @@ def commands():
 
 
 class SecureSession(sshd.CommandHandler):
-    def __init__(self, username: str = None):
+    def __init__(self, cfg: config.Configuration, username: str = None):
         super().__init__()
+        self.cfg = cfg
+        self.domain = cfg.make_domain()
         self.username = username
+        self.l = grammars.create_parser()
 
-    async def handle(self, username: str, line: str, back: TextIO):
-        log.info("handle: %s '%s'", username, line)
-        back.write("hey here!\n")
+    async def create_player_if_necessary(self, session: domains.Session):
+        player = await session.materialize(key=self.username)
+        if player:
+            return session.world, player
+
+        if session.registrar.empty():
+            log.info("creating example world")
+            world = await session.prepare()
+            generics, area = library.create_example_world(world)
+            session.registrar.add_entities(generics.all)
+            await session.add_area(area)
+
+        player = scopes.alive(
+            key=self.username,
+            creator=session.world,
+            props=properties.Common(self.username, desc="A player"),
+        )
+        await session.perform(default.actions.Join(), player)
+
+        assert session.world
+        return session.world, player
+
+    async def handle(self, line: str, back: TextIO):
+        log.info("handle: %s '%s'", self.username, line)
+
+        with self.domain.session() as session:
+            world, player = await self.create_player_if_necessary(session)
+            tree, create_evaluator = self.l.parse(line.strip())
+            tree_eval = create_evaluator(world, player)
+            action = tree_eval.transform(tree)
+            reply = await session.perform(action, player)
+
+            log.info("reply: %s", reply)
+
+            back.write(str(reply))
+
+            await session.save()
 
 
 @commands.command()
@@ -57,7 +100,7 @@ async def server(path: str):
     )
 
     def create_ssh_session(username: str = None):
-        return SecureSession(username)
+        return SecureSession(cfg, username)
 
     if False:
         with proxy.start(
