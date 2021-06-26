@@ -61,18 +61,23 @@ async def resolve_world(obj, info):
         return serialize_entity(await session.prepare())
 
 
+async def materialize(session, **kwargs):
+    loaded = await session.materialize(**kwargs)
+    if loaded:
+        entities = [loaded]
+        for other_key, other in session.registrar.entities.items():
+            if other_key != loaded.key:
+                entities.append(other)
+
+    return [serialize_entity(e) for e in entities]
+
+
 @query.field("entitiesByKey")
 async def resolve_entities_by_key(obj, info, key):
     domain = info.context.domain
     log.info("ariadne:entities-by-key key=%s", key)
     with domain.session() as session:
-        entities = []
-        loaded = await session.materialize(key=key)
-        if loaded:
-            entities = [loaded]
-
-        log.info("ariadne:entities-by-key entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return await materialize(session, key=key)
 
 
 @query.field("entitiesByGid")
@@ -80,13 +85,7 @@ async def resolve_entities_by_gid(obj, info, gid):
     domain = info.context.domain
     log.info("ariadne:entities-by-gid gid=%s", gid)
     with domain.session() as session:
-        entities = []
-        loaded = await session.materialize(gid=gid)
-        if loaded:
-            entities = [loaded]
-
-        log.info("ariadne:entities-by-gid entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return await materialize(session, gid=gid)
 
 
 @query.field("areas")
