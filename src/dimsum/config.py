@@ -29,7 +29,7 @@ class ConfigurationException(Exception):
 
 def get(path: Optional[str]) -> Configuration:
     if path is None:
-        path = "dimsum.conf"
+        return Configuration(":memory:", "session_key")
     if os.path.exists(path):
         with open(path, "r") as f:
             return Configuration(**json.loads(f.read()))

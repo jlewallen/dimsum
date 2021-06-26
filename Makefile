@@ -3,7 +3,7 @@ SHELL := /bin/bash
 default: checks test
 
 uvicorn:
-	uvicorn --app-dir src/dimsum --log-config `pwd`/logging.json --reload dimsum:app
+	uvicorn --app-dir src/dimsum --log-config `pwd`/logging.json --reload --factory dimsum:app
 
 checks: env
 	env/bin/mypy src/dimsum/*.py --ignore-missing-imports

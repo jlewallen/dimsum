@@ -60,5 +60,3 @@ async def server(path: str):
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(create_ssh_session))
     await asyncio.gather(sshd_task, gql_task)
-
-    log.info("done")
