@@ -41,7 +41,7 @@ input Credentials {
 
 input EntityDiff {
   key: String!
-  serialized: String!
+  serialized: String
 }
 
 type EntitiesUpdated {

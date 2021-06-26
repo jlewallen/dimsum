@@ -237,12 +237,17 @@ async def makeSample(obj, info):
 async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
-    with domain.session() as session:
-        await session.prepare()
-        diffs = [KeyedEntity(row["key"], row["serialized"]) for row in entities]
-        await session.materialize(json=diffs)
-        await session.save()
-        return {"affected": len(diffs)}
+
+    diffs = {
+        storage.Keys(row["key"], None): row["serialized"]
+        if "serialized" in row
+        else None
+        for row in entities
+    }
+
+    await domain.store.update(diffs)
+
+    return {"affected": len(diffs)}
 
 
 def create():

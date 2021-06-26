@@ -17,7 +17,7 @@ log = logging.getLogger("dimsum.storage")
 @dataclasses.dataclass(frozen=True)
 class Keys:
     key: str
-    gid: int
+    gid: Optional[int]
 
 
 class EntityStorage:

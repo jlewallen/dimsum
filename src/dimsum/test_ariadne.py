@@ -301,3 +301,27 @@ async def test_graphql_make_sample(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_delete(snapshot):
+    domain = domains.Domain()
+
+    serialized = serializing.serialize(world.World(), secure=True)
+
+    data = {
+        "variables": {"entities": [{"key": world.Key}]},
+        "query": """
+mutation UpdateEntities($entities: [EntityDiff!]) {
+    update(entities: $entities) {
+        affected
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
