@@ -88,7 +88,7 @@ async def test_graphql_world_directly(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "world.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
 
 
 @pytest.mark.asyncio
@@ -104,7 +104,7 @@ async def test_graphql_world_by_key(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "world.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
 
 
 @pytest.mark.asyncio
@@ -122,7 +122,7 @@ async def test_graphql_world_by_gid(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "world.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
 
 
 @pytest.mark.asyncio
@@ -155,7 +155,7 @@ async def test_graphql_language_basic(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "entities.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "entities.json")
 
 
 @pytest.mark.asyncio
@@ -168,7 +168,7 @@ async def test_graphql_entities_areas(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "areas.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "areas.json")
 
 
 @pytest.mark.asyncio
@@ -181,7 +181,7 @@ async def test_graphql_entities_people(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "people.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "people.json")
 
 
 @pytest.mark.asyncio
@@ -281,7 +281,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual), "world.json")
+    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
 
 
 @pytest.mark.asyncio

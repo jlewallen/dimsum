@@ -247,14 +247,10 @@ async def update(obj, info, entities):
     # TODO Parallel
     with domain.session() as session:
         await session.prepare()
-
         diffs = [KeyedEntity(row["key"], row["serialized"]) for row in entities]
-        instantiated = [await session.materialize(json=diffs) for e in entities]
-        new_world = [e for e in instantiated if e.key == world.Key]
-        if new_world:
-            session.world = new_world[0]
+        await session.materialize(json=diffs)
         await session.save()
-        return {"affected": len(instantiated)}
+        return {"affected": len(diffs)}
 
 
 def create():

@@ -1,4 +1,4 @@
-from typing import Optional, List, Sequence, Dict
+from typing import Optional, List, Sequence, Dict, Union
 
 import logging
 import time
@@ -63,8 +63,8 @@ class Session:
         gid: int = None,
         json: List[entity.Serialized] = None,
         reach=None,
-    ) -> Optional[entity.Entity]:
-        return await serializing.materialize(
+    ) -> Union[Optional[entity.Entity], List[entity.Entity]]:
+        materialized = await serializing.materialize(
             registrar=self.registrar,
             store=self.domain.store,
             key=key,
@@ -72,6 +72,13 @@ class Session:
             json=json,
             reach=reach if reach else default_reach,
         )
+
+        if materialized and isinstance(materialized, list):
+            for updated_world in [e for e in materialized if e.key == world.Key]:
+                assert isinstance(updated_world, world.World)
+                self.world = updated_world
+
+        return materialized
 
     async def prepare(self, reach=None):
         if self.world:
@@ -340,7 +347,9 @@ class WorldCtx(context.Ctx):
         )
 
         if number is not None:
-            return await self.session.materialize(gid=number)
+            by_gid = await self.session.materialize(gid=number)
+            assert isinstance(by_gid, entity.Entity) or by_gid is None
+            return by_gid
 
         if len(candidates) == 0:
             return None

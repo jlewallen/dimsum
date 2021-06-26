@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 import copy
 import jsonpickle
@@ -189,10 +189,11 @@ async def materialize(
     reach=None,
     depth: int = 0,
     cache: Dict[str, List[entity.Serialized]] = None,
-) -> Optional[entity.Entity]:
+) -> Union[Optional[entity.Entity], List[entity.Entity]]:
     assert registrar
     assert store
 
+    single_entity = json is None
     cache = cache or {}
     found = None
     if key is not None:
@@ -266,7 +267,10 @@ async def materialize(
 
     loaded.validate()
 
-    return loaded
+    if single_entity:
+        return loaded
+
+    return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
 def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:
