@@ -14,6 +14,12 @@ import dimsum
 log = logging.getLogger("dimsum")
 
 
+@pytest.fixture(scope="function")
+def silence_aihttp(caplog):
+    caplog.set_level(logging.CRITICAL, "gql.transport.aiohttp")
+    yield
+
+
 @pytest.fixture(scope="session")
 def server():
     log.info("started server")
@@ -30,39 +36,39 @@ def server():
 
 
 @pytest.mark.asyncio
-async def test_server(server):
-    pass
+async def test_server(server, caplog):
+    log.info("%s", caplog)
 
 
 @pytest.mark.asyncio
-async def test_storage_http_number_of_entities(server):
+async def test_storage_http_number_of_entities(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     size = await store.number_of_entities()
     assert size == 61
 
 
 @pytest.mark.asyncio
-async def test_storage_http_purge(server):
+async def test_storage_http_purge(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     await store.purge()
 
 
 @pytest.mark.asyncio
-async def test_storage_load_by_key(server):
+async def test_storage_load_by_key(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_key("world")
     assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
-async def test_storage_load_by_gid(server):
+async def test_storage_load_by_gid(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_gid(0)
     assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
-async def test_storage_update_entity(server):
+async def test_storage_update_entity(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_gid(0)
     assert [json.loads(s.serialized) for s in serialized]
