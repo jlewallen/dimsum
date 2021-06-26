@@ -188,7 +188,7 @@ class SqliteStorage(EntityStorage):
         self.db = sqlite3.connect(self.path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, gid INTEGER NOT NULL, serialized TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, gid INTEGER, serialized TEXT NOT NULL)"
         )
         self.db.commit()
 
@@ -314,8 +314,9 @@ class HttpStorage(EntityStorage):
             )
             entities = [
                 {"key": key.key, "serialized": serialized}
-                for key, serialized in updates.items()
                 if serialized
+                else {"key": key.key}
+                for key, serialized in updates.items()
             ]
             response = await session.execute(
                 query, variable_values={"entities": entities}

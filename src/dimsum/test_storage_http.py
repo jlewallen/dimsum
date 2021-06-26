@@ -6,7 +6,7 @@ import logging
 import contextlib
 import time
 import asyncio
-
+import shortuuid
 import pytest
 
 from gql import gql, Client
@@ -15,7 +15,10 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import uvicorn
 
 import storage
+import serializing
 import dimsum
+
+import model.world as world
 
 log = logging.getLogger("dimsum")
 
@@ -78,7 +81,26 @@ async def test_storage_load_by_gid(server, silence_aihttp):
 
 
 @pytest.mark.asyncio
-async def test_storage_update_entity(server, silence_aihttp):
+async def test_storage_update_nothing(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
-    serialized = await store.load_by_gid(0)
-    assert [json.loads(s.serialized) for s in serialized]
+    serialized = await store.update({})
+    assert serialized == 0
+
+
+@pytest.mark.asyncio
+async def test_storage_update_one_entity(server, silence_aihttp):
+    serialized = serializing.serialize(world.World())
+    store = storage.HttpStorage("http://127.0.0.1:45600")
+    serialized = await store.update({storage.Keys("world", 0): serialized})
+    assert serialized == 1
+
+
+@pytest.mark.asyncio
+async def test_storage_delete_one_entity(server, silence_aihttp):
+    serialized = serializing.serialize(world.World())
+    store = storage.HttpStorage("http://127.0.0.1:45600")
+    key = shortuuid.uuid()
+    serialized = await store.update({storage.Keys(key, 0): serialized})
+    assert serialized == 1
+    serialized = await store.update({storage.Keys(key, None): None})
+    assert serialized == 1

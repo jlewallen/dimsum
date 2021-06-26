@@ -84,8 +84,8 @@ async def materialize(session, **kwargs):
         for other_key, other in session.registrar.entities.items():
             if other_key != loaded.key:
                 entities.append(other)
-
-    return [serialize_entity(e) for e in entities]
+        return [serialize_entity(e) for e in entities]
+    return []
 
 
 @query.field("entitiesByKey")
