@@ -176,23 +176,9 @@ class Entity:
                         )
 
         log.debug(
-            "entity:ctor {0} '{1}' creator={2} {3} id={4} props={5}".format(
-                self.key,
-                self.props.name,
-                creator,
-                creator.key if creator else "<none>",
-                self.props,
-                id(self),
+            "entity:ctor {0} '{1}' creator={2} id={3} props={4}".format(
+                self.key, self.props.name, creator, id(self), self.props
             )
-        )
-
-        log.info(
-            "entity:ctor %s id=%s chimeras=%s props=%s initialize=%s",
-            self.key,
-            id(self),
-            self.chimeras,
-            self.props,
-            initialize,
         )
 
     def validate(self) -> None:

@@ -215,7 +215,7 @@ async def materialize(
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
-    log.info("json: %s", json)
+    log.debug("json: %s", json)
 
     refs: Dict[str, entity.EntityProxy] = {}
 
@@ -242,7 +242,7 @@ async def materialize(
     if reach:
         choice = reach(loaded, depth)
         if choice < 0:
-            log.info("reach! reach! reach!")
+            log.debug("reach! reach! reach!")
             deeper = False
         else:
             new_depth += choice
