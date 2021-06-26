@@ -52,5 +52,4 @@ type Mutation {
   login(credentials: Credentials!): Token!
   makeSample: EntitiesUpdated
   update(entities: [EntityDiff!]): EntitiesUpdated
-  purge: EntitiesUpdated
 }

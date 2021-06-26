@@ -212,13 +212,6 @@ async def login(obj, info, credentials):
         raise UsernamePasswordError()
 
 
-@mutation.field("purge")
-async def purge(obj, info):
-    domain = info.context.domain
-    log.info("ariadne:purge")
-    return {"affected": 0}
-
-
 @mutation.field("makeSample")
 async def makeSample(obj, info):
     domain = info.context.domain

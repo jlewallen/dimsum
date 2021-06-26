@@ -64,12 +64,6 @@ async def test_storage_http_number_of_entities(server, silence_aihttp):
 
 
 @pytest.mark.asyncio
-async def test_storage_http_purge(server, silence_aihttp):
-    store = storage.HttpStorage("http://127.0.0.1:45600")
-    await store.purge()
-
-
-@pytest.mark.asyncio
 async def test_storage_load_by_key(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_key("world")

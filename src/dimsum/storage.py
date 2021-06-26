@@ -24,9 +24,6 @@ class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def purge(self):
-        raise NotImplementedError
-
     async def destroy(self, keys: Keys):
         raise NotImplementedError
 
@@ -47,10 +44,6 @@ class All(EntityStorage):
 
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
-
-    async def purge(self):
-        for child in self.children:
-            await child.purge()
 
     async def destroy(self, keys: Keys):
         for child in self.children:
@@ -88,10 +81,6 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def purge(self):
-        for child in self.children:
-            return await child.purge()
-
     async def destroy(self, keys: Keys):
         for child in self.children:
             return await child.destroy(keys)
@@ -126,9 +115,6 @@ class Separated(EntityStorage):
 
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
-
-    async def purge(self):
-        return await self.write.purge()
 
     async def destroy(self, keys: Keys):
         return await self.write.number_of_entities()
@@ -346,12 +332,6 @@ class HttpStorage(EntityStorage):
             query = gql("query { size }")
             response = await session.execute(query)
             return response["size"]
-
-    async def purge(self):
-        async with self.session() as session:
-            query = gql("mutation { purge { affected } }")
-            response = await session.execute(query)
-            return response["purge"]["affected"]
 
     async def destroy(self, keys: Keys):
         pass
