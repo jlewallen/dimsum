@@ -33,6 +33,15 @@ class WrapStandardOut:
         pass
 
 
+class WriteEmptyEnd:
+    def __init__(self, writer):
+        super().__init__()
+        self.writer = writer
+
+    def write(self, data):
+        return self.writer.write(data, end="")
+
+
 class ShellSession:
     others: List["ShellSession"] = []
 
@@ -53,7 +62,7 @@ class ShellSession:
             return True
 
         try:
-            await self.handler.handle(command, self)
+            await self.handler.handle(command, WriteEmptyEnd(self))
         except:
             log.exception("error", exc_info=True)
 
