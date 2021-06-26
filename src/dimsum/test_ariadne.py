@@ -201,14 +201,9 @@ async def test_graphql_login_good():
     assert actual["data"]["login"]
 
 
-def rethrow(error, debug):
-    log.warning("rethrow %s", type(error))
-    raise error
-
-
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_login_failed(caplog):
+async def test_graphql_login_failed(caplog, snapshot):
     domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
@@ -218,15 +213,15 @@ async def test_graphql_login_failed(caplog):
     }
 
     with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
-        with pytest.raises(GraphQLError):
-            ok, actual = await ariadne.graphql(
-                schema,
-                data,
-                context_value=get_test_context(domain),
-                logger="ariadne.errors.hidden",
-                error_formatter=rethrow,
-            )
-            assert not ok
+        ok, actual = await ariadne.graphql(
+            schema,
+            data,
+            debug=True,
+            context_value=get_test_context(domain),
+            logger="ariadne.errors.hidden",
+        )
+        assert ok
+        assert "schema.UsernamePasswordError" in json.dumps(actual, indent=4)
 
 
 @pytest.mark.asyncio
@@ -247,7 +242,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 """,
     }
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     assert actual == {"data": {"update": {"affected": 1}}}
@@ -271,14 +266,14 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 """,
     }
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     assert actual == {"data": {"update": {"affected": 1}}}
 
     data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
@@ -296,13 +291,13 @@ async def test_graphql_make_sample(snapshot):
         "query": "mutation { makeSample { affected } }",
     }
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
     assert actual == {"data": {"makeSample": {"affected": 59}}}
 
     data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
-        schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
+        schema, data, context_value=get_test_context(domain)
     )
     assert ok
