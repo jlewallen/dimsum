@@ -6,10 +6,12 @@ import pytest
 import freezegun
 
 import routing
+import storage
+
+import test
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="create sample world")
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_fail_no_query(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
@@ -28,7 +30,6 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="create sample world")
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_entity(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
