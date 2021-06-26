@@ -185,7 +185,7 @@ async def materialize(
     store: storage.EntityStorage = None,
     key: str = None,
     gid: int = None,
-    json: str = None,
+    json: List[str] = None,
     reach=None,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
@@ -193,14 +193,14 @@ async def materialize(
     assert store
 
     found = None
-    if key:
+    if key is not None:
         log.debug("[%d] materialize key=%s", depth, key)
         found = registrar.find_by_key(key)
         if found:
             return found
 
         json = await store.load_by_key(key)
-        if json is None:
+        if not json or len(json) == 0:
             log.info("[%d] %s missing key=%s", depth, store, key)
             return None
 
@@ -211,7 +211,7 @@ async def materialize(
             return found
 
         json = await store.load_by_gid(gid)
-        if json is None:
+        if not json or len(json) == 0:
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
@@ -228,14 +228,14 @@ async def materialize(
             refs[ref.key] = entity.EntityProxy(ref)
         return refs[ref.key]
 
-    if not json:
+    if not json or len(json) == 0:
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
 
     assert json
 
-    loaded = deserialize(json, reference)
-    assert loaded
-    registrar.register(loaded)
+    deserialized = [deserialize(e, reference) for e in json[:1]]
+    registrar.register(deserialized)
+    loaded = deserialized[0]
 
     deeper = True
     new_depth = depth

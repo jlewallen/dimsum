@@ -331,7 +331,10 @@ class Registrar:
         self.key_to_number = {}
         self.number = 0
 
-    def register(self, entity: Union[Entity, Any]):
+    def register(self, entity: Union[Entity, List[Entity]]):
+        if isinstance(entity, list):
+            return [self.register(e) for e in entity]
+
         if entity.key in self.entities:
             log.info("register:noop {0} '{1}'".format(entity.key, entity))
         else:

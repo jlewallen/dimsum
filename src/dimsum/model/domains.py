@@ -61,7 +61,7 @@ class Session:
         self,
         key: str = None,
         gid: int = None,
-        json: str = None,
+        json: List[str] = None,
         reach=None,
     ) -> Optional[entity.Entity]:
         return await serializing.materialize(

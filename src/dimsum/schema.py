@@ -232,7 +232,7 @@ async def update(obj, info, entities):
     with domain.session() as session:
         await session.prepare()
 
-        instantiated = [await session.materialize(json=e) for e in entities]
+        instantiated = [await session.materialize(json=[e]) for e in entities]
         new_world = [e for e in instantiated if e.key == world.Key]
         if new_world:
             session.world = new_world[0]

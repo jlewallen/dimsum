@@ -25,13 +25,14 @@ class Interactive(sshd.CommandHandler):
         self.l = grammars.create_parser()
 
     async def create_player_if_necessary(self, session: domains.Session):
+        world = await session.prepare()
+
         player = await session.materialize(key=self.username)
         if player:
-            return session.world, player
+            return world, player
 
         if session.registrar.empty():
             log.info("creating example world")
-            world = await session.prepare()
             generics, area = library.create_example_world(world)
             session.registrar.add_entities(generics.all)
             await session.add_area(area)

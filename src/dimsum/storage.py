@@ -77,13 +77,13 @@ class InMemory(EntityStorage):
 
     async def load_by_gid(self, gid: int):
         if gid in self.by_gid:
-            return self.by_gid[gid]
-        return None
+            return [self.by_gid[gid]]
+        return []
 
     async def load_by_key(self, key: str):
         if key in self.by_key:
-            return self.by_key[key]
-        return None
+            return [self.by_key[key]]
+        return []
 
     async def write(self, stream: TextIO):
         stream.write("[\n")
@@ -201,16 +201,16 @@ class SqliteStorage(EntityStorage):
             "SELECT key, serialized FROM entities WHERE gid = ?", [gid]
         )
         if len(loaded) == 1:
-            return loaded[0]
-        return None
+            return loaded
+        return []
 
     async def load_by_key(self, key: str):
         loaded = await self.load_query(
             "SELECT key, serialized FROM entities WHERE key = ?", [key]
         )
         if len(loaded) == 1:
-            return loaded[0]
-        return None
+            return loaded
+        return []
 
     def __repr__(self):
         return "Sqlite<%s>" % (self.path,)
@@ -223,10 +223,11 @@ class HttpStorage(EntityStorage):
     def __init__(self, url: str):
         super().__init__()
         self.url = url
-        self.transport = AIOHTTPTransport(url=self.url)
 
     def session(self):
-        return Client(transport=self.transport, fetch_schema_from_transport=True)
+        return Client(
+            transport=AIOHTTPTransport(url=self.url), fetch_schema_from_transport=True
+        )
 
     async def number_of_entities(self):
         async with self.session() as session:
@@ -247,14 +248,14 @@ class HttpStorage(EntityStorage):
         async with self.session() as session:
             query = gql(
                 """
-        mutation {
+        mutation Update($entities: [Entity!]) {
             update(entities: $entities) {
                 affected
             }
         }
     """
             )
-            entities = updates.values()
+            entities = list(updates.values())
             response = await session.execute(
                 query, variable_values={"entities": entities}
             )
@@ -264,13 +265,19 @@ class HttpStorage(EntityStorage):
         async with self.session() as session:
             query = gql("query entityByGid($gid: Int!) { entitiesByGid(gid: $gid) }")
             response = await session.execute(query, variable_values={"gid": gid})
-            return response["affected"]
+            serialized_entities = response["entitiesByGid"]
+            if len(serialized_entities) == 0:
+                return []
+            return serialized_entities
 
     async def load_by_key(self, key: str):
         async with self.session() as session:
             query = gql("query entityByKey($key: Key!) { entitiesByKey(key: $key) }")
             response = await session.execute(query, variable_values={"key": key})
-            return response
+            serialized_entities = response["entitiesByKey"]
+            if len(serialized_entities) == 0:
+                return []
+            return serialized_entities
 
     def __repr__(self):
         return "Http<%s>" % (self.url,)
