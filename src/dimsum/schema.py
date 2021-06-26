@@ -41,7 +41,7 @@ class EntityDiff:
 @entity.serializer
 def serialize_entity(value):
     log.debug("ariadne:entity")
-    serialized = serializing.serialize(value, indent=True, reproducible=True)
+    serialized = serializing.serialize(value, reproducible=True)
     return KeyedEntity(value.key, serialized)
 
 
@@ -51,7 +51,7 @@ reply = ariadne.ScalarType("Reply")
 @reply.serializer
 def serialize_reply(value):
     log.debug("ariadne:reply")
-    return serializing.serialize(value, indent=True, reproducible=True)
+    return serializing.serialize(value, reproducible=True)
 
 
 query = ariadne.QueryType()
