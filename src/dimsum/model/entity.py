@@ -396,7 +396,7 @@ class Registrar:
         return None
 
     def empty(self) -> bool:
-        return len(self.entities.keys()) == 1
+        return len(self.entities.keys()) == 0
 
     def everything(self) -> List[Entity]:
         return list(self.entities.values())
