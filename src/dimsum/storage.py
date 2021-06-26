@@ -40,6 +40,44 @@ class EntityStorage:
         raise NotImplementedError
 
 
+class All(EntityStorage):
+    def __init__(self, children: List[EntityStorage]):
+        super().__init__()
+        self.children = children
+
+    async def number_of_entities(self) -> int:
+        return max([await child.number_of_entities() for child in self.children])
+
+    async def purge(self):
+        for child in self.children:
+            await child.purge()
+
+    async def destroy(self, keys: Keys):
+        for child in self.children:
+            await child.destroy(keys)
+
+    async def update(self, diffs: Dict[Keys, Optional[str]]):
+        for child in self.children:
+            await child.update(diffs)
+
+    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+        for child in self.children:
+            maybe = await child.load_by_gid(gid)
+            if maybe:
+                return maybe
+        return []
+
+    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+        for child in self.children:
+            maybe = await child.load_by_key(key)
+            if maybe:
+                return maybe
+        return []
+
+    def __str__(self):
+        return "All<{0}>".format(self.children)
+
+
 class Prioritized(EntityStorage):
     def __init__(self, children: List[EntityStorage]):
         super().__init__()

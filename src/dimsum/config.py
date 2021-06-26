@@ -35,7 +35,7 @@ class Persistence:
     def make_store(self):
         cache: Dict[str, storage.EntityStorage] = {}
         read = storage.Prioritized(self.get_stores_from_url(self.read, cache))
-        write = storage.Prioritized(self.get_stores_from_url(self.write, cache))
+        write = storage.All(self.get_stores_from_url(self.write, cache))
         return storage.Separated(read, write)
 
 
