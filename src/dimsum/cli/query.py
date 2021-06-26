@@ -19,7 +19,7 @@ import serializing
 import schema as schema_factory
 from schema import AriadneContext
 
-log = logging.getLogger("dimsum-cli")
+log = logging.getLogger("dimsum.cli")
 
 
 @click.group()

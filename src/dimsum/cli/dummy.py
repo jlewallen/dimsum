@@ -11,7 +11,7 @@ import model.scopes as scopes
 
 import cli.utils as utils
 
-log = logging.getLogger("dimsum-cli")
+log = logging.getLogger("dimsum.cli")
 
 
 @click.group()
