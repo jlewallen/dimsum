@@ -5,7 +5,7 @@ from lark import exceptions
 import logging
 import grammars
 
-import default.evaluator as evaluator
+import plugins.default.evaluator as evaluator
 
 log = logging.getLogger("dimsum")
 

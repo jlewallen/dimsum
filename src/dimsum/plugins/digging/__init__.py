@@ -7,8 +7,8 @@ import model.properties as properties
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
 
-import default.actions as actions
-import default.evaluator as evaluator
+import plugins.default.actions as actions
+import plugins.default.evaluator as evaluator
 
 import grammars
 

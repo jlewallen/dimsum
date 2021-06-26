@@ -6,8 +6,8 @@ import base64
 
 import routing
 
-import broker_schema as schema_factory
-from broker_schema import AriadneContext
+import broker.schema as schema_factory
+from broker.schema import AriadneContext
 from graphql import GraphQLError
 
 log = logging.getLogger("dimsum")

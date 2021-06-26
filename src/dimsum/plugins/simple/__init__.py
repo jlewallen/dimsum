@@ -8,8 +8,8 @@ import model.entity as entity
 
 import model.scopes.movement as movement
 
-import default.evaluator as evaluator
-import default.actions as actions
+import plugins.default.evaluator as evaluator
+import plugins.default.actions as actions
 
 import grammars
 

@@ -10,7 +10,7 @@ import model.world as world
 import model.domains as domains
 import model.scopes.users as users
 import model.scopes as scopes
-import default.actions as actions
+import plugins.default.actions as actions
 
 import serializing
 import config

@@ -8,7 +8,7 @@ import model.properties as properties
 
 import model.scopes.movement as movement
 
-import default.actions as actions
+import plugins.default.actions as actions
 
 log = logging.getLogger("dimsum")
 

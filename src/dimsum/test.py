@@ -21,15 +21,13 @@ import model.scopes.occupyable as occupyable
 import model.scopes.users as users
 import model.scopes as scopes
 
-import default.actions as actions
-
 import bus
 import grammars
 import serializing
 import luaproxy
 
-import digging
-import simple
+import plugins.all
+import plugins.default.actions as actions
 
 log = logging.getLogger("dimsum.tests")
 

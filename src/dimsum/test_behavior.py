@@ -11,7 +11,7 @@ import model.scopes.carryable as carryable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
-import default.actions
+import plugins.default.actions
 
 import test
 

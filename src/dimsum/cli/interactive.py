@@ -9,9 +9,11 @@ import model.properties as properties
 import model.world as world
 import model.library as library
 import grammars
-import default
 import config
 import messages
+
+import plugins.all
+import plugins.default
 
 log = logging.getLogger("dimsum.cli")
 
@@ -42,7 +44,7 @@ class Interactive(sshd.CommandHandler):
             creator=session.world,
             props=properties.Common(self.username, desc="A player"),
         )
-        await session.perform(default.actions.Join(), player)
+        await session.perform(plugins.default.actions.Join(), player)
 
         assert session.world
         return session.world, player
