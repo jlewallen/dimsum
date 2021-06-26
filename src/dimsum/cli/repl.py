@@ -28,8 +28,7 @@ def commands():
 )
 async def repl(path: str, username: str):
     """Allow easy one-person interaction with a world."""
-    session_key = "random"
-    cfg = config.Configuration(database=path, session_key=session_key)
+    cfg = config.symmetrical(path)
     repl = Repl(cfg, username)
     while True:
         safe = await repl.iteration()

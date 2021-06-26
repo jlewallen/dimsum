@@ -26,17 +26,22 @@ def commands():
 
 @commands.command()
 @click.option(
-    "--path",
-    required=True,
-    help="Database to serve from.",
+    "--database",
+    help="Database file.",
     type=click.Path(),
 )
-async def server(path: str):
+@click.option(
+    "--conf",
+    help="Configuration file.",
+    type=click.Path(exists=True),
+)
+async def server(database: str, conf: str):
     """
     Serve a database.
     """
-    session_key = "random"
-    cfg = config.Configuration(database=path, session_key=session_key)
+    cfg = config.symmetrical(database or ":memory")
+    if conf:
+        cfg = config.get(conf)
     schema = schema_factory.create()
     app = ariadne.asgi.GraphQL(
         schema, context_value=schema_factory.context(cfg), debug=True

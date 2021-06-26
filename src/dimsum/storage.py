@@ -40,6 +40,74 @@ class EntityStorage:
         raise NotImplementedError
 
 
+class Prioritized(EntityStorage):
+    def __init__(self, children: List[EntityStorage]):
+        super().__init__()
+        self.children = children
+
+    async def number_of_entities(self) -> int:
+        for child in self.children:
+            return await child.number_of_entities()
+        return 0
+
+    async def purge(self):
+        for child in self.children:
+            return await child.purge()
+
+    async def destroy(self, keys: Keys):
+        for child in self.children:
+            return await child.destroy(keys)
+
+    async def update(self, diffs: Dict[Keys, Optional[str]]):
+        for child in self.children:
+            return await child.update(diffs)
+
+    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+        for child in self.children:
+            maybe = await child.load_by_gid(gid)
+            if maybe:
+                return maybe
+        return []
+
+    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+        for child in self.children:
+            maybe = await child.load_by_key(key)
+            if maybe:
+                return maybe
+        return []
+
+    def __str__(self):
+        return "Prioritized<{0}>".format(self.children)
+
+
+class Separated(EntityStorage):
+    def __init__(self, read: EntityStorage, write: EntityStorage):
+        super().__init__()
+        self.read = read
+        self.write = write
+
+    async def number_of_entities(self) -> int:
+        return await self.read.number_of_entities()
+
+    async def purge(self):
+        return await self.write.purge()
+
+    async def destroy(self, keys: Keys):
+        return await self.write.number_of_entities()
+
+    async def update(self, diffs: Dict[Keys, Optional[str]]):
+        return await self.write.update(diffs)
+
+    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+        return await self.read.load_by_gid(gid)
+
+    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+        return await self.read.load_by_key(key)
+
+    def __str__(self):
+        return "Separated<read={0}, write={1}>".format(self.read, self.write)
+
+
 class InMemory(EntityStorage):
     def __init__(self):
         super().__init__()

@@ -44,7 +44,7 @@ async def query(config: str, database: str):
     def get_config():
         if config:
             return configuration.get(config)
-        return configuration.Configuration(database=database, session_key="session-key")
+        return configuration.symmetrical(database)
 
     body = None
     try:
@@ -55,7 +55,7 @@ async def query(config: str, database: str):
         return
 
     cfg = get_config()
-    domain = domains.Domain(store=cfg.make_store())
+    domain = cfg.make_domain()
     context = AriadneContext(domain, cfg, None)  # type:ignore
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
