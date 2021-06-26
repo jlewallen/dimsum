@@ -24,9 +24,6 @@ class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def destroy(self, keys: Keys):
-        raise NotImplementedError
-
     async def update(self, updates: Dict[Keys, Optional[str]]):
         raise NotImplementedError
 
@@ -44,10 +41,6 @@ class All(EntityStorage):
 
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
-
-    async def destroy(self, keys: Keys):
-        for child in self.children:
-            await child.destroy(keys)
 
     async def update(self, diffs: Dict[Keys, Optional[str]]):
         for child in self.children:
@@ -81,10 +74,6 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def destroy(self, keys: Keys):
-        for child in self.children:
-            return await child.destroy(keys)
-
     async def update(self, diffs: Dict[Keys, Optional[str]]):
         for child in self.children:
             return await child.update(diffs)
@@ -116,9 +105,6 @@ class Separated(EntityStorage):
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
 
-    async def destroy(self, keys: Keys):
-        return await self.write.number_of_entities()
-
     async def update(self, diffs: Dict[Keys, Optional[str]]):
         return await self.write.update(diffs)
 
@@ -148,11 +134,6 @@ class InMemory(EntityStorage):
         self.by_key = {}
         self.by_gid = {}
         self.gid_to_key = {}
-
-    async def destroy(self, keys: Keys):
-        del self.by_gid[keys.gid]
-        del self.by_key[keys.key]
-        del self.gid_to_key[keys.gid]
 
     async def update(self, updates: Dict[Keys, Optional[str]]):
         for keys, data in updates.items():
@@ -255,19 +236,6 @@ class SqliteStorage(EntityStorage):
         self.dbc.execute("DELETE FROM entities")
         self.db.commit()
 
-    async def destroy(self, keys: Keys):
-        await self.open_if_necessary()
-        assert self.db
-
-        log.info("destroying %s", keys)
-        self.dbc = self.db.cursor()
-        self.dbc.execute(
-            "DELETE FROM entities WHERE key = ?",
-            [
-                keys.key,
-            ],
-        )
-
     async def update(self, updates: Dict[Keys, Optional[str]]):
         await self.open_if_necessary()
         assert self.db
@@ -332,9 +300,6 @@ class HttpStorage(EntityStorage):
             query = gql("query { size }")
             response = await session.execute(query)
             return response["size"]
-
-    async def destroy(self, keys: Keys):
-        pass
 
     async def update(self, updates: Dict[Keys, Optional[str]]):
         async with self.session() as session:
