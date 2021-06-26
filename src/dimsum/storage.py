@@ -254,14 +254,18 @@ class HttpStorage(EntityStorage):
         async with self.session() as session:
             query = gql(
                 """
-        mutation Update($entities: [Entity!]) {
+        mutation Update($entities: [EntityDiff!]) {
             update(entities: $entities) {
                 affected
             }
         }
     """
             )
-            entities = list(updates.values())
+            entities = [
+                {"key": key.key, "serialized": serialized}
+                for key, serialized in updates.items()
+                if serialized
+            ]
             response = await session.execute(
                 query, variable_values={"entities": entities}
             )

@@ -188,10 +188,12 @@ async def materialize(
     json: List[entity.Serialized] = None,
     reach=None,
     depth: int = 0,
+    cache: Dict[str, str] = None,
 ) -> Optional[entity.Entity]:
     assert registrar
     assert store
 
+    cache = cache or {}
     found = None
     if key is not None:
         log.debug("[%d] materialize key=%s", depth, key)
@@ -232,7 +234,7 @@ async def materialize(
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
 
     loaded = None
-    for row in json:
+    for row in json[:1]:
         deserialized = deserialize(row.serialized, reference)
         registrar.register(deserialized)
         if loaded is None:
@@ -256,6 +258,7 @@ async def materialize(
                     key=referenced_key,
                     reach=reach,
                     depth=new_depth,
+                    cache=cache,
                 )
                 proxy.__wrapped__ = linked  # type: ignore
 
