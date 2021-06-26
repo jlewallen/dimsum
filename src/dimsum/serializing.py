@@ -82,7 +82,7 @@ class EntityRefHandler(jsonpickle.handlers.BaseHandler):
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         pyObject = entity_types[obj["py/object"]]
-        ref = entity.EntityRef.make(pyObject=pyObject, **obj)
+        ref = entity.EntityRef.new(pyObject=pyObject, **obj)
         log.debug("entity-handler: %s", ref)
         return self.context.lookup(ref)
 

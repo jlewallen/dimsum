@@ -30,7 +30,7 @@ class EntityRef:
     pyObject: Any
 
     @staticmethod
-    def make(key=None, klass=None, name=None, pyObject=None, **kwargs):
+    def new(key=None, klass=None, name=None, pyObject=None, **kwargs):
         assert key
         assert klass
         assert name
