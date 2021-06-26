@@ -185,7 +185,7 @@ async def materialize(
     store: storage.EntityStorage = None,
     key: str = None,
     gid: int = None,
-    json: List[str] = None,
+    json: List[entity.Serialized] = None,
     reach=None,
     depth: int = 0,
 ) -> Optional[entity.Entity]:
@@ -200,7 +200,7 @@ async def materialize(
             return found
 
         json = await store.load_by_key(key)
-        if not json or len(json) == 0:
+        if len(json) == 0:
             log.info("[%d] %s missing key=%s", depth, store, key)
             return None
 
@@ -211,7 +211,7 @@ async def materialize(
             return found
 
         json = await store.load_by_gid(gid)
-        if not json or len(json) == 0:
+        if len(json) == 0:
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
@@ -231,34 +231,35 @@ async def materialize(
     if not json or len(json) == 0:
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
 
-    assert json
+    loaded = None
+    for row in json:
+        deserialized = deserialize(row.serialized, reference)
+        registrar.register(deserialized)
+        if loaded is None:
+            loaded = deserialized
 
-    deserialized = [deserialize(e, reference) for e in json[:1]]
-    registrar.register(deserialized)
-    loaded = deserialized[0]
+        deeper = True
+        new_depth = depth
+        if reach:
+            choice = reach(loaded, depth)
+            if choice < 0:
+                log.debug("reach! reach! reach!")
+                deeper = False
+            else:
+                new_depth += choice
 
-    deeper = True
-    new_depth = depth
-    if reach:
-        choice = reach(loaded, depth)
-        if choice < 0:
-            log.debug("reach! reach! reach!")
-            deeper = False
-        else:
-            new_depth += choice
+        if deeper:
+            for referenced_key, proxy in refs.items():
+                linked = await materialize(
+                    registrar=registrar,
+                    store=store,
+                    key=referenced_key,
+                    reach=reach,
+                    depth=new_depth,
+                )
+                proxy.__wrapped__ = linked  # type: ignore
 
-    if deeper:
-        for referenced_key, proxy in refs.items():
-            linked = await materialize(
-                registrar=registrar,
-                store=store,
-                key=referenced_key,
-                reach=reach,
-                depth=new_depth,
-            )
-            proxy.__wrapped__ = linked  # type: ignore
-
-    loaded.validate()
+        loaded.validate()
 
     return loaded
 

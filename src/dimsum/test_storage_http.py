@@ -51,18 +51,18 @@ async def test_storage_http_purge(server):
 async def test_storage_load_by_key(server):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_key("world")
-    assert [json.loads(s) for s in serialized]
+    assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
 async def test_storage_load_by_gid(server):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_gid(0)
-    assert [json.loads(s) for s in serialized]
+    assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
 async def test_storage_update_entity(server):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.load_by_gid(0)
-    assert [json.loads(s) for s in serialized]
+    assert [json.loads(s.serialized) for s in serialized]

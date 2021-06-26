@@ -1,3 +1,5 @@
+from typing import List
+
 import logging
 import ariadne
 import os.path
@@ -21,12 +23,26 @@ import config
 log = logging.getLogger("dimsum")
 
 entity = ariadne.ScalarType("Entity")
+keyed_entity = ariadne.ObjectType("KeyedEntity")
+
+
+@dataclasses.dataclass
+class KeyedEntity:
+    key: str
+    serialized: str
+
+
+@dataclasses.dataclass
+class EntityDiff:
+    key: str
+    serialized: str
 
 
 @entity.serializer
 def serialize_entity(value):
     log.debug("ariadne:entity")
-    return serializing.serialize(value, indent=True, reproducible=True)
+    serialized = serializing.serialize(value, indent=True, reproducible=True)
+    return KeyedEntity(value.key, serialized)
 
 
 reply = ariadne.ScalarType("Reply")
@@ -111,7 +127,7 @@ async def resolve_people(obj, info):
 
 
 class Evaluation:
-    def __init__(self, reply, entities):
+    def __init__(self, reply, entities: List[KeyedEntity]):
         super().__init__()
         self.reply = reply
         self.entities = entities
@@ -232,7 +248,8 @@ async def update(obj, info, entities):
     with domain.session() as session:
         await session.prepare()
 
-        instantiated = [await session.materialize(json=[e]) for e in entities]
+        diffs = [KeyedEntity(row["key"], row["serialized"]) for row in entities]
+        instantiated = [await session.materialize(json=diffs) for e in entities]
         new_world = [e for e in instantiated if e.key == world.Key]
         if new_world:
             session.world = new_world[0]

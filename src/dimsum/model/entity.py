@@ -17,6 +17,12 @@ p = inflect.engine()
 
 
 @dataclasses.dataclass(frozen=True)
+class Serialized:
+    key: str
+    serialized: str
+
+
+@dataclasses.dataclass(frozen=True)
 class EntityRef:
     key: str
     klass: str

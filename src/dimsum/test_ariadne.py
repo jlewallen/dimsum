@@ -1,8 +1,9 @@
 import pytest
 import freezegun
 import logging
-import ariadne
 import base64
+import json
+import ariadne
 
 import model.properties as properties
 import model.world as world
@@ -76,18 +77,18 @@ async def test_graphql_size(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_world(snapshot):
+async def test_graphql_world_directly(snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         await session.prepare()
         await session.save()
 
-    data = {"query": "{ world }"}
+    data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(actual["data"]["world"], "world.json")
+    snapshot.assert_match(json.dumps(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -98,12 +99,12 @@ async def test_graphql_world_by_key(snapshot):
         await session.prepare()
         await session.save()
 
-    data = {"query": '{ entitiesByKey(key: "%s") }' % (world.Key)}
+    data = {"query": '{ entitiesByKey(key: "%s") { key serialized } }' % (world.Key)}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match("\n".join(actual["data"]["entitiesByKey"]), "world.json")
+    snapshot.assert_match(json.dumps(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -116,12 +117,12 @@ async def test_graphql_world_by_gid(snapshot):
         assert world.props.gid == 0
         await session.save()
 
-    data = {"query": "{ entitiesByGid(gid: %d) }" % (0)}
+    data = {"query": "{ entitiesByGid(gid: %d) { key serialized } }" % (0)}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match("\n".join(actual["data"]["entitiesByGid"]), "world.json")
+    snapshot.assert_match(json.dumps(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -147,16 +148,14 @@ async def test_graphql_language_basic(snapshot):
         await session.save()
 
     data = {
-        "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities } }'
+        "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities { key serialized } } }'
         % jacob.key
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(
-        "\n".join(actual["data"]["language"]["entities"]), "entities.json"
-    )
+    snapshot.assert_match(json.dumps(actual), "entities.json")
 
 
 @pytest.mark.asyncio
@@ -164,12 +163,12 @@ async def test_graphql_language_basic(snapshot):
 async def test_graphql_entities_areas(snapshot):
     domain = await test.make_simple_domain()
 
-    data = {"query": "{ areas }"}
+    data = {"query": "{ areas { key serialized } }"}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match("\n".join(actual["data"]["areas"]), "areas.json")
+    snapshot.assert_match(json.dumps(actual), "areas.json")
 
 
 @pytest.mark.asyncio
@@ -177,12 +176,12 @@ async def test_graphql_entities_areas(snapshot):
 async def test_graphql_entities_people(snapshot):
     domain = await test.make_simple_domain()
 
-    data = {"query": "{ people }"}
+    data = {"query": "{ people { key serialized } }"}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match("\n".join(actual["data"]["people"]), "people.json")
+    snapshot.assert_match(json.dumps(actual), "people.json")
 
 
 @pytest.mark.asyncio
@@ -238,9 +237,9 @@ async def test_graphql_update():
     serialized = serializing.serialize(world.World(), secure=True)
 
     data = {
-        "variables": {"entities": [serialized]},
+        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
         "query": """
-mutation UpdateEntities($entities: [Entity!]) {
+mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
         affected
     }
@@ -262,9 +261,9 @@ async def test_graphql_update_and_requery(snapshot):
     serialized = serializing.serialize(world.World(), secure=True)
 
     data = {
-        "variables": {"entities": [serialized]},
+        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
         "query": """
-mutation UpdateEntities($entities: [Entity!]) {
+mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
         affected
     }
@@ -277,12 +276,12 @@ mutation UpdateEntities($entities: [Entity!]) {
     assert ok
     assert actual == {"data": {"update": {"affected": 1}}}
 
-    data = {"query": "{ world }"}
+    data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
     assert ok
-    snapshot.assert_match(actual["data"]["world"], "world.json")
+    snapshot.assert_match(json.dumps(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -302,7 +301,7 @@ async def test_graphql_make_sample(snapshot):
     assert ok
     assert actual == {"data": {"makeSample": {"affected": 59}}}
 
-    data = {"query": "{ world }"}
+    data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain, error_formatter=rethrow)
     )
