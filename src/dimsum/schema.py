@@ -244,7 +244,6 @@ async def makeSample(obj, info):
 async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
-    # TODO Parallel
     with domain.session() as session:
         await session.prepare()
         diffs = [KeyedEntity(row["key"], row["serialized"]) for row in entities]
