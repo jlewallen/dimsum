@@ -368,11 +368,6 @@ class Registrar:
     def entities_of_klass(self, klass: Type[EntityClass]):
         return [e for key, e in self.entities.items() if e.klass == klass]
 
-    def add_entities(self, entities: List[Entity]):
-        for entity in entities:
-            log.debug("add-entity: %s %s", entity.key, entity)
-            self.register(entity)
-
     def find_by_gid(self, gid: int) -> Optional[Entity]:
         if gid in self.numbered:
             return self.numbered[gid]

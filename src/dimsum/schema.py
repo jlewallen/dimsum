@@ -230,7 +230,7 @@ async def makeSample(obj, info):
         number_before = session.registrar.number_of_entities()
 
         generics, area = library.create_example_world(session.world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()

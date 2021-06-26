@@ -23,7 +23,7 @@ async def test_library(caplog):
         world = await session.prepare()
 
         generics, area = library.create_example_world(world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()

@@ -34,7 +34,7 @@ class Interactive(sshd.CommandHandler):
         if session.registrar.empty():
             log.info("creating example world")
             generics, area = library.create_example_world(world)
-            session.registrar.add_entities(generics.all)
+            session.register(generics.all)
             await session.add_area(area)
 
         player = scopes.alive(
