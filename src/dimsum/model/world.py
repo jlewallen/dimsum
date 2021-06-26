@@ -97,18 +97,18 @@ class World(entity.Entity):
         log.info("finding area for %s", entity)
         with entity.make_and_discard(occupyable.Occupying) as occupying:
             if occupying.area:
-                log.info("finding area for %s (occupying)", entity)
+                log.debug("finding area for %s (occupying)", entity)
                 return occupying.area
 
         with entity.make_and_discard(carryable.Location) as location:
             if location.container:
-                log.info("finding area for %s (container)", entity)
+                log.debug("finding area for %s (container)", entity)
                 return location.container
 
         return None
 
-    def find_player_area(self, player: entity.Entity) -> entity.Entity:
-        area = self.find_entity_area(player)
+    def find_person_area(self, person: entity.Entity) -> entity.Entity:
+        area = self.find_entity_area(person)
         assert area
         return area
 
@@ -117,7 +117,7 @@ class World(entity.Entity):
     ) -> Optional[entity.Entity]:
         assert person
         assert finder
-        area = self.find_player_area(person)
+        area = self.find_person_area(person)
         log.info("applying finder:%s %s", finder, kwargs)
         found = await finder.find_item(area=area, person=person, world=self, **kwargs)
         if found:

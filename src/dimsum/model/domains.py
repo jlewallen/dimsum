@@ -90,7 +90,7 @@ class Session:
         return self.world
 
     async def perform(
-        self, action, person: Optional[entity.Entity], **kwargs
+        self, action, person: Optional[entity.Entity] = None, **kwargs
     ) -> game.Reply:
 
         log.info("-" * 100)
@@ -111,7 +111,9 @@ class Session:
             **kwargs
         ) as ctx:
             try:
-                return await action.perform(ctx, self.world, person)
+                return await action.perform(
+                    world=self.world, area=area, person=person, ctx=ctx
+                )
             except entity.EntityFrozen:
                 return game.Failure("whoa, that's frozen")
 
@@ -247,11 +249,11 @@ class WorldCtx(context.Ctx):
         self.session = session
         self.domain = session.domain
         self.world = session.world
-        assert isinstance(self.world, world.World)
         self.registrar = session.registrar
         self.bus = session.domain.bus
         self.context_factory = context_factory
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
+        assert isinstance(self.world, world.World)
 
     def __enter__(self):
         context.set(self)
@@ -314,7 +316,7 @@ class WorldCtx(context.Ctx):
                 actions = self.se.execute(thunk, prepared, b)
                 if actions:
                     for action in actions:
-                        await self.session.perform(action, self.person)
+                        await self.session.perform(action, person=self.person)
                         log.info("performing: %s", action)
 
     def create_item(

@@ -70,21 +70,26 @@ class Dig(actions.PersonAction):
         self.linkage = linkage
         self.area_name = area_name
 
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity):
-        area = world.find_player_area(player)
-
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         log.info(
             "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
         )
 
         digging = scopes.area(
-            creator=player,
+            creator=person,
             props=properties.Common(name=self.area_name),
         )
 
         if self.linkage.there:
             goes_there = scopes.exit(
-                creator=player,
+                creator=person,
                 props=properties.Common(name=self.linkage.there.name),
                 initialize={movement.Exit: dict(area=digging)},
             )
@@ -94,7 +99,7 @@ class Dig(actions.PersonAction):
 
         if self.linkage.back:
             comes_back = scopes.exit(
-                creator=player,
+                creator=person,
                 props=properties.Common(name=self.linkage.back.name),
                 initialize={movement.Exit: dict(area=area)},
             )

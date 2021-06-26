@@ -46,7 +46,7 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_before = world.find_player_area(jacob).key
+        area_before = world.find_person_area(jacob).key
 
     await tw.success("go Door")
 
@@ -54,7 +54,7 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_player_area(jacob).key
+        area_after = world.find_person_area(jacob).key
 
     assert area_after != area_before
 
@@ -66,7 +66,7 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = session.world.find_player_area(jacob).key
+        area_after = session.world.find_person_area(jacob).key
 
     assert area_after == area_before
 
@@ -82,7 +82,7 @@ async def test_dig_wall_and_climb_wall(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_before = world.find_player_area(jacob).key
+        area_before = world.find_person_area(jacob).key
 
     await tw.success("climb wall")
 
@@ -90,7 +90,7 @@ async def test_dig_wall_and_climb_wall(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_player_area(jacob).key
+        area_after = world.find_person_area(jacob).key
 
     assert area_after != area_before
 
@@ -102,6 +102,6 @@ async def test_dig_wall_and_climb_wall(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_player_area(jacob).key
+        area_after = world.find_person_area(jacob).key
 
     assert area_after == area_before
