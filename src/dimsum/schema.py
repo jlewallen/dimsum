@@ -177,11 +177,10 @@ async def login(obj, info, credentials):
     creds = Credentials(**credentials)
     log.info("ariadne:login username=%s", creds.username)
     with domain.session() as session:
-        if not session.registrar.contains(creds.username):
-            raise UsernamePasswordError()
+        await session.prepare()
 
         try:
-            person = session.registrar.find_by_key(creds.username)
+            person = await session.materialize(key=creds.username)
             if person:
                 with person.make(users.Auth) as auth:
                     token = auth.try_password(creds.password)

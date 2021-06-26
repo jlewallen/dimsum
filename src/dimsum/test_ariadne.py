@@ -187,7 +187,7 @@ async def test_graphql_entities_people(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_login():
+async def test_graphql_login_good():
     domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
@@ -199,6 +199,7 @@ async def test_graphql_login():
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
+    assert actual["data"]["login"]
 
 
 def rethrow(error, debug):
@@ -208,7 +209,7 @@ def rethrow(error, debug):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_login_failed():
+async def test_graphql_login_failed(caplog):
     domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
@@ -217,14 +218,16 @@ async def test_graphql_login_failed():
         % (jacob_key,)
     }
 
-    with pytest.raises(GraphQLError):
-        ok, actual = await ariadne.graphql(
-            schema,
-            data,
-            context_value=get_test_context(domain),
-            error_formatter=rethrow,
-        )
-        assert not ok
+    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+        with pytest.raises(GraphQLError):
+            ok, actual = await ariadne.graphql(
+                schema,
+                data,
+                context_value=get_test_context(domain),
+                logger="ariadne.errors.hidden",
+                error_formatter=rethrow,
+            )
+            assert not ok
 
 
 @pytest.mark.asyncio
