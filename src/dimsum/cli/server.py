@@ -29,7 +29,7 @@ def commands():
     "--path",
     required=True,
     help="Database to serve from.",
-    type=click.Path(exists=True),
+    type=click.Path(),
 )
 async def server(path: str):
     """
