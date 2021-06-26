@@ -1,8 +1,11 @@
+from typing import List
+
 import logging
 import ariadne
 import os.path
 import dataclasses
 import base64
+import starlette.requests
 import jwt
 
 import model.world as world
@@ -20,12 +23,26 @@ import config
 log = logging.getLogger("dimsum")
 
 entity = ariadne.ScalarType("Entity")
+keyed_entity = ariadne.ObjectType("KeyedEntity")
+
+
+@dataclasses.dataclass
+class KeyedEntity:
+    key: str
+    serialized: str
+
+
+@dataclasses.dataclass
+class EntityDiff:
+    key: str
+    serialized: str
 
 
 @entity.serializer
 def serialize_entity(value):
     log.debug("ariadne:entity")
-    return serializing.serialize(value, indent=True, reproducible=True)
+    serialized = serializing.serialize(value, indent=True, reproducible=True)
+    return KeyedEntity(value.key, serialized)
 
 
 reply = ariadne.ScalarType("Reply")
@@ -35,21 +52,6 @@ reply = ariadne.ScalarType("Reply")
 def serialize_reply(value):
     log.debug("ariadne:reply")
     return serializing.serialize(value, indent=True, reproducible=True)
-
-
-@dataclasses.dataclass
-class Credentials:
-    username: str
-    password: str
-
-
-credentials = ariadne.ScalarType("Credentials")
-
-
-@credentials.value_parser
-def parse_credentials_value(value):
-    log.info("ariadne:credentials: %s", value)
-    return value
 
 
 query = ariadne.QueryType()
@@ -75,18 +77,23 @@ async def resolve_world(obj, info):
         return serialize_entity(await session.prepare())
 
 
+async def materialize(session, **kwargs):
+    loaded = await session.materialize(**kwargs)
+    if loaded:
+        entities = [loaded]
+        for other_key, other in session.registrar.entities.items():
+            if other_key != loaded.key:
+                entities.append(other)
+
+    return [serialize_entity(e) for e in entities]
+
+
 @query.field("entitiesByKey")
 async def resolve_entities_by_key(obj, info, key):
     domain = info.context.domain
     log.info("ariadne:entities-by-key key=%s", key)
     with domain.session() as session:
-        entities = []
-        loaded = await session.materialize(key=key)
-        if loaded:
-            entities = [loaded]
-
-        log.info("ariadne:entities-by-key entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return await materialize(session, key=key)
 
 
 @query.field("entitiesByGid")
@@ -94,13 +101,7 @@ async def resolve_entities_by_gid(obj, info, gid):
     domain = info.context.domain
     log.info("ariadne:entities-by-gid gid=%s", gid)
     with domain.session() as session:
-        entities = []
-        loaded = await session.materialize(gid=gid)
-        if loaded:
-            entities = [loaded]
-
-        log.info("ariadne:entities-by-gid entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return await materialize(session, gid=gid)
 
 
 @query.field("areas")
@@ -126,7 +127,7 @@ async def resolve_people(obj, info):
 
 
 class Evaluation:
-    def __init__(self, reply, entities):
+    def __init__(self, reply, entities: List[KeyedEntity]):
         super().__init__()
         self.reply = reply
         self.entities = entities
@@ -179,17 +180,22 @@ class UsernamePasswordError(ValueError):
     pass
 
 
+@dataclasses.dataclass
+class Credentials:
+    username: str
+    password: str
+
+
 @mutation.field("login")
 async def login(obj, info, credentials):
     domain = info.context.domain
     creds = Credentials(**credentials)
     log.info("ariadne:login username=%s", creds.username)
     with domain.session() as session:
-        if not session.registrar.contains(creds.username):
-            raise UsernamePasswordError()
+        await session.prepare()
 
         try:
-            person = session.registrar.find_by_key(creds.username)
+            person = await session.materialize(key=creds.username)
             if person:
                 with person.make(users.Auth) as auth:
                     token = auth.try_password(creds.password)
@@ -224,7 +230,7 @@ async def makeSample(obj, info):
         number_before = session.registrar.number_of_entities()
 
         generics, area = library.create_example_world(session.world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()
@@ -238,30 +244,27 @@ async def makeSample(obj, info):
 async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
-    # TODO Parallel
     with domain.session() as session:
         await session.prepare()
-
-        instantiated = [await session.materialize(json=e) for e in entities]
-        new_world = [e for e in instantiated if e.key == world.Key]
-        if new_world:
-            session.world = new_world[0]
+        diffs = [KeyedEntity(row["key"], row["serialized"]) for row in entities]
+        await session.materialize(json=diffs)
         await session.save()
-        return {"affected": len(instantiated)}
+        return {"affected": len(diffs)}
 
 
 def create():
-    for path in ["src/dimsum/schema.graphql", "schema.graphql"]:
+    for path in ["src/dimsum/dimsum.graphql", "dimsum.graphql"]:
         if os.path.exists(path):
             type_defs = ariadne.load_schema_from_path(path)
             return ariadne.make_executable_schema(type_defs, [query, mutation])
-    raise Exception("unable to find schema.graphql")
+    raise Exception("unable to find dimsum.graphql")
 
 
 @dataclasses.dataclass
 class AriadneContext:
     domain: domains.Domain
     cfg: config.Configuration
+    request: starlette.requests.Request
 
 
 def context(cfg):
@@ -269,6 +272,6 @@ def context(cfg):
 
     def wrap(request):
         log.info("ariadne:context %s", request)
-        return AriadneContext(domain=domain, cfg=cfg)
+        return AriadneContext(domain=domain, cfg=cfg, request=request)
 
     return wrap

@@ -22,7 +22,7 @@ async def test_materialize_infinite_reach(caplog):
         world = await session.prepare()
 
         generics, area = library.create_example_world(world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()
@@ -55,7 +55,7 @@ async def test_materialize_reach_1(caplog):
         world = await session.prepare()
 
         generics, area = library.create_example_world(world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()
@@ -81,7 +81,7 @@ async def test_materialize_reach_by_area_3(caplog):
         world = await session.prepare()
 
         generics, area = library.create_example_world(world)
-        session.registrar.add_entities(generics.all)
+        session.register(generics.all)
 
         await session.add_area(area)
         await session.save()

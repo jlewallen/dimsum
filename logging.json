@@ -1,0 +1,43 @@
+{
+    "version": 1,
+    "disable_existing_loggers": true,
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "simple",
+            "stream": "ext://sys.stderr"
+        }
+    },
+    "loggers": {
+        "dimsum": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
+        "proxy": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
+        "uvicorn": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
+        "uvicorn.access": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        }
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": ["console"]
+    }
+}

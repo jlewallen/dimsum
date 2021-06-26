@@ -123,42 +123,6 @@ end
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="lua use of scope")
-async def test_behavior_move(caplog):
-    tw = test.TestWorld()
-    await tw.initialize()
-
-    with tw.domain.session() as session:
-        world = await session.prepare()
-
-        mystery_area = entity.Entity(
-            creator=tw.player, props=properties.Common("A Mystery Area")
-        )
-        await session.add_area(mystery_area)
-
-        cape = tw.add_item(scopes.item(creator=world, props=properties.Common("Cape")))
-        with cape.make(mechanics.Interactable) as inaction:
-            inaction.link_activity("worn", mystery_area)
-        with cape.make(behavior.Behaviors) as behave:
-            behave.add_behavior(
-                "b:test:wear:after",
-                lua="""
-function(s, world, area, player)
-    debug('wear[0].worn', wear[0].interactions.worn)
-    return player.go(wear[0].interactions.worn)
-end
-""",
-            )
-
-    await tw.success("look")
-    await tw.success("hold cape")
-    await tw.success("wear cape")
-    await tw.success("look")
-
-    assert tw.world.find_player_area(tw.player) == mystery_area
-
-
-@pytest.mark.asyncio
 async def test_behavior_create_item(caplog):
     tw = test.TestWorld()
     await tw.initialize()

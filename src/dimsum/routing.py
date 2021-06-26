@@ -4,12 +4,15 @@ import logging
 import json
 import dataclasses
 import subprocess
-import jsonpickle
 
 log = logging.getLogger("dimsum")
 
 
 class Target:
+    def __init__(self, name=None):
+        super().__init__()
+        self.name: str = name if name else "unknown"
+
     async def handle(self, query: str) -> str:
         raise NotImplementedError
 
@@ -27,7 +30,7 @@ class Router:
                 log.info("%s handling", target)
                 replies.append(await target.handle(query))
             except:
-                log.exception("error")
+                log.exception("error", exc_info=True)
 
         if len(replies) == 0:
             raise NoRoutesException()
@@ -35,13 +38,22 @@ class Router:
         return replies[0]
 
 
+class Broker:
+    def __init__(self, targets: List[Target] = None):
+        super().__init__()
+        self.router = Router(targets=targets)
+
+    def get_targets(self):
+        return self.router.targets
+
+
 class NoRoutesException(Exception):
     pass
 
 
 class ProcessTarget(Target):
-    def __init__(self, command: List[str] = None):
-        super().__init__()
+    def __init__(self, command: List[str] = None, **kwargs):
+        super().__init__(**kwargs)
         assert command
         self.command = command
 

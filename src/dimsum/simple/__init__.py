@@ -32,7 +32,14 @@ class SimpleVerb(actions.PersonAction):
 
 
 class Plant(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.item:
             return Failure("plant what?")
         await ctx.extend(plant=self.item).hook("plant")
@@ -40,8 +47,15 @@ class Plant(SimpleVerb):
 
 
 class Swing(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = await world.apply_item_finder(player, self.item)
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
+        item = await world.apply_item_finder(person, self.item)
         if self.item:
             return Failure("swing what?")
         await ctx.extend(swing=item).hook("swing")
@@ -49,8 +63,15 @@ class Swing(SimpleVerb):
 
 
 class Shake(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = await world.apply_item_finder(player, self.item)
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
+        item = await world.apply_item_finder(person, self.item)
         if not item:
             return Failure("shake what?")
         await ctx.extend(shake=item).hook("shake")
@@ -58,7 +79,14 @@ class Shake(SimpleVerb):
 
 
 class Heal(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.who:
             return Failure("who?")
         await ctx.extend(heal=self.who).hook("heal:after")
@@ -66,7 +94,14 @@ class Heal(SimpleVerb):
 
 
 class Hug(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.who:
             return Failure("who?")
         await ctx.extend(hug=self.who).hook("hug:after")
@@ -74,7 +109,14 @@ class Hug(SimpleVerb):
 
 
 class Kiss(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.who:
             return Failure("who?")
         await ctx.extend(kiss=self.who).hook("kiss:after")
@@ -82,8 +124,15 @@ class Kiss(SimpleVerb):
 
 
 class Kick(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = await world.apply_item_finder(player, self.item)
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
+        item = await world.apply_item_finder(person, self.item)
         if not item:
             return Failure("what?")
         await ctx.extend(kick=item).hook("kick:after")
@@ -91,7 +140,14 @@ class Kick(SimpleVerb):
 
 
 class Tickle(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.who:
             return Failure("who?")
         await ctx.extend(tickle=self.who).hook("tickle:after")
@@ -99,7 +155,14 @@ class Tickle(SimpleVerb):
 
 
 class Poke(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
         if not self.who:
             return Failure("who?")
         await ctx.extend(poke=self.who).hook("poke:after")
@@ -107,8 +170,15 @@ class Poke(SimpleVerb):
 
 
 class Hit(SimpleVerb):
-    async def perform(self, ctx: Ctx, world: World, player: entity.Entity, **kwargs):
-        item = await world.apply_item_finder(player, self.item)
+    async def perform(
+        self,
+        world: World,
+        area: entity.Entity,
+        person: entity.Entity,
+        ctx: Ctx,
+        **kwargs
+    ):
+        item = await world.apply_item_finder(person, self.item)
         if not item:
             return Failure("hit what?")
         await ctx.extend(swing=item).hook("hit")

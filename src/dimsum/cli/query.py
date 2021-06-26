@@ -19,7 +19,7 @@ import serializing
 import schema as schema_factory
 from schema import AriadneContext
 
-log = logging.getLogger("dimsum-cli")
+log = logging.getLogger("dimsum.cli")
 
 
 @click.group()
@@ -55,8 +55,8 @@ async def query(config: str, database: str):
         return
 
     cfg = get_config()
-    domain = domains.Domain(empty=True, store=cfg.make_store())
-    context = AriadneContext(domain, cfg)
+    domain = domains.Domain(store=cfg.make_store())
+    context = AriadneContext(domain, cfg, None)  # type:ignore
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 

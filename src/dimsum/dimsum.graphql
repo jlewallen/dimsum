@@ -14,17 +14,22 @@ input LanguageQueryCriteria {
 
 type Evaluation {
   reply: Reply!
-  entities: [Entity!]
+  entities: [KeyedEntity!]
+}
+
+type KeyedEntity {
+  key: String!
+  serialized: Entity!
 }
 
 type Query {
   size: Int!
-  world: Entity!
-  entitiesByKey(key: Key): [Entity!]
-  entitiesByGid(gid: Int): [Entity!]
+  world: KeyedEntity!
+  entitiesByKey(key: Key): [KeyedEntity!]
+  entitiesByGid(gid: Int): [KeyedEntity!]
   language(criteria: LanguageQueryCriteria!): Evaluation!
-  areas: [Entity!]
-  people: [Entity!]
+  areas: [KeyedEntity!]
+  people: [KeyedEntity!]
 }
 
 scalar Token
@@ -34,6 +39,11 @@ input Credentials {
   password: String!
 }
 
+input EntityDiff {
+  key: String!
+  serialized: String!
+}
+
 type EntitiesUpdated {
   affected: Int!
 }
@@ -41,6 +51,6 @@ type EntitiesUpdated {
 type Mutation {
   login(credentials: Credentials!): Token!
   makeSample: EntitiesUpdated
-  update(entities: [Entity!]): EntitiesUpdated
+  update(entities: [EntityDiff!]): EntitiesUpdated
   purge: EntitiesUpdated
 }

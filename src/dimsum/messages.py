@@ -36,8 +36,8 @@ class TextBus(bus.EventBus):
     async def LivingLeftArea(self, living=None, area=None, **kwargs):
         return "%s left %s" % (living, area)
 
-    async def PlayerJoined(self, player: entity.Entity = None, area=None, **kwargs):
-        return "%s joined!" % (player)
+    async def PlayerJoined(self, person: entity.Entity = None, area=None, **kwargs):
+        return "%s joined!" % (person)
 
     async def ItemHeld(self, person=None, area=None, items=None, **kwargs):
         return "%s held %s" % (

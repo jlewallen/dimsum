@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 import copy
 import jsonpickle
@@ -82,7 +82,7 @@ class EntityRefHandler(jsonpickle.handlers.BaseHandler):
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         pyObject = entity_types[obj["py/object"]]
-        ref = entity.EntityRef.make(pyObject=pyObject, **obj)
+        ref = entity.EntityRef.new(pyObject=pyObject, **obj)
         log.debug("entity-handler: %s", ref)
         return self.context.lookup(ref)
 
@@ -185,24 +185,30 @@ async def materialize(
     store: storage.EntityStorage = None,
     key: str = None,
     gid: int = None,
-    json: str = None,
+    json: List[entity.Serialized] = None,
     reach=None,
     depth: int = 0,
-) -> Optional[entity.Entity]:
+    cache: Dict[str, List[entity.Serialized]] = None,
+) -> Union[Optional[entity.Entity], List[entity.Entity]]:
     assert registrar
     assert store
 
+    single_entity = json is None
+    cache = cache or {}
     found = None
-    if key:
+    if key is not None:
         log.debug("[%d] materialize key=%s", depth, key)
         found = registrar.find_by_key(key)
         if found:
             return found
 
-        json = await store.load_by_key(key)
-        if json is None:
-            log.info("[%d] %s missing key=%s", depth, store, key)
-            return None
+        if key in cache:
+            json = cache[key]
+        else:
+            json = await store.load_by_key(key)
+            if len(json) == 0:
+                log.info("[%d] %s missing key=%s", depth, store, key)
+                return None
 
     if gid is not None:
         log.debug("[%d] materialize gid=%d", depth, gid)
@@ -211,11 +217,11 @@ async def materialize(
             return found
 
         json = await store.load_by_gid(gid)
-        if json is None:
+        if len(json) == 0:
             log.info("[%d] %s missing gid=%d", depth, store, gid)
             return None
 
-    log.info("json: %s", json)
+    log.debug("json: %s", json)
 
     refs: Dict[str, entity.EntityProxy] = {}
 
@@ -228,21 +234,21 @@ async def materialize(
             refs[ref.key] = entity.EntityProxy(ref)
         return refs[ref.key]
 
-    if not json:
+    if not json or len(json) == 0:
         raise SerializationException("no json for {0}".format({"key": key, "gid": gid}))
 
-    assert json
+    cache.update(**{se.key: [se] for se in json})
 
-    loaded = deserialize(json, reference)
-    assert loaded
-    registrar.register(loaded)
+    deserialized = deserialize(json[0].serialized, reference)
+    registrar.register(deserialized)
+    loaded = deserialized
 
     deeper = True
     new_depth = depth
     if reach:
         choice = reach(loaded, depth)
         if choice < 0:
-            log.info("reach! reach! reach!")
+            log.debug("reach! reach! reach!")
             deeper = False
         else:
             new_depth += choice
@@ -255,12 +261,16 @@ async def materialize(
                 key=referenced_key,
                 reach=reach,
                 depth=new_depth,
+                cache=cache,
             )
             proxy.__wrapped__ = linked  # type: ignore
 
     loaded.validate()
 
-    return loaded
+    if single_entity:
+        return loaded
+
+    return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
 def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:

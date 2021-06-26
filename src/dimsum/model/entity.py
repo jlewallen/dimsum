@@ -17,6 +17,12 @@ p = inflect.engine()
 
 
 @dataclasses.dataclass(frozen=True)
+class Serialized:
+    key: str
+    serialized: str
+
+
+@dataclasses.dataclass(frozen=True)
 class EntityRef:
     key: str
     klass: str
@@ -24,7 +30,7 @@ class EntityRef:
     pyObject: Any
 
     @staticmethod
-    def make(key=None, klass=None, name=None, pyObject=None, **kwargs):
+    def new(key=None, klass=None, name=None, pyObject=None, **kwargs):
         assert key
         assert klass
         assert name
@@ -176,23 +182,9 @@ class Entity:
                         )
 
         log.debug(
-            "entity:ctor {0} '{1}' creator={2} {3} id={4} props={5}".format(
-                self.key,
-                self.props.name,
-                creator,
-                creator.key if creator else "<none>",
-                self.props,
-                id(self),
+            "entity:ctor {0} '{1}' creator={2} id={3} props={4}".format(
+                self.key, self.props.name, creator, id(self), self.props
             )
-        )
-
-        log.info(
-            "entity:ctor %s id=%s chimeras=%s props=%s initialize=%s",
-            self.key,
-            id(self),
-            self.chimeras,
-            self.props,
-            initialize,
         )
 
     def validate(self) -> None:
@@ -345,7 +337,10 @@ class Registrar:
         self.key_to_number = {}
         self.number = 0
 
-    def register(self, entity: Union[Entity, Any]):
+    def register(self, entity: Union[Entity, List[Entity]]):
+        if isinstance(entity, list):
+            return [self.register(e) for e in entity]
+
         if entity.key in self.entities:
             log.info("register:noop {0} '{1}'".format(entity.key, entity))
         else:
@@ -373,11 +368,6 @@ class Registrar:
     def entities_of_klass(self, klass: Type[EntityClass]):
         return [e for key, e in self.entities.items() if e.klass == klass]
 
-    def add_entities(self, entities: List[Entity]):
-        for entity in entities:
-            log.debug("add-entity: %s %s", entity.key, entity)
-            self.register(entity)
-
     def find_by_gid(self, gid: int) -> Optional[Entity]:
         if gid in self.numbered:
             return self.numbered[gid]
@@ -396,7 +386,7 @@ class Registrar:
         return None
 
     def empty(self) -> bool:
-        return len(self.entities.keys()) == 1
+        return len(self.entities.keys()) == 0
 
     def everything(self) -> List[Entity]:
         return list(self.entities.values())

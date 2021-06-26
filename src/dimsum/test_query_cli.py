@@ -4,13 +4,11 @@ import json
 import logging
 import pytest
 import freezegun
-import test
-
-import model.domains as domains
-import storage
-
 
 import routing
+import storage
+
+import test
 
 
 @pytest.mark.asyncio
@@ -18,7 +16,7 @@ import routing
 async def test_routing_process_target_query_fail_no_query(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
     await store.purge()
-    domain = await test.make_simple_domain(store=store)
+    await test.make_simple_domain(store=store)
 
     router = routing.Router(
         targets=[
@@ -36,7 +34,7 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
 async def test_routing_process_target_query_entity(snapshot):
     store = storage.SqliteStorage("test.sqlite3")
     await store.purge()
-    domain = await test.make_simple_domain(store=store)
+    await test.make_simple_domain(store=store)
 
     router = routing.Router(
         targets=[
@@ -45,6 +43,6 @@ async def test_routing_process_target_query_entity(snapshot):
             )
         ]
     )
-    query = '{ entitiesByKey(key: "world") }'
+    query = '{ entitiesByKey(key: "world") { key serialized } }'
     reply = await router.handle(json.dumps({"query": query}))
     snapshot.assert_match(reply, "stdout.json")
