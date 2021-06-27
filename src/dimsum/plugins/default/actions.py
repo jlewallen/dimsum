@@ -410,8 +410,6 @@ class Look(PersonAction):
         if self.item:
             return DetailedObservation(ObservedItem(self.item))
 
-        area = world.find_person_area(person)
-
         assert area
         return AreaObservation(area, person)
 
