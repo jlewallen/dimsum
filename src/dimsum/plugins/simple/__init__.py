@@ -6,14 +6,7 @@ import model.properties as properties
 import model.finders as finders
 import model.entity as entity
 
-import model.scopes.movement as movement
-
-import plugins.default.evaluator as evaluator
-import plugins.default.actions as actions
-
 import grammars
-
-from context import *
 
 from model.reply import *
 from model.game import *
@@ -21,10 +14,15 @@ from model.things import *
 from model.events import *
 from model.world import *
 
+from plugins.actions import *
+from context import *
+
+import model.scopes.movement as movement
+
 log = logging.getLogger("dimsum")
 
 
-class SimpleVerb(actions.PersonAction):
+class SimpleVerb(PersonAction):
     def __init__(self, who=None, item: ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
         self.who = who
@@ -188,7 +186,7 @@ class Hit(SimpleVerb):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self) -> Type[evaluator.Evaluator]:
+    def evaluator(self) -> Type[Evaluator]:
         return Evaluator
 
     @property
@@ -209,7 +207,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(evaluator.Evaluator):
+class Evaluator(Evaluator):
     def plant(self, args):
         return actions.Plant(item=args[0])
 

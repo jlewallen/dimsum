@@ -5,9 +5,7 @@ import base64
 
 import model.entity as entity
 import model.finders as finders
-
 import model.properties as properties
-
 import model.scopes.users as users
 import model.scopes.movement as movement
 import model.scopes.health as health
@@ -23,37 +21,10 @@ from model.things import *
 from model.events import *
 from model.world import *
 
+from plugins.actions import *
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
-
-
-class PersonAction(Action):
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        raise NotImplementedError
-
-
-class Unknown(PersonAction):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        log.warning("{0} performed".format(self))
-        return Failure("sorry, i don't understand")
 
 
 class Auth(PersonAction):

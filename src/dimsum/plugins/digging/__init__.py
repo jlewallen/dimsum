@@ -4,21 +4,19 @@ import logging
 
 import model.properties as properties
 
-import model.scopes.movement as movement
-import model.scopes.carryable as carryable
-
-import plugins.default.actions as actions
-import plugins.default.evaluator as evaluator
-
 import grammars
-
-from context import *
 
 from model.reply import *
 from model.game import *
 from model.things import *
 from model.events import *
 from model.world import *
+
+from plugins.actions import *
+from context import *
+
+import model.scopes.movement as movement
+import model.scopes.carryable as carryable
 
 log = logging.getLogger("dimsum")
 
@@ -62,7 +60,7 @@ class DigLinkage:
         return "DigLinkage<{0}>".format(self.directions)
 
 
-class Dig(actions.PersonAction):
+class Dig(PersonAction):
     def __init__(self, linkage: DigLinkage = None, area_name: str = None, **kwargs):
         super().__init__(**kwargs)
         assert linkage
@@ -131,7 +129,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(evaluator.Evaluator):
+class Evaluator(Evaluator):
     def dig(self, args):
         return Dig(args[0], args[1])
 

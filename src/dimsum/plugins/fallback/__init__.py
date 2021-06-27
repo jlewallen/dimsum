@@ -3,12 +3,11 @@ from typing import Any, List, Type
 import logging
 
 import model.properties as properties
-import model.scopes.movement as movement
-
-import plugins.default.evaluator as evaluator
-import plugins.default.actions as actions
 
 import grammars
+
+from plugins.actions import *
+from context import *
 
 log = logging.getLogger("dimsum")
 
@@ -31,6 +30,6 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(evaluator.Evaluator):
+class Evaluator(Evaluator):
     def verb(self, args):
-        return actions.Unknown()
+        return Unknown()

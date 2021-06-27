@@ -5,37 +5,15 @@ import model.game as game
 import model.things as things
 import model.finders as finders
 import model.properties as properties
-
 import model.scopes.movement as movement
 
 import plugins.default.actions as actions
+import plugins.actions
 
 log = logging.getLogger("dimsum")
 
 
-class Evaluator(lark.Transformer):
-    def __init__(self, world, player):
-        self.world = world
-        self.player = player
-
-    def start(self, args):
-        return args[0]
-
-    def verbs(self, args):
-        return args[0]
-
-    def quoted_string(self, args):
-        return args[0][1:-1]
-
-    def string(self, args):
-        return args[0]
-
-    def text(self, args):
-        return str(args[0])
-
-    def number(self, args):
-        return float(args[0])
-
+class Evaluator(plugins.actions.Evaluator):
     # Item lookup
 
     def make_quantified(self, args):
@@ -57,12 +35,6 @@ class Evaluator(lark.Transformer):
     def unheld_noun(self, args):
         return finders.UnheldItem(str(args[0]))
 
-    def general_noun(self, args):
-        return finders.AnyItem(str(args[0]))
-
-    def object_by_gid(self, args):
-        return finders.ObjectNumber(int(args[0]))
-
     def makeable(self, args):
         return args[0]
 
@@ -77,15 +49,6 @@ class Evaluator(lark.Transformer):
 
     def unheld(self, args):
         return args[0]
-
-    def noun(self, args):
-        return args[0]
-
-    def direction(self, args):
-        for d in movement.Direction:
-            if str(args[0]).lower() == d.name.lower():
-                return d
-        raise Exception("unknown movement.Direction")
 
     def find_direction(self, args):
         return movement.FindDirectionalRoute(args[0])
