@@ -27,6 +27,10 @@ class Occupying(entity.Scope):
         super().__init__(**kwargs)
         self.area = area
 
+    def update(self, area: entity.Entity):
+        self.area = area
+        self.ourselves.touch()
+
 
 class Occupyable(entity.Scope):
     def __init__(self, occupied=None, **kwargs):
@@ -38,7 +42,7 @@ class Occupyable(entity.Scope):
         assert isinstance(living, entity.Entity)
         self.occupied.append(living)
         with living.make(Occupying) as occupying:
-            occupying.area = self.ourselves
+            occupying.update(self.ourselves)
             self.ourselves.touch()
         return living
 
@@ -53,6 +57,7 @@ class Occupyable(entity.Scope):
     async def left(self, player: entity.Entity):
         assert player in self.occupied
         self.occupied.remove(player)
+        self.ourselves.touch()
         await context.get().publish(LivingLeftArea(living=player, area=self))
 
 

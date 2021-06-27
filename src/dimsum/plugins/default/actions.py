@@ -754,7 +754,6 @@ class MovingAction(PersonAction):
                 await ctx.extend(area=area).hook("left:before")
                 await leaving.left(person)
                 await ctx.extend(area=area).hook("left:after")
-
                 await ctx.extend(area=destination).hook("entered:before")
                 await entering.entered(person)
                 await ctx.extend(area=destination).hook("entered:after")
