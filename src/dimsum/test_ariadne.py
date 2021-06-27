@@ -308,6 +308,10 @@ async def test_graphql_make_sample(snapshot):
 async def test_graphql_delete(snapshot):
     domain = domains.Domain()
 
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
+
     serialized = serializing.serialize(world.World(), secure=True)
 
     data = {

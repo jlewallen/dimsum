@@ -218,7 +218,6 @@ end
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
 
-        log.warning("entity equality is broken, comparing top level entity to proxy?")
         assert area.make(carryable.Containing).holding[0].creator.key == box.key
         assert (
             area.make(carryable.Containing)
