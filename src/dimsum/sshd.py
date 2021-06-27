@@ -9,6 +9,8 @@ import logging
 
 import rich
 import rich.console
+import rich.control
+import rich.segment
 import rich.live
 import rich.table
 
@@ -139,12 +141,17 @@ class ShellSession:
     def write_everyone_else(self, msg: str):
         for other in self.others:
             if other != self:
-                other.control("\033[1G\033[2K")
+                other.control(
+                    rich.control.Control(
+                        (rich.segment.ControlType.CURSOR_MOVE_TO_COLUMN, 0),
+                        (rich.segment.ControlType.ERASE_IN_LINE, 2),
+                    )
+                )
                 other.write(msg + "\n")
                 other.write(self.prompt(), end="")
 
-    def control(self, msg: str, **kwargs):
-        self.console.control(msg, **kwargs)
+    def control(self, control: rich.control.Control, **kwargs):
+        self.console.control(control, **kwargs)
 
     def print(self, msg: str, **kwargs):
         self.console.print(msg, **kwargs)
@@ -162,7 +169,7 @@ class Server(asyncssh.SSHServer):
 
     def connection_lost(self, exc):
         if exc:
-            log.error("connection error: " + str(exc))
+            log.exception("error", exc_info=exc)
         else:
             log.info("connection closed")
 

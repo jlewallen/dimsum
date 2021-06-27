@@ -64,7 +64,7 @@ Quart==0.15.1
 Quart-CORS==0.5.0
 regex==2021.4.4
 requests==2.25.1
-rich==10.3.0
+rich==10.4.0
 Rx==1.6.1
 shortuuid==1.0.1
 six==1.16.0
