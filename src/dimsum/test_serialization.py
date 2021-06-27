@@ -375,7 +375,9 @@ def add_item(container: entity.Entity, item: entity.Entity):
 
 def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
     return {
-        key: serializing.serialize(entity, secure=True, **kwargs)
+        key: serializing.serialize(
+            entity, identities=serializing.Identities.PRIVATE, **kwargs
+        )
         for key, entity in registrar.entities.items()
     }
 

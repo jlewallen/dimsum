@@ -3,7 +3,8 @@ schema {
   mutation: Mutation
 }
 
-scalar Entity
+scalar SerializedEntity
+scalar JsonDiff
 scalar Reply
 scalar Key
 
@@ -25,14 +26,15 @@ type Evaluation {
 
 type KeyedEntity {
   key: String!
-  serialized: Entity!
+  serialized: SerializedEntity!
+  diff: JsonDiff
 }
 
 type Query {
   size: Int!
   world: KeyedEntity!
-  entitiesByKey(key: Key): [KeyedEntity!]
-  entitiesByGid(gid: Int): [KeyedEntity!]
+  entitiesByKey(key: Key, identities: Boolean): [KeyedEntity!]
+  entitiesByGid(gid: Int, identities: Boolean): [KeyedEntity!]
   areas: [KeyedEntity!]
   people: [KeyedEntity!]
 }

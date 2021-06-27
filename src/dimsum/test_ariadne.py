@@ -25,7 +25,10 @@ log = logging.getLogger("dimsum")
 
 def get_test_context(domain: domains.Domain, **kwargs):
     return AriadneContext(
-        domain, config.Configuration("test.sqlite3", "session-key"), None  # type:ignore
+        domain,
+        config.symmetrical(":memory:"),
+        None,  # type:ignore
+        serializing.Identities.HIDDEN,
     )
 
 
@@ -99,7 +102,10 @@ async def test_graphql_world_by_key(snapshot):
         await session.prepare()
         await session.save()
 
-    data = {"query": '{ entitiesByKey(key: "%s") { key serialized } }' % (world.Key)}
+    data = {
+        "query": '{ entitiesByKey(key: "%s", identities: false) { key serialized } }'
+        % (world.Key)
+    }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -117,7 +123,10 @@ async def test_graphql_world_by_gid(snapshot):
         assert world.props.gid == 0
         await session.save()
 
-    data = {"query": "{ entitiesByGid(gid: %d) { key serialized } }" % (0)}
+    data = {
+        "query": "{ entitiesByGid(gid: %d, identities: false) { key serialized } }"
+        % (0)
+    }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -236,7 +245,9 @@ async def test_graphql_login_failed(caplog, snapshot):
 async def test_graphql_update():
     domain = domains.Domain()
 
-    serialized = serializing.serialize(world.World(), secure=True)
+    serialized = serializing.serialize(
+        world.World(), identities=serializing.Identities.PRIVATE
+    )
 
     data = {
         "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
@@ -260,7 +271,9 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 async def test_graphql_update_and_requery(snapshot):
     domain = domains.Domain()
 
-    serialized = serializing.serialize(world.World(), secure=True)
+    serialized = serializing.serialize(
+        world.World(), identities=serializing.Identities.PRIVATE
+    )
 
     data = {
         "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
@@ -291,7 +304,9 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 async def test_graphql_make_sample(snapshot):
     domain = domains.Domain(empty=True)
 
-    serialized = serializing.serialize(world.World(), secure=True)
+    serialized = serializing.serialize(
+        world.World(), identities=serializing.Identities.PRIVATE
+    )
 
     data = {
         "variables": {"entities": [serialized]},
@@ -319,7 +334,9 @@ async def test_graphql_delete(snapshot):
         await session.prepare()
         await session.save()
 
-    serialized = serializing.serialize(world.World(), secure=True)
+    serialized = serializing.serialize(
+        world.World(), identities=serializing.Identities.PRIVATE
+    )
 
     data = {
         "variables": {"entities": [{"key": world.Key}]},

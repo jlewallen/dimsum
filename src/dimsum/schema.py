@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 
 import logging
 import ariadne
 import os.path
+import json
 import dataclasses
 import base64
 import starlette.requests
@@ -11,6 +12,7 @@ import jwt
 import model.world as world
 import model.domains as domains
 import model.game as game
+import model.entity as entities
 import model.scopes as scopes
 import model.scopes.users as users
 import model.library as library
@@ -21,9 +23,6 @@ import storage
 import config
 
 log = logging.getLogger("dimsum")
-
-entity = ariadne.ScalarType("Entity")
-keyed_entity = ariadne.ObjectType("KeyedEntity")
 
 
 @dataclasses.dataclass
@@ -38,20 +37,13 @@ class EntityDiff:
     serialized: str
 
 
-@entity.serializer
-def serialize_entity(value):
-    log.debug("ariadne:entity")
-    serialized = serializing.serialize(value, reproducible=True)
-    return KeyedEntity(value.key, serialized)
-
-
 reply = ariadne.ScalarType("Reply")
 
 
 @reply.serializer
 def serialize_reply(value):
     log.debug("ariadne:reply")
-    return serializing.serialize(value, reproducible=True)
+    return serializing.serialize(value)
 
 
 query = ariadne.QueryType()
@@ -69,12 +61,37 @@ async def resolve_size(_, info):
         return store
 
 
+@dataclasses.dataclass
+class EntityResolver:
+    session: domains.Session
+    entity: entities.Entity
+    cached: Optional[str] = None
+
+    def key(self, info, **data):
+        return self.entity.key
+
+    def serialized(self, info, **data):
+        if self.cached:
+            return self.cached
+        assert self.entity.identity
+        self.cached = serializing.serialize(
+            self.entity,
+            identities=info.context.identities,
+        )
+        return self.cached
+
+    def diff(self, info, **data):
+        return self.session.registrar.get_diff_if_available(
+            self.entity.key, self.serialized(info)
+        )
+
+
 @query.field("world")
 async def resolve_world(obj, info):
     domain = info.context.domain
     log.info("ariadne:world")
     with domain.session() as session:
-        return serialize_entity(await session.prepare())
+        return EntityResolver(session, await session.prepare())
 
 
 async def materialize(session, **kwargs):
@@ -84,21 +101,27 @@ async def materialize(session, **kwargs):
         for other_key, other in session.registrar.entities.items():
             if other_key != loaded.key:
                 entities.append(other)
-        return [serialize_entity(e) for e in entities]
+        return [EntityResolver(session, e) for e in entities]
     return []
 
 
 @query.field("entitiesByKey")
-async def resolve_entities_by_key(obj, info, key):
+async def resolve_entities_by_key(obj, info, key, identities=True):
     domain = info.context.domain
+    info.context.identities = (
+        serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
+    )
     log.info("ariadne:entities-by-key key=%s", key)
     with domain.session() as session:
         return await materialize(session, key=key)
 
 
 @query.field("entitiesByGid")
-async def resolve_entities_by_gid(obj, info, gid):
+async def resolve_entities_by_gid(obj, info, gid, identities=True):
     domain = info.context.domain
+    info.context.identities = (
+        serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
+    )
     log.info("ariadne:entities-by-gid gid=%s", gid)
     with domain.session() as session:
         return await materialize(session, gid=gid)
@@ -112,7 +135,7 @@ async def resolve_areas(obj, info):
         await session.prepare()
         entities = session.registrar.entities_of_klass(scopes.AreaClass)
         log.info("ariadne:areas entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return [EntityResolver(session, e) for e in entities]
 
 
 @query.field("people")
@@ -123,7 +146,7 @@ async def resolve_people(obj, info):
         await session.prepare()
         entities = session.registrar.entities_of_klass(scopes.LivingClass)
         log.info("ariadne:people entities=%s", entities)
-        return [serialize_entity(e) for e in entities]
+        return [EntityResolver(session, e) for e in entities]
 
 
 mutation = ariadne.MutationType()
@@ -208,12 +231,15 @@ async def resolve_language(obj, info, criteria):
         action = tree_eval.transform(tree)
         reply = await session.perform(action, player)
 
-        log.info("reply: %s", reply)
         await session.save()
 
         return Evaluation(
             serialize_reply(reply),
-            [serialize_entity(e) for e in session.registrar.entities.values()],
+            [
+                EntityResolver(session, e)
+                for e in session.registrar.entities.values()
+                if e.modified
+            ],
         )
 
 
@@ -283,6 +309,7 @@ class AriadneContext:
     domain: domains.Domain
     cfg: config.Configuration
     request: starlette.requests.Request
+    identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
 def context(cfg):

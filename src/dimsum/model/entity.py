@@ -118,6 +118,9 @@ class Version:
     def modified(self):
         return self.o != self.i
 
+    def __str__(self):
+        return "Version<{0} {1}>".format(self.i, self.o)
+
 
 class Entity:
     def __init__(
@@ -341,10 +344,17 @@ class Registrar:
         self.garbage = {}
         self.numbered = {}
         self.key_to_number = {}
+        self.originals = {}
         self.number = 0
 
     def number_of_entities(self):
         return len(self.entities)
+
+    def get_diff_if_available(self, key: str, serialized: str):
+        if key in self.originals:
+            original = self.originals[key]
+            return jsondiff.diff(json.loads(original), json.loads(serialized))
+        return None
 
     def was_modified_from_original(
         self, key: str, e: Optional[Entity], serialized: Optional[str]

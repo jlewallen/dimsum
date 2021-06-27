@@ -2,8 +2,9 @@ from typing import Dict, Any, List, Optional, Union
 
 import copy
 import jsonpickle
-import wrapt
 import logging
+import enum
+import wrapt
 
 import model.crypto as crypto
 import model.entity as entity
@@ -16,6 +17,12 @@ import storage
 log = logging.getLogger("dimsum")
 
 
+class Identities(enum.Enum):
+    PRIVATE = 1
+    PUBLIC = 2
+    HIDDEN = 3
+
+
 @jsonpickle.handlers.register(crypto.Identity, base=True)
 class IdentityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
@@ -24,15 +31,15 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         )
 
     def flatten(self, obj, data):
-        if self.context.reproducible:
+        if self.context.identities == Identities.HIDDEN:
             data["public"] = "<public>"
             data["signature"] = "<signature>"
             data["private"] = "<private>"
-            return
+            return data
 
         data["public"] = obj.public
         data["signature"] = obj.signature
-        if self.context.secure:
+        if self.context.identities == Identities.PRIVATE:
             data["private"] = obj.private
         return data
 
@@ -94,10 +101,9 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):
-    def __init__(self, secure=False, reproducible=False, **kwargs):
+    def __init__(self, identities=Identities.PRIVATE, **kwargs):
         super().__init__(**kwargs)
-        self.secure = secure
-        self.reproducible = reproducible
+        self.identities = identities
 
 
 class CustomUnpickler(jsonpickle.unpickler.Unpickler):
@@ -145,7 +151,7 @@ def serialize_full(value, depth=0):
 
 
 def serialize(
-    value, indent=None, unpicklable=True, secure=False, full=True, reproducible=False
+    value, indent=None, unpicklable=True, identities=Identities.PUBLIC, full=True
 ):
     if value is None:
         return value
@@ -158,9 +164,8 @@ def serialize(
         unpicklable=unpicklable,
         make_refs=False,
         context=SecurePickler(
-            secure=secure,
             unpicklable=unpicklable,
-            reproducible=reproducible,
+            identities=identities,
             make_refs=False,
         ),
     )
@@ -285,7 +290,7 @@ def registrar(
 ) -> Dict[storage.Keys, Optional[str]]:
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
-            maybe_destroyed(entity), secure=True, **kwargs
+            maybe_destroyed(entity), identities=Identities.PRIVATE, **kwargs
         )
         for key, entity in registrar.entities.items()
         if not modified or entity.modified
@@ -304,7 +309,7 @@ def modified(r: entity.Registrar, **kwargs) -> Dict[storage.Keys, Optional[str]]
 def for_update(entities: List[entity.Entity], **kwargs) -> Dict[storage.Keys, str]:
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
-            entity, secure=True, **kwargs
+            entity, identities=Identities.PRIVATE, **kwargs
         )
         for entity in entities
     }
