@@ -7,9 +7,15 @@ scalar Entity
 scalar Reply
 scalar Key
 
+input PersistenceCriteria {
+  read: String!
+  write: String!
+}
+
 input LanguageQueryCriteria {
   text: String!
   evaluator: Key!
+  persistence: PersistenceCriteria
 }
 
 type Evaluation {
@@ -27,7 +33,6 @@ type Query {
   world: KeyedEntity!
   entitiesByKey(key: Key): [KeyedEntity!]
   entitiesByGid(gid: Int): [KeyedEntity!]
-  language(criteria: LanguageQueryCriteria!): Evaluation!
   areas: [KeyedEntity!]
   people: [KeyedEntity!]
 }
@@ -52,4 +57,5 @@ type Mutation {
   login(credentials: Credentials!): Token!
   makeSample: EntitiesUpdated
   update(entities: [EntityDiff!]): EntitiesUpdated
+  language(criteria: LanguageQueryCriteria!): Evaluation!
 }

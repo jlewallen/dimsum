@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import logging
 import ariadne
@@ -126,64 +126,17 @@ async def resolve_people(obj, info):
         return [serialize_entity(e) for e in entities]
 
 
-class Evaluation:
-    def __init__(self, reply, entities: List[KeyedEntity]):
-        super().__init__()
-        self.reply = reply
-        self.entities = entities
-
-
-@query.field("language")
-async def resolve_language(obj, info, criteria):
-    domain = info.context.domain
-    log.info("ariadne:language criteria=%s", criteria)
-
-    l = grammars.create_parser()
-    with domain.session() as session:
-        w = await session.materialize(key=world.Key)
-        assert w
-        player = await session.materialize(key=criteria["evaluator"])
-        assert player
-        tree, create_evaluator = l.parse(criteria["text"].strip())
-        tree_eval = create_evaluator(w, player)
-        action = tree_eval.transform(tree)
-        reply = await session.perform(action, player)
-
-        log.info("reply: %s", reply)
-        await session.save()
-
-        return Evaluation(
-            serialize_reply(reply),
-            [serialize_entity(e) for e in session.registrar.entities.values()],
-        )
-
-
-evaluation = ariadne.ObjectType("Evaluation")
-
-
-@evaluation.field("reply")
-async def resolve_evaluation_reply(obj, info):
-    log.info("evaluation:reply %s", obj)
-    return None
-
-
-@evaluation.field("entities")
-async def resolve_evaluation_entities(obj, info):
-    log.info("evaluation:entities %s", obj)
-    return []
-
-
 mutation = ariadne.MutationType()
-
-
-class UsernamePasswordError(ValueError):
-    pass
 
 
 @dataclasses.dataclass
 class Credentials:
     username: str
     password: str
+
+
+class UsernamePasswordError(ValueError):
+    pass
 
 
 @mutation.field("login")
@@ -210,6 +163,73 @@ async def login(obj, info, credentials):
             log.exception("login")
 
         raise UsernamePasswordError()
+
+
+@dataclasses.dataclass
+class PersistenceCriteria:
+    read: List[str]
+    write: List[str]
+
+
+@dataclasses.dataclass
+class LanguageQueryCriteria:
+    text: str
+    evaluator: str
+    persistence: Optional[PersistenceCriteria] = None
+
+
+def make_language_query_criteria(persistence=None, **kwargs) -> LanguageQueryCriteria:
+    return LanguageQueryCriteria(
+        persistence=PersistenceCriteria(**persistence) if persistence else None,
+        **kwargs
+    )
+
+
+@dataclasses.dataclass
+class Evaluation:
+    reply: game.Reply
+    entities: List[KeyedEntity]
+
+
+@mutation.field("language")
+async def resolve_language(obj, info, criteria):
+    domain = info.context.domain
+    lqc = make_language_query_criteria(**criteria)
+    log.info("ariadne:language criteria=%s", lqc)
+
+    l = grammars.create_parser()
+    with domain.session() as session:
+        w = await session.materialize(key=world.Key)
+        assert w
+        player = await session.materialize(key=lqc.evaluator)
+        assert player
+        tree, create_evaluator = l.parse(lqc.text.strip())
+        tree_eval = create_evaluator(w, player)
+        action = tree_eval.transform(tree)
+        reply = await session.perform(action, player)
+
+        log.info("reply: %s", reply)
+        await session.save()
+
+        return Evaluation(
+            serialize_reply(reply),
+            [serialize_entity(e) for e in session.registrar.entities.values()],
+        )
+
+
+evaluation = ariadne.ObjectType("Evaluation")
+
+
+@evaluation.field("reply")
+async def resolve_evaluation_reply(obj, info):
+    log.info("evaluation:reply %s", obj)
+    return None
+
+
+@evaluation.field("entities")
+async def resolve_evaluation_entities(obj, info):
+    log.info("evaluation:entities %s", obj)
+    return []
 
 
 @mutation.field("makeSample")

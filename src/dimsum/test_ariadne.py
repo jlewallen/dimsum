@@ -148,7 +148,14 @@ async def test_graphql_language_basic(snapshot):
         await session.save()
 
     data = {
-        "query": '{ language(criteria: { text: "look", evaluator: "%s" }) { reply entities { key serialized } } }'
+        "query": """
+mutation {
+    language(criteria: { text: "look", evaluator: "%s" }) {
+        reply
+        entities { key serialized }
+    }
+}
+"""
         % jacob.key
     }
     ok, actual = await ariadne.graphql(

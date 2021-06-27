@@ -9,6 +9,7 @@ import copy
 import wrapt
 import inflect
 import shortuuid
+import jsondiff
 
 import model.properties as properties
 import model.crypto as crypto
@@ -322,9 +323,6 @@ class Scope:
 
 class RegistrationException(Exception):
     pass
-
-
-import jsondiff
 
 
 class Registrar:
