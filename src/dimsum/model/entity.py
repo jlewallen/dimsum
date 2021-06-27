@@ -353,7 +353,7 @@ class Registrar:
         return True
 
     def was_modified(self, e: Entity) -> bool:
-        return True
+        return e.modified
 
     def modified(self) -> Dict[str, Entity]:
         return {key: e for key, e in self.entities.items() if self.was_modified(e)}
