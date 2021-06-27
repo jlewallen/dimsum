@@ -267,13 +267,13 @@ class Entity:
         return False
 
     def make_and_discard(self, ctor, **kwargs):
-        return self.make(ctor, **kwargs)
+        return self.make(ctor, discard=True, **kwargs)
 
     def has(self, ctor, **kwargs):
         key = get_ctor_key(ctor)
         return key in self.chimeras
 
-    def make(self, ctor, **kwargs):
+    def make(self, ctor, discard=False, **kwargs):
         key = get_ctor_key(ctor)
 
         chargs = {}
@@ -282,13 +282,14 @@ class Entity:
         chargs.update(**kwargs)
 
         log.debug("%s splitting chimera: %s %s", self.key, key, chargs)
-        child = ctor(chimera=self, **chargs)
+        child = ctor(chimera=self, discard=discard, **chargs)
         return child
 
     def update(self, child):
         key = child.chimera_key
         data = child.__dict__
         del data["chimera"]
+        del data["discard"]
         log.debug("%s updating chimera: %s %s", self.key, key, data)
         self.chimeras[key] = data
 
@@ -297,10 +298,11 @@ class Entity:
 
 
 class Scope:
-    def __init__(self, chimera: Entity = None, **kwargs):
+    def __init__(self, chimera: Entity = None, discard: bool = False, **kwargs):
         super().__init__()
         assert chimera
         self.chimera = chimera
+        self.discard = discard
 
     @property
     def chimera_key(self) -> str:
@@ -321,6 +323,8 @@ class Scope:
         self.save()
 
     def save(self):
+        if self.discard:
+            return
         self.chimera.update(self)
 
 
