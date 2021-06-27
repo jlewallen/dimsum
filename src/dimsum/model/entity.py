@@ -145,12 +145,6 @@ class Entity:
             # If we have an creator and no identity then we generate one
             # based on them, forming a chain.
             if self.creator:
-                if isinstance(self.creator, str):
-                    log.info("WTF: %s", self.creator)
-                    log.info("key = %s", key)
-                    log.info("klass = %s", klass)
-                    log.info("chimeras = %s", chimeras)
-                    assert False
                 self.identity = crypto.generate_identity_from(self.creator.identity)
             else:
                 self.identity = crypto.generate_identity()
