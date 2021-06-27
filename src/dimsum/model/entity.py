@@ -4,6 +4,7 @@ import abc
 import logging
 import dataclasses
 import time
+import json
 import copy
 import wrapt
 import inflect
@@ -103,10 +104,10 @@ class UnknownClass(EntityClass):
 
 
 class Version:
-    def __init__(self, i: int = 0):
+    def __init__(self, i: int = 0, o: int = -1):
         super().__init__()
         self.i = i
-        self.o = i
+        self.o = i if o < 0 else o
 
     def increase(self):
         if self.i == self.o:
@@ -224,7 +225,6 @@ class Entity:
 
     def try_modify(self) -> None:
         if self.can_modify():
-            self.version.increase()
             return
         raise EntityFrozen()
 
@@ -321,6 +321,9 @@ class RegistrationException(Exception):
     pass
 
 
+import jsondiff
+
+
 class Registrar:
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -348,8 +351,14 @@ class Registrar:
         if key in self.originals:
             if self.originals[key] == serialized:
                 return False
-            if e and not e.modified:
-                log.warning("unmodified save: %s", key)
+            original = self.originals[key]
+            assert original
+            if e and not e.modified and serialized:
+                log.warning(
+                    "%s: untouched save %s",
+                    key,
+                    jsondiff.diff(json.loads(original), json.loads(serialized)),
+                )
         return True
 
     def was_modified(self, e: Entity) -> bool:

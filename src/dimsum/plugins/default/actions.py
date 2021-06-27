@@ -962,6 +962,7 @@ class ModifyField(PersonAction):
                 i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
+        item.touch()
         return Success("done")
 
 

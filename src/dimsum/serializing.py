@@ -281,20 +281,21 @@ def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:
 
 
 def registrar(
-    registrar: entity.Registrar, **kwargs
+    registrar: entity.Registrar, modified: bool = False, **kwargs
 ) -> Dict[storage.Keys, Optional[str]]:
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
             maybe_destroyed(entity), secure=True, **kwargs
         )
         for key, entity in registrar.entities.items()
+        if not modified or entity.modified
     }
 
 
 def modified(r: entity.Registrar, **kwargs) -> Dict[storage.Keys, Optional[str]]:
     return {
         key: serialized
-        for key, serialized in registrar(r, **kwargs).items()
+        for key, serialized in registrar(r, modified=False, **kwargs).items()
         if key.key
         and r.was_modified_from_original(key.key, r.find_by_key(key.key), serialized)
     }
