@@ -1,4 +1,4 @@
-from typing import TextIO
+from typing import TextIO, List
 
 import logging
 import asyncclick as click
@@ -35,13 +35,46 @@ def commands():
     help="Configuration file.",
     type=click.Path(exists=True),
 )
-async def server(database: str, conf: str):
+@click.option(
+    "--read",
+    multiple=True,
+    help="Read URLs.",
+)
+@click.option(
+    "--write",
+    multiple=True,
+    help="Write URLs.",
+)
+@click.option(
+    "--web-port",
+    default=5100,
+    help="Port.",
+)
+@click.option(
+    "--ssh-port",
+    default=5101,
+    help="Port.",
+)
+async def server(
+    database: str,
+    conf: str,
+    read: List[str],
+    write: List[str],
+    web_port: int,
+    ssh_port: int,
+):
     """
     Serve a database.
     """
+
     cfg = config.symmetrical(database or ":memory")
     if conf:
         cfg = config.get(conf)
+    if read or write:
+        cfg = config.Configuration(
+            persistence=config.Persistence(read=read, write=write),
+            session_key=config.generate_session_key(),
+        )
     schema = schema_factory.create()
     app = ariadne.asgi.GraphQL(
         schema, context_value=schema_factory.context(cfg), debug=True
@@ -60,8 +93,8 @@ async def server(database: str, conf: str):
             pass
 
     loop = asyncio.get_event_loop()
-    gql_config = uvicorn.Config(app=app, loop=loop)
+    gql_config = uvicorn.Config(app=app, loop=loop, port=web_port)
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
-    sshd_task = loop.create_task(sshd.start_server(create_ssh_session))
+    sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
     await asyncio.gather(sshd_task, gql_task)

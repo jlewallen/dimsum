@@ -5,6 +5,7 @@ import dataclasses
 import os
 import os.path
 import json
+import shortuuid
 
 import model.domains as domains
 
@@ -33,6 +34,8 @@ class Persistence:
         return [self.get_store_from_url(url, cache) for url in urls]
 
     def make_store(self):
+        if not self.read or not self.write:
+            raise ConfigurationException("at least one read and write url is required")
         cache: Dict[str, storage.EntityStorage] = {}
         read = storage.Prioritized(self.get_stores_from_url(self.read, cache))
         write = storage.All(self.get_stores_from_url(self.write, cache))
@@ -67,8 +70,12 @@ def get(path: Optional[str]) -> Configuration:
     raise ConfigurationException("file not found")
 
 
+def generate_session_key() -> str:
+    return shortuuid.uuid()
+
+
 def symmetrical(file: str, session_key: str = None, **kwargs):
     return Configuration(
         persistence=Persistence(read=[file], write=[file]),
-        session_key=session_key or "terrible-session-key",
+        session_key=session_key or generate_session_key(),
     )

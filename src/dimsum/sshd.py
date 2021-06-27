@@ -176,7 +176,7 @@ class Server(asyncssh.SSHServer):
         return True
 
 
-async def start_server(handler_factory):
+async def start_server(port: int, handler_factory):
     def create_server():
         return Server()
 
@@ -186,7 +186,7 @@ async def start_server(handler_factory):
     await asyncssh.create_server(
         create_server,
         "",
-        8022,
+        port,
         server_host_keys=["ssh_host_key"],
         process_factory=handle_process,
     )
