@@ -5,4 +5,4 @@ if [ -z "$1" ]; then
 	exit 2
 fi
 
-sqlite3 $1 "SELECT serialized FROM entities" | jq .
+sqlite3 $1 "SELECT serialized FROM entities"
