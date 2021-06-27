@@ -108,9 +108,13 @@ class Version:
         self.i = i
         self.o = i
 
-    def inc(self):
+    def increase(self):
         if self.i == self.o:
             self.i += 1
+
+    @property
+    def modified(self):
+        return self.o != self.i
 
 
 class Entity:
@@ -212,18 +216,23 @@ class Entity:
 
     def touch(self) -> None:
         self.props[properties.Touched] = time.time()
+        self.version.increase()
 
-    def destroy(self) -> None:
-        self.props.destroyed = self.identity
+    @property
+    def modified(self) -> bool:
+        return self.version.modified
 
     def try_modify(self) -> None:
         if self.can_modify():
-            self.version.inc()
+            self.version.increase()
             return
         raise EntityFrozen()
 
     def can_modify(self) -> bool:
         return self.props.frozen is None
+
+    def destroy(self) -> None:
+        self.props.destroyed = self.identity
 
     def freeze(self, identity: crypto.Identity) -> bool:
         if self.props.frozen:
@@ -316,14 +325,12 @@ class Registrar:
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         log.info("registrar:ctor")
-        self.entities: Dict[str, entity.Entity] = {}
-        self.garbage: Dict[str, entity.Entity] = {}
-        self.numbered: Dict[int, entity.Entity] = {}
+        self.entities: Dict[str, Entity] = {}
+        self.garbage: Dict[str, Entity] = {}
+        self.numbered: Dict[int, Entity] = {}
         self.key_to_number: Dict[str, int] = {}
+        self.originals: Dict[str, str] = {}
         self.number: int = 0
-
-    def number_of_entities(self):
-        return len(self.entities)
 
     def purge(self):
         self.entities = {}
@@ -332,15 +339,36 @@ class Registrar:
         self.key_to_number = {}
         self.number = 0
 
-    def register(self, entity: Union[Entity, List[Entity]]):
+    def number_of_entities(self):
+        return len(self.entities)
+
+    def was_modified_from_original(
+        self, key: str, e: Optional[Entity], serialized: Optional[str]
+    ) -> bool:
+        if key in self.originals:
+            if self.originals[key] == serialized:
+                return False
+            if e and not e.modified:
+                log.warning("unmodified save: %s", key)
+        return True
+
+    def was_modified(self, e: Entity) -> bool:
+        return True
+
+    def modified(self) -> Dict[str, Entity]:
+        return {key: e for key, e in self.entities.items() if self.was_modified(e)}
+
+    def register(self, entity: Union[Entity, List[Entity]], original: str = None):
         if isinstance(entity, list):
             return [self.register(e) for e in entity]
 
         if entity.key in self.entities:
             log.info("register:noop {0} '{1}'".format(entity.key, entity))
         else:
-            assigned = entity.registered(self.number)
             log.info("register:new {0} '{1}'".format(entity.key, entity))
+            assigned = entity.registered(self.number)
+            if original:
+                self.originals[entity.key] = original
             if assigned in self.numbered:
                 already = self.numbered[assigned]
                 if already.key != entity.key:
@@ -391,7 +419,6 @@ class Registrar:
 
     def unregister(self, entity: Union[Entity, Any]):
         entity.destroy()
-        # del self.entities[entity.key]
         self.garbage[entity.key] = entity
 
     @property

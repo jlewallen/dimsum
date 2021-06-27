@@ -20,9 +20,7 @@ async def test_storage_materialize_world():
         assert not await serializing.materialize(
             session.registrar, store, key=world.Key
         )
-
         await store.update(serializing.for_update([world.World()]))
-
         assert await serializing.materialize(
             registrar=session.registrar, store=store, key=world.Key
         )
@@ -35,20 +33,36 @@ async def test_storage_materialize_reference():
 
     with domain.session() as session:
         w = await session.prepare()
-
         await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
-
         await session.save()
 
     with domain.session() as session:
-        session.registrar.purge()
-
         assert session.registrar.number_of_entities() == 0
-
         await session.prepare()
-
         assert await serializing.materialize(
             registrar=session.registrar, store=store, key=world.Key
         )
-
         assert session.registrar.number_of_entities() == 2
+
+
+@pytest.mark.asyncio
+async def test_storage_only_save_modified_super_simple():
+    store = storage.InMemory()
+    domain = domains.Domain(store=store)
+
+    with domain.session() as session:
+        w = await session.prepare()
+        await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
+        await session.save()
+
+    with domain.session() as session:
+        assert session.registrar.number_of_entities() == 0
+        await session.prepare()
+        assert await serializing.materialize(
+            registrar=session.registrar, store=store, key=world.Key
+        )
+        assert session.registrar.number_of_entities() == 2
+
+        store.freeze()
+
+        await session.save()

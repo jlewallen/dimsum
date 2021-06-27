@@ -240,7 +240,7 @@ async def materialize(
     cache.update(**{se.key: [se] for se in json})
 
     deserialized = deserialize(json[0].serialized, reference)
-    registrar.register(deserialized)
+    registrar.register(deserialized, original=json[0].serialized)
     loaded = deserialized
 
     deeper = True
@@ -288,6 +288,15 @@ def registrar(
             maybe_destroyed(entity), secure=True, **kwargs
         )
         for key, entity in registrar.entities.items()
+    }
+
+
+def modified(r: entity.Registrar, **kwargs) -> Dict[storage.Keys, Optional[str]]:
+    return {
+        key: serialized
+        for key, serialized in registrar(r, **kwargs).items()
+        if key.key
+        and r.was_modified_from_original(key.key, r.find_by_key(key.key), serialized)
     }
 
 

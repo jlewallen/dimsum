@@ -218,7 +218,7 @@ class Session:
         log.info("saving %s", self.domain.store)
         assert isinstance(self.world, world.World)
         self.world.update_gid(self.registrar.number)
-        await self.domain.store.update(serializing.registrar(self.registrar))
+        await self.domain.store.update(serializing.modified(self.registrar))
 
 
 class Domain:

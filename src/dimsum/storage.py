@@ -125,6 +125,10 @@ class InMemory(EntityStorage):
         self.by_key = {}
         self.by_gid = {}
         self.gid_to_key = {}
+        self.frozen = False
+
+    def freeze(self):
+        self.frozen = True
 
     async def number_of_entities(self) -> int:
         return len(self.by_key)
@@ -137,6 +141,7 @@ class InMemory(EntityStorage):
 
     async def update(self, updates: Dict[Keys, Optional[str]]):
         for keys, data in updates.items():
+            assert not self.frozen
             if data:
                 log.debug("updating %s", keys.key)
                 self.by_key[keys.key] = data
