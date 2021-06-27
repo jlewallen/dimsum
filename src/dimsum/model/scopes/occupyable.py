@@ -39,6 +39,7 @@ class Occupyable(entity.Scope):
         self.occupied.append(living)
         with living.make(Occupying) as occupying:
             occupying.area = self.ourselves
+            self.ourselves.touch()
         return living
 
     def occupying(self, living: entity.Entity) -> bool:

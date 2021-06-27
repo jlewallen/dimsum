@@ -233,11 +233,13 @@ class Entity:
 
     def destroy(self) -> None:
         self.props.destroyed = self.identity
+        self.touch()
 
     def freeze(self, identity: crypto.Identity) -> bool:
         if self.props.frozen:
             raise EntityFrozen()
         self.props.frozen = identity
+        self.touch()
         return True
 
     def unfreeze(self, identity: crypto.Identity) -> bool:
@@ -246,6 +248,7 @@ class Entity:
         if self.props.frozen.public != identity.public:
             return False
         self.props.frozen = None
+        self.touch()
         return True
 
     def describe(self) -> str:

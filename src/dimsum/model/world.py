@@ -75,7 +75,9 @@ class World(entity.Entity):
 
     def update_gid(self, gid: int):
         with self.make(Identifiers) as ids:
-            ids.gid = gid
+            if ids.gid != gid:
+                ids.gid = gid
+                self.touch()
 
     def welcome_area(self) -> entity.Entity:
         with self.make(Welcoming) as welcoming:
@@ -83,11 +85,14 @@ class World(entity.Entity):
 
     def change_welcome_area(self, area: entity.Entity):
         with self.make(Welcoming) as welcoming:
-            welcoming.area = area
+            if welcoming.area != area:
+                welcoming.area = area
+                self.touch()
 
     def remember(self, e: entity.Entity):
         with self.make(Remembering) as remembering:
             remembering.entities.append(e)
+            self.touch()
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
         if entity.has(occupyable.Occupyable):

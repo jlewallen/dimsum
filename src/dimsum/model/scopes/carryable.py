@@ -262,6 +262,8 @@ class Containing(Openable):
         return self.add_item(item, **kwargs)
 
     def add_item(self, item: entity.Entity, **kwargs) -> entity.Entity:
+        self.ourselves.touch()
+
         for already in self.holding:
             # log.info("adding %s already = %s", item.kind, already.kind)
             # log.info("adding %s already = %s", item, already)
@@ -276,8 +278,10 @@ class Containing(Openable):
                         return already
 
         self.holding.append(item)
+
         with item.make(Location) as location:
             location.container = self.ourselves
+            item.touch()
         return item
 
     def drop_all(self) -> List[entity.Entity]:
