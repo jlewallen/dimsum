@@ -242,6 +242,7 @@ class Containing(Openable):
 
     def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:
         self.holding.remove(e)
+        self.ourselves.touch()
         with e.make(Location) as location:
             location.container = None
         return e
@@ -339,6 +340,7 @@ class Containing(Openable):
     def drop(self, e: entity.Entity) -> List[entity.Entity]:
         if e in self.holding:
             self.holding.remove(e)
+            self.ourselves.touch()
             with e.make(Location) as location:
                 location.container = None
             return [e]
