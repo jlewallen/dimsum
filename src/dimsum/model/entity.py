@@ -105,14 +105,17 @@ class UnknownClass(EntityClass):
 
 
 class Version:
-    def __init__(self, i: int = 0, o: int = -1):
+    def __init__(self, i: int, o: int):
         super().__init__()
         self.i = i
-        self.o = i if o < 0 else o
+        self.o = i
 
     def increase(self):
         if self.i == self.o:
             self.i += 1
+
+    def constructed(self) -> "Version":
+        return Version(self.i, self.o)
 
     @property
     def modified(self):
@@ -138,7 +141,7 @@ class Entity:
         **kwargs
     ):
         super().__init__()
-        self.version = version if version else Version()
+        self.version = version.constructed() if version else Version(0, -1)
         # It's important to just assign these and avoid testing for
         # None, as we may have a None target EntityProxy that needs to
         # be linked up later, and in that case we need to keep the
@@ -186,8 +189,8 @@ class Entity:
                         )
 
         log.debug(
-            "entity:ctor {0} '{1}' creator={2} id={3} props={4}".format(
-                self.key, self.props.name, creator, id(self), self.props
+            "entity:ctor {0} {1} '{2}' creator={3} id={4} props={5}".format(
+                self.key, self.version, self.props.name, creator, id(self), self.props
             )
         )
 
@@ -357,7 +360,9 @@ class Registrar:
     def get_diff_if_available(self, key: str, serialized: str):
         if key in self.originals:
             original = self.originals[key]
-            return jsondiff.diff(json.loads(original), json.loads(serialized))
+            return jsondiff.diff(
+                json.loads(original), json.loads(serialized), marshal=True
+            )
         return None
 
     def was_modified_from_original(
@@ -372,7 +377,9 @@ class Registrar:
                 log.warning(
                     "%s: untouched save %s",
                     key,
-                    jsondiff.diff(json.loads(original), json.loads(serialized)),
+                    jsondiff.diff(
+                        json.loads(original), json.loads(serialized), marshal=True
+                    ),
                 )
         return True
 
