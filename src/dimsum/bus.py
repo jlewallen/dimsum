@@ -1,5 +1,8 @@
 from typing import Union, Any
+
 import logging
+import inspect
+import model.events as events
 
 log = logging.getLogger("dimsum")
 
@@ -10,14 +13,20 @@ class EventBus:
         self.handlers = {}
         self.modules = [f(self) for f in handlers] if handlers else []
 
-    async def publish(self, event: Union[Any]):
-        raise NotImplementedError
+    async def publish(self, event: events.Event, **kwargs):
+        assert event
+        log.info("publish:%s", event)
+        await self.invoke_handlers(event)
 
-    def invoke_handlers(self, event: Union[Any]):
-        if type(event) in self.handlers:
-            handlers = self.handlers[type(event)]
+    async def invoke_handler_type(self, klass, event: Union[Any]):
+        if klass in self.handlers:
+            handlers = self.handlers[klass]
             for fn in handlers:
-                fn(**event.kwargs)
+                await fn(event=event, **event.kwargs)
+
+    async def invoke_handlers(self, event: Union[Any]):
+        for t in inspect.getmro(type(event)):
+            await self.invoke_handler_type(t, event)
 
     def handler(self, klass):
         def final_decorator(func, **kwargs):

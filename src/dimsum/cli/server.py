@@ -80,8 +80,8 @@ async def server(
         schema, context_value=schema_factory.context(cfg), debug=True
     )
 
-    def create_ssh_session(username: str = None):
-        return interactive.Interactive(cfg, username)
+    def create_ssh_session(**kwargs):
+        return interactive.Interactive(cfg, **kwargs)
 
     if False:
         with proxy.start(

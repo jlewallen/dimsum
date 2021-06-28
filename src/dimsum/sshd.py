@@ -1,7 +1,8 @@
-from typing import Any, List, Union, TextIO
+from typing import Any, List, Union, TextIO, Dict
 
 import asyncio
 import asyncssh
+import dataclasses
 import time
 import crypt
 import sys
@@ -14,12 +15,13 @@ import rich.segment
 import rich.live
 import rich.table
 
+import visual
 
 log = logging.getLogger("dimsum.sshd")
 
 
 class CommandHandler:
-    async def handle(self, line: str, back: TextIO):
+    async def handle(self, line: str):
         raise NotImplementedError
 
 
@@ -44,15 +46,29 @@ class WriteEmptyEnd:
         return self.writer.write(data, end="")
 
 
-class ShellSession:
-    others: List["ShellSession"] = []
-
-    def __init__(self, process, handler_factory):
+class ShellSession(visual.Comms):
+    def __init__(self, connected: Dict[str, "ShellSession"], process, handler_factory):
         super().__init__()
+        self.connected = connected
         self.process = process
         self.username = process.get_extra_info("username")
-        self.handler = handler_factory(self.username)
+        self.handler = handler_factory(username=self.username, comms=self)
         assert self.handler
+
+    async def user(self, r: visual.Renderable) -> bool:
+        self.write(str(r.render_string()))
+        return True
+
+    async def somebody(self, key: str, r: visual.Renderable) -> bool:
+        if key in self.connected:
+            self.connected[key].user(r)
+            return True
+        return False
+
+    async def everybody(self, r: visual.Renderable) -> bool:
+        for key, other in self.connected.items():
+            other.user(r)
+        return True
 
     async def iteration(self):
         command = await self.read_command()
@@ -64,7 +80,7 @@ class ShellSession:
             return True
 
         try:
-            await self.handler.handle(command, WriteEmptyEnd(self))
+            await self.handler.handle(command)
         except:
             log.exception("error", exc_info=True)
 
@@ -99,7 +115,7 @@ class ShellSession:
 
         log.info("%s: connected" % (self.username))
 
-        self.others.append(self)
+        self.connected[self.username] = self
 
         try:
             self.print("\n", end="")
@@ -110,7 +126,7 @@ class ShellSession:
                         self.process.stdout.write("%s=%s\n" % (key, value))
 
             self.print("Welcome to the party, %s!" % (self.username,))
-            self.print("%d other users are connected." % len(self.others))
+            self.print("%d other users are connected." % len(self.connected))
             self.print("\n", end="")
 
             self.write_everyone_else("*** %s has joined" % self.username)
@@ -124,7 +140,7 @@ class ShellSession:
 
             self.write_everyone_else("*** %s has left" % self.username)
         finally:
-            self.others.remove(self)
+            del self.connected[self.username]
             self.process.exit(0)
 
     def prompt(self) -> str:
@@ -139,7 +155,7 @@ class ShellSession:
         return None
 
     def write_everyone_else(self, msg: str):
-        for other in self.others:
+        for username, other in self.connected.items():
             if other != self:
                 other.control(
                     rich.control.Control(
@@ -187,8 +203,10 @@ async def start_server(port: int, handler_factory):
     def create_server():
         return Server()
 
+    connected: Dict[str, ShellSession] = {}
+
     async def handle_process(process):
-        await ShellSession(process, handler_factory).run()
+        await ShellSession(connected, process, handler_factory).run()
 
     await asyncssh.create_server(
         create_server,

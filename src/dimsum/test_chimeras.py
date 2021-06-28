@@ -12,11 +12,6 @@ import model.domains as domains
 
 import model.scopes.ownership as ownership
 
-import handlers
-import messages
-import luaproxy
-import serializing
-
 import test
 
 

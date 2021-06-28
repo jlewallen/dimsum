@@ -107,7 +107,7 @@ class Dig(PersonAction):
 
         ctx.register(digging)
 
-        return Success("dug and done", created=[area])
+        return Success("dug and done")
 
 
 @grammars.grammar()

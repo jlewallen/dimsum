@@ -5,7 +5,7 @@ from lark import Transformer
 
 import logging
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.grammars")
 
 
 class Grammar:
@@ -22,17 +22,6 @@ class Grammar:
         raise NotImplementedError
 
 
-grammars: List[Grammar] = []
-
-
-def grammar():
-    def wrap(klass):
-        log.info("registered grammar: %s", klass)
-        grammars.append(klass())
-
-    return wrap
-
-
 class ParseMultipleGrammars:
     def __init__(self, grammars):
         self.grammars = grammars
@@ -44,7 +33,7 @@ class ParseMultipleGrammars:
         for parser, grammar in self.parsers:
             try:
                 tree = parser.parse(command)
-                log.info("done %s", tree)
+                log.info("parsed=%s", tree)
                 if tree:
                     return tree, grammar.evaluator
             except exceptions.UnexpectedCharacters:
@@ -52,9 +41,19 @@ class ParseMultipleGrammars:
         raise Exception("unable to parse")
 
 
+grammars: List[Grammar] = []
+
+
+def grammar():
+    def wrap(klass):
+        log.info("registered: %s", klass)
+        grammars.append(klass())
+
+    return wrap
+
+
 def create_parser():
     log.info("create-parser: grammars=%s", grammars)
-
     return ParseMultipleGrammars(sorted(grammars, key=lambda g: g.order))
 
 

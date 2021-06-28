@@ -47,10 +47,10 @@ class Configuration:
     persistence: Persistence
     session_key: str
 
-    def make_domain(self):
+    def make_domain(self, handlers=None):
         store = self.persistence.make_store()
         log.info("store = %s", store)
-        return domains.Domain(store=store)
+        return domains.Domain(store=store, handlers=handlers)
 
 
 class ConfigurationException(Exception):

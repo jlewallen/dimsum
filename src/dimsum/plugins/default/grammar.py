@@ -31,7 +31,6 @@ class DefaultGrammar(grammars.Grammar):
                          | eat | drink
                          | go | climb | walk | run | home
                          | pour | water
-                         | say | tell
                          | remember | forget | think
                          | auth
 
@@ -43,9 +42,6 @@ class DefaultGrammar(grammars.Grammar):
                          | "look" ("in" held)                      -> look_inside
 
         call:              "call" this NAME
-
-        say:               "say" TEXT
-        tell:              "tell" TEXT
 
         give:              "give"
 

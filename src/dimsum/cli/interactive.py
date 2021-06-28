@@ -8,23 +8,33 @@ import model.scopes as scopes
 import model.properties as properties
 import model.world as world
 import model.library as library
+
 import grammars
+import visual
 import config
-import messages
 
 import plugins.all
 import plugins.default
+
+import cli.handlers as handlers
 
 log = logging.getLogger("dimsum.cli")
 
 
 class Interactive(sshd.CommandHandler):
-    def __init__(self, cfg: config.Configuration, username: str = None):
+    def __init__(
+        self,
+        cfg: config.Configuration,
+        username: str = None,
+        comms: visual.Comms = None,
+    ):
         super().__init__()
+        assert comms
         self.cfg = cfg
-        self.domain = cfg.make_domain()
-        self.username = username
         self.l = grammars.create_parser()
+        self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
+        self.username = username
+        self.comms = comms
 
     async def create_player_if_necessary(self, session: domains.Session):
         world = await session.prepare()
@@ -49,7 +59,7 @@ class Interactive(sshd.CommandHandler):
         assert session.world
         return session.world, player
 
-    async def handle(self, line: str, back: TextIO):
+    async def handle(self, line: str):
         log.info("handle: %s '%s'", self.username, line)
 
         with self.domain.session() as session:
@@ -59,28 +69,11 @@ class Interactive(sshd.CommandHandler):
             action = tree_eval.transform(tree)
             reply = await session.perform(action, player)
 
-            log.info("reply: %s", reply)
+            log.debug("reply: %s", reply)
 
-            visitor = messages.ReplyVisitor()
-            visual = reply.accept(visitor)
-            log.info(
-                "%s" % (visual),
-            )
-
-            back.write("\n")
-
-            if "title" in visual:
-                back.write(visual["title"])
-                back.write("\n")
-
-            if "text" in visual:
-                back.write(visual["text"])
-                back.write("\n")
-
-            if "description" in visual:
-                back.write("\n")
-                back.write(visual["description"])
-
-            back.write("\n")
+            if isinstance(reply, visual.Renderable):
+                await self.comms.user(reply)
+            else:
+                log.warning("unrenderable reply")
 
             await session.save()

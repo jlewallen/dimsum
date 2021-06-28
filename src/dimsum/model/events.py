@@ -1,6 +1,7 @@
 from typing import Any
-import logging
 
+import logging
+import enum
 
 log = logging.getLogger("dimsum.model")
 
@@ -9,15 +10,6 @@ class Event:
     def __init__(self, **kwargs):
         super().__init__()
         self.kwargs = kwargs
-
-    async def accept(self, visitor: Any):
-        if not hasattr(visitor, self.name):
-            log.warning("handler-missing: %s", self.name)
-            return None
-
-        fn = getattr(visitor, self.name)
-        log.debug("handler-invoke: %s", self.name)
-        return await fn(**self.kwargs)
 
     @property
     def name(self):
@@ -28,6 +20,20 @@ class Event:
 
     def __repr__(self):
         return str(self)
+
+
+class Audience(enum.Enum):
+    NONE = 1
+    DIRECT = 2
+    NEARBY = 3
+    SURROUNDINGS = 4
+    EVERYONE = 5
+
+
+class StandardEvent(Event):
+    @property
+    def audience(self) -> Audience:
+        return Audience.NEARBY
 
 
 class PlayerJoined(Event):
