@@ -10,6 +10,8 @@ import proxy
 import ariadne.asgi
 import uvicorn
 
+from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
+
 import config
 import schema as schema_factory
 import sshd
@@ -77,7 +79,10 @@ async def server(
         )
     schema = schema_factory.create()
     app = ariadne.asgi.GraphQL(
-        schema, context_value=schema_factory.context(cfg), debug=True
+        schema,
+        context_value=schema_factory.context(cfg),
+        debug=True,
+        extensions=[ApolloTracingExtension],
     )
 
     def create_ssh_session(**kwargs):

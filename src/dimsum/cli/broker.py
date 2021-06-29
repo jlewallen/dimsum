@@ -214,7 +214,7 @@ async def broker():
                 )
             )
 
-        if True:
+        if False:
             time.sleep(1)
             pp.remove("proc-1")
 
