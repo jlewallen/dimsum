@@ -22,6 +22,7 @@ class Auth(entity.Scope):
             base64.b64encode(salt).decode("utf-8"),
             base64.b64encode(key).decode("utf-8"),
         ]
+        self.ourselves.touch()
         log.info("%s: password changed %s", self.ourselves.key, self.ourselves)
 
     def try_password(self, password: str, **kwargs):

@@ -70,6 +70,8 @@ class Health(entity.Scope):
                     pockets.drop(edible)  # type: ignore
                 # TODO Holding chimera
                 eating.ourselves.destroy()  # type:ignore
+            self.ourselves.touch()
+            edible.touch()
 
         if drink:
             await ctx.publish(ItemDrank(animal=self, area=area, item=edible))

@@ -88,21 +88,30 @@ class Visibility(entity.Scope):
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):
+        if self.visible.hidden:
+            self.ourselves.touch()
         self.visible.hidden = False
 
     def make_invisible(self):
+        if not self.visible.hidden:
+            self.ourselves.touch()
         self.visible.hidden = True
 
     def can_see(self, identity: crypto.Identity) -> bool:
         return self.visible.can_see(identity)
 
     def make_easy_to_see(self):
+        if self.visible.hard_to_see:
+            self.ourselves.touch()
         self.visible.hard_to_see = False
 
     def make_hard_to_see(self):
+        if not self.visible.hard_to_see:
+            self.ourselves.touch()
         self.visible.hard_to_see = True
 
     def add_observation(self, identity: crypto.Identity):
+        self.ourselves.touch()
         return self.visible.add_observation(identity)
 
     @property

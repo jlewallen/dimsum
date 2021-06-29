@@ -833,6 +833,8 @@ class CallThis(PersonAction):
         ctx.register(recipe)
         with person.make(mechanics.Memory) as brain:
             brain.memorize("r:" + self.name, recipe)
+        person.touch()
+
         return Success(
             "cool, you'll be able to make another %s easier now" % (self.name,)
         )
@@ -932,7 +934,9 @@ class ModifyField(PersonAction):
                 i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
+
         item.touch()
+
         return Success("done")
 
 
@@ -964,6 +968,7 @@ class ModifyActivity(PersonAction):
         with item.make(mechanics.Interactable) as inaction:
             inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
+        item.touch()
         return Success("done")
 
 
@@ -986,9 +991,14 @@ class ModifyServings(PersonAction):
         item = await world.apply_item_finder(person, self.item)
         if not item:
             return Failure("nothing to modify")
+
         item.try_modify()
+
         with item.make(health.Edible) as edible:
             edible.modify_servings(self.number)
+
+        item.touch()
+
         return Success("done")
 
 
@@ -1110,8 +1120,11 @@ class ModifyPours(PersonAction):
         log.info("modifying %s to produce %s", item, self.produces)
 
         item.try_modify()
+
         with item.make(carryable.Containing) as produces:
             produces.produces_when(PourVerb, PourProducer(template=self.produces))
+
+        item.touch()
 
         return Success("done")
 

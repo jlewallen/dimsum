@@ -42,6 +42,7 @@ class Lockable(entity.Scope):
 
             self.pattern = crypto.generate_identity()
             self.locked = True
+            self.ourselves.touch()
 
             patterns = {}
             patterns[self.pattern.public] = self.pattern
@@ -61,6 +62,7 @@ class Lockable(entity.Scope):
                 return False
 
         self.locked = True
+        self.ourselves.touch()
 
         return key
 
@@ -77,6 +79,7 @@ class Lockable(entity.Scope):
                 return False
 
         self.locked = False
+        self.ourselves.touch()
 
         log.info("unlcoked")
 
@@ -135,11 +138,13 @@ class Openable(Lockable):
             return False
         log.info("openable:opening")
         self.openable = self.openable.open()
+        self.ourselves.touch()
         return True
 
     def close(self, **kwargs):
         if self.openable.is_open():
             self.openable = self.openable.close()
+            self.ourselves.touch()
             return True
         return False
 
@@ -177,6 +182,7 @@ class Carryable(entity.Scope):
         assert ctx
 
         self.decrease_quantity(quantity)
+        self.ourselves.touch()
 
         item = context.get().create_item(
             props=self.ourselves.props.clone(),
@@ -230,6 +236,7 @@ class Containing(Openable):
         log.info("opening %s", self)
         self.open()
         log.info("opening %s", self.is_open())
+        self.ourselves.touch()
         return True
 
     def can_hold(self) -> bool:
@@ -263,8 +270,6 @@ class Containing(Openable):
         return self.add_item(item, **kwargs)
 
     def add_item(self, item: entity.Entity, **kwargs) -> entity.Entity:
-        self.ourselves.touch()
-
         for already in self.holding:
             # log.info("adding %s already = %s", item.kind, already.kind)
             # log.info("adding %s already = %s", item, already)
@@ -273,11 +278,14 @@ class Containing(Openable):
                     if additional.kind.same(coming.kind):
                         additional.quantity += coming.quantity
 
+                        already.touch()
+
                         # We return, which skips the append to holding below,
                         # and that has the effect of obliterating the item we
                         # picked up, merging with the one in our hands.
                         return already
 
+        self.ourselves.touch()
         self.holding.append(item)
 
         with item.make(Location) as location:
@@ -291,6 +299,7 @@ class Containing(Openable):
             item = self.holding[0]
             self.drop(item)
             dropped.append(item)
+        self.ourselves.touch()
         return dropped
 
     def is_holding(self, item: entity.Entity):
@@ -321,6 +330,7 @@ class Containing(Openable):
                 if dropping.quantity == 0:
                     context.get().unregister(item)
                     self.drop(item)
+                    self.ourselves.touch()
         else:
             if item:
                 dropped = self.drop(item)
@@ -343,6 +353,7 @@ class Containing(Openable):
             self.ourselves.touch()
             with e.make(Location) as location:
                 location.container = None
+            e.touch()
             return [e]
         return []
 
