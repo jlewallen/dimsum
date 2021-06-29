@@ -14,6 +14,7 @@ from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
 import config
 import schema as schema_factory
+import bus
 import sshd
 
 import cli.interactive as interactive
@@ -85,8 +86,10 @@ async def server(
         extensions=[ApolloTracingExtension],
     )
 
+    subscriptions = bus.SubscriptionManager()
+
     def create_ssh_session(**kwargs):
-        return interactive.Interactive(cfg, **kwargs)
+        return interactive.Interactive(cfg, subscriptions=subscriptions, **kwargs)
 
     if False:
         with proxy.start(

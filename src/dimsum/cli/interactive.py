@@ -1,4 +1,4 @@
-from typing import TextIO
+from typing import TextIO, Any
 
 import logging
 import sshd
@@ -9,9 +9,10 @@ import model.properties as properties
 import model.world as world
 import model.library as library
 
-import grammars
+import bus
 import visual
 import config
+import grammars
 
 import plugins.all
 import plugins.default
@@ -26,15 +27,22 @@ class Interactive(sshd.CommandHandler):
         self,
         cfg: config.Configuration,
         username: str = None,
+        subscriptions: bus.SubscriptionManager = None,
         comms: visual.Comms = None,
     ):
         super().__init__()
         assert comms
+        assert subscriptions
         self.cfg = cfg
         self.l = grammars.create_parser()
         self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
         self.username = username
         self.comms = comms
+        assert self.username
+        self.subscription = subscriptions.subscribe(self.username, self.write)
+
+    async def write(self, item: Any, **kwargs):
+        log.info("send-user: %s %s", self.username, item)
 
     async def create_player_if_necessary(self, session: domains.Session):
         world = await session.prepare()
@@ -77,3 +85,6 @@ class Interactive(sshd.CommandHandler):
                 log.warning("unrenderable reply")
 
             await session.save()
+
+    async def finished(self):
+        self.subscription.remove()

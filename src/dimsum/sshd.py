@@ -87,15 +87,18 @@ class ShellSession(visual.Comms):
         return True
 
     async def repl(self):
-        while True:
-            try:
-                safe = await self.iteration()
-                if not safe:
-                    break
-            except asyncssh.TerminalSizeChanged as exc:
-                log.info("%s: terminal size changed %s" % (self.username, str(exc)))
-                self.recreate_console()
-                self.write("\n", end="")
+        try:
+            while True:
+                try:
+                    safe = await self.iteration()
+                    if not safe:
+                        break
+                except asyncssh.TerminalSizeChanged as exc:
+                    log.info("%s: terminal size changed %s" % (self.username, str(exc)))
+                    self.recreate_console()
+                    self.write("\n", end="")
+        finally:
+            await self.handler.finished()
 
     def recreate_console(self):
         term_type = self.process.get_terminal_type()
