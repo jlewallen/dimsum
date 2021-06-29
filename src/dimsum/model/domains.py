@@ -329,6 +329,7 @@ class WorldCtx(context.Ctx):
                     for action in actions:
                         await self.session.perform(action, person=self.person)
                         log.info("performing: %s", action)
+                entity.touch()
 
     def create_item(
         self, quantity: float = None, initialize=None, **kwargs

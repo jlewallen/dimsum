@@ -220,6 +220,7 @@ class Entity:
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
             self.props.related[name] = kinds.Kind()
+            self.touch()
         return self.props.related[name]
 
     def touch(self) -> None:
