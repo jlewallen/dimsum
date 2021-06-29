@@ -22,6 +22,8 @@ cryptography==3.4.7
 discord==1.0.1
 discord.py==1.7.3
 freezegun==1.1.0
+gitdb==4.0.7
+GitPython==3.1.18
 gql==3.0.0a6
 graphql-core==3.1.5
 graphql-relay==2.0.1
@@ -68,6 +70,7 @@ rich==10.4.0
 Rx==1.6.1
 shortuuid==1.0.1
 six==1.16.0
+smmap==4.0.0
 sniffio==1.2.0
 starlette==0.14.2
 toml==0.10.2
