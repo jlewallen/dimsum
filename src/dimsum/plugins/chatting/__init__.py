@@ -87,7 +87,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(Evaluator):
+class Evaluator(BaseEvaluator):
     def say(self, args):
         return Say(str(args[0]))
 

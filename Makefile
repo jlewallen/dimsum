@@ -6,7 +6,7 @@ uvicorn:
 	uvicorn --app-dir src/dimsum --log-config `pwd`/logging.json --reload --factory dimsum:app
 
 checks: env
-	env/bin/mypy src/dimsum/*.py --ignore-missing-imports
+	env/bin/mypy src/dimsum --ignore-missing-imports
 
 clean:
 	rm -rf env

@@ -2,7 +2,8 @@ import dataclasses
 
 
 class Action:
-    pass
+    def __init__(self, **kwargs):
+        super().__init__()
 
 
 class Reply:

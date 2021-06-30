@@ -26,8 +26,9 @@ import grammars
 import serializing
 import luaproxy
 
-import plugins.all
 import plugins.default.actions as actions
+
+import everything
 
 log = logging.getLogger("dimsum.tests")
 

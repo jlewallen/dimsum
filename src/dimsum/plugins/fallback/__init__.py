@@ -30,6 +30,6 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(Evaluator):
+class Evaluator(BaseEvaluator):
     def verb(self, args):
         return Unknown()

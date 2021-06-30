@@ -5,6 +5,7 @@ import model.entity as entity
 import model.world as world
 import model.game as game
 import model.finders as finders
+import model.reply as reply
 
 import context
 
@@ -38,10 +39,10 @@ class Unknown(PersonAction):
         **kwargs
     ):
         log.warning("{0} performed".format(self))
-        return Failure("sorry, i don't understand")
+        return reply.Failure("sorry, i don't understand")
 
 
-class Evaluator(lark.Transformer):
+class BaseEvaluator(lark.Transformer):
     def __init__(self, world: world.World, player: entity.Entity):
         self.world = world
         self.player = player

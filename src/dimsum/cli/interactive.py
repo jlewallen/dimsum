@@ -14,10 +14,11 @@ import bus
 import config
 import grammars
 
-import plugins.all
 import plugins.default
 
 import cli.handlers as handlers
+
+import everything
 
 log = logging.getLogger("dimsum.cli")
 

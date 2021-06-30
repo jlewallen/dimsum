@@ -24,7 +24,7 @@ log = logging.getLogger("dimsum")
 
 class SimpleVerb(PersonAction):
     def __init__(self, who=None, item: ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.who = who
         self.item = item if item else finders.FindNone()
 
@@ -186,7 +186,7 @@ class Hit(SimpleVerb):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self) -> Type[Evaluator]:
+    def evaluator(self) -> Type[BaseEvaluator]:
         return Evaluator
 
     @property
@@ -207,7 +207,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(Evaluator):
+class Evaluator(BaseEvaluator):
     def plant(self, args):
         return actions.Plant(item=args[0])
 

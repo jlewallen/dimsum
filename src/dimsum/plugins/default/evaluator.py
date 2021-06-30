@@ -13,7 +13,7 @@ import plugins.actions
 log = logging.getLogger("dimsum")
 
 
-class Evaluator(plugins.actions.Evaluator):
+class Evaluator(plugins.actions.BaseEvaluator):
     # Item lookup
 
     def make_quantified(self, args):

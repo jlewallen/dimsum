@@ -62,7 +62,7 @@ class DigLinkage:
 
 class Dig(PersonAction):
     def __init__(self, linkage: DigLinkage = None, area_name: str = None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         assert linkage
         assert area_name
         self.linkage = linkage
@@ -129,7 +129,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(Evaluator):
+class Evaluator(BaseEvaluator):
     def dig(self, args):
         return Dig(args[0], args[1])
 
