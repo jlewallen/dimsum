@@ -70,7 +70,7 @@ class Grammar(grammars.Grammar):
         return """
         start:             say | tell
 
-        say:               "say" TEXT
+        say:               ("say" | "\\"") TEXT
         tell:              "tell" noun TEXT
 """
 
