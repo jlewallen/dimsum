@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Dict
 
 import abc
 import logging
@@ -34,6 +34,24 @@ class Occupying(entity.Scope):
         self.ourselves.touch()
 
 
+@dataclasses.dataclass
+class LivingEnteredArea(events.StandardEvent):
+    living: entity.Entity
+    area: entity.Entity
+
+    def render_string(self) -> Dict[str, str]:
+        return {"text": f"{self.living.props.name} arrived from {self.area}"}
+
+
+@dataclasses.dataclass
+class LivingLeftArea(events.StandardEvent):
+    living: entity.Entity
+    area: entity.Entity
+
+    def render_string(self) -> Dict[str, str]:
+        return {"text": f"{self.living.props.name} went to {self.area}"}
+
+
 class Occupyable(entity.Scope):
     def __init__(self, occupied=None, **kwargs):
         super().__init__(**kwargs)
@@ -53,25 +71,15 @@ class Occupyable(entity.Scope):
 
     async def entered(self, player: entity.Entity):
         assert player not in self.occupied
-        self.add_living(player)
         await context.get().publish(
-            LivingEnteredArea(living=player, area=self.ourselves)
+            LivingEnteredArea(living=player, area=self.ourselves, heard=self.occupied)
         )
+        self.add_living(player)
 
     async def left(self, player: entity.Entity):
         assert player in self.occupied
         self.occupied.remove(player)
         self.ourselves.touch()
-        await context.get().publish(LivingLeftArea(living=player, area=self.ourselves))
-
-
-@dataclasses.dataclass
-class LivingEnteredArea(events.Event):
-    living: entity.Entity
-    area: entity.Entity
-
-
-@dataclasses.dataclass
-class LivingLeftArea(events.Event):
-    living: entity.Entity
-    area: entity.Entity
+        await context.get().publish(
+            LivingLeftArea(living=player, area=self.ourselves, heard=self.occupied)
+        )
