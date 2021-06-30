@@ -45,7 +45,6 @@ class Interactive(sshd.CommandHandler):
         self.subscription = subscriptions.subscribe(self.username, self.write)
 
     async def write(self, item: visual.Renderable, **kwargs):
-        log.debug("send-user: %s %s", self.username, item)
         self.channel.write("\n" + str(item.render_string()) + "\n\n")
 
     async def create_player_if_necessary(self, session: domains.Session):
@@ -86,7 +85,7 @@ class Interactive(sshd.CommandHandler):
             if isinstance(reply, visual.Renderable):
                 await self.write(reply)
             else:
-                log.warning("unrenderable reply")
+                await self.write(visual.String(str(reply)))
 
             await session.save()
 

@@ -54,6 +54,14 @@ class EntityProxy(wrapt.ObjectProxy):
     def __deepcopy__(self, memo):
         return copy.deepcopy(self.__wrapped__, memo)
 
+    def __repr__(self) -> str:
+        assert self.__wrapped__
+        return str(self.__wrapped__)
+
+    def __str__(self) -> str:
+        assert self.__wrapped__
+        return str(self.__wrapped__)
+
 
 class IgnoreExtraConstructorArguments:
     """

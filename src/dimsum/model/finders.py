@@ -8,6 +8,7 @@ import model.things as things
 import model.world as world
 
 import model.scopes.carryable as carryable
+import model.scopes.occupyable as occupyable
 import model.scopes.mechanics as mechanics
 import model.scopes.apparel as apparel
 
@@ -75,6 +76,14 @@ class AnyItem(things.ItemFinder):
         with area.make_and_discard(carryable.Containing) as ground:
             item = await context.get().find_item(
                 candidates=ground.holding, q=self.q, **kwargs
+            )
+            if item:
+                return item
+
+        log.info("%s finding occupyable", self)
+        with area.make_and_discard(occupyable.Occupyable) as here:
+            item = await context.get().find_item(
+                candidates=here.occupied, q=self.q, **kwargs
             )
             if item:
                 return item

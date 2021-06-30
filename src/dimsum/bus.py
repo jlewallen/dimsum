@@ -76,7 +76,7 @@ class EventBus:
         if klass in self.handlers:
             handlers = self.handlers[klass]
             for fn in handlers:
-                await fn(event=event, **event.kwargs)
+                await fn(event=event)
 
     async def invoke_handlers(self, event: Union[Any]):
         for t in inspect.getmro(type(event)):
@@ -90,3 +90,12 @@ class EventBus:
             self.handlers[klass].append(func)
 
         return final_decorator
+
+
+class TextRendering:
+    def __init__(self, bus: EventBus, comms: visual.Comms):
+        super().__init__()
+        self.install(bus, comms)
+
+    def install(self, bus: EventBus, comms: visual.Comms):
+        pass

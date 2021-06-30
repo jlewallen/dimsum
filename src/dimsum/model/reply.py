@@ -35,8 +35,8 @@ class Success(SimpleReply):
 class Failure(SimpleReply):
     def __str__(self):
         if self.message:
-            return "Success<%s>" % (self.message,)
-        return "Success"
+            return "Failure<%s>" % (self.message,)
+        return "Failure"
 
 
 class Observation(game.Reply, visual.Renderable):

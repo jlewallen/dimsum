@@ -18,32 +18,15 @@ import model.scopes.health as health
 log = logging.getLogger("dimsum.handlers")
 
 
-class EventHandlers:
-    def __init__(self, bus: bus.EventBus, comms: visual.Comms):
-        self.comms = comms
-
-        @bus.handler(Event)
-        async def handle_plain_event(event, **kwargs):
-            log.debug("event: %s %s", event, kwargs)
-
-        @bus.handler(PlayerJoined)
-        async def handle_player_joined(player: entity.Entity = None, **kwargs):
-            log.info("player joined handler: %s %s", player, kwargs)
-
+class EventHandlers(bus.TextRendering):
+    def install(self, bus: bus.EventBus, comms: visual.Comms):
         @bus.handler(StandardEvent)
-        async def handle_standard_event(
-            person: entity.Entity = None,
-            heard: List[entity.Entity] = None,
-            event: StandardEvent = None,
-            **kwargs
-        ):
+        async def handle_standard_event(event: StandardEvent = None, **kwargs):
             assert event
-            log.info(
-                "%s: person=%s heard=%s kwargs=%s", type(event), person, heard, kwargs
-            )
-            if heard:
-                for nearby in heard:
-                    await self.comms.somebody(nearby.key, event)
+            log.info("%s: event=%s kwargs=%s", type(event), event, kwargs)
+            if event.heard:
+                for nearby in event.heard:
+                    await comms.somebody(nearby.key, event)
 
 
 def create(comms: visual.Comms):

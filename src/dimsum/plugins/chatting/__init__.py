@@ -8,9 +8,11 @@ import model.scopes.occupyable as occupyable
 import grammars
 
 from model.entity import *
-from model.events import *
 from model.world import *
+from model.events import *
+from model.things import *
 from model.reply import *
+from model.finders import *
 
 from plugins.actions import *
 from context import *
@@ -18,14 +20,17 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
+@dataclasses.dataclass
 class PlayerSpoke(StandardEvent):
-    pass
+    message: str
+
+    def render_string(self) -> Dict[str, str]:
+        return {"text": f"{self.living.props.name} said '{self.message}'"}
 
 
-class PlayerTold(StandardEvent):
-    @property
-    def audience(self) -> Audience:
-        return Audience.DIRECT
+class PlayerTold(PlayerSpoke):
+    def render_string(self) -> Dict[str, str]:
+        return {"text": f"{self.living.props.name} whispered '{self.message}'"}
 
 
 class Say(PersonAction):
@@ -40,23 +45,30 @@ class Say(PersonAction):
         with area.make_and_discard(occupyable.Occupyable) as here:
             await ctx.publish(
                 PlayerSpoke(
-                    message=self.message, person=person, area=area, heard=here.occupied
+                    living=person, area=area, heard=here.occupied, message=self.message
                 )
             )
         return Success()
 
 
 class Tell(PersonAction):
-    def __init__(self, message: str = None, **kwargs):
+    def __init__(self, who: ItemFinder = None, message: str = None, **kwargs):
         super().__init__(**kwargs)
+        assert who
         assert message
+        self.who = who
         self.message = message
 
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        await ctx.publish(PlayerTold(person=person, area=area))
-        return Success("told")
+        who = await world.apply_item_finder(person, self.who)
+        if who:
+            await ctx.publish(
+                PlayerTold(living=person, area=area, heard=[who], message=self.message)
+            )
+            return Success("told")
+        return Failure("who?")
 
 
 @grammars.grammar()

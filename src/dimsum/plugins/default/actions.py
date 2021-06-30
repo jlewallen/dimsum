@@ -64,6 +64,11 @@ class Home(PersonAction):
         )
 
 
+@dataclasses.dataclass
+class ItemsAppeared(StandardEvent):
+    items: List[entity.Entity]
+
+
 class AddItemArea(PersonAction):
     def __init__(self, item=None, area=None, **kwargs):
         super().__init__(**kwargs)
@@ -86,9 +91,21 @@ class AddItemArea(PersonAction):
             # this keeps us from having to unregister the item.
             ctx.register(after_add)
 
-        await ctx.publish(ItemsAppeared(area=self.area, items=[self.item]))
+        await ctx.publish(
+            ItemsAppeared(living=person, area=self.area, heard=[], items=[self.item])
+        )
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
+
+
+@dataclasses.dataclass
+class ItemsDropped(StandardEvent):
+    items: List[entity.Entity]
+
+
+@dataclasses.dataclass
+class ItemsMade(StandardEvent):
+    items: List[entity.Entity]
 
 
 class Make(PersonAction):
@@ -129,7 +146,9 @@ class Make(PersonAction):
             ctx.register(after_hold)
 
         area = world.find_person_area(person)
-        await ctx.publish(ItemsMade(person=person, area=area, items=[after_hold]))
+        await ctx.publish(
+            ItemsMade(living=person, area=area, heard=[], items=[after_hold])
+        )
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
 
@@ -259,6 +278,11 @@ class Drink(PersonAction):
         return Success("you drank %s" % (item))
 
 
+@dataclasses.dataclass
+class PlayerJoined(StandardEvent):
+    pass
+
+
 class Join(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -272,12 +296,11 @@ class Join(PersonAction):
         **kwargs
     ):
         ctx.register(person)
-        await ctx.publish(PlayerJoined(person=person))
-        await ctx.hook("entered:before")
         with world.welcome_area().make(occupyable.Occupyable) as entering:
-            log.info("welcome area: %s", world.welcome_area())
+            await ctx.publish(
+                PlayerJoined(living=person, area=entering.ourselves, heard=[])
+            )
             await entering.entered(person)
-        await ctx.hook("entered:after")
         return Success("welcome!")
 
 
@@ -420,12 +443,22 @@ class Drop(PersonAction):
             if dropped:
                 area = world.find_person_area(person)
                 await ctx.publish(
-                    ItemsDropped(person=person, area=area, dropped=dropped)
+                    ItemsDropped(living=person, area=area, heard=[], items=dropped)
                 )
                 await ctx.extend(dropped=dropped).hook("drop:after")
                 return Success("you dropped %s" % (p.join(dropped),))
 
             return Failure(failure)
+
+
+@dataclasses.dataclass
+class ItemHeld(StandardEvent):
+    items: List[entity.Entity]
+
+
+@dataclasses.dataclass
+class ItemObliterated(StandardEvent):
+    items: List[entity.Entity]
 
 
 class Hold(PersonAction):
@@ -469,8 +502,9 @@ class Hold(PersonAction):
                 after_hold = pockets.hold(item)
                 if after_hold != item and item:
                     ctx.unregister(item)
-                await ctx.publish(ItemHeld(person=person, area=area, hold=[after_hold]))
-                await ctx.extend(hold=[after_hold]).hook("hold:after")
+                await ctx.publish(
+                    ItemHeld(living=person, area=area, heard=[], items=[after_hold])
+                )
                 return Success("you picked up %s" % (after_hold,), item=after_hold)
 
 
@@ -783,7 +817,10 @@ class Obliterate(PersonAction):
 
         for item in items:
             ctx.unregister(item)
-            await ctx.publish(ItemObliterated(person=person, area=area, item=item))
+
+        await ctx.publish(
+            ItemObliterated(living=person, area=area, heard=[], items=items)
+        )
 
         await ctx.extend(obliterate=items).hook("obliterate:after")
 
@@ -1127,10 +1164,6 @@ class ModifyPours(PersonAction):
         item.touch()
 
         return Success("done")
-
-
-class ItemsAppeared(Event):
-    pass
 
 
 class Freeze(PersonAction):
