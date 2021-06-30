@@ -15,8 +15,6 @@ import rich.segment
 import rich.live
 import rich.table
 
-import visual
-
 log = logging.getLogger("dimsum.sshd")
 
 
@@ -46,29 +44,16 @@ class WriteEmptyEnd:
         return self.writer.write(data, end="")
 
 
-class ShellSession(visual.Comms):
+class ShellSession:
     def __init__(self, connected: Dict[str, "ShellSession"], process, handler_factory):
         super().__init__()
         self.connected = connected
         self.process = process
         self.username = process.get_extra_info("username")
-        self.handler = handler_factory(username=self.username, comms=self)
+        self.handler = handler_factory(
+            username=self.username, channel=WriteEmptyEnd(self)
+        )
         assert self.handler
-
-    async def user(self, r: visual.Renderable) -> bool:
-        self.write(str(r.render_string()))
-        return True
-
-    async def somebody(self, key: str, r: visual.Renderable) -> bool:
-        if key in self.connected:
-            self.connected[key].user(r)
-            return True
-        return False
-
-    async def everybody(self, r: visual.Renderable) -> bool:
-        for key, other in self.connected.items():
-            other.user(r)
-        return True
 
     async def iteration(self):
         command = await self.read_command()

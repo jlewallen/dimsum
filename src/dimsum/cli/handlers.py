@@ -8,13 +8,12 @@ import bus
 import context
 
 import model.entity as entity
+import model.visual as visual
+
+from model.events import *
 
 import model.scopes.movement as movement
 import model.scopes.health as health
-
-import visual
-
-from model.events import *
 
 log = logging.getLogger("dimsum.handlers")
 
@@ -38,12 +37,13 @@ class EventHandlers:
             event: StandardEvent = None,
             **kwargs
         ):
+            assert event
             log.info(
                 "%s: person=%s heard=%s kwargs=%s", type(event), person, heard, kwargs
             )
             if heard:
                 for nearby in heard:
-                    pass
+                    await self.comms.somebody(nearby.key, event)
 
 
 def create(comms: visual.Comms):

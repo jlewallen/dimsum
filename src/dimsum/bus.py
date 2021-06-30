@@ -2,7 +2,9 @@ from typing import Dict, Union, Any, Callable
 
 import logging
 import inspect
+
 import model.events as events
+import model.visual as visual
 
 log = logging.getLogger("dimsum")
 
@@ -16,14 +18,14 @@ class Subscription:
         self.path_key = path_key
         self.handler_fn = handler_fn
 
-    async def write(self, item: Any):
+    async def write(self, item: visual.Renderable):
         await self.handler_fn(item)
 
     def remove(self):
         self.manager.remove(self)
 
 
-class SubscriptionManager:
+class SubscriptionManager(visual.Comms):
     def __init__(self):
         super().__init__()
         self.by_key: Dict[str, List[Subscription]] = {}
@@ -43,6 +45,20 @@ class SubscriptionManager:
             return True
         else:
             return False
+
+    async def somebody(self, key: str, r: visual.Renderable) -> bool:
+        if key in self.by_key:
+            # TODO Parallel
+            for subscription in self.by_key[key]:
+                await subscription.write(r)
+            return True
+        return False
+
+    async def everybody(self, r: visual.Renderable) -> bool:
+        # TODO Parallel
+        for key, other in self.by_key.items():
+            await other.write(r)
+        return True
 
 
 class EventBus:

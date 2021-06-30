@@ -20,9 +20,6 @@ class String(Renderable):
 
 
 class Comms:
-    async def user(self, r: Renderable) -> bool:
-        raise NotImplementedError
-
     async def somebody(self, key: str, r: Renderable) -> bool:
         raise NotImplementedError
 
@@ -31,10 +28,6 @@ class Comms:
 
 
 class NoopComms(Comms):
-    async def user(self, r: Renderable) -> bool:
-        log.info("noop-comms: user")
-        return True
-
     async def somebody(self, key: str, r: Renderable) -> bool:
         log.info("noop-comms: somebody=%s", key)
         return True

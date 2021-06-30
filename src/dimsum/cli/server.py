@@ -89,7 +89,9 @@ async def server(
     subscriptions = bus.SubscriptionManager()
 
     def create_ssh_session(**kwargs):
-        return interactive.Interactive(cfg, subscriptions=subscriptions, **kwargs)
+        return interactive.Interactive(
+            cfg, subscriptions=subscriptions, comms=subscriptions, **kwargs
+        )
 
     if False:
         with proxy.start(

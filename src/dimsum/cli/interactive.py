@@ -8,9 +8,9 @@ import model.scopes as scopes
 import model.properties as properties
 import model.world as world
 import model.library as library
+import model.visual as visual
 
 import bus
-import visual
 import config
 import grammars
 
@@ -29,20 +29,24 @@ class Interactive(sshd.CommandHandler):
         username: str = None,
         subscriptions: bus.SubscriptionManager = None,
         comms: visual.Comms = None,
+        channel: TextIO = None,
     ):
         super().__init__()
-        assert comms
+        assert username
         assert subscriptions
+        assert comms
+        assert channel
         self.cfg = cfg
         self.l = grammars.create_parser()
         self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
         self.username = username
         self.comms = comms
-        assert self.username
+        self.channel = channel
         self.subscription = subscriptions.subscribe(self.username, self.write)
 
-    async def write(self, item: Any, **kwargs):
-        log.info("send-user: %s %s", self.username, item)
+    async def write(self, item: visual.Renderable, **kwargs):
+        log.debug("send-user: %s %s", self.username, item)
+        self.channel.write("\n" + str(item.render_string()) + "\n\n")
 
     async def create_player_if_necessary(self, session: domains.Session):
         world = await session.prepare()
@@ -80,7 +84,7 @@ class Interactive(sshd.CommandHandler):
             log.debug("reply: %s", reply)
 
             if isinstance(reply, visual.Renderable):
-                await self.comms.user(reply)
+                await self.write(reply)
             else:
                 log.warning("unrenderable reply")
 

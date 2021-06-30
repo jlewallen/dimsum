@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Dict
 
 import logging
 import enum
+
+import model.visual as visual
 
 log = logging.getLogger("dimsum.model")
 
@@ -30,10 +32,13 @@ class Audience(enum.Enum):
     EVERYONE = 5
 
 
-class StandardEvent(Event):
+class StandardEvent(Event, visual.Renderable):
     @property
     def audience(self) -> Audience:
         return Audience.NEARBY
+
+    def render_string(self) -> Dict[str, str]:
+        return {"standard": str(self)}
 
 
 class PlayerJoined(Event):

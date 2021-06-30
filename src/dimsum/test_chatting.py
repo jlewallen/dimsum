@@ -7,12 +7,12 @@ import model.game as game
 import model.things as things
 import model.world as world
 import model.reply as reply
+import model.visual as visual
 
 import serializing
 
 import cli.handlers as handlers
 
-import visual
 import test
 
 log = logging.getLogger("dimsum")
