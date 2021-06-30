@@ -334,12 +334,14 @@ async def test_graphql_delete(snapshot):
         await session.prepare()
         await session.save()
 
-    serialized = serializing.serialize(
-        world.World(), identities=serializing.Identities.PRIVATE
-    )
+        session.world.destroy()
+
+        serialized = serializing.serialize(
+            session.world, identities=serializing.Identities.PRIVATE
+        )
 
     data = {
-        "variables": {"entities": [{"key": world.Key}]},
+        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {

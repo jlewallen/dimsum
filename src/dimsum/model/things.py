@@ -88,9 +88,11 @@ class Recipe(entity.Scope, ItemFactory):
             kwargs,
             initialize,
         )
+        # TODO Clone
         updated = copy.deepcopy(self.template.__dict__)
         updated.update(
             key=None,
+            version=None,
             identity=None,
             props=self.template.props.clone(),
             initialize=initialize,

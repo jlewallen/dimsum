@@ -860,11 +860,14 @@ class CallThis(PersonAction):
             kind=item.make(carryable.Carryable).kind,
         )
         with recipe.make(Recipe) as makes:
+            # TODO Clone
             updated = copy.deepcopy(template.__dict__)
-            updated.update(key=None, identity=None, props=template.props.clone())
-            log.info("updated = %s", updated)
+            updated.update(
+                key=None, identity=None, version=None, props=template.props.clone()
+            )
             cloned = scopes.item(**updated)
             makes.template = cloned
+            log.info("registering template: %s", cloned.key)
             ctx.register(cloned)
 
         ctx.register(recipe)

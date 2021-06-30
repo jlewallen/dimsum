@@ -18,6 +18,7 @@ import storage
 import serializing
 import dimsum
 
+import model.properties as properties
 import model.entity as entity
 import model.world as world
 
@@ -95,18 +96,32 @@ async def test_storage_update_nothing(server, silence_aihttp):
 
 @pytest.mark.asyncio
 async def test_storage_update_one_entity(server, silence_aihttp):
-    serialized = serializing.serialize(world.World())
+    w = entity.Entity(props=properties.Common(name="Fake Entity"))
+    serialized = serializing.serialize(w)
     store = storage.HttpStorage("http://127.0.0.1:45600")
-    serialized = await store.update({entity.Keys("world", 0): serialized})
+    key = shortuuid.uuid()
+    serialized = await store.update({entity.Keys(key): serialized})
+    assert serialized == 1
+
+    w.version.increase()
+    serialized = serializing.serialize(w)
+
+    serialized = await store.update({entity.Keys(key): serialized})
     assert serialized == 1
 
 
 @pytest.mark.asyncio
 async def test_storage_delete_one_entity(server, silence_aihttp):
-    serialized = serializing.serialize(world.World())
+    w = entity.Entity(props=properties.Common(name="Fake Entity"))
+    serialized = serializing.serialize(w)
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid()
-    serialized = await store.update({entity.Keys(key, 0): serialized})
+    serialized = await store.update({entity.Keys(key): serialized})
     assert serialized == 1
-    serialized = await store.update({entity.Keys(key, None): None})
+
+    w.version.increase()
+    w.destroy()
+    serialized = serializing.serialize(w)
+
+    serialized = await store.update({entity.Keys(key): serialized})
     assert serialized == 1

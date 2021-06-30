@@ -6,6 +6,7 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import logging
 import dataclasses
 import sqlite3
+import json
 
 import model.entity as entity
 
@@ -112,70 +113,6 @@ class Separated(EntityStorage):
         return "Separated<read={0}, write={1}>".format(self.read, self.write)
 
 
-class InMemory(EntityStorage):
-    def __init__(self):
-        super().__init__()
-        log.info("%s constructed!", self)
-        self.by_key: Dict[str, str] = {}
-        self.by_gid: Dict[int, str] = {}
-        self.gid_to_key: Dict[int, str] = {}
-        self.frozen = False
-
-    def freeze(self):
-        self.frozen = True
-
-    async def number_of_entities(self) -> int:
-        return len(self.by_key)
-
-    async def purge(self):
-        log.info("%s purge!", self)
-        self.by_key = {}
-        self.by_gid = {}
-        self.gid_to_key = {}
-
-    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
-        for keys, update in updates.items():
-            assert not self.frozen
-            assert update
-            if update.serialized is None:
-                if keys.key in self.by_key:
-                    log.debug("deleting %s", keys.key)
-                    del self.by_key[keys.key]
-                else:
-                    log.warning("delete:noop %s", keys.key)
-
-                if keys.gid in self.by_gid:
-                    del self.by_gid[keys.gid]
-                    del self.gid_to_key[keys.gid]
-            else:
-                log.info("updating %s", keys)
-                assert keys.key is not None
-                self.by_key[keys.key] = update.serialized
-                if keys.gid is not None:
-                    self.by_gid[keys.gid] = update.serialized
-                    self.gid_to_key[keys.gid] = keys.key
-
-    async def load_by_gid(self, gid: int):
-        if gid in self.by_gid:
-            key = self.gid_to_key[gid]
-            return [entity.Serialized(key, self.by_gid[gid])]
-        return []
-
-    async def load_by_key(self, key: str):
-        if key in self.by_key:
-            return [entity.Serialized(key, self.by_key[key])]
-        return []
-
-    async def write(self, stream: TextIO):
-        stream.write("[\n")
-        prefix = ""
-        for key, item in self.by_key.items():
-            stream.write(prefix)
-            stream.write(item)
-            prefix = ","
-        stream.write("]\n")
-
-
 class SqliteStorage(EntityStorage):
     def __init__(self, path: str):
         super().__init__()
@@ -183,6 +120,7 @@ class SqliteStorage(EntityStorage):
         self.db: Optional[sqlite3.Connection] = None
         self.dbc: Optional[sqlite3.Cursor] = None
         self.saves = 0
+        self.frozen = False
 
     async def open_if_necessary(self):
         if self.db:
@@ -190,7 +128,7 @@ class SqliteStorage(EntityStorage):
         self.db = sqlite3.connect(self.path)
         self.dbc = self.db.cursor()
         self.dbc.execute(
-            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, gid INTEGER, serialized TEXT NOT NULL)"
+            "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, version INTEGER NOT NULL, gid INTEGER, serialized TEXT NOT NULL)"
         )
         self.db.commit()
 
@@ -246,22 +184,53 @@ class SqliteStorage(EntityStorage):
 
         self.dbc = self.db.cursor()
         for keys, update in updates.items():
-            if update.serialized:
+            assert not self.frozen
+            fields = StorageFields.parse(update.serialized)
+            if fields.destroyed:
+                log.info(
+                    "deleting %s version=%d original=%d",
+                    fields.key,
+                    fields.version,
+                    fields.original,
+                )
                 self.dbc.execute(
-                    "INSERT INTO entities (key, gid, serialized) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET gid = EXCLUDED.gid, serialized = EXCLUDED.serialized",
-                    [
-                        keys.key,
-                        keys.gid,
-                        update.serialized,
-                    ],
+                    "DELETE FROM entities WHERE key = ? AND version = ?",
+                    [keys.key, fields.original],
                 )
             else:
-                self.dbc.execute(
-                    "DELETE FROM entities WHERE key = ?",
-                    [
-                        keys.key,
-                    ],
-                )
+                if fields.original == 0:
+                    log.info(
+                        "inserting %s version=%d original=%d",
+                        fields.key,
+                        fields.version,
+                        fields.original,
+                    )
+                    self.dbc.execute(
+                        "INSERT INTO entities (key, gid, version, serialized) VALUES (?, ?, ?, ?) ",
+                        [
+                            fields.key,
+                            fields.gid,
+                            fields.version,
+                            fields.serialized,
+                        ],
+                    )
+                else:
+                    log.info(
+                        "updating %s version=%d original=%d",
+                        fields.key,
+                        fields.version,
+                        fields.original,
+                    )
+                    self.dbc.execute(
+                        "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
+                        [
+                            fields.version,
+                            fields.gid,
+                            fields.serialized,
+                            fields.key,
+                            fields.original,
+                        ],
+                    )
         self.db.commit()
 
     async def load_by_gid(self, gid: int):
@@ -279,6 +248,9 @@ class SqliteStorage(EntityStorage):
         if len(loaded) == 1:
             return loaded
         return []
+
+    def freeze(self):
+        self.frozen = True
 
     def __repr__(self):
         return "Sqlite<%s>" % (self.path,)
@@ -352,3 +324,31 @@ class HttpStorage(EntityStorage):
 
     def __str__(self):
         return "Http<%s>" % (self.url,)
+
+
+@dataclasses.dataclass
+class StorageFields:
+    parsed: Dict[str, Any]
+    key: str
+    gid: int
+    version: int
+    original: int
+    destroyed: bool
+    serialized: str
+
+    @staticmethod
+    def parse(serialized: str):
+        parsed = json.loads(serialized)  # TODO Parsing JSON
+        try:
+            key = parsed["key"]
+            gid = parsed["props"]["map"]["gid"]["value"]
+            original = parsed["version"]["i"]
+            version = original + 1
+            parsed["version"]["i"] += 1
+            destroyed = parsed["props"]["map"]["destroyed"]["value"] is not None
+            reserialized = json.dumps(parsed)
+            return StorageFields(
+                parsed, key, gid, version, original, destroyed, reserialized
+            )
+        except KeyError:
+            raise Exception("malformed entity: {0}".format(serialized))

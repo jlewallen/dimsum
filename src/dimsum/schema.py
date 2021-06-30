@@ -286,9 +286,7 @@ async def update(obj, info, entities):
     log.info("ariadne:update entities=%d", len(entities))
 
     diffs = {
-        entity.Keys(row["key"], None): entity.EntityUpdate(
-            row["serialized"] if "serialized" in row else None
-        )
+        entity.Keys(row["key"]): entity.EntityUpdate(row["serialized"])
         for row in entities
     }
 

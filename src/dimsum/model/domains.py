@@ -236,7 +236,7 @@ class Domain:
         self, store: storage.EntityStorage = None, handlers: List[Any] = None, **kwargs
     ):
         super().__init__()
-        self.store = store if store else storage.InMemory()
+        self.store = store if store else storage.SqliteStorage(":memory:")
         self.context_factory = luaproxy.context_factory
         self.handlers = handlers or []
 

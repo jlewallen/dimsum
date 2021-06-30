@@ -131,7 +131,7 @@ class World(entity.Entity):
             log.info("found: nada")
         return found
 
-    # NOTE Removing these causes a very strange modified during
+    # TODO Removing these causes a very strange modified during
     # iteration dict error. Would be worth seeing why!
     def __str__(self):
         return "$world"

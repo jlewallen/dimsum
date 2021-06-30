@@ -26,14 +26,14 @@ class Serialized:
 
 
 @dataclasses.dataclass(frozen=True)
-class Keys:
-    key: str
-    gid: Optional[int]
+class EntityUpdate:
+    serialized: str
+    entity: Optional["Entity"] = None
 
 
 @dataclasses.dataclass(frozen=True)
-class EntityUpdate:
-    serialized: Optional[str]
+class Keys:
+    key: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -126,14 +126,16 @@ class UnknownClass(EntityClass):
 class Version:
     def __init__(self, i: int):
         super().__init__()
-        self.i = i or 0
+        self.i = i
         self.dirty = False
 
-    def increase(self):
+    def touch(self):
         if self.dirty:
             return
-        self.i += 1
         self.dirty = True
+
+    def increase(self):
+        self.i += 1
 
     @property
     def modified(self):
@@ -240,7 +242,7 @@ class Entity:
 
     def touch(self) -> None:
         self.props[properties.Touched] = time.time()
-        self.version.increase()
+        self.version.touch()
 
     @property
     def modified(self) -> bool:

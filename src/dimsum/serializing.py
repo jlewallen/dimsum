@@ -287,19 +287,19 @@ async def materialize(
     return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
-def entity_update(e: entity.Entity, serialized: Optional[str]) -> entity.EntityUpdate:
+def entity_update(
+    instance: entity.Entity, serialized: Optional[str]
+) -> entity.EntityUpdate:
     assert serialized
-    if e.props.destroyed:
-        log.info("destroyed: %s", e)
-        return entity.EntityUpdate(None)
-    return entity.EntityUpdate(serialized)
+    assert instance
+    return entity.EntityUpdate(serialized, instance)
 
 
 def registrar(
     registrar: entity.Registrar, modified: bool = False, **kwargs
 ) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
-        entity.Keys(key=e.key, gid=e.props.gid): entity_update(
+        entity.Keys(key=e.key): entity_update(
             e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
         for key, e in registrar.entities.items()
@@ -320,7 +320,7 @@ def for_update(
     entities: List[entity.Entity], **kwargs
 ) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
-        entity.Keys(key=e.key, gid=e.props.gid): entity_update(
+        entity.Keys(key=e.key): entity_update(
             e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
         for e in entities

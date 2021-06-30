@@ -14,7 +14,7 @@ log = logging.getLogger("dimsum")
 
 @pytest.mark.asyncio
 async def test_storage_materialize_world():
-    store = storage.InMemory()
+    store = storage.SqliteStorage(":memory:")
     domain = domains.Domain(storage=store)
     with domain.session() as session:
         assert not await serializing.materialize(
@@ -28,7 +28,7 @@ async def test_storage_materialize_world():
 
 @pytest.mark.asyncio
 async def test_storage_materialize_reference():
-    store = storage.InMemory()
+    store = storage.SqliteStorage(":memory:")
     domain = domains.Domain(store=store)
 
     with domain.session() as session:
@@ -47,7 +47,7 @@ async def test_storage_materialize_reference():
 
 @pytest.mark.asyncio
 async def test_storage_only_save_modified_super_simple():
-    store = storage.InMemory()
+    store = storage.SqliteStorage(":memory:")
     domain = domains.Domain(store=store)
 
     with domain.session() as session:
