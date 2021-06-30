@@ -60,7 +60,9 @@ async def query(config: str, database: str):
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 
-    sys.stdout.write(serializing.serialize(actual, indent=True))
+    s = serializing.serialize(actual, indent=True)
+    if s:
+        sys.stdout.write(s)
 
 
 def make_error(message: str):

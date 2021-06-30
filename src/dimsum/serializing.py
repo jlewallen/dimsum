@@ -139,13 +139,14 @@ classes = {k: derive_from(k) for k in allowed}
 inverted = {v: k for k, v in classes.items()}
 
 
-def serialize_full(value, depth=0):
+def internal_prepare(value, depth=0):
     if isinstance(value, list):
-        value = [serialize_full(item, depth=depth + 1) for item in value]
+        value = [internal_prepare(item, depth=depth + 1) for item in value]
 
     if isinstance(value, dict):
         value = {
-            key: serialize_full(value, depth=depth + 1) for key, value in value.items()
+            key: internal_prepare(value, depth=depth + 1)
+            for key, value in value.items()
         }
 
     if value.__class__ in classes:
@@ -160,11 +161,11 @@ def serialize_full(value, depth=0):
 
 def serialize(
     value, indent=None, unpicklable=True, identities=Identities.PUBLIC, full=True
-):
+) -> Optional[str]:
     if value is None:
         return value
 
-    prepared = serialize_full(value) if full else value
+    prepared = internal_prepare(value) if full else value
 
     return jsonpickle.encode(
         prepared,
@@ -286,16 +287,14 @@ async def materialize(
     return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
-def maybe_destroyed(e: entity.Entity) -> Optional[entity.Entity]:
+def maybe_destroyed(e: entity.Entity):
     if e.props.destroyed:
         log.info("destroyed: %s", e)
         return None
     return e
 
 
-def registrar(
-    registrar: entity.Registrar, modified: bool = False, **kwargs
-) -> Dict[storage.Keys, Optional[str]]:
+def registrar(registrar: entity.Registrar, modified: bool = False, **kwargs):
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
             maybe_destroyed(entity), identities=Identities.PRIVATE, **kwargs
@@ -305,7 +304,7 @@ def registrar(
     }
 
 
-def modified(r: entity.Registrar, **kwargs) -> Dict[storage.Keys, Optional[str]]:
+def modified(r: entity.Registrar, **kwargs):
     return {
         key: serialized
         for key, serialized in registrar(r, modified=False, **kwargs).items()
@@ -314,7 +313,7 @@ def modified(r: entity.Registrar, **kwargs) -> Dict[storage.Keys, Optional[str]]
     }
 
 
-def for_update(entities: List[entity.Entity], **kwargs) -> Dict[storage.Keys, str]:
+def for_update(entities: List[entity.Entity], **kwargs):
     return {
         storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
             entity, identities=Identities.PRIVATE, **kwargs

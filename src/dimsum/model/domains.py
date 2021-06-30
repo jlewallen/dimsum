@@ -1,4 +1,4 @@
-from typing import Optional, List, Sequence, Dict, Union, Any
+from typing import Optional, List, Sequence, Dict, Union, Any, Literal, Callable
 
 import logging
 import time
@@ -25,11 +25,11 @@ log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
 
 
-def infinite_reach(entity, depth):
+def infinite_reach(entity: entity.Entity, depth: int):
     return 0
 
 
-def default_reach(entity, depth):
+def default_reach(entity: entity.Entity, depth: int):
     if depth == 3:
         return -1
     if entity.klass == scopes.AreaClass:
@@ -39,19 +39,30 @@ def default_reach(entity, depth):
 
 class Session:
     def __init__(
-        self, store: storage.EntityStorage = None, context_factory=None, handlers=None
+        self,
+        store: storage.EntityStorage = None,
+        context_factory: Callable = None,
+        handlers: List[Any] = None,
     ):
         super().__init__()
-        self.store = store
-        self.context_factory = context_factory
+        assert store
+        assert context_factory
+        self.store: storage.EntityStorage = store
+        self.context_factory: Callable = context_factory
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
 
-    def __enter__(self):
+    async def save(self) -> None:
+        log.info("saving %s", self.store)
+        assert isinstance(self.world, world.World)
+        self.world.update_gid(self.registrar.number)
+        await self.store.update(serializing.modified(self.registrar))
+
+    def __enter__(self) -> "Session":
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, traceback) -> Literal[False]:
         # TODO Warn on unsaved changes?
         return False
 
@@ -217,12 +228,6 @@ class Session:
             await self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
-
-    async def save(self):
-        log.info("saving %s", self.store)
-        assert isinstance(self.world, world.World)
-        self.world.update_gid(self.registrar.number)
-        await self.store.update(serializing.modified(self.registrar))
 
 
 class Domain:

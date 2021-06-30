@@ -20,11 +20,16 @@ class Keys:
     gid: Optional[int]
 
 
+@dataclasses.dataclass(frozen=True)
+class EntityUpdate:
+    serialized: Optional[str]
+
+
 class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def update(self, updates: Dict[Keys, Optional[str]]):
+    async def update(self, updates: Dict[Keys, EntityUpdate]):
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -42,7 +47,7 @@ class All(EntityStorage):
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
 
-    async def update(self, diffs: Dict[Keys, Optional[str]]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         for child in self.children:
             await child.update(diffs)
 
@@ -74,7 +79,7 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def update(self, diffs: Dict[Keys, Optional[str]]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         for child in self.children:
             return await child.update(diffs)
 
@@ -105,7 +110,7 @@ class Separated(EntityStorage):
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
 
-    async def update(self, diffs: Dict[Keys, Optional[str]]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         return await self.write.update(diffs)
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -139,7 +144,7 @@ class InMemory(EntityStorage):
         self.by_gid = {}
         self.gid_to_key = {}
 
-    async def update(self, updates: Dict[Keys, Optional[str]]):
+    async def update(self, updates: Dict[Keys, EntityUpdate]):
         for keys, data in updates.items():
             assert not self.frozen
             if data:
@@ -241,7 +246,7 @@ class SqliteStorage(EntityStorage):
         self.dbc.execute("DELETE FROM entities")
         self.db.commit()
 
-    async def update(self, updates: Dict[Keys, Optional[str]]):
+    async def update(self, updates: Dict[Keys, EntityUpdate]):
         await self.open_if_necessary()
         assert self.db
 
@@ -306,7 +311,7 @@ class HttpStorage(EntityStorage):
             response = await session.execute(query)
             return response["size"]
 
-    async def update(self, updates: Dict[Keys, Optional[str]]):
+    async def update(self, updates: Dict[Keys, EntityUpdate]):
         async with self.session() as session:
             query = gql(
                 """

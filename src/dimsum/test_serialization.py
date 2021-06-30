@@ -373,7 +373,7 @@ def add_item(container: entity.Entity, item: entity.Entity):
         contain.add_item(item)
 
 
-def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, str]:
+def serialize_all(registrar: entity.Registrar, **kwargs) -> Dict[str, Optional[str]]:
     return {
         key: serializing.serialize(
             entity, identities=serializing.Identities.PRIVATE, **kwargs

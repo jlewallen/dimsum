@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import asyncio
 import logging
@@ -136,7 +136,7 @@ class TestWorld:
                 ground.add_item(item)
         return item
 
-    def dumps(self, item) -> str:
+    def dumps(self, item) -> Optional[str]:
         return serializing.serialize(item, indent=4)
 
     async def execute(self, command: str, person=None, **kwargs):
