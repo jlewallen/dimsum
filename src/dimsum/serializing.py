@@ -23,6 +23,16 @@ class Identities(enum.Enum):
     HIDDEN = 3
 
 
+@jsonpickle.handlers.register(entity.Version, base=True)
+class VersionHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        return entity.Version(i=obj["i"])
+
+    def flatten(self, obj, data):
+        data["i"] = obj.i
+        return data
+
+
 @jsonpickle.handlers.register(crypto.Identity, base=True)
 class IdentityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):

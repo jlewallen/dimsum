@@ -113,24 +113,20 @@ class UnknownClass(EntityClass):
 
 
 class Version:
-    def __init__(self, i: int, o: int):
+    def __init__(self, i: int):
         super().__init__()
-        self.i = i
-        self.o = i
+        self.i = i or 0
+        self.dirty = False
 
     def increase(self):
-        if self.i == self.o:
-            self.i += 1
-
-    def constructed(self) -> "Version":
-        return Version(self.i, self.o)
+        self.dirty = True
 
     @property
     def modified(self):
-        return self.o != self.i
+        return self.dirty
 
     def __str__(self):
-        return "Version<{0} {1}>".format(self.i, self.o)
+        return "Version<{0}>".format(self.i)
 
 
 class Entity:
@@ -149,7 +145,7 @@ class Entity:
         **kwargs
     ):
         super().__init__()
-        self.version = version.constructed() if version else Version(0, -1)
+        self.version = version if version else Version(0)
         # It's important to just assign these and avoid testing for
         # None, as we may have a None target EntityProxy that needs to
         # be linked up later, and in that case we need to keep the
@@ -209,9 +205,6 @@ class Entity:
         if RootEntityClass == self.klass:
             pass
         else:
-            if self.creator is None:
-                log.info("type %s", type(self.creator))
-                log.info("no-creator: %s %s", self, self.key)
             assert self.creator
 
     def registered(self, gid: int) -> int:
