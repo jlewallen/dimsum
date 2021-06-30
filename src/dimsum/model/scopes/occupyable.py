@@ -1,12 +1,14 @@
 from typing import List, Any
 
 import abc
-import bus
 import logging
+import dataclasses
 
 import model.events as events
 import model.entity as entity
+
 import context
+import bus
 
 """
 One thing I've considered is to use this as a place for a way to
@@ -52,18 +54,24 @@ class Occupyable(entity.Scope):
     async def entered(self, player: entity.Entity):
         assert player not in self.occupied
         self.add_living(player)
-        await context.get().publish(LivingEnteredArea(living=player, area=self))
+        await context.get().publish(
+            LivingEnteredArea(living=player, area=self.ourselves)
+        )
 
     async def left(self, player: entity.Entity):
         assert player in self.occupied
         self.occupied.remove(player)
         self.ourselves.touch()
-        await context.get().publish(LivingLeftArea(living=player, area=self))
+        await context.get().publish(LivingLeftArea(living=player, area=self.ourselves))
 
 
+@dataclasses.dataclass
 class LivingEnteredArea(events.Event):
-    pass
+    living: entity.Entity
+    area: entity.Entity
 
 
+@dataclasses.dataclass
 class LivingLeftArea(events.Event):
-    pass
+    living: entity.Entity
+    area: entity.Entity

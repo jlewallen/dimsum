@@ -1,10 +1,13 @@
-from typing import List, Sequence, Any
+from typing import List, Sequence, Any, Dict, Optional
+
 import logging
+import dataclasses
 import inflect
 
 import model.entity as entity
 import model.game as game
 import model.things as things
+import model.visual as visual
 
 import model.scopes.movement as movement
 import model.scopes.mechanics as mechanics
@@ -15,15 +18,33 @@ p = inflect.engine()
 log = logging.getLogger("dimsum.model")
 
 
-class Observable:
-    pass
+@dataclasses.dataclass
+class SimpleReply(game.Reply):
+    message: Optional[str] = None
+    item: Optional[entity.Entity] = None
 
 
-class Observation(game.Reply, Observable):
-    pass
+@dataclasses.dataclass
+class Success(SimpleReply):
+    def __str__(self):
+        if self.message:
+            return "Success<%s>" % (self.message,)
+        return "Success"
 
 
-class ObservedEntity(Observable):
+class Failure(SimpleReply):
+    def __str__(self):
+        if self.message:
+            return "Failure<%s>" % (self.message,)
+        return "Failure"
+
+
+class Observation(game.Reply, visual.Renderable):
+    def render_string(self) -> Dict[str, str]:
+        return {"message": "some kind of observation"}
+
+
+class ObservedEntity:
     pass
 
 
@@ -101,7 +122,7 @@ class ObservedPerson(ObservedLiving):
         return self.alive
 
 
-class ObservedEntities(Observable):
+class ObservedEntities:
     def __init__(self, entities: List[entity.Entity]):
         super().__init__()
         self.entities = entities
@@ -221,6 +242,27 @@ class AreaObservation(Observation):
             self.living,
             self.items,
         )
+
+    def render_string(self) -> Dict[str, str]:
+        emd = self.props.desc
+        emd += "\n\n"
+        if len(self.living) > 0:
+            emd += "Also here: " + p.join([str(x) for x in self.living])
+            emd += "\n"
+        if len(self.items) > 0:
+            emd += "You can see " + p.join([str(x) for x in self.items])
+            emd += "\n"
+        if len(self.who.holding) > 0:
+            emd += "You're holding " + p.join([str(x) for x in self.who.holding])
+            emd += "\n"
+        directional = [
+            e for e in self.routes if isinstance(e, movement.DirectionalRoute)
+        ]
+        if len(directional) > 0:
+            directions = [d.direction for d in directional]
+            emd += "You can go " + p.join([str(d) for d in directions])
+            emd += "\n"
+        return {"title": self.props.name, "description": emd}
 
 
 def observe(entity: Any) -> Sequence[ObservedEntity]:

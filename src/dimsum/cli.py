@@ -13,6 +13,7 @@ import cli.graph
 import cli.export
 import cli.query
 import cli.server
+import cli.broker
 import cli.dummy
 
 log = logging.getLogger("dimsum.cli")
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         cli.export.commands,
         cli.query.commands,
         cli.server.commands,
+        cli.broker.commands,
         cli.dummy.commands,
     ]
     for g in sources:

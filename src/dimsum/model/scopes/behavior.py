@@ -194,4 +194,5 @@ class Behaviors(entity.Scope):
     def add_behavior(self, world: entity.Entity, name, **kwargs):
         with world.make(BehaviorCollection) as world_behaviors:
             world_behaviors.entities.append(self.ourselves)
+        self.ourselves.touch()
         return self.behaviors.add(name, **kwargs)

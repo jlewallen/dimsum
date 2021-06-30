@@ -45,7 +45,12 @@ def server():
     proc = Process(
         target=uvicorn.run,
         args=(dimsum.app,),
-        kwargs={"host": "127.0.0.1", "port": 45600, "log_level": "info"},
+        kwargs={
+            "host": "127.0.0.1",
+            "port": 45600,
+            "log_level": "info",
+            "factory": True,
+        },
         daemon=True,
     )
     proc.start()

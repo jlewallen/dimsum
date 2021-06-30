@@ -1,7 +1,8 @@
-from typing import Any, List, Union, TextIO
+from typing import Any, List, Union, TextIO, Dict
 
 import asyncio
 import asyncssh
+import dataclasses
 import time
 import crypt
 import sys
@@ -14,12 +15,11 @@ import rich.segment
 import rich.live
 import rich.table
 
-
 log = logging.getLogger("dimsum.sshd")
 
 
 class CommandHandler:
-    async def handle(self, line: str, back: TextIO):
+    async def handle(self, line: str):
         raise NotImplementedError
 
 
@@ -45,13 +45,14 @@ class WriteEmptyEnd:
 
 
 class ShellSession:
-    others: List["ShellSession"] = []
-
-    def __init__(self, process, handler_factory):
+    def __init__(self, connected: Dict[str, "ShellSession"], process, handler_factory):
         super().__init__()
+        self.connected = connected
         self.process = process
         self.username = process.get_extra_info("username")
-        self.handler = handler_factory(self.username)
+        self.handler = handler_factory(
+            username=self.username, channel=WriteEmptyEnd(self)
+        )
         assert self.handler
 
     async def iteration(self):
@@ -64,22 +65,25 @@ class ShellSession:
             return True
 
         try:
-            await self.handler.handle(command, WriteEmptyEnd(self))
+            await self.handler.handle(command)
         except:
             log.exception("error", exc_info=True)
 
         return True
 
     async def repl(self):
-        while True:
-            try:
-                safe = await self.iteration()
-                if not safe:
-                    break
-            except asyncssh.TerminalSizeChanged as exc:
-                log.info("%s: terminal size changed %s" % (self.username, str(exc)))
-                self.recreate_console()
-                self.write("\n", end="")
+        try:
+            while True:
+                try:
+                    safe = await self.iteration()
+                    if not safe:
+                        break
+                except asyncssh.TerminalSizeChanged as exc:
+                    log.info("%s: terminal size changed %s" % (self.username, str(exc)))
+                    self.recreate_console()
+                    self.write("\n", end="")
+        finally:
+            await self.handler.finished()
 
     def recreate_console(self):
         term_type = self.process.get_terminal_type()
@@ -99,7 +103,7 @@ class ShellSession:
 
         log.info("%s: connected" % (self.username))
 
-        self.others.append(self)
+        self.connected[self.username] = self
 
         try:
             self.print("\n", end="")
@@ -110,7 +114,7 @@ class ShellSession:
                         self.process.stdout.write("%s=%s\n" % (key, value))
 
             self.print("Welcome to the party, %s!" % (self.username,))
-            self.print("%d other users are connected." % len(self.others))
+            self.print("%d other users are connected." % len(self.connected))
             self.print("\n", end="")
 
             self.write_everyone_else("*** %s has joined" % self.username)
@@ -124,7 +128,7 @@ class ShellSession:
 
             self.write_everyone_else("*** %s has left" % self.username)
         finally:
-            self.others.remove(self)
+            del self.connected[self.username]
             self.process.exit(0)
 
     def prompt(self) -> str:
@@ -139,7 +143,7 @@ class ShellSession:
         return None
 
     def write_everyone_else(self, msg: str):
-        for other in self.others:
+        for username, other in self.connected.items():
             if other != self:
                 other.control(
                     rich.control.Control(
@@ -187,8 +191,10 @@ async def start_server(port: int, handler_factory):
     def create_server():
         return Server()
 
+    connected: Dict[str, ShellSession] = {}
+
     async def handle_process(process):
-        await ShellSession(process, handler_factory).run()
+        await ShellSession(connected, process, handler_factory).run()
 
     await asyncssh.create_server(
         create_server,

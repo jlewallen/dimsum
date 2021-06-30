@@ -143,8 +143,6 @@ def serialize_full(value, depth=0):
             "swap class: %s -> %s (%s)", type(value), classes[value.__class__], value
         )
         attrs = copy.copy(value.__dict__)
-        if "hooks" in attrs:
-            del attrs["hooks"]
         klass = classes[value.__class__]
         return klass(**attrs)
     return value

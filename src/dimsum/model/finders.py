@@ -8,6 +8,7 @@ import model.things as things
 import model.world as world
 
 import model.scopes.carryable as carryable
+import model.scopes.occupyable as occupyable
 import model.scopes.mechanics as mechanics
 import model.scopes.apparel as apparel
 
@@ -50,7 +51,7 @@ class AnyItem(things.ItemFinder):
         assert area
 
         log.info("%s finding wearing", self)
-        with person.make(apparel.Apparel) as wearing:
+        with person.make_and_discard(apparel.Apparel) as wearing:
             item = await context.get().find_item(
                 candidates=wearing.wearing, q=self.q, **kwargs
             )
@@ -58,13 +59,13 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding pockets (contained)", self)
-        for item in person.make(carryable.Containing).holding:
+        for item in person.make_and_discard(carryable.Containing).holding:
             for contained in item.make(carryable.Containing).holding:
                 if contained.describes(q=self.q):
                     return contained
 
         log.info("%s finding pockets", self)
-        with person.make(carryable.Containing) as pockets:
+        with person.make_and_discard(carryable.Containing) as pockets:
             item = await context.get().find_item(
                 candidates=pockets.holding, q=self.q, **kwargs
             )
@@ -72,9 +73,17 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding ground", self)
-        with area.make(carryable.Containing) as ground:
+        with area.make_and_discard(carryable.Containing) as ground:
             item = await context.get().find_item(
                 candidates=ground.holding, q=self.q, **kwargs
+            )
+            if item:
+                return item
+
+        log.info("%s finding occupyable", self)
+        with area.make_and_discard(occupyable.Occupyable) as here:
+            item = await context.get().find_item(
+                candidates=here.occupied, q=self.q, **kwargs
             )
             if item:
                 return item

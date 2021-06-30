@@ -1,3 +1,4 @@
+import logging
 import lark
 
 import model.entity as entity
@@ -8,6 +9,8 @@ import model.finders as finders
 import context
 
 import model.scopes.movement as movement
+
+log = logging.getLogger("dimsum.plugins")
 
 
 class PersonAction(game.Action):

@@ -1,6 +1,7 @@
 from typing import Any, cast
 
 import logging
+import dataclasses
 
 import model.entity as entity
 import model.properties as properties
@@ -70,16 +71,24 @@ class Health(entity.Scope):
                     pockets.drop(edible)  # type: ignore
                 # TODO Holding chimera
                 eating.ourselves.destroy()  # type:ignore
+            self.ourselves.touch()
+            edible.touch()
 
         if drink:
-            await ctx.publish(ItemDrank(animal=self, area=area, item=edible))
+            await ctx.publish(ItemDrank(living=self.ourselves, area=area, item=edible))
         else:
-            await ctx.publish(ItemEaten(animal=self, area=area, item=edible))
+            await ctx.publish(ItemEaten(living=self.ourselves, area=area, item=edible))
 
 
+@dataclasses.dataclass
 class ItemEaten(events.Event):
-    pass
+    living: entity.Entity
+    area: entity.Entity
+    item: entity.Entity
 
 
+@dataclasses.dataclass
 class ItemDrank(events.Event):
-    pass
+    living: entity.Entity
+    area: entity.Entity
+    item: entity.Entity

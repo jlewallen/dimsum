@@ -15,8 +15,10 @@ class Apparel(entity.Scope):
 
     def wear(self, item: entity.Entity) -> bool:
         self.wearing.append(item)
+        self.ourselves.touch()
         return True
 
     def unwear(self, item: entity.Entity, **kwargs) -> bool:
         self.wearing.remove(item)
+        self.ourselves.touch()
         return True

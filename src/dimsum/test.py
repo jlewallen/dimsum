@@ -37,9 +37,8 @@ def create_empty_world():
 
 
 class TestWorld:
-    def __init__(self):
-        self.domain = domains.Domain()
-        self.bus = self.domain.bus
+    def __init__(self, handlers=None):
+        self.domain = domains.Domain(handlers=handlers)
         self.l = grammars.create_parser()
         self.carla_key = None
         self.jacob_key = None
@@ -162,7 +161,7 @@ class TestWorld:
             response = await session.perform(action, person)
 
             log.info("response: %s" % (response,))
-            if isinstance(response, game.Failure):
+            if isinstance(response, reply.Failure):
                 log.info("unsaved!")
             else:
                 await session.save()
@@ -172,14 +171,14 @@ class TestWorld:
     async def success(self, *commands: str, **kwargs):
         for command in commands:
             r = await self.execute(command, **kwargs)
-            if not isinstance(r, game.Failure):
+            if not isinstance(r, reply.Failure):
                 return r
             log.error("reply: %s", r)
-            assert not isinstance(r, game.Failure)
+            assert not isinstance(r, reply.Failure)
 
     async def failure(self, command: str, **kwargs):
         r = await self.execute(command, **kwargs)
-        assert isinstance(r, game.Failure)
+        assert isinstance(r, reply.Failure)
         return r
 
 

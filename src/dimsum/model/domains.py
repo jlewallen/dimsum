@@ -1,9 +1,10 @@
-from typing import Optional, List, Sequence, Dict, Union
+from typing import Optional, List, Sequence, Dict, Union, Any
 
 import logging
 import time
 
 import model.game as game
+import model.reply as reply
 import model.entity as entity
 import model.world as world
 
@@ -13,11 +14,10 @@ import model.scopes.occupyable as occupyable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
-import bus
+from bus import EventBus
+
 import context
 import luaproxy
-import messages
-import handlers
 import serializing
 import storage
 
@@ -38,11 +38,15 @@ def default_reach(entity, depth):
 
 
 class Session:
-    def __init__(self, domain: "Domain"):
+    def __init__(
+        self, store: storage.EntityStorage = None, context_factory=None, handlers=None
+    ):
         super().__init__()
-        self.domain = domain
-        self.registrar = entity.Registrar()
+        self.store = store
+        self.context_factory = context_factory
         self.world: Optional[world.World] = None
+        self.bus = EventBus(handlers=handlers or [])
+        self.registrar = entity.Registrar()
 
     def __enter__(self):
         return self
@@ -66,7 +70,7 @@ class Session:
     ) -> Union[Optional[entity.Entity], List[entity.Entity]]:
         materialized = await serializing.materialize(
             registrar=self.registrar,
-            store=self.domain.store,
+            store=self.store,
             key=key,
             gid=gid,
             json=json,
@@ -114,7 +118,7 @@ class Session:
             person=person,
             area=area,
             session=self,
-            context_factory=self.domain.context_factory,
+            context_factory=self.context_factory,
             **kwargs
         ) as ctx:
             try:
@@ -122,7 +126,7 @@ class Session:
                     world=self.world, area=area, person=person, ctx=ctx
                 )
             except entity.EntityFrozen:
-                return game.Failure("whoa, that's frozen")
+                return reply.Failure("whoa, that's frozen")
 
         log.info("-" * 100)
 
@@ -155,7 +159,7 @@ class Session:
                         area=area,
                         entity=entity,
                         session=self,
-                        context_factory=self.domain.context_factory,
+                        context_factory=self.context_factory,
                         **kwargs
                     ) as ctx:
                         await ctx.hook(name)
@@ -215,26 +219,27 @@ class Session:
         log.debug("area-done:%d %s", depth, area.key)
 
     async def save(self):
-        log.info("saving %s", self.domain.store)
+        log.info("saving %s", self.store)
         assert isinstance(self.world, world.World)
         self.world.update_gid(self.registrar.number)
-        await self.domain.store.update(serializing.modified(self.registrar))
+        await self.store.update(serializing.modified(self.registrar))
 
 
 class Domain:
     def __init__(
-        self, bus: bus.EventBus = None, store: storage.EntityStorage = None, **kwargs
+        self, store: storage.EntityStorage = None, handlers: List[Any] = None, **kwargs
     ):
         super().__init__()
-        self.bus = (
-            bus if bus else messages.TextBus(handlers=[handlers.WhateverHandlers])
-        )
         self.store = store if store else storage.InMemory()
         self.context_factory = luaproxy.context_factory
+        self.handlers = handlers or []
 
-    def session(self) -> "Session":
+    def session(self, handlers=None) -> "Session":
         log.info("session:new")
-        return Session(self)
+        combined = (handlers or []) + self.handlers
+        return Session(
+            store=self.store, context_factory=self.context_factory, handlers=combined
+        )
 
     async def reload(self):
         return Domain(empty=True, store=self.store)
@@ -254,10 +259,9 @@ class WorldCtx(context.Ctx):
         self.person = person
         self.se = scripting
         self.session = session
-        self.domain = session.domain
         self.world = session.world
         self.registrar = session.registrar
-        self.bus = session.domain.bus
+        self.bus = session.bus
         self.context_factory = context_factory
         self.scope = behavior.Scope(world=world, person=person, **kwargs)
         assert isinstance(self.world, world.World)
@@ -325,6 +329,7 @@ class WorldCtx(context.Ctx):
                     for action in actions:
                         await self.session.perform(action, person=self.person)
                         log.info("performing: %s", action)
+                entity.touch()
 
     def create_item(
         self, quantity: float = None, initialize=None, **kwargs
