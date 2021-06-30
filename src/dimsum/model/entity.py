@@ -130,6 +130,9 @@ class Version:
         self.dirty = False
 
     def increase(self):
+        if self.dirty:
+            return
+        self.i += 1
         self.dirty = True
 
     @property
