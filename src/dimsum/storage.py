@@ -14,22 +14,11 @@ import storage
 log = logging.getLogger("dimsum.storage")
 
 
-@dataclasses.dataclass(frozen=True)
-class Keys:
-    key: str
-    gid: Optional[int]
-
-
-@dataclasses.dataclass(frozen=True)
-class EntityUpdate:
-    serialized: Optional[str]
-
-
 class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]):
+    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -47,7 +36,7 @@ class All(EntityStorage):
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
         for child in self.children:
             await child.update(diffs)
 
@@ -79,7 +68,7 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
         for child in self.children:
             return await child.update(diffs)
 
@@ -110,7 +99,7 @@ class Separated(EntityStorage):
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
         return await self.write.update(diffs)
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -127,9 +116,9 @@ class InMemory(EntityStorage):
     def __init__(self):
         super().__init__()
         log.info("%s constructed!", self)
-        self.by_key = {}
-        self.by_gid = {}
-        self.gid_to_key = {}
+        self.by_key: Dict[str, str] = {}
+        self.by_gid: Dict[int, str] = {}
+        self.gid_to_key: Dict[int, str] = {}
         self.frozen = False
 
     def freeze(self):
@@ -144,15 +133,11 @@ class InMemory(EntityStorage):
         self.by_gid = {}
         self.gid_to_key = {}
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]):
-        for keys, data in updates.items():
+    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
+        for keys, update in updates.items():
             assert not self.frozen
-            if data:
-                log.debug("updating %s", keys.key)
-                self.by_key[keys.key] = data
-                self.by_gid[keys.gid] = data
-                self.gid_to_key[keys.gid] = keys.key
-            else:
+            assert update
+            if update.serialized is None:
                 if keys.key in self.by_key:
                     log.debug("deleting %s", keys.key)
                     del self.by_key[keys.key]
@@ -162,6 +147,13 @@ class InMemory(EntityStorage):
                 if keys.gid in self.by_gid:
                     del self.by_gid[keys.gid]
                     del self.gid_to_key[keys.gid]
+            else:
+                log.info("updating %s", keys)
+                assert keys.key is not None
+                self.by_key[keys.key] = update.serialized
+                if keys.gid is not None:
+                    self.by_gid[keys.gid] = update.serialized
+                    self.gid_to_key[keys.gid] = keys.key
 
     async def load_by_gid(self, gid: int):
         if gid in self.by_gid:
@@ -246,21 +238,21 @@ class SqliteStorage(EntityStorage):
         self.dbc.execute("DELETE FROM entities")
         self.db.commit()
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]):
+    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
         await self.open_if_necessary()
         assert self.db
 
         log.debug("applying %d updates", len(updates))
 
         self.dbc = self.db.cursor()
-        for keys, data in updates.items():
-            if data:
+        for keys, update in updates.items():
+            if update.serialized:
                 self.dbc.execute(
                     "INSERT INTO entities (key, gid, serialized) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET gid = EXCLUDED.gid, serialized = EXCLUDED.serialized",
                     [
                         keys.key,
                         keys.gid,
-                        data,
+                        update.serialized,
                     ],
                 )
             else:
@@ -311,7 +303,7 @@ class HttpStorage(EntityStorage):
             response = await session.execute(query)
             return response["size"]
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]):
+    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
         async with self.session() as session:
             query = gql(
                 """

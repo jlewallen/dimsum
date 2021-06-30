@@ -57,7 +57,8 @@ class Session:
         log.info("saving %s", self.store)
         assert isinstance(self.world, world.World)
         self.world.update_gid(self.registrar.number)
-        await self.store.update(serializing.modified(self.registrar))
+        modified = serializing.modified(self.registrar)
+        await self.store.update(modified)
 
     def __enter__(self) -> "Session":
         return self

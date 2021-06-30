@@ -9,6 +9,7 @@ import base64
 import starlette.requests
 import jwt
 
+import model.entity as entity
 import model.world as world
 import model.domains as domains
 import model.game as game
@@ -285,9 +286,9 @@ async def update(obj, info, entities):
     log.info("ariadne:update entities=%d", len(entities))
 
     diffs = {
-        storage.Keys(row["key"], None): row["serialized"]
-        if "serialized" in row
-        else None
+        entity.Keys(row["key"], None): entity.EntityUpdate(
+            row["serialized"] if "serialized" in row else None
+        )
         for row in entities
     }
 

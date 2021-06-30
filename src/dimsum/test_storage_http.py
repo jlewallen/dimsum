@@ -18,6 +18,7 @@ import storage
 import serializing
 import dimsum
 
+import model.entity as entity
 import model.world as world
 
 log = logging.getLogger("dimsum")
@@ -96,7 +97,7 @@ async def test_storage_update_nothing(server, silence_aihttp):
 async def test_storage_update_one_entity(server, silence_aihttp):
     serialized = serializing.serialize(world.World())
     store = storage.HttpStorage("http://127.0.0.1:45600")
-    serialized = await store.update({storage.Keys("world", 0): serialized})
+    serialized = await store.update({entity.Keys("world", 0): serialized})
     assert serialized == 1
 
 
@@ -105,7 +106,7 @@ async def test_storage_delete_one_entity(server, silence_aihttp):
     serialized = serializing.serialize(world.World())
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid()
-    serialized = await store.update({storage.Keys(key, 0): serialized})
+    serialized = await store.update({entity.Keys(key, 0): serialized})
     assert serialized == 1
-    serialized = await store.update({storage.Keys(key, None): None})
+    serialized = await store.update({entity.Keys(key, None): None})
     assert serialized == 1

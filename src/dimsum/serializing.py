@@ -287,24 +287,27 @@ async def materialize(
     return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
-def maybe_destroyed(e: entity.Entity):
+def entity_update(e: entity.Entity, serialized: Optional[str]) -> entity.EntityUpdate:
+    assert serialized
     if e.props.destroyed:
         log.info("destroyed: %s", e)
-        return None
-    return e
+        return entity.EntityUpdate(None)
+    return entity.EntityUpdate(serialized)
 
 
-def registrar(registrar: entity.Registrar, modified: bool = False, **kwargs):
+def registrar(
+    registrar: entity.Registrar, modified: bool = False, **kwargs
+) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
-        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
-            maybe_destroyed(entity), identities=Identities.PRIVATE, **kwargs
+        entity.Keys(key=e.key, gid=e.props.gid): entity_update(
+            e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
-        for key, entity in registrar.entities.items()
-        if not modified or entity.modified
+        for key, e in registrar.entities.items()
+        if not modified or e.modified
     }
 
 
-def modified(r: entity.Registrar, **kwargs):
+def modified(r: entity.Registrar, **kwargs) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
         key: serialized
         for key, serialized in registrar(r, modified=False, **kwargs).items()
@@ -313,10 +316,12 @@ def modified(r: entity.Registrar, **kwargs):
     }
 
 
-def for_update(entities: List[entity.Entity], **kwargs):
+def for_update(
+    entities: List[entity.Entity], **kwargs
+) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
-        storage.Keys(key=entity.key, gid=entity.props.gid): serialize(
-            entity, identities=Identities.PRIVATE, **kwargs
+        entity.Keys(key=e.key, gid=e.props.gid): entity_update(
+            e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
-        for entity in entities
+        for e in entities
     }

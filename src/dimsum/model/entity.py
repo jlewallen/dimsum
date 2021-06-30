@@ -26,6 +26,17 @@ class Serialized:
 
 
 @dataclasses.dataclass(frozen=True)
+class Keys:
+    key: str
+    gid: Optional[int]
+
+
+@dataclasses.dataclass(frozen=True)
+class EntityUpdate:
+    serialized: Optional[str]
+
+
+@dataclasses.dataclass(frozen=True)
 class EntityRef:
     key: str
     klass: str
@@ -368,19 +379,21 @@ class Registrar:
         return None
 
     def was_modified_from_original(
-        self, key: str, e: Optional[Entity], serialized: Optional[str]
+        self, key: str, e: Optional[Entity], update: EntityUpdate
     ) -> bool:
         if key in self.originals:
-            if self.originals[key] == serialized:
+            if self.originals[key] == update.serialized:
                 return False
             original = self.originals[key]
             assert original
-            if e and not e.modified and serialized:
+            if e and not e.modified and update.serialized:
                 log.warning(
                     "%s: untouched save %s",
                     key,
                     jsondiff.diff(
-                        json.loads(original), json.loads(serialized), marshal=True
+                        json.loads(original),
+                        json.loads(update.serialized),
+                        marshal=True,
                     ),
                 )
         return True
