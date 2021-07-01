@@ -187,7 +187,7 @@ class SqliteStorage(EntityStorage):
             assert not self.frozen
             fields = StorageFields.parse(update.serialized)
             if fields.destroyed:
-                log.info(
+                log.debug(
                     "deleting %s version=%d original=%d",
                     fields.key,
                     fields.version,
@@ -199,7 +199,7 @@ class SqliteStorage(EntityStorage):
                 )
             else:
                 if fields.original == 0:
-                    log.info(
+                    log.debug(
                         "inserting %s version=%d original=%d",
                         fields.key,
                         fields.version,
@@ -215,7 +215,7 @@ class SqliteStorage(EntityStorage):
                         ],
                     )
                 else:
-                    log.info(
+                    log.debug(
                         "updating %s version=%d original=%d",
                         fields.key,
                         fields.version,
