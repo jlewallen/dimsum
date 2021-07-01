@@ -22,6 +22,10 @@ class Grammar:
         raise NotImplementedError
 
 
+class ParsingException(Exception):
+    pass
+
+
 class ParseMultipleGrammars:
     def __init__(self, grammars):
         self.grammars = grammars
@@ -38,7 +42,9 @@ class ParseMultipleGrammars:
                     return tree, grammar.evaluator
             except exceptions.UnexpectedCharacters:
                 log.debug("parse-failed")
-        raise Exception("unable to parse")
+            except exceptions.UnexpectedEOF:
+                log.debug("parse-failed")
+        raise ParsingException()
 
 
 grammars: List[Grammar] = []

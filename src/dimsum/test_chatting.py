@@ -22,8 +22,7 @@ log = logging.getLogger("dimsum")
 async def test_say_nothing():
     tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
     await tw.initialize()
-    with pytest.raises(lark.exceptions.UnexpectedEOF):
-        await tw.failure("say")
+    await tw.failure("say")
 
 
 @pytest.mark.asyncio
