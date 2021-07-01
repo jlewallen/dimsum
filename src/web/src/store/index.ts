@@ -20,7 +20,7 @@ import {
     ReplResponse,
     ReplAction,
 } from "./types";
-import { getApi } from "@/http";
+import { getApi, subscribe } from "@/http";
 
 export * from "./types";
 
@@ -116,6 +116,8 @@ export default createStore<RootState>({
                     people.people.map((row) => JSON.parse(row.serialized))
                 );
             }
+
+            await subscribe(state.headers);
         },
 
         [ActionTypes.REFRESH_ENTITY]: async ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
