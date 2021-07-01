@@ -20,7 +20,7 @@ import {
     ReplResponse,
     ReplAction,
 } from "./types";
-import { graphql, http } from "@/http";
+import { getApi } from "@/http";
 
 export * from "./types";
 
@@ -81,11 +81,11 @@ export default createStore<RootState>({
         },
     },
     actions: {
-        [ActionTypes.LOGIN]: async ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
-            const mutation = `mutation { login(credentials: { username: "${payload.name}", password: "${payload.password}" }) }`;
-            const data = await graphql<Auth>(mutation);
-            commit(MutationTypes.AUTH, data);
-            return Promise.all([dispatch(new AuthenticatedAction(data)), dispatch(ActionTypes.LOADING)]);
+        [ActionTypes.LOGIN]: async ({ state, dispatch, commit }: ActionParameters, payload: LoginAction) => {
+            const api = getApi(state.headers);
+            const data = await api.login({ username: payload.name, password: payload.password });
+            commit(MutationTypes.AUTH, data.login);
+            return Promise.all([dispatch(new AuthenticatedAction(data.login)), dispatch(ActionTypes.LOADING)]);
         },
         [ActionTypes.AUTHENTICATED]: ({ state }: ActionParameters, payload: AuthenticatedAction) => {
             return Promise.resolve();
@@ -93,47 +93,50 @@ export default createStore<RootState>({
         [ActionTypes.LOGOUT]: ({ commit }: ActionParameters) => {
             commit(MutationTypes.AUTH, null);
         },
-        [ActionTypes.REPL]: ({ state, commit }: ActionParameters, payload: ReplAction) => {
-            /*
-            return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((response) => {
-                commit(MutationTypes.REPLY, response);
-                return response;
-			});
-			*/
+        [ActionTypes.REPL]: async ({ state, commit }: ActionParameters, payload: ReplAction) => {
+            const api = getApi(state.headers);
+            const data = await api.language({ text: payload.command, evaluator: "jlewallen" });
+            if (data.language) {
+                commit(MutationTypes.REPLY, { reply: JSON.parse(data.language.reply) });
+            }
         },
-        [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
-            return Promise.all([
-                /*
-                http<AreasResponse>({ url: "/areas", headers: state.headers }).then((data) => {
-                    commit(MutationTypes.AREAS, data.areas);
-                }),
-                http<PeopleResponse>({ url: "/people", headers: state.headers }).then((data) => {
-                    commit(MutationTypes.PEOPLE, data.people);
-				}),
-				*/
-            ]);
+        [ActionTypes.LOADING]: async ({ state, commit }: ActionParameters) => {
+            const api = getApi(state.headers);
+            const areas = await api.areas();
+            if (areas && areas.areas) {
+                commit(
+                    MutationTypes.AREAS,
+                    areas.areas.map((row) => JSON.parse(row.serialized))
+                );
+            }
+            const people = await api.people();
+            if (people && people.people) {
+                commit(
+                    MutationTypes.PEOPLE,
+                    people.people.map((row) => JSON.parse(row.serialized))
+                );
+            }
         },
 
-        [ActionTypes.REFRESH_ENTITY]: ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
+        [ActionTypes.REFRESH_ENTITY]: async ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
             if (state.entities[payload.key]) {
                 return Promise.resolve();
             }
-            /*
-            return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
-                commit(MutationTypes.ENTITY, data.entity);
-			});
-			*/
+            const api = getApi(state.headers);
+            const data = await api.entity({ key: payload.key });
+            if (data.entitiesByKey) {
+                commit(MutationTypes.ENTITY, JSON.parse(data.entitiesByKey[0].serialized));
+            }
         },
-        [ActionTypes.NEED_ENTITY]: ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
-            /*
-            return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
-                if (!data.entity) {
-                    console.warn("commit-null-entity", data);
-                    return;
+        [ActionTypes.NEED_ENTITY]: async ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
+            const api = getApi(state.headers);
+            const data = await api.entity({ key: payload.key });
+            if (data.entitiesByKey) {
+                for (const row of data.entitiesByKey) {
+                    commit(MutationTypes.ENTITY, JSON.parse(row.serialized));
+                    break; // TODO FIX
                 }
-                commit(MutationTypes.ENTITY, data.entity);
-			});
-			*/
+            }
         },
         [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
             /*

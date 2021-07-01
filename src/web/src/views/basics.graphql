@@ -1,3 +1,31 @@
 mutation login($username: String!, $password: String!) {
 	login(credentials: { username: $username, password: $password })
 }
+
+mutation language($text: String!, $evaluator: Key!) {
+	language(criteria: { text: $text, evaluator: $evaluator }) {
+		reply
+		entities { key serialized diff }
+	}
+}
+
+query areas {
+  areas {
+	key
+	serialized
+  }
+}
+
+query people {
+  people {
+	key
+	serialized
+  }
+}
+
+query entity($key: Key!) {
+  entitiesByKey(key: $key) {
+	key
+	serialized
+  }
+}

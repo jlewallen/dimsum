@@ -1,4 +1,13 @@
 import { Config } from "@/config";
+import { GraphQLClient } from "graphql-request";
+import { getSdk } from "@/generated/graphql";
+
+export function getApi(headers: { [index: string]: string }) {
+    const gqlc = new GraphQLClient(Config.baseUrl + "/graphql", {
+        headers: headers,
+    });
+    return getSdk(gqlc);
+}
 
 export interface OurRequestInfo {
     url: string;
@@ -48,47 +57,6 @@ export interface ReplResponse {
 export type PropertyMap = { [index: string]: any };
 export type UpdateEntityDetailsPayload = PropertyMap;
 export type UpdateEntityBehaviorPayload = PropertyMap;
-
-export async function graphql<T>(query: string): Promise<T> {
-    const response = await fetch(Config.baseUrl, {
-        method: "POST",
-        mode: "cors",
-        headers: Object.assign({
-            "Content-Type": "application/json",
-        }),
-        body: JSON.stringify({
-            query: query,
-        }),
-    });
-    const returned = await response.json();
-
-    console.log(returned);
-
-    if (returned.errors) {
-        throw new Error("errors");
-    }
-
-    return returned.data;
-}
-
-export async function http<T>(info: OurRequestInfo): Promise<T> {
-    let body: string | null = null;
-    if (info.data) {
-        body = JSON.stringify(info.data);
-    }
-    const response = await fetch(Config.baseUrl + info.url, {
-        method: info.method || "GET",
-        mode: "cors",
-        headers: Object.assign(
-            {
-                "Content-Type": "application/json",
-            },
-            info.headers
-        ),
-        body: body,
-    });
-    return await response.json();
-}
 
 export interface Property<T> {
     value: T;
