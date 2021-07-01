@@ -67,6 +67,7 @@ class Interactive(sshd.CommandHandler):
             props=properties.Common(self.username, desc="A player"),
         )
         await session.perform(plugins.default.actions.Join(), player)
+        await session.perform(plugins.default.actions.Auth(password="asdfasdf"), player)
 
         assert session.world
         return session.world, player
