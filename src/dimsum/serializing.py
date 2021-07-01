@@ -16,6 +16,25 @@ import storage
 
 log = logging.getLogger("dimsum")
 
+entity_types = {"model.entity.Entity": entity.Entity, "model.world.World": world.World}
+
+
+# From stackoverflow
+def _fullname(klass):
+    module = klass.__module__
+    if module == "builtins":
+        return klass.__qualname__  # avoid outputs like 'builtins.str'
+    return module + "." + klass.__qualname__
+
+
+def _derive_from(klass):
+    name = klass.__name__
+    return type("Root" + name, (klass,), {})
+
+
+classes = {k: _derive_from(k) for k in entity_types.values()}
+inverted = {v: k for k, v in classes.items()}
+
 
 class Identities(enum.Enum):
     PRIVATE = 1
@@ -69,17 +88,6 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-entity_types = {"model.entity.Entity": entity.Entity, "model.world.World": world.World}
-
-
-# From stackoverflow
-def fullname(klass):
-    module = klass.__module__
-    if module == "builtins":
-        return klass.__qualname__  # avoid outputs like 'builtins.str'
-    return module + "." + klass.__qualname__
-
-
 @jsonpickle.handlers.register(entity.EntityRef)
 class EntityRefHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
@@ -87,7 +95,7 @@ class EntityRefHandler(jsonpickle.handlers.BaseHandler):
 
     def flatten(self, obj, data):
         assert obj.pyObject
-        data["py/object"] = fullname(obj.pyObject)
+        data["py/object"] = _fullname(obj.pyObject)
         data["key"] = obj.key
         data["klass"] = obj.klass
         data["name"] = obj.name
@@ -126,28 +134,12 @@ class SerializationException(Exception):
     pass
 
 
-def derive_from(klass):
-    name = klass.__name__
-    return type("Root" + name, (klass,), {})
-
-
-allowed = [
-    entity.Entity,
-    world.World,
-]
-classes = {k: derive_from(k) for k in allowed}
-inverted = {v: k for k, v in classes.items()}
-
-
-def internal_prepare(value, depth=0):
+def _prepare(value, depth=0):
     if isinstance(value, list):
-        value = [internal_prepare(item, depth=depth + 1) for item in value]
+        value = [_prepare(item, depth=depth + 1) for item in value]
 
     if isinstance(value, dict):
-        value = {
-            key: internal_prepare(value, depth=depth + 1)
-            for key, value in value.items()
-        }
+        value = {key: _prepare(value, depth=depth + 1) for key, value in value.items()}
 
     if value.__class__ in classes:
         log.debug(
@@ -165,7 +157,7 @@ def serialize(
     if value is None:
         return value
 
-    prepared = internal_prepare(value) if full else value
+    prepared = _prepare(value) if full else value
 
     return jsonpickle.encode(
         prepared,
@@ -180,7 +172,7 @@ def serialize(
     )
 
 
-def deserialize(encoded, lookup):
+def _deserialize(encoded, lookup):
     decoded = jsonpickle.decode(
         encoded,
         context=CustomUnpickler(lookup),
@@ -253,7 +245,7 @@ async def materialize(
 
     cache.update(**{se.key: [se] for se in json})
 
-    deserialized = deserialize(json[0].serialized, reference)
+    deserialized = _deserialize(json[0].serialized, reference)
     registrar.register(deserialized, original=json[0].serialized)
     loaded = deserialized
 
@@ -287,7 +279,7 @@ async def materialize(
     return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
 
 
-def entity_update(
+def _entity_update(
     instance: entity.Entity, serialized: Optional[str]
 ) -> entity.EntityUpdate:
     assert serialized
@@ -295,33 +287,27 @@ def entity_update(
     return entity.EntityUpdate(serialized, instance)
 
 
-def registrar(
-    registrar: entity.Registrar, modified: bool = False, **kwargs
-) -> Dict[entity.Keys, entity.EntityUpdate]:
-    return {
-        entity.Keys(key=e.key): entity_update(
-            e, serialize(e, identities=Identities.PRIVATE, **kwargs)
-        )
-        for key, e in registrar.entities.items()
-        if not modified or e.modified
-    }
-
-
-def modified(r: entity.Registrar, **kwargs) -> Dict[entity.Keys, entity.EntityUpdate]:
-    return {
-        key: serialized
-        for key, serialized in registrar(r, modified=False, **kwargs).items()
-        if key.key
-        and r.was_modified_from_original(key.key, r.find_by_key(key.key), serialized)
-    }
-
-
 def for_update(
-    entities: List[entity.Entity], **kwargs
+    entities: List[entity.Entity], everything: bool = True, **kwargs
 ) -> Dict[entity.Keys, entity.EntityUpdate]:
     return {
-        entity.Keys(key=e.key): entity_update(
+        entity.Keys(key=e.key): _entity_update(
             e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
         for e in entities
+        if everything or e.modified
+    }
+
+
+def modified(
+    registrar: entity.Registrar, **kwargs
+) -> Dict[entity.Keys, entity.EntityUpdate]:
+    return {
+        key: serialized
+        for key, serialized in for_update(
+            list(registrar.entities.values()), **kwargs
+        ).items()
+        if registrar.was_modified_from_original(
+            key.key, registrar.find_by_key(key.key), serialized
+        )
     }
