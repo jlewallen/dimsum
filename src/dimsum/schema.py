@@ -218,16 +218,16 @@ class Evaluation:
 @mutation.field("language")
 async def resolve_language(obj, info, criteria):
     domain = info.context.domain
+    parser = info.context.parser
     lqc = make_language_query_criteria(**criteria)
     log.info("ariadne:language criteria=%s", lqc)
 
-    l = grammars.create_parser()
     with domain.session() as session:
         w = await session.materialize(key=world.Key)
         assert w
         player = await session.materialize(key=lqc.evaluator)
         assert player
-        tree, create_evaluator = l.parse(lqc.text.strip())
+        tree, create_evaluator = parser.parse(lqc.text.strip())
         tree_eval = create_evaluator(w, player)
         action = tree_eval.transform(tree)
         reply = await session.perform(action, player)
@@ -305,17 +305,19 @@ def create():
 
 @dataclasses.dataclass
 class AriadneContext:
-    domain: domains.Domain
     cfg: config.Configuration
+    domain: domains.Domain
+    parser: grammars.ParseMultipleGrammars
     request: starlette.requests.Request
     identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
 def context(cfg):
     domain = cfg.make_domain()
+    parser = grammars.create_parser()
 
     def wrap(request):
         log.info("ariadne:context %s", request)
-        return AriadneContext(domain=domain, cfg=cfg, request=request)
+        return AriadneContext(cfg=cfg, domain=domain, parser=parser, request=request)
 
     return wrap
