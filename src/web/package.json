@@ -5,10 +5,13 @@
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint"
+        "lint": "vue-cli-service lint",
+        "graphql-codegen": "graphql-codegen --config codegen.yml",
+        "gqlgen": "graphql-codegen --config codegen.yml"
     },
     "dependencies": {
         "core-js": "^3.6.5",
+        "graphql": "^15.5.1",
         "lodash": "^4.17.20",
         "moment": "^2.29.1",
         "vue": "^3.0.0",
@@ -17,6 +20,11 @@
         "vuex": "^4.0.0-beta.4"
     },
     "devDependencies": {
+        "@graphql-codegen/cli": "1.21.6",
+        "@graphql-codegen/introspection": "1.18.2",
+        "@graphql-codegen/typescript": "1.22.4",
+        "@graphql-codegen/typescript-graphql-request": "^3.2.4",
+        "@graphql-codegen/typescript-operations": "1.18.3",
         "@types/lodash": "^4.14.162",
         "@typescript-eslint/eslint-plugin": "^2.33.0",
         "@typescript-eslint/parser": "^2.33.0",
