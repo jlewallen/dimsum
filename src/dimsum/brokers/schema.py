@@ -69,7 +69,7 @@ async def provision(obj, info, config):
 
 
 def create():
-    for path in ["src/dimsum/broker/broker.graphql", "broker.graphql"]:
+    for path in ["src/dimsum/brokers/broker.graphql", "broker.graphql"]:
         if os.path.exists(path):
             type_defs = ariadne.load_schema_from_path(path)
             return ariadne.make_executable_schema(type_defs, [query, mutation])
