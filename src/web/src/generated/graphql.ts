@@ -98,6 +98,11 @@ export type QueryEntitiesByGidArgs = {
     identities?: Maybe<Scalars["Boolean"]>;
 };
 
+export type Subscription = {
+    __typename?: "Subscription";
+    nearby?: Maybe<Array<Scalars["Reply"]>>;
+};
+
 export type LoginMutationVariables = Exact<{
     username: Scalars["String"];
     password: Scalars["String"];
@@ -135,6 +140,10 @@ export type EntityQueryVariables = Exact<{
 export type EntityQuery = { __typename?: "Query" } & {
     entitiesByKey?: Maybe<Array<{ __typename?: "KeyedEntity" } & Pick<KeyedEntity, "key" | "serialized">>>;
 };
+
+export type NearbySubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type NearbySubscription = { __typename?: "Subscription" } & Pick<Subscription, "nearby">;
 
 export const LoginDocument = gql`
     mutation login($username: String!, $password: String!) {
@@ -177,6 +186,11 @@ export const EntityDocument = gql`
         }
     }
 `;
+export const NearbyDocument = gql`
+    subscription nearby {
+        nearby
+    }
+`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -217,6 +231,13 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
                 (wrappedRequestHeaders) =>
                     client.request<EntityQuery>(EntityDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
                 "entity"
+            );
+        },
+        nearby(variables?: NearbySubscriptionVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NearbySubscription> {
+            return withWrapper(
+                (wrappedRequestHeaders) =>
+                    client.request<NearbySubscription>(NearbyDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+                "nearby"
             );
         },
     };

@@ -1,6 +1,7 @@
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 scalar SerializedEntity
@@ -37,6 +38,10 @@ type Query {
   entitiesByGid(gid: Int, identities: Boolean): [KeyedEntity!]
   areas: [KeyedEntity!]
   people: [KeyedEntity!]
+}
+
+type Subscription {
+  nearby: [Reply!]
 }
 
 scalar Token

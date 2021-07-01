@@ -29,3 +29,7 @@ query entity($key: Key!) {
 	serialized
   }
 }
+
+subscription nearby {
+  nearby
+}

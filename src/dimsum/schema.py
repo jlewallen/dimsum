@@ -6,8 +6,10 @@ import os.path
 import json
 import dataclasses
 import base64
-import starlette.requests
 import jwt
+import asyncio
+
+import starlette.requests
 
 import model.entity as entity
 import model.world as world
@@ -148,6 +150,23 @@ async def resolve_people(obj, info):
         entities = session.registrar.entities_of_klass(scopes.LivingClass)
         log.info("ariadne:people entities=%s", entities)
         return [EntityResolver(session, e) for e in entities]
+
+
+subscription = ariadne.SubscriptionType()
+
+
+@subscription.source("nearby")
+async def nearby_generator(obj, info):
+    for i in range(5):
+        await asyncio.sleep(1)
+        log.info("yield %s", i)
+        yield [i]
+
+
+@subscription.field("nearby")
+def nearby_resolver(count, info):
+    log.info("resolver %s", count)
+    return [count[0] + 1]
 
 
 mutation = ariadne.MutationType()
@@ -299,7 +318,9 @@ def create():
     for path in ["src/dimsum/dimsum.graphql", "dimsum.graphql"]:
         if os.path.exists(path):
             type_defs = ariadne.load_schema_from_path(path)
-            return ariadne.make_executable_schema(type_defs, [query, mutation])
+            return ariadne.make_executable_schema(
+                type_defs, [query, mutation, subscription]
+            )
     raise Exception("unable to find dimsum.graphql")
 
 
