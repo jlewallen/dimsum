@@ -5,12 +5,13 @@ import re
 import logging
 import json
 import types
-import multiprocessing
 import dataclasses
 import ipaddress
-import threading
 import signal
 import pathlib
+import threading
+import multiprocessing
+import queue
 
 import watchgod
 
@@ -122,6 +123,7 @@ class Pool:
         super().__init__()
         self.procs = {}
         self.mp = multiprocessing.get_context("spawn")
+        self.queue = self.mp.Queue()
         self.signaled = threading.Event()
         log.info("%d: process-pool", os.getpid())
 
@@ -142,7 +144,17 @@ class Pool:
 
     def spawn(self, config: ProcessConfig) -> multiprocessing.Process:
         log.info("%d: spawn '%s' kwargs=%s", os.getpid(), config.key, config.kwargs)
-        return self.mp.Process(target=config.target, kwargs=config.kwargs, daemon=True)
+        kwargs: Dict[str, Any] = {}
+        kwargs.update(**config.kwargs)  # type:ignore
+        kwargs.update(dict(queue=self.queue))
+        return self.mp.Process(target=config.target, kwargs=kwargs, daemon=True)
+
+    def service(self):
+        try:
+            work = self.queue.get(block=False)
+            log.info("work: %s", work)
+        except queue.Empty:
+            pass
 
     def remove(self, key: str):
         if key in self.procs:

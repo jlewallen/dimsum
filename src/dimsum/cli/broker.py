@@ -4,6 +4,7 @@ import logging
 import time
 import json
 import asyncclick as click
+import multiprocessing as mp
 import os
 
 import brokers.brokers as brokers
@@ -19,10 +20,14 @@ def configure_logging():
         logging.config.dictConfig(config)
 
 
-def child(port=45600, **kwargs):
+def child(port=45600, queue: mp.Queue = None, **kwargs):
     configure_logging()
 
     log.info("child: kwargs=%s", kwargs)
+
+    if False:
+        assert queue
+        queue.put([dict(reload=True)])
 
     uvicorn.run(
         "dimsum:app",
@@ -65,7 +70,8 @@ async def broker():
 
         while True:
             try:
-                time.sleep(1)
+                time.sleep(0.1)
+                pp.service()
             except KeyboardInterrupt as ki:
                 log.exception("error")
                 break
