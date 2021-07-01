@@ -20,7 +20,7 @@ import {
     ReplResponse,
     ReplAction,
 } from "./types";
-import { http } from "@/http";
+import { graphql, http } from "@/http";
 
 export * from "./types";
 
@@ -81,11 +81,11 @@ export default createStore<RootState>({
         },
     },
     actions: {
-        [ActionTypes.LOGIN]: ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
-            return http<Auth>({ url: "/login", method: "POST", data: payload }).then((data: Auth) => {
-                commit(MutationTypes.AUTH, data);
-                return Promise.all([dispatch(new AuthenticatedAction(data)), dispatch(ActionTypes.LOADING)]);
-            });
+        [ActionTypes.LOGIN]: async ({ dispatch, commit }: ActionParameters, payload: LoginAction) => {
+            const mutation = `mutation { login(credentials: { username: "${payload.name}", password: "${payload.password}" }) }`;
+            const data = await graphql<Auth>(mutation);
+            commit(MutationTypes.AUTH, data);
+            return Promise.all([dispatch(new AuthenticatedAction(data)), dispatch(ActionTypes.LOADING)]);
         },
         [ActionTypes.AUTHENTICATED]: ({ state }: ActionParameters, payload: AuthenticatedAction) => {
             return Promise.resolve();
@@ -94,19 +94,23 @@ export default createStore<RootState>({
             commit(MutationTypes.AUTH, null);
         },
         [ActionTypes.REPL]: ({ state, commit }: ActionParameters, payload: ReplAction) => {
+            /*
             return http<ReplResponse>({ method: "POST", url: "/repl", headers: state.headers, data: payload }).then((response) => {
                 commit(MutationTypes.REPLY, response);
                 return response;
-            });
+			});
+			*/
         },
         [ActionTypes.LOADING]: ({ state, commit }: ActionParameters) => {
             return Promise.all([
+                /*
                 http<AreasResponse>({ url: "/areas", headers: state.headers }).then((data) => {
                     commit(MutationTypes.AREAS, data.areas);
                 }),
                 http<PeopleResponse>({ url: "/people", headers: state.headers }).then((data) => {
                     commit(MutationTypes.PEOPLE, data.people);
-                }),
+				}),
+				*/
             ]);
         },
 
@@ -114,20 +118,25 @@ export default createStore<RootState>({
             if (state.entities[payload.key]) {
                 return Promise.resolve();
             }
+            /*
             return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
-            });
+			});
+			*/
         },
         [ActionTypes.NEED_ENTITY]: ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
+            /*
             return http<EntityResponse>({ url: `/entities/${urlKey(payload.key)}`, headers: state.headers }).then((data) => {
                 if (!data.entity) {
                     console.warn("commit-null-entity", data);
                     return;
                 }
                 commit(MutationTypes.ENTITY, data.entity);
-            });
+			});
+			*/
         },
         [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
+            /*
             return http<EntityResponse>({
                 url: `/entities/${urlKey(payload.form.key)}/props`,
                 method: "POST",
@@ -136,9 +145,11 @@ export default createStore<RootState>({
             }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
                 return data;
-            });
+			});
+			*/
         },
         [ActionTypes.SAVE_ENTITY_BEHAVIOR]: ({ state, commit }: ActionParameters, payload: SaveEntityBehaviorAction) => {
+            /*
             return http<EntityResponse>({
                 url: `/entities/${urlKey(payload.key)}/behavior`,
                 method: "POST",
@@ -147,7 +158,8 @@ export default createStore<RootState>({
             }).then((data) => {
                 commit(MutationTypes.ENTITY, data.entity);
                 return data;
-            });
+			});
+			*/
         },
     },
     getters: {},

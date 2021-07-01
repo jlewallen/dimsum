@@ -49,6 +49,28 @@ export type PropertyMap = { [index: string]: any };
 export type UpdateEntityDetailsPayload = PropertyMap;
 export type UpdateEntityBehaviorPayload = PropertyMap;
 
+export async function graphql<T>(query: string): Promise<T> {
+    const response = await fetch(Config.baseUrl, {
+        method: "POST",
+        mode: "cors",
+        headers: Object.assign({
+            "Content-Type": "application/json",
+        }),
+        body: JSON.stringify({
+            query: query,
+        }),
+    });
+    const returned = await response.json();
+
+    console.log(returned);
+
+    if (returned.errors) {
+        throw new Error("errors");
+    }
+
+    return returned.data;
+}
+
 export async function http<T>(info: OurRequestInfo): Promise<T> {
     let body: string | null = null;
     if (info.data) {
