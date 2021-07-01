@@ -84,6 +84,7 @@ async def server(
         schema,
         context_value=schema_factory.context(cfg),
         debug=True,
+        # extensions=[ApolloTracingExtension],
         extensions=[ApolloTracingExtension],
     )
 
