@@ -16,6 +16,7 @@ import ariadne
 import config as configuration
 import grammars
 import serializing
+import bus
 
 import schema as schema_factory
 from schema import AriadneContext
@@ -57,7 +58,10 @@ async def query(config: str, database: str):
 
     cfg = get_config()
     domain = cfg.make_domain()
-    context = AriadneContext(cfg, domain, grammars.create_parser(), None)  # type:ignore
+    subscriptions = bus.SubscriptionManager()
+    context = AriadneContext(
+        cfg, domain, subscriptions, grammars.create_parser(), None  # type:ignore
+    )
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)
 

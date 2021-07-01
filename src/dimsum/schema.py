@@ -24,6 +24,7 @@ import serializing
 import grammars
 import storage
 import config
+import bus
 
 log = logging.getLogger("dimsum")
 
@@ -328,17 +329,24 @@ def create():
 class AriadneContext:
     cfg: config.Configuration
     domain: domains.Domain
+    subscriptions: bus.SubscriptionManager
     parser: grammars.ParseMultipleGrammars
     request: starlette.requests.Request
     identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
-def context(cfg):
+def context(cfg, subscriptions: bus.SubscriptionManager):
     domain = cfg.make_domain()
     parser = grammars.create_parser()
 
     def wrap(request):
         log.info("ariadne:context %s", request)
-        return AriadneContext(cfg=cfg, domain=domain, parser=parser, request=request)
+        return AriadneContext(
+            cfg=cfg,
+            domain=domain,
+            subscriptions=subscriptions,
+            parser=parser,
+            request=request,
+        )
 
     return wrap

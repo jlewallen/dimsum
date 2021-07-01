@@ -79,12 +79,14 @@ async def server(
             persistence=config.Persistence(read=read, write=write),
             session_key=config.generate_session_key(),
         )
+
+    subscriptions = bus.SubscriptionManager()
     schema = schema_factory.create()
     gql_app = ariadne.asgi.GraphQL(
         schema,
-        context_value=schema_factory.context(cfg),
+        context_value=schema_factory.context(cfg, subscriptions),
         debug=True,
-        # extensions=[ApolloTracingExtension],
+        # extensions=[],
         extensions=[ApolloTracingExtension],
     )
 
@@ -94,8 +96,6 @@ async def server(
         allow_methods=("GET", "POST", "OPTIONS"),
         allow_headers=["access-control-allow-origin", "authorization", "content-type"],
     )
-
-    subscriptions = bus.SubscriptionManager()
 
     def create_ssh_session(**kwargs):
         return interactive.Interactive(

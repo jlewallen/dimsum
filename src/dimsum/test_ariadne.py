@@ -15,6 +15,7 @@ import plugins.default.actions as actions
 import serializing
 import config
 import grammars
+import bus
 import test
 
 import schema as schema_factory
@@ -25,9 +26,12 @@ log = logging.getLogger("dimsum")
 
 
 def get_test_context(domain: domains.Domain, **kwargs):
+    subscriptions = bus.SubscriptionManager()
+
     return AriadneContext(
         config.symmetrical(":memory:"),
         domain,
+        subscriptions,
         grammars.create_parser(),
         None,  # type:ignore
         serializing.Identities.HIDDEN,
