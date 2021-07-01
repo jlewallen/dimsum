@@ -11,6 +11,7 @@ import ariadne.asgi
 import uvicorn
 
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
+from starlette.middleware.cors import CORSMiddleware
 
 import config
 import schema as schema_factory
@@ -79,11 +80,18 @@ async def server(
             session_key=config.generate_session_key(),
         )
     schema = schema_factory.create()
-    app = ariadne.asgi.GraphQL(
+    gql_app = ariadne.asgi.GraphQL(
         schema,
         context_value=schema_factory.context(cfg),
         debug=True,
         extensions=[ApolloTracingExtension],
+    )
+
+    app = CORSMiddleware(
+        gql_app,
+        allow_origins=["*"],
+        allow_methods=("GET", "POST", "OPTIONS"),
+        allow_headers=["access-control-allow-origin", "authorization", "content-type"],
     )
 
     subscriptions = bus.SubscriptionManager()
