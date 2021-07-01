@@ -21,7 +21,7 @@ log = logging.getLogger("dimsum.cli")
 
 def configure_logging():
     with open("logging.json", "r") as file:
-        config = json.loads(file.read())
+        config = json.loads(file.read())  # TODO Parsing logging config JSON
         logging.config.dictConfig(config)
 
 

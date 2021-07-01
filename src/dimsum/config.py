@@ -66,7 +66,8 @@ def get(path: Optional[str]) -> Configuration:
         return symmetrical(":memory:")
     if os.path.exists(path):
         with open(path, "r") as f:
-            return make_configuration(**json.loads(f.read()))
+            cfg = json.loads(f.read())  # TODO Parsing logging config JSON
+            return make_configuration(**cfg)
     raise ConfigurationException("file not found")
 
 

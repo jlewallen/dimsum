@@ -378,6 +378,7 @@ class Registrar:
     def get_diff_if_available(self, key: str, serialized: str):
         if key in self.originals:
             original = self.originals[key]
+            # TODO Parsing/diffing entity JSON
             return jsondiff.diff(
                 json.loads(original), json.loads(serialized), marshal=True
             )
@@ -395,7 +396,7 @@ class Registrar:
                 log.warning(
                     "%s: untouched save %s",
                     key,
-                    jsondiff.diff(
+                    jsondiff.diff(  # TODO Parsing/diffing entity JSON
                         json.loads(original),
                         json.loads(update.serialized),
                         marshal=True,

@@ -49,7 +49,7 @@ async def query(config: str, database: str):
     body = None
     try:
         unparsed_body = sys.stdin.read()
-        body = json.loads(unparsed_body)
+        body = json.loads(unparsed_body)  # TODO Parsing gql JSON
     except:
         sys.stdout.write(json.dumps(make_error("parsing")))
         return

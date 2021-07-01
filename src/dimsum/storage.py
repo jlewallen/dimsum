@@ -15,6 +15,34 @@ import storage
 log = logging.getLogger("dimsum.storage")
 
 
+@dataclasses.dataclass
+class StorageFields:
+    parsed: Dict[str, Any]
+    key: str
+    gid: int
+    version: int
+    original: int
+    destroyed: bool
+    serialized: str
+
+    @staticmethod
+    def parse(serialized: str):
+        parsed = json.loads(serialized)  # TODO Parsing entity JSON
+        try:
+            key = parsed["key"]
+            gid = parsed["props"]["map"]["gid"]["value"]
+            destroyed = parsed["props"]["map"]["destroyed"]["value"] is not None
+            original = parsed["version"]["i"]
+            version = original + 1
+            parsed["version"]["i"] = version
+            reserialized = json.dumps(parsed)
+            return StorageFields(
+                parsed, key, gid, version, original, destroyed, reserialized
+            )
+        except KeyError:
+            raise Exception("malformed entity: {0}".format(serialized))
+
+
 class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
@@ -176,6 +204,56 @@ class SqliteStorage(EntityStorage):
         self.dbc.execute("DELETE FROM entities")
         self.db.commit()
 
+    def _delete_row(self, fields: StorageFields):
+        assert self.dbc
+        log.debug(
+            "deleting %s version=%d original=%d",
+            fields.key,
+            fields.version,
+            fields.original,
+        )
+        self.dbc.execute(
+            "DELETE FROM entities WHERE key = ? AND version = ?",
+            [fields.key, fields.original],
+        )
+
+    def _update_row(self, fields: StorageFields):
+        assert self.dbc
+        log.debug(
+            "updating %s version=%d original=%d",
+            fields.key,
+            fields.version,
+            fields.original,
+        )
+        self.dbc.execute(
+            "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
+            [
+                fields.version,
+                fields.gid,
+                fields.serialized,
+                fields.key,
+                fields.original,
+            ],
+        )
+
+    def _insert_row(self, fields: StorageFields):
+        assert self.dbc
+        log.debug(
+            "inserting %s version=%d original=%d",
+            fields.key,
+            fields.version,
+            fields.original,
+        )
+        self.dbc.execute(
+            "INSERT INTO entities (key, gid, version, serialized) VALUES (?, ?, ?, ?) ",
+            [
+                fields.key,
+                fields.gid,
+                fields.version,
+                fields.serialized,
+            ],
+        )
+
     async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
         await self.open_if_necessary()
         assert self.db
@@ -187,50 +265,12 @@ class SqliteStorage(EntityStorage):
             assert not self.frozen
             fields = StorageFields.parse(update.serialized)
             if fields.destroyed:
-                log.debug(
-                    "deleting %s version=%d original=%d",
-                    fields.key,
-                    fields.version,
-                    fields.original,
-                )
-                self.dbc.execute(
-                    "DELETE FROM entities WHERE key = ? AND version = ?",
-                    [keys.key, fields.original],
-                )
+                self._delete_row(fields)
             else:
                 if fields.original == 0:
-                    log.debug(
-                        "inserting %s version=%d original=%d",
-                        fields.key,
-                        fields.version,
-                        fields.original,
-                    )
-                    self.dbc.execute(
-                        "INSERT INTO entities (key, gid, version, serialized) VALUES (?, ?, ?, ?) ",
-                        [
-                            fields.key,
-                            fields.gid,
-                            fields.version,
-                            fields.serialized,
-                        ],
-                    )
+                    self._insert_row(fields)
                 else:
-                    log.debug(
-                        "updating %s version=%d original=%d",
-                        fields.key,
-                        fields.version,
-                        fields.original,
-                    )
-                    self.dbc.execute(
-                        "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
-                        [
-                            fields.version,
-                            fields.gid,
-                            fields.serialized,
-                            fields.key,
-                            fields.original,
-                        ],
-                    )
+                    self._update_row(fields)
         self.db.commit()
 
     async def load_by_gid(self, gid: int):
@@ -288,8 +328,6 @@ class HttpStorage(EntityStorage):
             )
             entities = [
                 {"key": key.key, "serialized": serialized}
-                if serialized
-                else {"key": key.key}
                 for key, serialized in updates.items()
             ]
             response = await session.execute(
@@ -324,31 +362,3 @@ class HttpStorage(EntityStorage):
 
     def __str__(self):
         return "Http<%s>" % (self.url,)
-
-
-@dataclasses.dataclass
-class StorageFields:
-    parsed: Dict[str, Any]
-    key: str
-    gid: int
-    version: int
-    original: int
-    destroyed: bool
-    serialized: str
-
-    @staticmethod
-    def parse(serialized: str):
-        parsed = json.loads(serialized)  # TODO Parsing JSON
-        try:
-            key = parsed["key"]
-            gid = parsed["props"]["map"]["gid"]["value"]
-            original = parsed["version"]["i"]
-            version = original + 1
-            parsed["version"]["i"] += 1
-            destroyed = parsed["props"]["map"]["destroyed"]["value"] is not None
-            reserialized = json.dumps(parsed)
-            return StorageFields(
-                parsed, key, gid, version, original, destroyed, reserialized
-            )
-        except KeyError:
-            raise Exception("malformed entity: {0}".format(serialized))
