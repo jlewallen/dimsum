@@ -106,10 +106,12 @@ export default defineComponent({
 </script>
 <style scoped>
 .behavior {
+    /*
     background-color: #efefef;
     border: 1px solid #afafaf;
     border-radius: 5px;
     padding: 1em;
+	*/
     margin-top: 1em;
 }
 .behavior-container {
