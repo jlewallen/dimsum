@@ -117,16 +117,12 @@ class ShellSession:
             self.print("%d other users are connected." % len(self.connected))
             self.print("\n", end="")
 
-            self.write_everyone_else("*** %s has joined" % self.username)
-
             try:
                 await self.repl()
             except asyncssh.BreakReceived:
                 log.info("%s: brk" % (self.username,))
 
             log.info("%s: disconnected" % (self.username,))
-
-            self.write_everyone_else("*** %s has left" % self.username)
         finally:
             del self.connected[self.username]
             self.process.exit(0)
