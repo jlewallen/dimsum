@@ -58,6 +58,14 @@ input EntityDiff {
   serialized: String!
 }
 
+input EntityTemplate {
+  name: String!
+  desc: String!
+  klass: String! # Enum?
+  key: String
+  holding: [Key!]
+}
+
 type EntitiesUpdated {
   affected: Int!
 }
@@ -67,4 +75,5 @@ type Mutation {
   makeSample: EntitiesUpdated
   update(entities: [EntityDiff!]): EntitiesUpdated
   language(criteria: LanguageQueryCriteria!): Evaluation!
+  create(entities: [EntityTemplate!]): Evaluation!
 }

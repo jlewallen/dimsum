@@ -380,3 +380,112 @@ async def test_graphql_entities(snapshot):
     )
     assert ok
     snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_create_basic(snapshot):
+    domain = domains.Domain()
+
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
+
+        session.world.destroy()
+
+    data = {
+        "variables": {"key": "asdfasdf", "name": "Flute"},
+        "query": """
+mutation CreateThing($key: String!, $name: String!) {
+    create(entities: [{ key: $key, name: $name, desc: $name, klass: "ItemClass" }]) {
+        entities {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_create_two(snapshot):
+    domain = domains.Domain()
+
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
+
+        session.world.destroy()
+
+    data = {
+        "variables": {
+            "entities": [
+                dict(key="a", name="Thing A", desc="Thing", klass="ItemClass"),
+                dict(key="b", name="Thing B", desc="Thing", klass="ItemClass"),
+            ]
+        },
+        "query": """
+mutation CreateThing($entities: [EntityTemplate!]) {
+    create(entities: $entities) {
+        entities {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_create_one_containing_another(snapshot):
+    domain = domains.Domain()
+
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
+
+        session.world.destroy()
+
+    data = {
+        "variables": {
+            "entities": [
+                dict(
+                    key="a",
+                    name="Thing A",
+                    desc="Thing",
+                    klass="ItemClass",
+                    holding=["b"],
+                ),
+                dict(key="b", name="Thing B", desc="Thing", klass="ItemClass"),
+            ]
+        },
+        "query": """
+mutation CreateThing($entities: [EntityTemplate!]) {
+    create(entities: $entities) {
+        entities {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")

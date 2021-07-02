@@ -1,3 +1,5 @@
+from typing import Type
+
 import logging
 
 import model.entity as entity
@@ -11,17 +13,6 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 
 log = logging.getLogger("dimsum.scopes")
-
-Alive = [
-    ownership.Ownership,
-    carryable.Containing,
-    mechanics.Memory,
-    health.Health,
-]
-Item = [ownership.Ownership, carryable.Carryable]
-Exit = [ownership.Ownership, movement.Exit]
-Area = [ownership.Ownership, carryable.Containing, occupyable.Occupyable]
-World = [ownership.Ownership]
 
 
 class LivingClass(entity.EntityClass):
@@ -40,6 +31,25 @@ class ExitClass(entity.EntityClass):
     pass
 
 
+Alive = [
+    ownership.Ownership,
+    carryable.Containing,
+    mechanics.Memory,
+    health.Health,
+]
+Item = [ownership.Ownership, carryable.Carryable]
+Exit = [ownership.Ownership, movement.Exit]
+Area = [ownership.Ownership, carryable.Containing, occupyable.Occupyable]
+World = [ownership.Ownership]
+
+scopes_by_class = {
+    LivingClass: Alive,
+    ItemClass: Item,
+    AreaClass: Area,
+    ExitClass: Exit,
+}
+
+
 def alive(**kwargs) -> entity.Entity:
     return entity.Entity(scopes=Alive, klass=LivingClass, **kwargs)
 
@@ -54,3 +64,16 @@ def area(**kwargs) -> entity.Entity:
 
 def exit(**kwargs) -> entity.Entity:
     return entity.Entity(scopes=Exit, klass=ExitClass, **kwargs)
+
+
+classes = {
+    "ItemClass": ItemClass,
+    "AreaClass": AreaClass,
+    "ExitClass": ExitClass,
+    "LivingClass": LivingClass,
+}
+
+
+def get_entity_class(name: str) -> Type[entity.EntityClass]:
+    assert name in classes
+    return classes[name]

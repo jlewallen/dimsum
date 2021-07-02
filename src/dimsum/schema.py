@@ -15,11 +15,15 @@ import model.entity as entity
 import model.world as world
 import model.domains as domains
 import model.game as game
+import model.properties as properties
 import model.entity as entities
 import model.scopes as scopes
 import model.scopes.users as users
 import model.visual as visual
 import model.library as library
+
+# Create
+import model.scopes.carryable as carryable
 
 import serializing
 import grammars
@@ -295,6 +299,65 @@ async def resolve_language(obj, info, criteria):
                 for e in session.registrar.entities.values()
                 if e.modified or lqc.reach > 0
             ],
+        )
+
+
+import shortuuid
+
+
+@dataclasses.dataclass
+class Template:
+    name: str
+    desc: str
+    klass: str
+    key: Optional[str] = None
+    holding: Optional[List[str]] = None
+
+    def generate_key(self, key_space: str) -> str:
+        if self.key:
+            return self.key
+        return shortuuid.uuid()
+
+    def create(self, key_space: str):
+        key = self.generate_key(key_space)
+        entity_class = scopes.get_entity_class(self.klass)
+        entity_scopes = scopes.scopes_by_class[entity_class]
+        log.info(
+            "create key=%s klass=%s scopes=%s", self.key, entity_class, entity_scopes
+        )
+        return entity.Entity(
+            key=self.key,
+            props=properties.Common(name=self.name, desc=self.desc),
+            klass=entity_class,
+            scopes=entity_scopes,
+        )  # TODO create
+
+
+@mutation.field("create")
+async def resolve_create(obj, info, entities):
+    domain = info.context.domain
+    templates = [Template(**e) for e in entities]
+    key_space = "key-space"
+    log.info("ariadne:create entities = %s", templates)
+
+    with domain.session() as session:
+        world = await session.prepare()
+        created = [(template, template.create(key_space)) for template in templates]
+        session.register([r[1] for r in created])
+        by_key = {r[1].key: r[1] for r in created}
+        for template, container in created:
+            if template.holding:
+                for k in template.holding:
+                    log.debug("adding (k) %s", k)
+                    e = await session.materialize(k)
+                    log.info("adding (e) %s", e)
+                    with container.make(carryable.Containing) as containing:
+                        containing.add_item(e)
+
+        await session.save()
+        return Evaluation(
+            dict(ok=True),
+            [EntityResolver(session, r[1]) for r in created],
         )
 
 
