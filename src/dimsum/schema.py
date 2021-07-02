@@ -258,10 +258,12 @@ async def resolve_language(obj, info, criteria):
     log.info("ariadne:language criteria=%s", lqc)
 
     with domain.session() as session:
-        w = await session.materialize(key=world.Key)
-        assert w
+        log.debug("materialize player")
         player = await session.materialize(key=lqc.evaluator)
         assert player
+        log.debug("materialize world")
+        w = await session.materialize(key=world.Key)
+        assert w
         tree, create_evaluator = parser.parse(lqc.text.strip())
         tree_eval = create_evaluator(w, player)
         action = tree_eval.transform(tree)

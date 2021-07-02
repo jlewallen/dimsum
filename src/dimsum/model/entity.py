@@ -410,14 +410,19 @@ class Registrar:
     def modified(self) -> Dict[str, Entity]:
         return {key: e for key, e in self.entities.items() if self.was_modified(e)}
 
-    def register(self, entity: Union[Entity, List[Entity]], original: str = None):
+    def register(
+        self,
+        entity: Union[Entity, List[Entity]],
+        original: str = None,
+        depth: int = 0,
+    ):
         if isinstance(entity, list):
             return [self.register(e) for e in entity]
 
         if entity.key in self.entities:
-            log.info("register:noop {0} '{1}'".format(entity.key, entity))
+            log.info("[%d] register:noop %s '%s'", depth, entity.key, entity)
         else:
-            log.info("register:new {0} '{1}'".format(entity.key, entity))
+            log.info("[%d] register:new %s '%s'", depth, entity.key, entity)
             assigned = entity.registered(self.number)
             if original:
                 self.originals[entity.key] = original

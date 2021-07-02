@@ -230,14 +230,12 @@ async def materialize(
     log.debug("json: %s", json)
 
     refs: Dict[str, entity.EntityProxy] = {}
+    depths: Dict[str, int] = {}
 
     def reference(ref: entity.EntityRef):
-        assert registrar
-        if registrar.contains(ref.key):
-            return registrar.find_by_key(ref.key)
-
         if ref.key not in refs:
             refs[ref.key] = entity.EntityProxy(ref)
+            depths[ref.key] = depth
         return refs[ref.key]
 
     if not json or len(json) == 0:
@@ -246,7 +244,7 @@ async def materialize(
     cache.update(**{se.key: [se] for se in json})
 
     deserialized = _deserialize(json[0].serialized, reference)
-    registrar.register(deserialized, original=json[0].serialized)
+    registrar.register(deserialized, original=json[0].serialized, depth=depth)
     loaded = deserialized
 
     deeper = True
@@ -261,12 +259,13 @@ async def materialize(
 
     if deeper:
         for referenced_key, proxy in refs.items():
+            log.debug("materialize: %s -> %s", loaded, referenced_key)
             linked = await materialize(
                 registrar=registrar,
                 store=store,
                 key=referenced_key,
                 reach=reach,
-                depth=new_depth,
+                depth=depths[referenced_key],
                 cache=cache,
             )
             proxy.__wrapped__ = linked  # type: ignore
