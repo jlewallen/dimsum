@@ -11,7 +11,7 @@ import model.visual as visual
 
 import serializing
 
-import cli.handlers as handlers
+import handlers
 
 import test
 

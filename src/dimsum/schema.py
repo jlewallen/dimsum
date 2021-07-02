@@ -25,6 +25,7 @@ import serializing
 import grammars
 import storage
 import config
+import handlers
 import bus
 
 log = logging.getLogger("dimsum")
@@ -349,8 +350,8 @@ class AriadneContext:
     identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
-def context(cfg, subscriptions: bus.SubscriptionManager):
-    domain = cfg.make_domain()
+def context(cfg, subscriptions: bus.SubscriptionManager, comms: visual.Comms):
+    domain = cfg.make_domain(handlers=[handlers.create(comms)])
     parser = grammars.create_parser()
 
     def wrap(request):

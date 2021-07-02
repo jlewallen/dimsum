@@ -6,7 +6,7 @@ import inspect
 import model.events as events
 import model.visual as visual
 
-log = logging.getLogger("dimsum")
+log = logging.getLogger("dimsum.bus")
 
 
 class Subscription:

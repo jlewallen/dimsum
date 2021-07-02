@@ -12,5 +12,7 @@ def app():
     schema = schema_factory.create()
     subscriptions = bus.SubscriptionManager()
     return ariadne.asgi.GraphQL(
-        schema, context_value=schema_factory.context(cfg, subscriptions), debug=True
+        schema,
+        context_value=schema_factory.context(cfg, subscriptions, subscriptions),
+        debug=True,
     )

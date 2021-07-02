@@ -16,7 +16,7 @@ import grammars
 
 import plugins.default
 
-import cli.handlers as handlers
+import handlers
 
 import everything
 

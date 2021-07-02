@@ -84,7 +84,7 @@ async def server(
     schema = schema_factory.create()
     gql_app = ariadne.asgi.GraphQL(
         schema,
-        context_value=schema_factory.context(cfg, subscriptions),
+        context_value=schema_factory.context(cfg, subscriptions, subscriptions),
         debug=True,
         # extensions=[],
         extensions=[ApolloTracingExtension],

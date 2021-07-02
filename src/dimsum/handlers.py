@@ -12,9 +12,6 @@ import model.visual as visual
 
 from model.events import *
 
-import model.scopes.movement as movement
-import model.scopes.health as health
-
 log = logging.getLogger("dimsum.handlers")
 
 

@@ -1,8 +1,10 @@
 <template>
-    <div class="alert alert-dismissible alert-success">
-        <div class="response success" v-if="reply.message">{{ reply.message }}</div>
-        <div class="response success" v-else>{{ JSON.stringify(reply) }}</div>
-    </div>
+    <template v-if="reply.message">
+        <div class="alert alert-dismissible alert-success">
+            <div class="response success" v-if="reply.message">{{ reply.message }}</div>
+            <div class="response success" v-if="false">{{ JSON.stringify(reply) }}</div>
+        </div>
+    </template>
 </template>
 
 <script lang="ts">
