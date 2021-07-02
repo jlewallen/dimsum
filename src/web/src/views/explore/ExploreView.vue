@@ -1,7 +1,5 @@
 <template>
-    <div class="explore container-fluid">
-        <Repl @send="send" />
-
+    <div class="history">
         <div v-for="response in responses" v-bind:key="response.key" class="response">
             <component v-bind:is="viewFor(response)" :response="response" :reply="response.reply" @selected="onSelected" />
         </div>
@@ -10,7 +8,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Repl from "../shared/Repl.vue";
 import Replies from "../shared/replies";
 import store, { Entity, ReplAction, ReplResponse } from "@/store";
 
@@ -18,18 +15,25 @@ export default defineComponent({
     name: "ExploreView",
     components: {
         ...Replies,
-        Repl,
-    },
-    props: {},
-    computed: {
-        responses(): ReplResponse[] {
-            return store.state.responses;
-        },
     },
     data(): { command: string; response: ReplResponse | null } {
         return { command: "", response: null };
     },
+    computed: {
+        responses(): ReplResponse[] {
+            return store.state.responses;
+        },
+        historyLength(): number {
+            return store.state.responses.length;
+        },
+    },
+    watch: {
+        historyLength(after: number, before: number): void {
+            this.$emit("scroll-bottom");
+        },
+    },
     mounted(): Promise<any> {
+        this.$emit("scroll-bottom");
         return store.dispatch(new ReplAction("look"));
     },
     methods: {
@@ -52,6 +56,5 @@ export default defineComponent({
 </script>
 <style scoped>
 .response {
-    margin-bottom: 1em;
 }
 </style>

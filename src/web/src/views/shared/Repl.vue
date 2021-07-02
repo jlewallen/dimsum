@@ -25,4 +25,8 @@ export default defineComponent({
     },
 });
 </script>
-<style scoped></style>
+<style scoped>
+.form-group {
+    margin: 0em;
+}
+</style>

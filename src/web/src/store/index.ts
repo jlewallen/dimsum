@@ -77,7 +77,7 @@ export default createStore<RootState>({
             state.entities[entity.key] = entity;
         },
         [MutationTypes.REPLY]: (state: RootState, response: ReplResponse) => {
-            state.responses.unshift(response);
+            state.responses.push(response);
         },
     },
     actions: {
