@@ -100,37 +100,38 @@ async def resolve_world(obj, info):
         return EntityResolver(session, await session.prepare())
 
 
-async def materialize(session, **kwargs):
-    loaded = await session.materialize(**kwargs)
+async def materialize(session, key=None, gid=None, reach: int = None, **kwargs):
+    loaded = await session.materialize(key=key, gid=gid)
     if loaded:
         entities = [loaded]
-        for other_key, other in session.registrar.entities.items():
-            if other_key != loaded.key:
-                entities.append(other)
+        if reach:
+            for other_key, other in session.registrar.entities.items():
+                if other_key != loaded.key:
+                    entities.append(other)
         return [EntityResolver(session, e) for e in entities]
     return []
 
 
 @query.field("entitiesByKey")
-async def resolve_entities_by_key(obj, info, key, identities=True):
+async def resolve_entities_by_key(obj, info, key, reach: int = 0, identities=True):
     domain = info.context.domain
     info.context.identities = (
         serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
     )
     log.info("ariadne:entities-by-key key=%s", key)
     with domain.session() as session:
-        return await materialize(session, key=key)
+        return await materialize(session, key=key, reach=reach)
 
 
 @query.field("entitiesByGid")
-async def resolve_entities_by_gid(obj, info, gid, identities=True):
+async def resolve_entities_by_gid(obj, info, gid, reach: int = 0, identities=True):
     domain = info.context.domain
     info.context.identities = (
         serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
     )
     log.info("ariadne:entities-by-gid gid=%s", gid)
     with domain.session() as session:
-        return await materialize(session, gid=gid)
+        return await materialize(session, gid=gid, reach=reach)
 
 
 @query.field("areas")

@@ -35,8 +35,8 @@ type KeyedEntity {
 type Query {
   size: Int!
   world: KeyedEntity!
-  entitiesByKey(key: Key, identities: Boolean): [KeyedEntity!]
-  entitiesByGid(gid: Int, identities: Boolean): [KeyedEntity!]
+  entitiesByKey(key: Key, reach: Int, identities: Boolean): [KeyedEntity!]
+  entitiesByGid(gid: Int, reach: Int, identities: Boolean): [KeyedEntity!]
   areas: [KeyedEntity!]
   people: [KeyedEntity!]
 }
