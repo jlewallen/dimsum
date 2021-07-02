@@ -229,12 +229,16 @@ class PersistenceCriteria:
 class LanguageQueryCriteria:
     text: str
     evaluator: str
+    reach: int = 0
     persistence: Optional[PersistenceCriteria] = None
 
 
-def make_language_query_criteria(persistence=None, **kwargs) -> LanguageQueryCriteria:
+def make_language_query_criteria(
+    persistence=None, reach=None, **kwargs
+) -> LanguageQueryCriteria:
     return LanguageQueryCriteria(
         persistence=PersistenceCriteria(**persistence) if persistence else None,
+        reach=reach if reach else 0,
         **kwargs
     )
 
@@ -269,7 +273,7 @@ async def resolve_language(obj, info, criteria):
             [
                 EntityResolver(session, e)
                 for e in session.registrar.entities.values()
-                if e.modified
+                if e.modified or lqc.reach > 0
             ],
         )
 

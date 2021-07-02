@@ -17,6 +17,7 @@ input PersistenceCriteria {
 input LanguageQueryCriteria {
   text: String!
   evaluator: Key!
+  reach: Int
   persistence: PersistenceCriteria
 }
 
