@@ -1,3 +1,5 @@
+from typing import Dict, Any, List
+
 import pytest
 import freezegun
 import logging
@@ -97,7 +99,7 @@ async def test_graphql_world_directly(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+    snapshot.assert_match(test.pretty_json(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -116,7 +118,7 @@ async def test_graphql_world_by_key(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+    snapshot.assert_match(test.pretty_json(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -137,7 +139,7 @@ async def test_graphql_world_by_gid(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+    snapshot.assert_match(test.pretty_json(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -177,7 +179,7 @@ mutation {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "entities.json")
+    snapshot.assert_match(test.pretty_json(actual), "entities.json")
 
 
 @pytest.mark.asyncio
@@ -190,7 +192,7 @@ async def test_graphql_entities_areas(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "areas.json")
+    snapshot.assert_match(test.pretty_json(actual), "areas.json")
 
 
 @pytest.mark.asyncio
@@ -203,7 +205,7 @@ async def test_graphql_entities_people(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "people.json")
+    snapshot.assert_match(test.pretty_json(actual), "people.json")
 
 
 @pytest.mark.asyncio
@@ -302,7 +304,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+    snapshot.assert_match(test.pretty_json(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -360,7 +362,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+    snapshot.assert_match(test.pretty_json(actual), "response.json")
 
 
 @pytest.mark.asyncio
@@ -379,7 +381,7 @@ async def test_graphql_entities(snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")
+    snapshot.assert_match(test.pretty_json(actual), "world.json")
 
 
 @pytest.mark.asyncio
@@ -410,7 +412,7 @@ mutation CreateThing($key: String!, $name: String!) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+    snapshot.assert_match(test.pretty_json(actual), "response.json")
 
 
 @pytest.mark.asyncio
@@ -446,7 +448,7 @@ mutation CreateThing($entities: [EntityTemplate!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+    snapshot.assert_match(test.pretty_json(actual), "response.json")
 
 
 @pytest.mark.asyncio
@@ -488,4 +490,4 @@ mutation CreateThing($entities: [EntityTemplate!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+    snapshot.assert_match(test.pretty_json(actual), "response.json")

@@ -1,7 +1,28 @@
 {
     "data": {
         "language": {
-            "reply": "{\"py/object\": \"model.reply.AreaObservation\", \"who\": {\"py/object\": \"model.reply.ObservedPerson\", \"alive\": {\"py/object\": \"model.entity.Entity\", \"key\": \"jlewallen\", \"klass\": \"LivingClass\", \"name\": \"Jacob\"}, \"activities\": []}, \"where\": {\"py/object\": \"model.entity.Entity\", \"key\": \"welcome\", \"klass\": \"AreaClass\", \"name\": \"welcome\"}, \"living\": [], \"items\": [], \"routes\": []}",
+            "reply": {
+                "py/object": "model.reply.AreaObservation",
+                "who": {
+                    "py/object": "model.reply.ObservedPerson",
+                    "alive": {
+                        "py/object": "model.entity.Entity",
+                        "key": "jlewallen",
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    },
+                    "activities": []
+                },
+                "where": {
+                    "py/object": "model.entity.Entity",
+                    "key": "welcome",
+                    "klass": "AreaClass",
+                    "name": "welcome"
+                },
+                "living": [],
+                "items": [],
+                "routes": []
+            },
             "entities": []
         }
     }

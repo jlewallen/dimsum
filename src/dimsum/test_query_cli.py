@@ -26,7 +26,7 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
         ]
     )
     reply = await router.handle("{}")
-    snapshot.assert_match(reply, "stdout.json")
+    snapshot.assert_match(test.pretty_json(reply), "stdout.json")
 
 
 @pytest.mark.asyncio
@@ -45,4 +45,4 @@ async def test_routing_process_target_query_entity(snapshot):
     )
     query = '{ entitiesByKey(key: "world", reach: 1, identities: false) { key serialized } }'
     reply = await router.handle(json.dumps({"query": query}))
-    snapshot.assert_match(reply, "stdout.json")
+    snapshot.assert_match(test.pretty_json(reply), "stdout.json")

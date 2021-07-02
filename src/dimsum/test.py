@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import Dict, List, Optional, Any, Union
 
 import asyncio
 import logging
 import sys
+import json
 import lark
 import base64
 
@@ -208,3 +209,28 @@ async def make_simple_domain(password: str = None, store=None) -> domains.Domain
         await session.save()
 
     return domain
+
+
+def expand_json(obj: Dict[str, Any]) -> Dict[str, Any]:
+    def expand_value(value):
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except:
+                return value
+        if isinstance(value, dict):
+            return expand_json(value)
+        if isinstance(value, list):
+            return [expand_json(v) for v in value]
+        return value
+
+    return {key: expand_value(value) for key, value in obj.items()}
+
+
+def pretty_json(obj: Union[Dict[str, Any], str]) -> str:
+    if isinstance(obj, str):
+        return pretty_json(json.loads(obj))
+
+    expanded = expand_json(obj)
+
+    return json.dumps(expanded, indent=4)

@@ -4,11 +4,167 @@
             "entities": [
                 {
                     "key": "a",
-                    "serialized": "{\"py/object\": \"serializing.RootEntity\", \"version\": {\"py/object\": \"model.entity.Version\", \"i\": 0}, \"creator\": null, \"parent\": null, \"chimeras\": {\"ownership\": {\"owner\": {\"py/object\": \"model.entity.Entity\", \"key\": \"a\", \"klass\": \"ItemClass\", \"name\": \"Thing A\"}}, \"carryable\": {\"kind\": {\"py/object\": \"model.kinds.Kind\", \"identity\": {\"py/object\": \"model.crypto.Identity\", \"public\": \"<public>\", \"signature\": \"<signature>\", \"private\": \"<private>\"}}, \"quantity\": 1, \"loose\": false}}, \"klass\": {\"py/type\": \"model.scopes.ItemClass\"}, \"identity\": {\"py/object\": \"model.crypto.Identity\", \"public\": \"<public>\", \"signature\": \"<signature>\", \"private\": \"<private>\"}, \"key\": \"a\", \"props\": {\"py/object\": \"model.properties.Common\", \"map\": {\"gid\": {\"py/object\": \"model.properties.Property\", \"value\": 1}, \"name\": {\"py/object\": \"model.properties.Property\", \"value\": \"Thing A\"}, \"desc\": {\"py/object\": \"model.properties.Property\", \"value\": \"Thing\"}, \"created\": {\"py/object\": \"model.properties.Property\", \"value\": 1569369600.0}, \"touched\": {\"py/object\": \"model.properties.Property\", \"value\": 1569369600.0}, \"frozen\": {\"py/object\": \"model.properties.Property\", \"value\": null}, \"destroyed\": {\"py/object\": \"model.properties.Property\", \"value\": null}, \"related\": {\"py/object\": \"model.properties.Property\", \"value\": {}}}}}"
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": null,
+                        "parent": null,
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "a",
+                                    "klass": "ItemClass",
+                                    "name": "Thing A"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            }
+                        },
+                        "klass": {
+                            "py/type": "model.scopes.ItemClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "a",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Thing A"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Thing"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
                 },
                 {
                     "key": "b",
-                    "serialized": "{\"py/object\": \"serializing.RootEntity\", \"version\": {\"py/object\": \"model.entity.Version\", \"i\": 0}, \"creator\": null, \"parent\": null, \"chimeras\": {\"ownership\": {\"owner\": {\"py/object\": \"model.entity.Entity\", \"key\": \"b\", \"klass\": \"ItemClass\", \"name\": \"Thing B\"}}, \"carryable\": {\"kind\": {\"py/object\": \"model.kinds.Kind\", \"identity\": {\"py/object\": \"model.crypto.Identity\", \"public\": \"<public>\", \"signature\": \"<signature>\", \"private\": \"<private>\"}}, \"quantity\": 1, \"loose\": false}}, \"klass\": {\"py/type\": \"model.scopes.ItemClass\"}, \"identity\": {\"py/object\": \"model.crypto.Identity\", \"public\": \"<public>\", \"signature\": \"<signature>\", \"private\": \"<private>\"}, \"key\": \"b\", \"props\": {\"py/object\": \"model.properties.Common\", \"map\": {\"gid\": {\"py/object\": \"model.properties.Property\", \"value\": 2}, \"name\": {\"py/object\": \"model.properties.Property\", \"value\": \"Thing B\"}, \"desc\": {\"py/object\": \"model.properties.Property\", \"value\": \"Thing\"}, \"created\": {\"py/object\": \"model.properties.Property\", \"value\": 1569369600.0}, \"touched\": {\"py/object\": \"model.properties.Property\", \"value\": 1569369600.0}, \"frozen\": {\"py/object\": \"model.properties.Property\", \"value\": null}, \"destroyed\": {\"py/object\": \"model.properties.Property\", \"value\": null}, \"related\": {\"py/object\": \"model.properties.Property\", \"value\": {}}}}}"
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": null,
+                        "parent": null,
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "b",
+                                    "klass": "ItemClass",
+                                    "name": "Thing B"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            }
+                        },
+                        "klass": {
+                            "py/type": "model.scopes.ItemClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "b",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 2
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Thing B"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Thing"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
                 }
             ]
         }
