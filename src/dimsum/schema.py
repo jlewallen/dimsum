@@ -18,6 +18,7 @@ import model.game as game
 import model.entity as entities
 import model.scopes as scopes
 import model.scopes.users as users
+import model.visual as visual
 import model.library as library
 
 import serializing
@@ -157,17 +158,26 @@ subscription = ariadne.SubscriptionType()
 
 
 @subscription.source("nearby")
-async def nearby_generator(obj, info):
-    for i in range(5):
-        await asyncio.sleep(1)
-        log.info("yield %s", i)
-        yield [i]
+async def nearby_generator(obj, info, evaluator: str):
+    q: asyncio.Queue = asyncio.Queue()
+    subscriptions = info.context.subscriptions
+
+    async def publish(item: visual.Renderable, **kwargs):
+        await q.put(item)
+
+    subscription = subscriptions.subscribe(evaluator, publish)
+
+    try:
+        while True:
+            yield await q.get()
+    finally:
+        subscription.remove()
 
 
 @subscription.field("nearby")
-def nearby_resolver(count, info):
-    log.info("resolver %s", count)
-    return [count[0] + 1]
+def nearby_resolver(item, info, evaluator: str):
+    log.debug("resolver %s", item)
+    return [serialize_reply(item)]
 
 
 mutation = ariadne.MutationType()

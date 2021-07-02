@@ -36,7 +36,7 @@ export async function subscribe(headers: { [index: string]: string }) {
 
     const asGql = gql`
         subscription {
-            nearby
+            nearby(evaluator: "jlewallen")
         }
     `;
 

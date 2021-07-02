@@ -41,7 +41,7 @@ type Query {
 }
 
 type Subscription {
-  nearby: [Reply!]
+  nearby(evaluator: Key): [Reply!]
 }
 
 scalar Token
