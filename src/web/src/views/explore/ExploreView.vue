@@ -73,4 +73,8 @@ export default defineComponent({
     padding: 1em;
     background-color: #efefef;
 }
+.response.items {
+    padding: 1em;
+    background-color: #efefef;
+}
 </style>

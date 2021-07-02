@@ -69,6 +69,13 @@ class ItemsAppeared(StandardEvent):
     items: List[entity.Entity]
 
 
+def default_heard_for(area: entity.Entity = None) -> List[entity.Entity]:
+    if area:
+        with area.make_and_discard(occupyable.Occupyable) as here:
+            return here.occupied
+    return []
+
+
 class AddItemArea(PersonAction):
     def __init__(self, item=None, area=None, **kwargs):
         super().__init__(**kwargs)
@@ -92,7 +99,12 @@ class AddItemArea(PersonAction):
             ctx.register(after_add)
 
         await ctx.publish(
-            ItemsAppeared(living=person, area=self.area, heard=[], items=[self.item])
+            ItemsAppeared(
+                living=person,
+                area=self.area,
+                heard=default_heard_for(area=area),
+                items=[self.item],
+            )
         )
         await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
@@ -147,7 +159,12 @@ class Make(PersonAction):
 
         area = world.find_person_area(person)
         await ctx.publish(
-            ItemsMade(living=person, area=area, heard=[], items=[after_hold])
+            ItemsMade(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=[after_hold],
+            )
         )
         return Success("you're now holding %s" % (after_hold,), item=after_hold)
 
@@ -298,7 +315,11 @@ class Join(PersonAction):
         ctx.register(person)
         with world.welcome_area().make(occupyable.Occupyable) as entering:
             await ctx.publish(
-                PlayerJoined(living=person, area=entering.ourselves, heard=[])
+                PlayerJoined(
+                    living=person,
+                    area=entering.ourselves,
+                    heard=default_heard_for(area=area),
+                )
             )
             await entering.entered(person)
         return Success("welcome!")
@@ -443,7 +464,12 @@ class Drop(PersonAction):
             if dropped:
                 area = world.find_person_area(person)
                 await ctx.publish(
-                    ItemsDropped(living=person, area=area, heard=[], items=dropped)
+                    ItemsDropped(
+                        living=person,
+                        area=area,
+                        heard=default_heard_for(area=area),
+                        items=dropped,
+                    )
                 )
                 await ctx.extend(dropped=dropped).hook("drop:after")
                 return Success("you dropped %s" % (p.join(dropped),))
@@ -452,12 +478,12 @@ class Drop(PersonAction):
 
 
 @dataclasses.dataclass
-class ItemHeld(StandardEvent):
+class ItemsHeld(StandardEvent):
     items: List[entity.Entity]
 
 
 @dataclasses.dataclass
-class ItemObliterated(StandardEvent):
+class ItemsObliterated(StandardEvent):
     items: List[entity.Entity]
 
 
@@ -503,7 +529,12 @@ class Hold(PersonAction):
                 if after_hold != item and item:
                     ctx.unregister(item)
                 await ctx.publish(
-                    ItemHeld(living=person, area=area, heard=[], items=[after_hold])
+                    ItemsHeld(
+                        living=person,
+                        area=area,
+                        heard=default_heard_for(area=area),
+                        items=[after_hold],
+                    )
                 )
                 return Success("you picked up %s" % (after_hold,), item=after_hold)
 
@@ -819,7 +850,12 @@ class Obliterate(PersonAction):
             ctx.unregister(item)
 
         await ctx.publish(
-            ItemObliterated(living=person, area=area, heard=[], items=items)
+            ItemsObliterated(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=items,
+            )
         )
 
         await ctx.extend(obliterate=items).hook("obliterate:after")
