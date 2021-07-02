@@ -361,3 +361,22 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
     )
     assert ok
     snapshot.assert_match(json.dumps(actual, indent=4), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_entities(snapshot):
+    domain = domains.Domain()
+    with domain.session() as session:
+        await session.prepare()
+        await session.save()
+
+    data = {
+        "query": '{ entities(keys: ["%s"], identities: false) { key serialized } }'
+        % (world.Key)
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(json.dumps(actual, indent=4), "world.json")

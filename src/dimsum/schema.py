@@ -112,6 +112,22 @@ async def materialize(session, key=None, gid=None, reach: int = None, **kwargs):
     return []
 
 
+def flatten(l):
+    return [item for sl in l for item in sl]
+
+
+@query.field("entities")
+async def resolve_entities(obj, info, keys, reach: int = 0, identities=True):
+    domain = info.context.domain
+    info.context.identities = (
+        serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
+    )
+    log.info("ariadne:entities keys=%s", keys)
+    with domain.session() as session:
+        entities = [await materialize(session, key=key, reach=reach) for key in keys]
+        return flatten(entities)
+
+
 @query.field("entitiesByKey")
 async def resolve_entities_by_key(obj, info, key, reach: int = 0, identities=True):
     domain = info.context.domain
