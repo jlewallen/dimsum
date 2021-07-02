@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "@apollo/client": "^3.3.20",
+        "@tiptap/core": "^2.0.0-beta.85",
+        "@tiptap/starter-kit": "^2.0.0-beta.81",
         "core-js": "^3.6.5",
         "graphql": "^15.5.1",
         "graphql-ws": "^5.3.0",
