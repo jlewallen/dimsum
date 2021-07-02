@@ -22,7 +22,9 @@ function getWebsocketsUrl() {
     return http.replace("https", "ws").replace("http", "ws");
 }
 
-export async function subscribe(headers: { [index: string]: string }) {
+type OnReceivedFunc = (item: unknown) => Promise<void>;
+
+export async function subscribe(headers: { [index: string]: string }, onReceived: OnReceivedFunc) {
     const wsUrl = getWebsocketsUrl();
     const subscriptionClient = new SubscriptionClient(wsUrl, {
         reconnect: true,
@@ -46,7 +48,7 @@ export async function subscribe(headers: { [index: string]: string }) {
 
     s.subscribe({
         next: ({ data }: { data: unknown }) => {
-            console.log("received", data);
+            return onReceived(data);
         },
     });
 }

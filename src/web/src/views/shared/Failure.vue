@@ -1,6 +1,7 @@
 <template>
     <div class="alert alert-dismissible alert-danger">
-        <div class="response failure">{{ reply.message }}</div>
+        <div class="response failure" v-if="reply.message">{{ reply.message }}</div>
+        <div class="response failure" v-else>{{ JSON.stringify(reply) }}</div>
     </div>
 </template>
 

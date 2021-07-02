@@ -74,4 +74,7 @@ export default defineComponent({
 .entities {
     display: flex;
 }
+.card {
+    background-color: transparent;
+}
 </style>

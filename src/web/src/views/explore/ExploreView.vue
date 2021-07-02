@@ -9,7 +9,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Replies from "../shared/replies";
-import store, { Entity, ReplAction, ReplResponse } from "@/store";
+import store, { getObjectType, Entity, ReplAction, ReplResponse } from "@/store";
 
 export default defineComponent({
     name: "ExploreView",
@@ -41,8 +41,14 @@ export default defineComponent({
             return store.dispatch(new ReplAction(command));
         },
         viewFor(response: ReplResponse): string | null {
-            const pyObject: string = (response?.reply as any)["py/object"] || "";
-            return pyObject.replace("model.reply.", "").replace("model.game.", "") || null;
+            const info = getObjectType(response?.reply as any);
+            if (info.simple) {
+                const keys = Object.keys(Replies);
+                if (keys.indexOf(info.simple) >= 0) {
+                    return info.simple;
+                }
+            }
+            return "DefaultReply";
         },
         onSelected(entity: Entity): Promise<any> {
             console.log("explore:selected", entity);
@@ -54,7 +60,17 @@ export default defineComponent({
     },
 });
 </script>
-<style scoped>
-.response {
+<style>
+.response.living-entered-area {
+    padding: 1em;
+    background-color: #efefef;
+}
+.response.living-left-area {
+    padding: 1em;
+    background-color: #efefef;
+}
+.response.player-spoke {
+    padding: 1em;
+    background-color: #efefef;
 }
 </style>

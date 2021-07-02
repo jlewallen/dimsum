@@ -1,6 +1,16 @@
 import { Entity, Area, Person, UpdateEntityDetailsPayload, UpdateEntityBehaviorPayload, ReplResponse } from "@/http";
 export * from "@/http";
 
+export function getObjectType(something: Record<string, unknown>) {
+    const pyObject: string = (something["py/object"] as string) || "";
+    const parts = pyObject.split(".");
+    const simpleClassName = parts.length > 0 ? parts[parts.length - 1] : null;
+    return {
+        pyObject: pyObject,
+        simple: simpleClassName,
+    };
+}
+
 export class RootState {
     authenticated = false;
     headers: { [index: string]: string } = {};
