@@ -29,4 +29,12 @@ export default defineComponent({
 .form-group {
     margin: 0em;
 }
+
+.repl {
+}
+
+.form-control {
+    background-color: #393e46;
+    color: white;
+}
 </style>

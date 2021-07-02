@@ -63,18 +63,18 @@ export default defineComponent({
 <style>
 .response.living-entered-area {
     padding: 1em;
-    background-color: #efefef;
+    background-color: #30475e;
 }
 .response.living-left-area {
     padding: 1em;
-    background-color: #efefef;
+    background-color: #30475e;
 }
 .response.player-spoke {
     padding: 1em;
-    background-color: #efefef;
+    background-color: #30475e;
 }
 .response.items {
     padding: 1em;
-    background-color: #efefef;
+    background-color: #30475e;
 }
 </style>
