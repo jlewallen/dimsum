@@ -60,7 +60,7 @@ class Child(threading.Thread):
         assert config
         self.pool = pool
         self.config = config
-        self.process = None
+        self.process: Optional[multiprocessing.Process] = None
         self.exiting = threading.Event()
 
         watching = self.config.watching or []
@@ -88,15 +88,18 @@ class Child(threading.Thread):
             self.watchers.append(CustomWatcher(str(w)))
 
     def run(self):
-        self.process = self.pool.spawn(self.config)
-        self.process.start()
+        p = self.pool.spawn(self.config)
+        p.start()
+
+        self.process = p
 
         while not self.exiting.wait(0.25):
             if self.needs_restarting():
                 self.restart()
 
-        self.process.terminate()
-        self.process.join()
+        if self.process:
+            self.process.terminate()
+            self.process.join()
 
     def restart(self):
         if self.process:
@@ -148,7 +151,9 @@ class Pool:
         kwargs: Dict[str, Any] = {}
         kwargs.update(**config.kwargs)  # type:ignore
         kwargs.update(dict(queue=self.queue))
-        return self.mp.Process(target=config.target, kwargs=kwargs, daemon=True)
+        return self.mp.Process(
+            target=config.target, kwargs=kwargs, daemon=True
+        )  # type:ignore
 
     def service(self):
         try:

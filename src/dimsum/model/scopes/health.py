@@ -28,7 +28,7 @@ Fields = [properties.SumFields(name) for name in NutritionFields]
 
 class Nutrition:
     def __init__(self, properties=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):

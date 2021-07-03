@@ -330,7 +330,7 @@ class RoomGrid(Factory):
             )
 
         def link_cells(cell1, cell2, direction):
-            add_doorway(cell2, cell1)
+            add_doorway(cell2, cell1, direction)
 
         def try_add(cell, ox, oy, x, y, direction):
             if y < 0 or y >= len(grid):

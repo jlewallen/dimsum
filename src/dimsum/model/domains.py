@@ -1,6 +1,7 @@
-from typing import Optional, List, Sequence, Dict, Union, Any, Literal, Callable
+from typing import Optional, List, Sequence, Dict, Union, Any, Literal, Callable, cast
 
 import logging
+import dataclasses
 import time
 
 import model.game as game
@@ -73,13 +74,13 @@ class Session:
     def unregister(self, entity: entity.Entity) -> entity.Entity:
         return self.registrar.unregister(entity)
 
-    async def materialize(
+    async def try_materialize(
         self,
         key: Optional[str] = None,
         gid: Optional[int] = None,
         json: Optional[List[entity.Serialized]] = None,
         reach=None,
-    ) -> Union[Optional[entity.Entity], List[entity.Entity]]:
+    ) -> serializing.Materialized:
         materialized = await serializing.materialize(
             registrar=self.registrar,
             store=self.store,
@@ -89,20 +90,28 @@ class Session:
             reach=reach if reach else default_reach,
         )
 
-        if materialized and isinstance(materialized, list):
-            for updated_world in [e for e in materialized if e.key == world.Key]:
-                assert isinstance(updated_world, world.World)
-                self.world = updated_world
+        for updated_world in [e for e in materialized.all() if e.key == world.Key]:
+            assert isinstance(updated_world, world.World)
+            self.world = updated_world
 
         return materialized
+
+    async def materialize(self, **kwargs) -> entity.Entity:
+        materialized = await self.try_materialize(**kwargs)
+        return materialized.one()
 
     async def prepare(self, reach=None):
         if self.world:
             return self.world
 
-        self.world = await self.materialize(
+        maybe_world = await self.try_materialize(
             key=world.Key, reach=reach if reach else None
         )
+
+        if maybe_world.maybe_one():
+            self.world = cast(world.World, maybe_world.one())
+            assert isinstance(self.world, world.World)
+
         if self.world:
             self.registrar.number = self.world.gid()
             return self.world
@@ -362,9 +371,10 @@ class WorldCtx(context.Ctx):
         )
 
         if number is not None:
-            by_gid = await self.session.materialize(gid=number)
-            assert isinstance(by_gid, entity.Entity) or by_gid is None
-            return by_gid
+            maybe_by_gid = await self.session.try_materialize(gid=number)
+            if maybe_by_gid.empty():
+                return None
+            return maybe_by_gid.one()
 
         if len(candidates) == 0:
             return None

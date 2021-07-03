@@ -37,9 +37,9 @@ class InitializeWorld:
     async def create_player_if_necessary(self, session: domains.Session, key: str):
         world = await session.prepare()
 
-        player = await session.materialize(key=key)
-        if player:
-            return world, player
+        maybe_player = await session.try_materialize(key=key)
+        if not maybe_player.empty():
+            return world, maybe_player.one()
 
         if world.welcome_area() is None:
             log.info("creating example world")

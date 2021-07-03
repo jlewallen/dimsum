@@ -17,13 +17,14 @@ async def test_storage_materialize_world():
     store = storage.SqliteStorage(":memory:")
     domain = domains.Domain(storage=store)
     with domain.session() as session:
-        assert not await serializing.materialize(
-            session.registrar, store, key=world.Key
-        )
+        before = await serializing.materialize(session.registrar, store, key=world.Key)
+        assert before.empty()
+
         await store.update(serializing.for_update([world.World()]))
-        assert await serializing.materialize(
+        after = await serializing.materialize(
             registrar=session.registrar, store=store, key=world.Key
         )
+        assert after.one()
 
 
 @pytest.mark.asyncio

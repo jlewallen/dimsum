@@ -341,8 +341,8 @@ class HttpStorage(EntityStorage):
     """
             )
             entities = [
-                {"key": key.key, "serialized": serialized}
-                for key, serialized in updates.items()
+                {"key": key.key, "serialized": update.serialized}
+                for key, update in updates.items()
             ]
             response = await session.execute(
                 query, variable_values={"entities": entities}

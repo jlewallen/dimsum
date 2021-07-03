@@ -270,7 +270,7 @@ def make_language_query_criteria(
 @dataclasses.dataclass
 class Evaluation:
     reply: game.Reply
-    entities: List[KeyedEntity]
+    entities: List[EntityResolver]
 
 
 @mutation.field("language")
@@ -351,14 +351,14 @@ async def resolve_create(obj, info, entities):
             if template.holding:
                 for k in template.holding:
                     log.debug("adding (k) %s", k)
-                    e = await session.materialize(k)
+                    e = await session.materialize(key=k)
                     log.info("adding (e) %s", e)
                     with container.make(carryable.Containing) as containing:
                         containing.add_item(e)
 
         await session.save()
         return Evaluation(
-            dict(ok=True),
+            game.Reply(),
             [EntityResolver(session, r[1]) for r in created],
         )
 

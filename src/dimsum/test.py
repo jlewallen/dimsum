@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Union, Callable
 
 import asyncio
 import logging
@@ -51,7 +51,7 @@ class TestWorld:
 
     async def to_json(self):
         capture = io.StringIO()
-        await self.domain.store.write(capture)
+        await self.domain.store.write(capture)  # type:ignore
         return pretty_json(capture.getvalue())
 
     async def add_simple_area_here(self, door, name):
@@ -237,7 +237,10 @@ def expand_json(obj: Dict[str, Any]) -> Dict[str, Any]:
     return expand_value(obj)
 
 
-def pretty_json(obj: Union[Dict[str, Any], str]) -> str:
+def pretty_json(obj: Union[Dict[str, Any], Optional[str]]) -> str:
+    if obj is None:
+        return json.dumps(None)
+
     if isinstance(obj, str):
         return pretty_json(json.loads(obj))
 
@@ -250,15 +253,17 @@ class Deterministic:
     def __init__(self):
         super().__init__()
         self.i = 0
-        self.previous_keys = None
-        self.previous_identities = None
+        self.previous_keys: Optional[Callable] = None
+        self.previous_identities: Optional[Callable] = None
 
     def __enter__(self):
         self.previous_keys = entity.keys(self.generate_key)
         self.previous_identities = entity.identities(self.generate_identity)
 
     def __exit__(self, type, value, traceback):
+        assert self.previous_identities
         entity.identities(self.previous_identities)
+        assert self.previous_keys
         entity.keys(self.previous_keys)
 
     def generate_key(self) -> str:

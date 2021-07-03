@@ -1,4 +1,5 @@
 from typing import Optional, List, Any
+
 import logging
 import datetime
 import abc
@@ -40,9 +41,11 @@ class Ctx:
         raise NotImplementedError
 
 
-def get():
-    return worldCtx.get()
+def get() -> Ctx:
+    ctx = worldCtx.get()
+    assert ctx
+    return ctx
 
 
-def set(ctx: Ctx):
+def set(ctx: Optional[Ctx]):
     worldCtx.set(ctx)

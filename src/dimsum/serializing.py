@@ -1,9 +1,11 @@
 from typing import Dict, Any, List, Optional, Union
 
 import copy
-import jsonpickle
+import dataclasses
 import logging
 import enum
+
+import jsonpickle
 import wrapt
 
 import model.crypto as crypto
@@ -186,6 +188,27 @@ def _deserialize(encoded, lookup):
     return decoded
 
 
+@dataclasses.dataclass()
+class Materialized:
+    entities: List[entity.Entity]
+
+    def empty(self) -> bool:
+        return len(self.entities) == 0
+
+    def maybe_one(self) -> Optional[entity.Entity]:
+        if len(self.entities) == 1:
+            return self.entities[0]
+        return None
+
+    def one(self) -> entity.Entity:
+        if len(self.entities) == 1:
+            return self.entities[0]
+        raise Exception()
+
+    def all(self) -> List[entity.Entity]:
+        return self.entities
+
+
 async def materialize(
     registrar: Optional[entity.Registrar] = None,
     store: Optional[storage.EntityStorage] = None,
@@ -195,7 +218,7 @@ async def materialize(
     reach=None,
     depth: int = 0,
     cache: Optional[Dict[str, List[entity.Serialized]]] = None,
-) -> Union[Optional[entity.Entity], List[entity.Entity]]:
+) -> Materialized:
     assert registrar
     assert store
 
@@ -206,7 +229,7 @@ async def materialize(
         log.debug("[%d] materialize key=%s", depth, key)
         found = registrar.find_by_key(key)
         if found:
-            return found
+            return Materialized([found])
 
         if key in cache:
             json = cache[key]
@@ -214,18 +237,18 @@ async def materialize(
             json = await store.load_by_key(key)
             if len(json) == 0:
                 log.info("[%d] %s missing key=%s", depth, store, key)
-                return None
+                return Materialized([])
 
     if gid is not None:
         log.debug("[%d] materialize gid=%d", depth, gid)
         found = registrar.find_by_gid(gid)
         if found:
-            return found
+            return Materialized([found])
 
         json = await store.load_by_gid(gid)
         if len(json) == 0:
             log.info("[%d] %s missing gid=%d", depth, store, gid)
-            return None
+            return Materialized([])
 
     log.debug("json: %s", json)
 
@@ -268,14 +291,16 @@ async def materialize(
                 depth=depths[referenced_key],
                 cache=cache,
             )
-            proxy.__wrapped__ = linked
+            proxy.__wrapped__ = linked.one()
 
     loaded.validate()
 
     if single_entity:
-        return loaded
+        return Materialized([loaded])
 
-    return [v for v in [registrar.find_by_key(se.key) for se in json] if v]
+    return Materialized(
+        [v for v in [registrar.find_by_key(se.key) for se in json] if v]
+    )
 
 
 def _entity_update(

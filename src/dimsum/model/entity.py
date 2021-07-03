@@ -99,34 +99,34 @@ class Hooks:
         pass
 
 
-key_generator_fn = shortuuid.uuid
+key_generator_fn: Callable = shortuuid.uuid
 
 
-def keys(fn: Callable):
+def keys(fn: Callable) -> Callable:
     global key_generator_fn
     previous = key_generator_fn
     key_generator_fn = fn
     return previous
 
 
-identity_generator_fn = crypto.generate
+identity_generator_fn: Callable = crypto.generate
 
 
-def identities(fn: Callable):
+def identities(fn: Callable) -> Callable:
     global identity_generator_fn
     previous = identity_generator_fn
     identity_generator_fn = fn
     return previous
 
 
-def generate_identity(creator=None):
+def generate_identity(creator=None) -> crypto.Identity:
     return identity_generator_fn(creator=creator)
 
 
 global_hooks = Hooks()
 
 
-def hooks(new_hooks: Hooks):
+def hooks(new_hooks: Hooks) -> Hooks:
     global global_hooks
     previous = global_hooks
     global_hooks = new_hooks

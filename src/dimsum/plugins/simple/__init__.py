@@ -209,7 +209,7 @@ class Grammar(grammars.Grammar):
 
 class Evaluator(BaseEvaluator):
     def plant(self, args):
-        return actions.Plant(item=args[0])
+        return Plant(item=args[0])
 
     def swing(self, args):
         return Swing(item=args[0])

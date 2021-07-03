@@ -62,8 +62,8 @@ class AnyItem(things.ItemFinder):
                 return item
 
         log.info("%s finding pockets (contained)", self)
-        for item in person.make_and_discard(carryable.Containing).holding:
-            for contained in item.make(carryable.Containing).holding:
+        for h in person.make_and_discard(carryable.Containing).holding:
+            for contained in h.make(carryable.Containing).holding:
                 if contained.describes(q=self.q):
                     return contained
 

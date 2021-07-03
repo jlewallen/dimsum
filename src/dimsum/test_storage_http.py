@@ -109,16 +109,20 @@ async def test_storage_update_one_entity(
 ):
     w = entity.Entity(props=properties.Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
+    assert serialized
+
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid(name="example-1")
-    serialized = await store.update({entity.Keys(key): serialized})
-    snapshot.assert_match(test.pretty_json(serialized), "before.json")
+
+    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    snapshot.assert_match(test.pretty_json(updated), "before.json")
 
     w.version.increase()
     serialized = serializing.serialize(w)
+    assert serialized
 
-    serialized = await store.update({entity.Keys(key): serialized})
-    snapshot.assert_match(test.pretty_json(serialized), "after.json")
+    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    snapshot.assert_match(test.pretty_json(updated), "after.json")
 
 
 @pytest.mark.asyncio
@@ -128,14 +132,17 @@ async def test_storage_delete_one_entity(
 ):
     w = entity.Entity(props=properties.Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
+    assert serialized
+
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid(name="example-2")
-    serialized = await store.update({entity.Keys(key): serialized})
-    snapshot.assert_match(test.pretty_json(serialized), "before.json")
+    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    snapshot.assert_match(test.pretty_json(updated), "before.json")
 
     w.version.increase()
     w.destroy()
     serialized = serializing.serialize(w)
+    assert serialized
 
-    serialized = await store.update({entity.Keys(key): serialized})
-    snapshot.assert_match(test.pretty_json(serialized), "after.json")
+    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    snapshot.assert_match(test.pretty_json(updated), "after.json")

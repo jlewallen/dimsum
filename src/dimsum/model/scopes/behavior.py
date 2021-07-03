@@ -159,7 +159,7 @@ class BehaviorMap(properties.Map):
         return [self.map[key] for key in self.keys_matching(pattern)]
 
     def add(self, name, **kwargs):
-        b = self.map[name] = Behavior(**kwargs)
+        b = self.map[name] = Behavior(**kwargs)  # type:ignore
         b.check()
         return b
 

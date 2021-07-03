@@ -40,7 +40,7 @@ def get_now() -> datetime.datetime:
 
 class Observation:
     def __init__(self, time=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.time = time if time else get_now()
 
     def memorable(self) -> bool:

@@ -37,7 +37,7 @@ class DigDirection:
             return self.direction.exiting
         if self.arbitrary:
             return self.arbitrary
-        raise Error("malformed dig")
+        raise Exception("malformed dig")
 
 
 class DigLinkage:
@@ -46,6 +46,7 @@ class DigLinkage:
         directions: Optional[List[DigDirection]] = None,
     ):
         super().__init__()
+        assert directions
         self.directions = directions
 
     @property

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import logging
 import ariadne
 import os.path
@@ -37,8 +39,8 @@ class HttpTargetConfig:
 @dataclasses.dataclass
 class TargetConfiguration:
     name: str
-    process: ProcessTargetConfig
-    http: HttpTargetConfig
+    process: Optional[ProcessTargetConfig]
+    http: Optional[HttpTargetConfig]
 
 
 query = ariadne.QueryType()

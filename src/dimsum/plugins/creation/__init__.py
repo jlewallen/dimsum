@@ -80,7 +80,7 @@ class ItemsMade(StandardEvent):
 class Make(PersonAction):
     def __init__(
         self,
-        template: Optional[finders.MaybeItemOrRecipe] = None,
+        template: Optional[things.ItemFactory] = None,
         item: Optional[things.ItemFinder] = None,
         **kwargs,
     ):
@@ -266,7 +266,7 @@ class Evaluator(BaseEvaluator):
         return scopes.ExitClass
 
     def create_entity_kind_living(self, args):
-        return scopes.AliveClass
+        return scopes.LivingClass
 
     def make(self, args):
         return Make(template=args[0])

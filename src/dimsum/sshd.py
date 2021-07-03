@@ -90,7 +90,7 @@ class ShellSession:
         width, height, width_pixels, height_pixels = self.process.get_terminal_size()
         log.info("%s: recreating (%d x %d)" % (self.username, width, height))
         self.console = rich.console.Console(
-            file=WrapStandardOut(self.process.stdout),
+            file=WrapStandardOut(self.process.stdout),  # type:ignore
             force_terminal=True,
             width=width,
             height=height,
@@ -131,7 +131,6 @@ class ShellSession:
             if len(line) == 0:
                 return None
             return line.strip()
-        return None
 
     def write_everyone_else(self, msg: str):
         for username, other in self.connected.items():

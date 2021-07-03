@@ -1,6 +1,7 @@
 from typing import Optional, TextIO, List, Dict, Any, TYPE_CHECKING
 
 import logging
+import logging.config
 import time
 import json
 import asyncclick as click

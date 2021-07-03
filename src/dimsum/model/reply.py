@@ -77,28 +77,28 @@ class HoldingActivity(Activity):
 
 
 class ObservedLiving(ObservedEntity):
-    def __init__(self, alive: entity.Entity):
+    def __init__(self, living: entity.Entity):
         super().__init__()
-        self.alive = alive
+        self.living = living
         self.activities: Sequence[Activity] = [
-            HoldingActivity(e) for e in alive.make(carryable.Containing).holding
+            HoldingActivity(e) for e in living.make(carryable.Containing).holding
         ]
 
     @property
     def holding(self):
-        return self.alive.make(carryable.Containing).holding
+        return self.living.make(carryable.Containing).holding
 
     @property
     def memory(self):
-        return self.alive.make(mechanics.Memory).memory
+        return self.living.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.observed_living(self)
 
     def __str__(self):
         if len(self.activities) == 0:
-            return "%s" % (self.alive,)
-        return "%s who is %s" % (self.alive, p.join(list(map(str, self.activities))))
+            return "%s" % (self.living,)
+        return "%s who is %s" % (self.living, p.join(list(map(str, self.activities))))
 
     def __repr__(self):
         return str(self)
@@ -119,7 +119,7 @@ class ObservedPerson(ObservedLiving):
 
     @property
     def person(self):
-        return self.alive
+        return self.living
 
 
 class ObservedEntities:
@@ -152,7 +152,7 @@ class PersonalObservation(Observation):
 
     @property
     def memory(self):
-        return self.who.make(mechanics.Memory).memory
+        return self.who.person.make(mechanics.Memory).memory
 
     def accept(self, visitor):
         return visitor.personal_observation(self)
@@ -171,7 +171,7 @@ class DetailedObservation(Observation):
 
     @property
     def props(self):
-        return self.item.props
+        return self.item.entity.props  # type:ignore
 
     @property
     def properties(self):

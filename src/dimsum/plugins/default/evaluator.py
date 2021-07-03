@@ -154,12 +154,6 @@ class Default(Evaluator):
     def look_inside(self, args):
         return actions.LookInside(item=args[0])
 
-    def say(self, args):
-        return actions.Unknown()
-
-    def tell(self, args):
-        return actions.Unknown()
-
     def think(self, args):
         return actions.LookMyself()
 
