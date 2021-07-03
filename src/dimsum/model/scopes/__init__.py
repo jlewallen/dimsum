@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Optional
 
 import logging
 
@@ -56,24 +56,29 @@ scopes_by_class = {
 }
 
 
-def create_klass(klass: Type[entity.EntityClass], **kwargs) -> entity.Entity:
-    return entity.Entity(scopes=scopes_by_class[klass], klass=klass, **kwargs)
+def create_klass(
+    desired: Type[entity.EntityClass],
+    klass: Optional[Type[entity.EntityClass]] = None,
+    **kwargs
+) -> entity.Entity:
+    assert klass is None or klass is desired
+    return entity.Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
 
 
 def alive(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Alive, klass=LivingClass, **kwargs)
+    return create_klass(LivingClass, **kwargs)
 
 
-def item(klass=ItemClass, **kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Item, klass=klass, **kwargs)
+def item(**kwargs) -> entity.Entity:
+    return create_klass(ItemClass, **kwargs)
 
 
 def area(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Area, klass=AreaClass, **kwargs)
+    return create_klass(AreaClass, **kwargs)
 
 
 def exit(**kwargs) -> entity.Entity:
-    return entity.Entity(scopes=Exit, klass=ExitClass, **kwargs)
+    return create_klass(ExitClass, **kwargs)
 
 
 classes = {
