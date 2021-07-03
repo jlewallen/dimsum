@@ -52,6 +52,18 @@ const ItemsDropped = defineComponent({
     template: `<div class="response items">{{ reply.living.name }} dropped {{ reply.items }}</div>`,
 });
 
+const ItemsObliterated = defineComponent({
+    name: "ItemsObliterated",
+    props: CommonProps,
+    template: `<div class="response items">{{ reply.living.name }} obliterated {{ reply.items }}</div>`,
+});
+
+const EntityCreated = defineComponent({
+    name: "EntityCreated",
+    props: CommonProps,
+    template: `<div class="response items">{{ reply.living.name }} created {{ reply.entity.name }}</div>`,
+});
+
 import InlineEditor from "@/views/entity/InlineEditor.vue";
 
 const EditingEntity = defineComponent({
@@ -84,5 +96,7 @@ export default {
     ItemsHeld,
     ItemsDropped,
     EditingEntity,
+    EntityCreated,
     ScreenCleared,
+    ItemsObliterated,
 };
