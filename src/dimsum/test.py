@@ -6,6 +6,7 @@ import sys
 import json
 import lark
 import base64
+import io
 
 import model.crypto as crypto
 import model.entity as entity
@@ -47,6 +48,11 @@ class TestWorld:
         self.carla_key = None
         self.jacob_key = None
         self.tomi_key = None
+
+    async def to_json(self):
+        capture = io.StringIO()
+        await self.domain.store.write(capture)
+        return pretty_json(capture.getvalue())
 
     async def add_simple_area_here(self, door, name):
         with self.domain.session() as session:
@@ -221,12 +227,12 @@ def expand_json(obj: Dict[str, Any]) -> Dict[str, Any]:
             except:
                 return value
         if isinstance(value, dict):
-            return expand_json(value)
+            return {key: expand_value(value) for key, value in value.items()}
         if isinstance(value, list):
             return [expand_json(v) for v in value]
         return value
 
-    return {key: expand_value(value) for key, value in obj.items()}
+    return expand_value(obj)
 
 
 def pretty_json(obj: Union[Dict[str, Any], str]) -> str:
