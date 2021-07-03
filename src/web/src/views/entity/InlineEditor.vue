@@ -1,6 +1,6 @@
 <template>
     <div>
-        <form class="" @submit.prevent="saveForm">
+        <form class="" @submit.prevent="saveForm" @keydown.esc="cancel">
             <div class="form-group row">
                 <label class="col-sm-2">Name</label>
                 <div class="col-sm-5">
@@ -53,11 +53,9 @@ export default defineComponent({
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
             await store.dispatch(new UpdateEntityAction(updating));
-            console.log("save-form");
             this.$emit("dismiss");
         },
         async cancel(e: Event): Promise<void> {
-            console.log("cancel");
             this.$emit("dismiss");
             e.preventDefault();
         },
