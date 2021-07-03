@@ -21,8 +21,10 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { defineComponent } from "vue";
 import { Entity, PropertyMap } from "@/http";
+import store, { UpdateEntityAction } from "@/store";
 
 export default defineComponent({
     name: "InlineEditor",
@@ -47,7 +49,10 @@ export default defineComponent({
     methods: {
         async saveForm(): Promise<void> {
             console.log("save");
-            await Promise.resolve();
+            const updating = _.clone(this.entity);
+            updating.props.map.name.value = this.form.name;
+            updating.props.map.desc.value = this.form.desc;
+            await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("saved");
         },
     },

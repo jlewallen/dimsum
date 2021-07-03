@@ -18,6 +18,7 @@ import {
     ReplResponse,
     ReplAction,
     RemoveHistoryEntry,
+    UpdateEntityAction,
 } from "./types";
 import { getApi, subscribe } from "@/http";
 
@@ -161,31 +162,13 @@ export default createStore<RootState>({
                 }
             }
         },
-        [ActionTypes.SAVE_ENTITY_DETAILS]: ({ state, commit }: ActionParameters, payload: SaveEntityDetailsAction) => {
-            /*
-            return http<EntityResponse>({
-                url: `/entities/${urlKey(payload.form.key)}/props`,
-                method: "POST",
-                data: payload.form,
-                headers: state.headers,
-            }).then((data) => {
-                commit(MutationTypes.ENTITY, data.entity);
-                return data;
-			});
-			*/
-        },
-        [ActionTypes.SAVE_ENTITY_BEHAVIOR]: ({ state, commit }: ActionParameters, payload: SaveEntityBehaviorAction) => {
-            /*
-            return http<EntityResponse>({
-                url: `/entities/${urlKey(payload.key)}/behavior`,
-                method: "POST",
-                data: payload.form,
-                headers: state.headers,
-            }).then((data) => {
-                commit(MutationTypes.ENTITY, data.entity);
-                return data;
-			});
-			*/
+        [ActionTypes.UPDATE_ENTITY]: async ({ state, commit }: ActionParameters, payload: UpdateEntityAction) => {
+            const api = getApi(state.headers);
+            const data = await api.updateEntity({
+                key: payload.entity.key,
+                serialized: JSON.stringify(payload.entity),
+            });
+            commit(MutationTypes.ENTITY, payload.entity);
         },
     },
     getters: {},

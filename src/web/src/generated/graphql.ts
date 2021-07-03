@@ -1,6 +1,7 @@
 import { GraphQLClient } from "graphql-request";
 import * as Dom from "graphql-request/dist/types.dom";
 import gql from "graphql-tag";
+
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -34,6 +35,14 @@ export type EntityDiff = {
     serialized: Scalars["String"];
 };
 
+export type EntityTemplate = {
+    name: Scalars["String"];
+    desc: Scalars["String"];
+    klass: Scalars["String"];
+    key?: Maybe<Scalars["String"]>;
+    holding?: Maybe<Array<Scalars["Key"]>>;
+};
+
 export type Evaluation = {
     __typename?: "Evaluation";
     reply: Scalars["Reply"];
@@ -50,6 +59,7 @@ export type KeyedEntity = {
 export type LanguageQueryCriteria = {
     text: Scalars["String"];
     evaluator: Scalars["Key"];
+    reach?: Maybe<Scalars["Int"]>;
     persistence?: Maybe<PersistenceCriteria>;
 };
 
@@ -59,6 +69,7 @@ export type Mutation = {
     makeSample?: Maybe<EntitiesUpdated>;
     update?: Maybe<EntitiesUpdated>;
     language: Evaluation;
+    create: Evaluation;
 };
 
 export type MutationLoginArgs = {
@@ -73,6 +84,10 @@ export type MutationLanguageArgs = {
     criteria: LanguageQueryCriteria;
 };
 
+export type MutationCreateArgs = {
+    entities?: Maybe<Array<EntityTemplate>>;
+};
+
 export type PersistenceCriteria = {
     read: Scalars["String"];
     write: Scalars["String"];
@@ -82,25 +97,38 @@ export type Query = {
     __typename?: "Query";
     size: Scalars["Int"];
     world: KeyedEntity;
+    entities?: Maybe<Array<KeyedEntity>>;
     entitiesByKey?: Maybe<Array<KeyedEntity>>;
     entitiesByGid?: Maybe<Array<KeyedEntity>>;
     areas?: Maybe<Array<KeyedEntity>>;
     people?: Maybe<Array<KeyedEntity>>;
 };
 
+export type QueryEntitiesArgs = {
+    keys?: Maybe<Array<Scalars["Key"]>>;
+    reach?: Maybe<Scalars["Int"]>;
+    identities?: Maybe<Scalars["Boolean"]>;
+};
+
 export type QueryEntitiesByKeyArgs = {
     key?: Maybe<Scalars["Key"]>;
+    reach?: Maybe<Scalars["Int"]>;
     identities?: Maybe<Scalars["Boolean"]>;
 };
 
 export type QueryEntitiesByGidArgs = {
     gid?: Maybe<Scalars["Int"]>;
+    reach?: Maybe<Scalars["Int"]>;
     identities?: Maybe<Scalars["Boolean"]>;
 };
 
 export type Subscription = {
     __typename?: "Subscription";
     nearby?: Maybe<Array<Scalars["Reply"]>>;
+};
+
+export type SubscriptionNearbyArgs = {
+    evaluator?: Maybe<Scalars["Key"]>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -119,6 +147,15 @@ export type LanguageMutation = { __typename?: "Mutation" } & {
     language: { __typename?: "Evaluation" } & Pick<Evaluation, "reply"> & {
             entities?: Maybe<Array<{ __typename?: "KeyedEntity" } & Pick<KeyedEntity, "key" | "serialized" | "diff">>>;
         };
+};
+
+export type UpdateEntityMutationVariables = Exact<{
+    key: Scalars["String"];
+    serialized: Scalars["String"];
+}>;
+
+export type UpdateEntityMutation = { __typename?: "Mutation" } & {
+    update?: Maybe<{ __typename?: "EntitiesUpdated" } & Pick<EntitiesUpdated, "affected">>;
 };
 
 export type AreasQueryVariables = Exact<{ [key: string]: never }>;
@@ -152,13 +189,20 @@ export const LoginDocument = gql`
 `;
 export const LanguageDocument = gql`
     mutation language($text: String!, $evaluator: Key!) {
-        language(criteria: { text: $text, evaluator: $evaluator }) {
+        language(criteria: { text: $text, evaluator: $evaluator, reach: 1 }) {
             reply
             entities {
                 key
                 serialized
                 diff
             }
+        }
+    }
+`;
+export const UpdateEntityDocument = gql`
+    mutation updateEntity($key: String!, $serialized: String!) {
+        update(entities: [{ key: $key, serialized: $serialized }]) {
+            affected
         }
     }
 `;
@@ -210,6 +254,13 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
                 (wrappedRequestHeaders) =>
                     client.request<LanguageMutation>(LanguageDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
                 "language"
+            );
+        },
+        updateEntity(variables: UpdateEntityMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateEntityMutation> {
+            return withWrapper(
+                (wrappedRequestHeaders) =>
+                    client.request<UpdateEntityMutation>(UpdateEntityDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+                "updateEntity"
             );
         },
         areas(variables?: AreasQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AreasQuery> {

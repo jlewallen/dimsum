@@ -31,6 +31,7 @@ export enum ActionTypes {
     SAVE_ENTITY_DETAILS = "SAVE_ENTITY_DETAILS",
     SAVE_ENTITY_BEHAVIOR = "SAVE_ENTITY_BEHAVIOR",
     REPL = "REPL",
+    UPDATE_ENTITY = "UPDATE_ENTITY",
 }
 
 export enum MutationTypes {
@@ -113,4 +114,10 @@ export class RemoveHistoryEntry {
     type = MutationTypes.REMOVE_HISTORY_ENTRY;
 
     constructor(public readonly entry: ReplResponse) {}
+}
+
+export class UpdateEntityAction {
+    type = ActionTypes.UPDATE_ENTITY;
+
+    constructor(public readonly entity: Entity) {}
 }
