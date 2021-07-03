@@ -7,6 +7,7 @@ import json
 import lark
 import base64
 
+import model.crypto as crypto
 import model.entity as entity
 import model.properties as properties
 import model.game as game
@@ -26,6 +27,7 @@ import bus
 import grammars
 import serializing
 import luaproxy
+import pytest
 
 import plugins.default.actions as actions
 
@@ -234,3 +236,27 @@ def pretty_json(obj: Union[Dict[str, Any], str]) -> str:
     expanded = expand_json(obj)
 
     return json.dumps(expanded, indent=4)
+
+
+class Deterministic:
+    def __init__(self):
+        super().__init__()
+        self.i = 0
+        self.previous_keys = None
+        self.previous_identities = None
+
+    def __enter__(self):
+        self.previous_keys = entity.keys(self.generate_key)
+        self.previous_identities = entity.identities(self.generate_identity)
+
+    def __exit__(self, type, value, traceback):
+        entity.keys(self.previous_keys)
+        entity.identities(self.previous_identities)
+
+    def generate_key(self) -> str:
+        self.i += 1
+        return str(self.i)
+
+    def generate_identity(self, creator=None) -> crypto.Identity:
+        self.i += 1
+        return crypto.Identity(str(self.i), str(self.i), str(self.i))

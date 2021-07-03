@@ -49,7 +49,7 @@ class EntityStorage:
 
     async def update(
         self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[entity.Keys, str]:
+    ) -> Dict[str, str]:
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -259,7 +259,7 @@ class SqliteStorage(EntityStorage):
 
     async def update(
         self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[entity.Keys, str]:
+    ) -> Dict[str, str]:
         await self.open_if_necessary()
         assert self.db
 
@@ -283,7 +283,7 @@ class SqliteStorage(EntityStorage):
 
         self.db.commit()
 
-        return {key: f.serialized for key, f in updating.items()}
+        return {keys.key: f.serialized for keys, f in updating.items()}
 
     async def load_by_gid(self, gid: int):
         loaded = await self.load_query(
@@ -329,7 +329,7 @@ class HttpStorage(EntityStorage):
 
     async def update(
         self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[entity.Keys, str]:
+    ) -> Dict[str, str]:
         async with self.session() as session:
             query = gql(
                 """
@@ -349,7 +349,7 @@ class HttpStorage(EntityStorage):
             )
 
             affected = response["update"]["affected"]
-            return {entity.Keys(key=row["key"]): row["serialized"] for row in affected}
+            return {row["key"]: row["serialized"] for row in affected}
 
     async def load_by_gid(self, gid: int):
         async with self.session() as session:

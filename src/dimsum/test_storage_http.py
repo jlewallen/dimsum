@@ -7,6 +7,7 @@ import contextlib
 import time
 import asyncio
 import shortuuid
+import freezegun
 import pytest
 
 from gql import gql, Client
@@ -17,6 +18,7 @@ import uvicorn
 import storage
 import serializing
 import dimsum
+import test
 
 import model.properties as properties
 import model.entity as entity
@@ -91,37 +93,49 @@ async def test_storage_load_by_gid(server, silence_aihttp):
 async def test_storage_update_nothing(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600")
     serialized = await store.update({})
-    assert serialized == 0
+    assert serialized == {}
+
+
+@pytest.fixture(scope="session")
+def deterministic():
+    with test.Deterministic():
+        yield
 
 
 @pytest.mark.asyncio
-async def test_storage_update_one_entity(server, silence_aihttp):
+@freezegun.freeze_time("2019-09-25")
+async def test_storage_update_one_entity(
+    snapshot, server, silence_aihttp, deterministic
+):
     w = entity.Entity(props=properties.Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
     store = storage.HttpStorage("http://127.0.0.1:45600")
-    key = shortuuid.uuid()
+    key = shortuuid.uuid(name="example-1")
     serialized = await store.update({entity.Keys(key): serialized})
-    assert serialized == 1
+    snapshot.assert_match(test.pretty_json(serialized), "before.json")
 
     w.version.increase()
     serialized = serializing.serialize(w)
 
     serialized = await store.update({entity.Keys(key): serialized})
-    assert serialized == 1
+    snapshot.assert_match(test.pretty_json(serialized), "after.json")
 
 
 @pytest.mark.asyncio
-async def test_storage_delete_one_entity(server, silence_aihttp):
+@freezegun.freeze_time("2019-09-25")
+async def test_storage_delete_one_entity(
+    snapshot, server, silence_aihttp, deterministic
+):
     w = entity.Entity(props=properties.Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
     store = storage.HttpStorage("http://127.0.0.1:45600")
-    key = shortuuid.uuid()
+    key = shortuuid.uuid(name="example-2")
     serialized = await store.update({entity.Keys(key): serialized})
-    assert serialized == 1
+    snapshot.assert_match(test.pretty_json(serialized), "before.json")
 
     w.version.increase()
     w.destroy()
     serialized = serializing.serialize(w)
 
     serialized = await store.update({entity.Keys(key): serialized})
-    assert serialized == 1
+    snapshot.assert_match(test.pretty_json(serialized), "after.json")

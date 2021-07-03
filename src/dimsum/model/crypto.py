@@ -59,3 +59,9 @@ def generate_identity() -> Identity:
 
 def generate_identity_from(other: Identity):
     return other.sign(generate_identity())
+
+
+def generate(creator=None) -> Identity:
+    if creator:
+        return creator.sign(generate_identity())
+    return generate_identity()

@@ -27,9 +27,9 @@
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
-                            "public": "xMu6xgQk/ledjrfA8k3xaXxEkA1q5YOCR6XbQCjPZN0=",
-                            "signature": null,
-                            "private": "FbMQ5ZDGaxUlVa6cMyLIibXg2EQYSTp0Vc2pveAsUJQ="
+                            "public": "1",
+                            "signature": "1",
+                            "private": "1"
                         },
                         "key": "world",
                         "props": {

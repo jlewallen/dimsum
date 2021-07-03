@@ -1,0 +1,58 @@
+{
+    "UTJ8yaFqCgirYAGrQwrHpN": {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 1
+        },
+        "creator": null,
+        "parent": null,
+        "chimeras": {},
+        "klass": {
+            "py/type": "model.entity.UnknownClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": "1",
+            "signature": "1"
+        },
+        "key": "2",
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": -1
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Fake Entity"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Fake Entity"
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    }
+}

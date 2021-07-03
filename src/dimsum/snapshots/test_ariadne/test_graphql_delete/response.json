@@ -30,9 +30,9 @@
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
-                            "public": "NlaoO0m9mo6Tpho/0nNCSMrsyV3fCuS5UBRb4cdyryk=",
-                            "signature": null,
-                            "private": "rb5wJG8908euEGwMiAaHD1ywEfccvon85CBC/gqjznA="
+                            "public": "1",
+                            "signature": "1",
+                            "private": "1"
                         },
                         "key": "world",
                         "props": {
@@ -66,9 +66,9 @@
                                     "py/object": "model.properties.Property",
                                     "value": {
                                         "py/object": "model.crypto.Identity",
-                                        "public": "NlaoO0m9mo6Tpho/0nNCSMrsyV3fCuS5UBRb4cdyryk=",
-                                        "signature": null,
-                                        "private": "rb5wJG8908euEGwMiAaHD1ywEfccvon85CBC/gqjznA="
+                                        "public": "1",
+                                        "signature": "1",
+                                        "private": "1"
                                     }
                                 },
                                 "related": {

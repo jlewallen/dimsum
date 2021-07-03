@@ -412,8 +412,7 @@ async def update(obj, info, entities):
     updated = await domain.store.update(diffs)
 
     affected = [
-        dict(key=keys.key, serialized=serialized)
-        for keys, serialized in updated.items()
+        dict(key=key, serialized=serialized) for key, serialized in updated.items()
     ]
 
     log.info("affected: %s", affected)

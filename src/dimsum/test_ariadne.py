@@ -1,12 +1,13 @@
 from typing import Dict, Any, List
 
-import pytest
-import freezegun
 import logging
 import base64
 import json
-import ariadne
+import freezegun
+import pytest
 
+import model.crypto as crypto
+import model.entity as entity
 import model.properties as properties
 import model.world as world
 import model.domains as domains
@@ -20,6 +21,7 @@ import grammars
 import bus
 import test
 
+import ariadne
 import schema as schema_factory
 from schema import AriadneContext
 from graphql import GraphQLError
@@ -40,9 +42,15 @@ def get_test_context(domain: domains.Domain, **kwargs):
     )
 
 
+@pytest.fixture(scope="function")
+def deterministic():
+    with test.Deterministic():
+        yield
+
+
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_ariadne_basic(snapshot):
+async def test_ariadne_basic(deterministic, snapshot):
     query = ariadne.QueryType()
 
     @query.field("hello")
@@ -72,7 +80,7 @@ schema = schema_factory.create()
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_size(snapshot):
+async def test_graphql_size(deterministic, snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         await session.prepare()
@@ -88,7 +96,7 @@ async def test_graphql_size(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_world_directly(snapshot):
+async def test_graphql_world_directly(deterministic, snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         await session.prepare()
@@ -104,7 +112,7 @@ async def test_graphql_world_directly(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_world_by_key(snapshot):
+async def test_graphql_world_by_key(deterministic, snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         await session.prepare()
@@ -123,7 +131,7 @@ async def test_graphql_world_by_key(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_world_by_gid(snapshot):
+async def test_graphql_world_by_gid(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
@@ -144,7 +152,7 @@ async def test_graphql_world_by_gid(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_language_basic(snapshot):
+async def test_graphql_language_basic(deterministic, snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         world = await session.prepare()
@@ -184,7 +192,7 @@ mutation {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_entities_areas(snapshot):
+async def test_graphql_entities_areas(deterministic, snapshot):
     domain = await test.make_simple_domain()
 
     data = {"query": "{ areas { key serialized } }"}
@@ -197,7 +205,7 @@ async def test_graphql_entities_areas(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_entities_people(snapshot):
+async def test_graphql_entities_people(deterministic, snapshot):
     domain = await test.make_simple_domain()
 
     data = {"query": "{ people { key serialized } }"}
@@ -210,7 +218,7 @@ async def test_graphql_entities_people(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_login_good():
+async def test_graphql_login_good(deterministic):
     domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
@@ -227,7 +235,7 @@ async def test_graphql_login_good():
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_login_failed(caplog, snapshot):
+async def test_graphql_login_failed(deterministic, snapshot, caplog):
     domain = await test.make_simple_domain(password="asdfasdf")
     jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
@@ -250,7 +258,7 @@ async def test_graphql_login_failed(caplog, snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_update(snapshot):
+async def test_graphql_update(deterministic, snapshot):
     domain = domains.Domain()
 
     serialized = serializing.serialize(
@@ -279,7 +287,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_update_and_requery(snapshot):
+async def test_graphql_update_and_requery(deterministic, snapshot):
     domain = domains.Domain()
 
     serialized = serializing.serialize(
@@ -312,7 +320,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_make_sample(snapshot):
+async def test_graphql_make_sample(deterministic, snapshot):
     domain = domains.Domain(empty=True)
 
     serialized = serializing.serialize(
@@ -338,7 +346,7 @@ async def test_graphql_make_sample(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_delete(snapshot):
+async def test_graphql_delete(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
@@ -370,7 +378,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_entities(snapshot):
+async def test_graphql_entities(deterministic, snapshot):
     domain = domains.Domain()
     with domain.session() as session:
         await session.prepare()
@@ -389,7 +397,7 @@ async def test_graphql_entities(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_create_basic(snapshot):
+async def test_graphql_create_basic(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
@@ -420,7 +428,7 @@ mutation CreateThing($key: String!, $name: String!) {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_create_two(snapshot):
+async def test_graphql_create_two(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
@@ -456,7 +464,7 @@ mutation CreateThing($entities: [EntityTemplate!]) {
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_create_one_containing_another(snapshot):
+async def test_graphql_create_one_containing_another(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:

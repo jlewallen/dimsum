@@ -1,4 +1,4 @@
-from typing import Optional, Type, List, Union, Any, Dict, Sequence, cast
+from typing import Optional, Type, List, Union, Any, Dict, Sequence, Callable, cast
 
 import abc
 import logging
@@ -95,12 +95,34 @@ class Hooks:
         return "{0} (#{1})".format(entity.props.name, entity.props.gid)
 
 
+key_generator_fn = shortuuid.uuid
+
+
+def keys(fn: Callable):
+    global key_generator_fn
+    previous = key_generator_fn
+    key_generator_fn = fn
+    return previous
+
+
+identity_generator_fn = crypto.generate
+
+
+def identities(fn: Callable):
+    global identity_generator_fn
+    previous = identity_generator_fn
+    identity_generator_fn = fn
+    return previous
+
+
 global_hooks = Hooks()
 
 
 def hooks(new_hooks: Hooks):
     global global_hooks
+    previous = global_hooks
     global_hooks = new_hooks
+    return previous
 
 
 def get_ctor_key(ctor) -> str:
@@ -174,14 +196,11 @@ class Entity:
         if identity:
             self.identity = identity
         else:
-            # If we have an creator and no identity then we generate one
-            # based on them, forming a chain.
-            if self.creator:
-                self.identity = crypto.generate_identity_from(self.creator.identity)
-            else:
-                self.identity = crypto.generate_identity()
+            self.identity = identity_generator_fn(
+                creator=self.creator.identity if self.creator else None
+            )
             # If we aren't given a key, the default one is our public key.
-            self.key = shortuuid.uuid()
+            self.key = key_generator_fn()
 
         if key:
             self.key = key

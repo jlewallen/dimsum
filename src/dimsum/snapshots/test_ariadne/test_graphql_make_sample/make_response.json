@@ -25,43 +25,43 @@
                                 "entities": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "84DjRe4fYUWn8dWyN9FT5Z",
+                                        "key": "16",
                                         "klass": "ItemClass",
                                         "name": "Large Oak Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "84DjRe4fYUWn8dWyN9FT5Z",
+                                        "key": "16",
                                         "klass": "ItemClass",
                                         "name": "Large Oak Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6JZoRHUw2BdiFnymQFfnwD",
+                                        "key": "20",
                                         "klass": "ItemClass",
                                         "name": "Mysterious Box"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "H4ccjrLG2GkF86vbRbvLCx",
+                                        "key": "22",
                                         "klass": "ItemClass",
                                         "name": "Acoustic Guitar"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "kCzcY72uG7QmECaxfWanKd",
+                                        "key": "24",
                                         "klass": "ItemClass",
                                         "name": "Large Steep Cliff"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6K5fUksn26rxVac3Sf6wD5",
+                                        "key": "46",
                                         "klass": "ItemClass",
                                         "name": "Large Maple Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6K5fUksn26rxVac3Sf6wD5",
+                                        "key": "46",
                                         "klass": "ItemClass",
                                         "name": "Large Maple Tree"
                                     }
@@ -70,7 +70,7 @@
                             "welcoming": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -129,7 +129,7 @@
                     }
                 },
                 {
-                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                    "key": 12,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -144,7 +144,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -166,55 +166,55 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "TnsgR2iR6ALzVeRQF7eucL",
+                                        "key": "14",
                                         "klass": "ItemClass",
                                         "name": "Beer Keg"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "84DjRe4fYUWn8dWyN9FT5Z",
+                                        "key": "16",
                                         "klass": "ItemClass",
                                         "name": "Large Oak Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "8ZkM3C9xLFSsnWb2pMtXTa",
+                                        "key": "18",
                                         "klass": "ItemClass",
                                         "name": "Hammer"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6JZoRHUw2BdiFnymQFfnwD",
+                                        "key": "20",
                                         "klass": "ItemClass",
                                         "name": "Mysterious Box"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "H4ccjrLG2GkF86vbRbvLCx",
+                                        "key": "22",
                                         "klass": "ItemClass",
                                         "name": "Acoustic Guitar"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "kCzcY72uG7QmECaxfWanKd",
+                                        "key": "24",
                                         "klass": "ItemClass",
                                         "name": "Large Steep Cliff"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "Rn5bR4WUE4uvKWR8SqbQ2W",
+                                        "key": "30",
                                         "klass": "ExitClass",
                                         "name": "Wooden Ladder"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "gn9sUae8tPRtcuCR6mRKPk",
+                                        "key": "36",
                                         "klass": "ExitClass",
                                         "name": "Rocky Path"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "RwUcuLFNQSNrV4FHvbisEV",
+                                        "key": "42",
                                         "klass": "ExitClass",
                                         "name": "Worn Path"
                                     }
@@ -226,7 +226,7 @@
                                 "occupied": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "FzouYGJr2Whie4qu6gcd2p",
+                                        "key": "26",
                                         "klass": "LivingClass",
                                         "name": "Tomorrow"
                                     }
@@ -243,7 +243,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                        "key": "12",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -284,7 +284,7 @@
                     }
                 },
                 {
-                    "key": "FzouYGJr2Whie4qu6gcd2p",
+                    "key": 26,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -299,7 +299,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -337,7 +337,7 @@
                             "occupying": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -352,7 +352,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "FzouYGJr2Whie4qu6gcd2p",
+                        "key": "26",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -393,7 +393,7 @@
                     }
                 },
                 {
-                    "key": "TnsgR2iR6ALzVeRQF7eucL",
+                    "key": 14,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -408,7 +408,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -437,7 +437,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -452,7 +452,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "TnsgR2iR6ALzVeRQF7eucL",
+                        "key": "14",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -493,7 +493,7 @@
                     }
                 },
                 {
-                    "key": "84DjRe4fYUWn8dWyN9FT5Z",
+                    "key": 16,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -508,7 +508,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -554,7 +554,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -569,7 +569,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "84DjRe4fYUWn8dWyN9FT5Z",
+                        "key": "16",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -610,7 +610,7 @@
                     }
                 },
                 {
-                    "key": "8ZkM3C9xLFSsnWb2pMtXTa",
+                    "key": 18,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -625,7 +625,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -654,7 +654,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -669,7 +669,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "8ZkM3C9xLFSsnWb2pMtXTa",
+                        "key": "18",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -710,7 +710,7 @@
                     }
                 },
                 {
-                    "key": "6JZoRHUw2BdiFnymQFfnwD",
+                    "key": 20,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -725,7 +725,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -766,7 +766,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -781,7 +781,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "6JZoRHUw2BdiFnymQFfnwD",
+                        "key": "20",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -822,7 +822,7 @@
                     }
                 },
                 {
-                    "key": "H4ccjrLG2GkF86vbRbvLCx",
+                    "key": 22,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -837,7 +837,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -878,7 +878,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -893,7 +893,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "H4ccjrLG2GkF86vbRbvLCx",
+                        "key": "22",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -934,7 +934,7 @@
                     }
                 },
                 {
-                    "key": "kCzcY72uG7QmECaxfWanKd",
+                    "key": 24,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -949,7 +949,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -990,7 +990,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1005,7 +1005,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "kCzcY72uG7QmECaxfWanKd",
+                        "key": "24",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1046,7 +1046,7 @@
                     }
                 },
                 {
-                    "key": "Rn5bR4WUE4uvKWR8SqbQ2W",
+                    "key": 30,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1061,7 +1061,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1077,7 +1077,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "gaL88jm5toACXcVjgGx2yi",
+                                    "key": "28",
                                     "klass": "AreaClass",
                                     "name": "Artist's Loft"
                                 }
@@ -1098,7 +1098,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1113,7 +1113,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "Rn5bR4WUE4uvKWR8SqbQ2W",
+                        "key": "30",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1154,7 +1154,7 @@
                     }
                 },
                 {
-                    "key": "gn9sUae8tPRtcuCR6mRKPk",
+                    "key": 36,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1169,7 +1169,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1185,7 +1185,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "54AtnKkz2qUCfokMcErGiK",
+                                    "key": "34",
                                     "klass": "AreaClass",
                                     "name": "Narrow Canyon"
                                 }
@@ -1206,7 +1206,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1221,7 +1221,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "gn9sUae8tPRtcuCR6mRKPk",
+                        "key": "36",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1262,7 +1262,7 @@
                     }
                 },
                 {
-                    "key": "RwUcuLFNQSNrV4FHvbisEV",
+                    "key": 42,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1277,7 +1277,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1293,7 +1293,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -1314,7 +1314,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1329,7 +1329,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "RwUcuLFNQSNrV4FHvbisEV",
+                        "key": "42",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1370,7 +1370,7 @@
                     }
                 },
                 {
-                    "key": "gaL88jm5toACXcVjgGx2yi",
+                    "key": 28,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1385,7 +1385,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -1407,7 +1407,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "f8KghuJRSBfywrX984utsX",
+                                        "key": "32",
                                         "klass": "ExitClass",
                                         "name": "Wooden Ladder"
                                     }
@@ -1429,7 +1429,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "gaL88jm5toACXcVjgGx2yi",
+                        "key": "28",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1470,7 +1470,7 @@
                     }
                 },
                 {
-                    "key": "f8KghuJRSBfywrX984utsX",
+                    "key": 32,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1485,7 +1485,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1501,7 +1501,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1509,7 +1509,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "gaL88jm5toACXcVjgGx2yi",
+                                    "key": "28",
                                     "klass": "AreaClass",
                                     "name": "Artist's Loft"
                                 }
@@ -1524,7 +1524,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "f8KghuJRSBfywrX984utsX",
+                        "key": "32",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1565,7 +1565,7 @@
                     }
                 },
                 {
-                    "key": "54AtnKkz2qUCfokMcErGiK",
+                    "key": 34,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1580,7 +1580,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -1602,7 +1602,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "WDUcjGddo3SELAr3AHr5tZ",
+                                        "key": "38",
                                         "klass": "ExitClass",
                                         "name": "Rocky Path"
                                     }
@@ -1630,7 +1630,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "54AtnKkz2qUCfokMcErGiK",
+                        "key": "34",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1671,7 +1671,7 @@
                     }
                 },
                 {
-                    "key": "WDUcjGddo3SELAr3AHr5tZ",
+                    "key": 38,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1686,7 +1686,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1702,7 +1702,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1710,7 +1710,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "54AtnKkz2qUCfokMcErGiK",
+                                    "key": "34",
                                     "klass": "AreaClass",
                                     "name": "Narrow Canyon"
                                 }
@@ -1725,7 +1725,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "WDUcjGddo3SELAr3AHr5tZ",
+                        "key": "38",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1766,7 +1766,7 @@
                     }
                 },
                 {
-                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                    "key": 40,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1781,7 +1781,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -1803,25 +1803,25 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "bCB2VHAAt2utAz6RKin6aH",
+                                        "key": "44",
                                         "klass": "ExitClass",
                                         "name": "Worn Path"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6K5fUksn26rxVac3Sf6wD5",
+                                        "key": "46",
                                         "klass": "ItemClass",
                                         "name": "Large Maple Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "jvmkwS8Ayfw2vB6nd3jEVF",
+                                        "key": "50",
                                         "klass": "ExitClass",
                                         "name": "Entrance to a Dark Cavern"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "YwigHBsynvpFBXPTiBA3Ek",
+                                        "key": "120",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -1843,7 +1843,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "7oQAqj79CRcSKUxrUAwraC",
+                        "key": "40",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1884,7 +1884,7 @@
                     }
                 },
                 {
-                    "key": "bCB2VHAAt2utAz6RKin6aH",
+                    "key": 44,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -1899,7 +1899,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -1915,7 +1915,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "BY6a4m9nWqGqn4XZw9JQ26",
+                                    "key": "12",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard."
                                 }
@@ -1923,7 +1923,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -1951,7 +1951,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "bCB2VHAAt2utAz6RKin6aH",
+                        "key": "44",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -1992,7 +1992,7 @@
                     }
                 },
                 {
-                    "key": "6K5fUksn26rxVac3Sf6wD5",
+                    "key": 46,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2007,7 +2007,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2053,7 +2053,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -2068,7 +2068,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "6K5fUksn26rxVac3Sf6wD5",
+                        "key": "46",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2109,7 +2109,7 @@
                     }
                 },
                 {
-                    "key": "jvmkwS8Ayfw2vB6nd3jEVF",
+                    "key": 50,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2124,7 +2124,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -2140,7 +2140,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "6ghzufyhwP7nprziFKBSEE",
+                                    "key": "48",
                                     "klass": "AreaClass",
                                     "name": "Dark Cavern"
                                 }
@@ -2161,7 +2161,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -2176,7 +2176,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "jvmkwS8Ayfw2vB6nd3jEVF",
+                        "key": "50",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2217,7 +2217,7 @@
                     }
                 },
                 {
-                    "key": "YwigHBsynvpFBXPTiBA3Ek",
+                    "key": 120,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2232,7 +2232,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2248,7 +2248,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2269,7 +2269,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -2284,7 +2284,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "YwigHBsynvpFBXPTiBA3Ek",
+                        "key": "120",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2325,7 +2325,7 @@
                     }
                 },
                 {
-                    "key": "6ghzufyhwP7nprziFKBSEE",
+                    "key": 48,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2340,7 +2340,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -2362,7 +2362,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "A7YVZyMpB8qgmMg6UjvU4y",
+                                        "key": "52",
                                         "klass": "ExitClass",
                                         "name": "Small Crevice"
                                     }
@@ -2384,7 +2384,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "6ghzufyhwP7nprziFKBSEE",
+                        "key": "48",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2425,7 +2425,7 @@
                     }
                 },
                 {
-                    "key": "A7YVZyMpB8qgmMg6UjvU4y",
+                    "key": 52,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2440,7 +2440,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2456,7 +2456,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -2464,7 +2464,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "6ghzufyhwP7nprziFKBSEE",
+                                    "key": "48",
                                     "klass": "AreaClass",
                                     "name": "Dark Cavern"
                                 }
@@ -2479,7 +2479,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "A7YVZyMpB8qgmMg6UjvU4y",
+                        "key": "52",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2520,7 +2520,7 @@
                     }
                 },
                 {
-                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                    "key": 54,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2535,7 +2535,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -2557,19 +2557,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "UjaTtszuNnAJBuED2gmBXv",
+                                        "key": "72",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "cxvgzMeCVYimUzm8ihj3ua",
+                                        "key": "74",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "VtwDqxCrAUDc2Vk6SXve8X",
+                                        "key": "122",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -2591,7 +2591,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "7mVYYxNkn3JfunNN42HtsY",
+                        "key": "54",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2632,7 +2632,7 @@
                     }
                 },
                 {
-                    "key": "UjaTtszuNnAJBuED2gmBXv",
+                    "key": 72,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2647,7 +2647,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2663,7 +2663,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -2671,7 +2671,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2699,7 +2699,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "UjaTtszuNnAJBuED2gmBXv",
+                        "key": "72",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2740,7 +2740,7 @@
                     }
                 },
                 {
-                    "key": "cxvgzMeCVYimUzm8ihj3ua",
+                    "key": 74,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2755,7 +2755,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2771,7 +2771,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -2792,7 +2792,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2807,7 +2807,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "cxvgzMeCVYimUzm8ihj3ua",
+                        "key": "74",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2848,7 +2848,7 @@
                     }
                 },
                 {
-                    "key": "VtwDqxCrAUDc2Vk6SXve8X",
+                    "key": 122,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2863,7 +2863,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -2879,7 +2879,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7oQAqj79CRcSKUxrUAwraC",
+                                    "key": "40",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
@@ -2900,7 +2900,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2915,7 +2915,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "VtwDqxCrAUDc2Vk6SXve8X",
+                        "key": "122",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2956,7 +2956,7 @@
                     }
                 },
                 {
-                    "key": "FktogE2DN8VRuX2TAoASt3",
+                    "key": 56,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2971,7 +2971,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -2993,19 +2993,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "dAtmMLVyC7NJG6hwLNrMHa",
+                                        "key": "76",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "79b3mT35tKFYpQSvWLuCoV",
+                                        "key": "78",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "6C32xn7xaNBPcd84ckj5ao",
+                                        "key": "80",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     }
@@ -3027,7 +3027,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "FktogE2DN8VRuX2TAoASt3",
+                        "key": "56",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3068,7 +3068,7 @@
                     }
                 },
                 {
-                    "key": "dAtmMLVyC7NJG6hwLNrMHa",
+                    "key": 76,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3083,7 +3083,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3099,7 +3099,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                                    "key": "58",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -3107,7 +3107,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3135,7 +3135,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "dAtmMLVyC7NJG6hwLNrMHa",
+                        "key": "76",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3176,7 +3176,7 @@
                     }
                 },
                 {
-                    "key": "79b3mT35tKFYpQSvWLuCoV",
+                    "key": 78,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3191,7 +3191,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3207,7 +3207,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -3228,7 +3228,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3243,7 +3243,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "79b3mT35tKFYpQSvWLuCoV",
+                        "key": "78",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3284,7 +3284,7 @@
                     }
                 },
                 {
-                    "key": "6C32xn7xaNBPcd84ckj5ao",
+                    "key": 80,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3299,7 +3299,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3315,7 +3315,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -3336,7 +3336,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3351,7 +3351,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "6C32xn7xaNBPcd84ckj5ao",
+                        "key": "80",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3392,7 +3392,7 @@
                     }
                 },
                 {
-                    "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                    "key": 58,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3407,7 +3407,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -3429,13 +3429,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "hUPFREBsjpKWkaxCpa5ZAL",
+                                        "key": "82",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "ms2Wbht4S7TEf9SxyWf5c9",
+                                        "key": "84",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     }
@@ -3457,7 +3457,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                        "key": "58",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3498,7 +3498,7 @@
                     }
                 },
                 {
-                    "key": "hUPFREBsjpKWkaxCpa5ZAL",
+                    "key": 82,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3513,7 +3513,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3529,7 +3529,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3537,7 +3537,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                                    "key": "58",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -3565,7 +3565,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "hUPFREBsjpKWkaxCpa5ZAL",
+                        "key": "82",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3606,7 +3606,7 @@
                     }
                 },
                 {
-                    "key": "ms2Wbht4S7TEf9SxyWf5c9",
+                    "key": 84,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3621,7 +3621,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3637,7 +3637,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -3658,7 +3658,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                                    "key": "58",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -3673,7 +3673,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "ms2Wbht4S7TEf9SxyWf5c9",
+                        "key": "84",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3714,7 +3714,7 @@
                     }
                 },
                 {
-                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                    "key": 64,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3729,7 +3729,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -3751,19 +3751,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "7Et9XCgEcmg8Qf8QwayxJF",
+                                        "key": "100",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "YvoQbDUaAJ5EciqVWYVo96",
+                                        "key": "102",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "iEZVF44659nEViWdqLfACy",
+                                        "key": "104",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -3785,7 +3785,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                        "key": "64",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3826,7 +3826,7 @@
                     }
                 },
                 {
-                    "key": "7Et9XCgEcmg8Qf8QwayxJF",
+                    "key": 100,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3841,7 +3841,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3857,7 +3857,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -3865,7 +3865,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -3893,7 +3893,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "7Et9XCgEcmg8Qf8QwayxJF",
+                        "key": "100",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3934,7 +3934,7 @@
                     }
                 },
                 {
-                    "key": "YvoQbDUaAJ5EciqVWYVo96",
+                    "key": 102,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3949,7 +3949,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -3965,7 +3965,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ZwsknbKuf47JQiHVDcJyuk",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -3986,7 +3986,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -4001,7 +4001,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "YvoQbDUaAJ5EciqVWYVo96",
+                        "key": "102",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4042,7 +4042,7 @@
                     }
                 },
                 {
-                    "key": "iEZVF44659nEViWdqLfACy",
+                    "key": 104,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4057,7 +4057,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4073,7 +4073,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "nnQEMHoJW3hZn7uxeyxKeD",
+                                    "key": "58",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -4094,7 +4094,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -4109,7 +4109,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "iEZVF44659nEViWdqLfACy",
+                        "key": "104",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4150,7 +4150,7 @@
                     }
                 },
                 {
-                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                    "key": 62,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4165,7 +4165,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -4187,25 +4187,25 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "GqKBC2B46vvhDNzQt6qn4c",
+                                        "key": "92",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "LYKcCwKqcRuFZny2SL96NQ",
+                                        "key": "94",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "W24USptGL7UoC48T7CRbNs",
+                                        "key": "96",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "kZYQSzCJ8dsRRnj2sG2spi",
+                                        "key": "98",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -4227,7 +4227,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                        "key": "62",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4268,7 +4268,7 @@
                     }
                 },
                 {
-                    "key": "GqKBC2B46vvhDNzQt6qn4c",
+                    "key": 92,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4283,7 +4283,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4299,7 +4299,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -4307,7 +4307,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4335,7 +4335,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "GqKBC2B46vvhDNzQt6qn4c",
+                        "key": "92",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4376,7 +4376,7 @@
                     }
                 },
                 {
-                    "key": "LYKcCwKqcRuFZny2SL96NQ",
+                    "key": 94,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4391,7 +4391,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4407,7 +4407,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -4428,7 +4428,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4443,7 +4443,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "LYKcCwKqcRuFZny2SL96NQ",
+                        "key": "94",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4484,7 +4484,7 @@
                     }
                 },
                 {
-                    "key": "W24USptGL7UoC48T7CRbNs",
+                    "key": 96,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4499,7 +4499,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4515,7 +4515,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -4536,7 +4536,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4551,7 +4551,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "W24USptGL7UoC48T7CRbNs",
+                        "key": "96",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4592,7 +4592,7 @@
                     }
                 },
                 {
-                    "key": "kZYQSzCJ8dsRRnj2sG2spi",
+                    "key": 98,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4607,7 +4607,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4623,7 +4623,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "FktogE2DN8VRuX2TAoASt3",
+                                    "key": "56",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -4644,7 +4644,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4659,7 +4659,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "kZYQSzCJ8dsRRnj2sG2spi",
+                        "key": "98",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4700,7 +4700,7 @@
                     }
                 },
                 {
-                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                    "key": 60,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4715,7 +4715,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -4737,19 +4737,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "SUcnbQTfEDdu6HrCbkYVan",
+                                        "key": "86",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "PewNLBqiF2ePGxFMMDLae2",
+                                        "key": "88",
                                         "klass": "ExitClass",
                                         "name": "EAST"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "83eFTZeWMndAHmuawT3Vh3",
+                                        "key": "90",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -4771,7 +4771,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                        "key": "60",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4812,7 +4812,7 @@
                     }
                 },
                 {
-                    "key": "SUcnbQTfEDdu6HrCbkYVan",
+                    "key": 86,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4827,7 +4827,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4843,7 +4843,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4851,7 +4851,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -4879,7 +4879,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "SUcnbQTfEDdu6HrCbkYVan",
+                        "key": "86",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4920,7 +4920,7 @@
                     }
                 },
                 {
-                    "key": "PewNLBqiF2ePGxFMMDLae2",
+                    "key": 88,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4935,7 +4935,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -4951,7 +4951,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ajFoTtdihVxJYWQsuabTnC",
+                                    "key": "66",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -4972,7 +4972,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -4987,7 +4987,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "PewNLBqiF2ePGxFMMDLae2",
+                        "key": "88",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5028,7 +5028,7 @@
                     }
                 },
                 {
-                    "key": "83eFTZeWMndAHmuawT3Vh3",
+                    "key": 90,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5043,7 +5043,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5059,7 +5059,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "7mVYYxNkn3JfunNN42HtsY",
+                                    "key": "54",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -5080,7 +5080,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -5095,7 +5095,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "83eFTZeWMndAHmuawT3Vh3",
+                        "key": "90",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5136,7 +5136,7 @@
                     }
                 },
                 {
-                    "key": "ajFoTtdihVxJYWQsuabTnC",
+                    "key": 66,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5151,7 +5151,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -5173,13 +5173,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "YNWjAdEVpudChHc7QCqY9p",
+                                        "key": "106",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "ejpmfeNWsNt6kaSM4EwQFH",
+                                        "key": "108",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -5201,7 +5201,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "ajFoTtdihVxJYWQsuabTnC",
+                        "key": "66",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5242,7 +5242,7 @@
                     }
                 },
                 {
-                    "key": "YNWjAdEVpudChHc7QCqY9p",
+                    "key": 106,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5257,7 +5257,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5273,7 +5273,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -5281,7 +5281,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ajFoTtdihVxJYWQsuabTnC",
+                                    "key": "66",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -5309,7 +5309,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "YNWjAdEVpudChHc7QCqY9p",
+                        "key": "106",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5350,7 +5350,7 @@
                     }
                 },
                 {
-                    "key": "ejpmfeNWsNt6kaSM4EwQFH",
+                    "key": 108,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5365,7 +5365,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5381,7 +5381,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "aLL2SQYDGMLoKLpk8wpoHh",
+                                    "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -5402,7 +5402,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ajFoTtdihVxJYWQsuabTnC",
+                                    "key": "66",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -5417,7 +5417,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "ejpmfeNWsNt6kaSM4EwQFH",
+                        "key": "108",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5458,7 +5458,7 @@
                     }
                 },
                 {
-                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                    "key": 68,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5473,7 +5473,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -5495,19 +5495,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "YpWTwy8jK6o9YYtnUvBL9t",
+                                        "key": "110",
                                         "klass": "ExitClass",
                                         "name": "NORTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "agBaYz9CbDWjTfq5GLRbsG",
+                                        "key": "112",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "PQoqFsTFynhZp5KSQcRtxh",
+                                        "key": "114",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -5529,7 +5529,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "5WqAaQDAq7isMrRgBW9ttK",
+                        "key": "68",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5570,7 +5570,7 @@
                     }
                 },
                 {
-                    "key": "YpWTwy8jK6o9YYtnUvBL9t",
+                    "key": 110,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5585,7 +5585,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5601,7 +5601,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ZwsknbKuf47JQiHVDcJyuk",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -5609,7 +5609,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -5637,7 +5637,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "YpWTwy8jK6o9YYtnUvBL9t",
+                        "key": "110",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5678,7 +5678,7 @@
                     }
                 },
                 {
-                    "key": "agBaYz9CbDWjTfq5GLRbsG",
+                    "key": 112,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5693,7 +5693,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5709,7 +5709,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ajFoTtdihVxJYWQsuabTnC",
+                                    "key": "66",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -5730,7 +5730,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -5745,7 +5745,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "agBaYz9CbDWjTfq5GLRbsG",
+                        "key": "112",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5786,7 +5786,7 @@
                     }
                 },
                 {
-                    "key": "PQoqFsTFynhZp5KSQcRtxh",
+                    "key": 114,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5801,7 +5801,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -5817,7 +5817,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Fa9Yd8fNqzraeJ9mbCsfHg",
+                                    "key": "62",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -5838,7 +5838,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -5853,7 +5853,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "PQoqFsTFynhZp5KSQcRtxh",
+                        "key": "114",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5894,7 +5894,7 @@
                     }
                 },
                 {
-                    "key": "ZwsknbKuf47JQiHVDcJyuk",
+                    "key": 70,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5909,7 +5909,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "9KmfGyVdXCSFWjkjDtAbvb",
+                            "key": "8",
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
@@ -5931,13 +5931,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "Mz3g66b7HP8WvF2wNhRPGA",
+                                        "key": "116",
                                         "klass": "ExitClass",
                                         "name": "SOUTH"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "jKwUMdALkCjuB2tNDWBRUp",
+                                        "key": "118",
                                         "klass": "ExitClass",
                                         "name": "WEST"
                                     }
@@ -5959,7 +5959,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "ZwsknbKuf47JQiHVDcJyuk",
+                        "key": "70",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6000,7 +6000,7 @@
                     }
                 },
                 {
-                    "key": "Mz3g66b7HP8WvF2wNhRPGA",
+                    "key": 116,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6015,7 +6015,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -6031,7 +6031,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "5WqAaQDAq7isMrRgBW9ttK",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -6039,7 +6039,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ZwsknbKuf47JQiHVDcJyuk",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -6067,7 +6067,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "Mz3g66b7HP8WvF2wNhRPGA",
+                        "key": "116",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6108,7 +6108,7 @@
                     }
                 },
                 {
-                    "key": "jKwUMdALkCjuB2tNDWBRUp",
+                    "key": 118,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6123,7 +6123,7 @@
                         },
                         "parent": {
                             "py/object": "model.entity.Entity",
-                            "key": "Cec5ZLUMyLg5EHkwhf79rF",
+                            "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
@@ -6139,7 +6139,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "Sm9zZWUK4n7aArYi5AuZ4r",
+                                    "key": "64",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -6160,7 +6160,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "ZwsknbKuf47JQiHVDcJyuk",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -6175,7 +6175,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "jKwUMdALkCjuB2tNDWBRUp",
+                        "key": "118",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
