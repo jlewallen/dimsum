@@ -20,6 +20,7 @@ log = logging.getLogger("dimsum")
 @dataclasses.dataclass
 class EditingEntity(StandardEvent):
     entity: Entity
+    interactive: bool = True
 
 
 class EditEntity(PersonAction):
