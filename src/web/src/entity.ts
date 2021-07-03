@@ -1,19 +1,3 @@
-export interface Entity {
-    key: string;
-    url: string;
-    klass: Klass;
-    creator: EntityRef;
-    props: { map: Properties };
-    chimeras: {
-        containing?: Containing;
-        behaviors?: { behaviors: { map: Behaviors } };
-        occupyable?: Occupyable;
-        visibility?: Visibility;
-        carryable?: Carryable;
-        exit?: Exit;
-    };
-}
-
 export interface ObservedItem {
     item: EntityRef;
 }
@@ -120,8 +104,8 @@ export interface Entity {
     creator: EntityRef;
     props: { map: Properties };
     chimeras: {
+        behaviors: { behaviors: { map: Behaviors } };
         containing?: Containing;
-        behaviors?: { behaviors: { map: Behaviors } };
         occupyable?: Occupyable;
         visibility?: Visibility;
         carryable?: Carryable;

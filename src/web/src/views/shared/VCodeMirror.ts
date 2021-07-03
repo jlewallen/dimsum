@@ -30,11 +30,11 @@ const Events: (keyof CodeMirror.EditorEventMap)[] = [
 /** 代码编辑组件 */
 @Component({
     name: "VCodeMirror",
-    emits: ["update:value", "save", ...Events],
+    emits: ["update:modelValue", "save", ...Events],
 })
 export class VCodeMirror extends VueComponentBase {
     /** 代码字符串值 */
-    @Prop({ required: true }) readonly value!: string;
+    @Prop({ required: true }) readonly modelValue!: string;
     /** 语言，默认为json */
     @Prop({ default: () => ({ name: "python", json: true }) }) readonly mode!: CodeMirror.ModeSpec<unknown>;
     /** 是否只读 */
@@ -64,7 +64,7 @@ export class VCodeMirror extends VueComponentBase {
 
         const editor = (this.editor = markRaw(
             CodeMirror(this.$el, {
-                value: this.value,
+                value: this.modelValue,
                 mode: this.mode,
                 theme: $theme.get() === "white" ? "default" : "blackboard",
                 readOnly: this.readonly,
@@ -79,7 +79,7 @@ export class VCodeMirror extends VueComponentBase {
         editor.on("changes", () => {
             const value = editor.getValue();
             this.backupValue = value;
-            this.$emit("update:value", editor.getValue());
+            this.$emit("update:modelValue", editor.getValue());
         });
         Events.forEach((x) => {
             const eventName = "on" + capitalize(x);
@@ -92,7 +92,7 @@ export class VCodeMirror extends VueComponentBase {
                 this.editor.setOption("theme", detail === "white" ? "default" : "dracula");
             })
         );
-        this.backupValue = this.value;
+        this.backupValue = this.modelValue;
         this.$el._component = this;
         if (!VCodeMirror.ro) {
             VCodeMirror.ro = new ResizeObserver(function(this: void, entries) {

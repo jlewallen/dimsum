@@ -21,6 +21,12 @@
                                     "name": "Flute"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",

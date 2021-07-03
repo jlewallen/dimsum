@@ -21,6 +21,12 @@
                                     "name": "Thing A"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",
@@ -118,6 +124,12 @@
                                     "key": "b",
                                     "klass": "ItemClass",
                                     "name": "Thing B"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "carryable": {

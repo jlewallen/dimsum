@@ -20,6 +20,12 @@
                                 "name": "World"
                             }
                         },
+                        "behaviors": {
+                            "behaviors": {
+                                "py/object": "model.scopes.behavior.BehaviorMap",
+                                "map": {}
+                            }
+                        },
                         "welcoming": {
                             "area": {
                                 "py/object": "model.entity.Entity",
@@ -103,6 +109,12 @@
                                 "key": "world",
                                 "klass": "RootEntityClass",
                                 "name": "World"
+                            }
+                        },
+                        "behaviors": {
+                            "behaviors": {
+                                "py/object": "model.scopes.behavior.BehaviorMap",
+                                "map": {}
                             }
                         },
                         "containing": {

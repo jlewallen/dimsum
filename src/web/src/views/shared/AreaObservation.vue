@@ -13,15 +13,15 @@
                     </div>
                 </div>
                 <div class="people">
-                    <div v-for="observed in reply.living" v-bind:key="observed.item.key">
-                        <WithEntity :entityKey="observed.item.key" v-slot="withEntity">
+                    <div v-for="observed in reply.living" v-bind:key="observed.entity.key">
+                        <WithEntity :entityKey="observed.entity.key" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>
                 </div>
                 <div class="entities">
-                    <div v-for="observed in reply.items" v-bind:key="observed.item.key">
-                        <WithEntity :entityKey="observed.item.key" v-slot="withEntity">
+                    <div v-for="observed in reply.items" v-bind:key="observed.entity.key">
+                        <WithEntity :entityKey="observed.entity.key" v-slot="withEntity">
                             <TinyEntityPanel :entity="withEntity.entity" @selected="(e) => onSelected(e)" />
                         </WithEntity>
                     </div>

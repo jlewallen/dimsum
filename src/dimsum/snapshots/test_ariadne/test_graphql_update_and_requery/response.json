@@ -20,6 +20,12 @@
                                     "klass": "RootEntityClass",
                                     "name": "World"
                                 }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
                             }
                         },
                         "klass": {

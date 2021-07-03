@@ -1,23 +1,28 @@
 <template>
-    <div>
-        <form class="" @submit.prevent="saveForm" @keydown.esc="cancel">
-            <div class="form-group row">
-                <label class="col-sm-2">Name</label>
-                <div class="col-sm-5">
-                    <input class="form-control" type="text" v-model="form.name" ref="name" />
+    <div class="inline-editor">
+        <div class="inline-editor-row">
+            <VCodeMirror v-model="form.behavior" />
+        </div>
+        <div class="inline-editor-row">
+            <form class="" @submit.prevent="saveForm" @keydown.esc="cancel">
+                <div class="form-group row">
+                    <label class="col-sm-2">Name</label>
+                    <div class="col-sm-5">
+                        <input class="form-control" type="text" v-model="form.name" ref="name" />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-2">Description</label>
-                <div class="col-sm-5">
-                    <input class="form-control" type="text" v-model="form.desc" ref="desc" />
+                <div class="form-group row">
+                    <label class="col-sm-2">Description</label>
+                    <div class="col-sm-5">
+                        <input class="form-control" type="text" v-model="form.desc" ref="desc" />
+                    </div>
                 </div>
-            </div>
-            <div class="buttons">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
-            </div>
-        </form>
+                <div class="buttons">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -26,10 +31,13 @@ import _ from "lodash";
 import { defineComponent } from "vue";
 import { Entity, PropertyMap } from "@/http";
 import store, { UpdateEntityAction } from "@/store";
+import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
 
 export default defineComponent({
     name: "InlineEditor",
-    components: {},
+    components: {
+        VCodeMirror,
+    },
     props: {
         entity: {
             type: Object as () => Entity,
@@ -39,6 +47,7 @@ export default defineComponent({
     data() {
         return {
             form: {
+                behavior: this.entity.chimeras.behaviors.behaviors.map["b:default"] || "",
                 name: this.entity.props.map.name.value,
                 desc: this.entity.props.map.desc.value,
             },
@@ -52,6 +61,7 @@ export default defineComponent({
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
+            updating.chimeras.behaviors.behaviors.map["b:default"] = this.form.behavior;
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },
@@ -68,5 +78,11 @@ export default defineComponent({
 }
 .buttons button {
     margin-right: 1em;
+}
+.inline-editor {
+    padding-top: 1em;
+}
+.inline-editor-row {
+    padding-bottom: 1em;
 }
 </style>

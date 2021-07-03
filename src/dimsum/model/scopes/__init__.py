@@ -11,6 +11,7 @@ import model.scopes.mechanics as mechanics
 import model.scopes.occupyable as occupyable
 import model.scopes.carryable as carryable
 import model.scopes.movement as movement
+import model.scopes.behavior as behavior
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -37,10 +38,15 @@ Alive = [
     mechanics.Memory,
     health.Health,
 ]
-Item = [ownership.Ownership, carryable.Carryable]
-Exit = [ownership.Ownership, movement.Exit]
-Area = [ownership.Ownership, carryable.Containing, occupyable.Occupyable]
-World = [ownership.Ownership]
+Item = [ownership.Ownership, behavior.Behaviors, carryable.Carryable]
+Exit = [ownership.Ownership, behavior.Behaviors, movement.Exit]
+Area = [
+    ownership.Ownership,
+    behavior.Behaviors,
+    carryable.Containing,
+    occupyable.Occupyable,
+]
+World = [ownership.Ownership, behavior.Behaviors]
 
 scopes_by_class = {
     LivingClass: Alive,

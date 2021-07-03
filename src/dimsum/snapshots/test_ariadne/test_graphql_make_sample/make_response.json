@@ -21,6 +21,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "behaviorCollection": {
                                 "entities": [
                                     {
@@ -155,6 +161,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -421,6 +433,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",
@@ -521,19 +539,6 @@
                                     "name": "World"
                                 }
                             },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
                             "behaviors": {
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
@@ -550,6 +555,19 @@
                                         }
                                     }
                                 }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
                             },
                             "location": {
                                 "container": {
@@ -636,6 +654,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "carryable": {
@@ -738,6 +762,18 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {
+                                        "b:mystery:shake": {
+                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "logs": []
+                                        }
+                                    }
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",
@@ -750,18 +786,6 @@
                                 },
                                 "quantity": 1,
                                 "loose": false
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
-                                    "map": {
-                                        "b:mystery:shake": {
-                                            "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\nend\n",
-                                            "logs": []
-                                        }
-                                    }
-                                }
                             },
                             "location": {
                                 "container": {
@@ -850,6 +874,18 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {
+                                        "b:music:play": {
+                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "logs": []
+                                        }
+                                    }
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",
@@ -862,18 +898,6 @@
                                 },
                                 "quantity": 1,
                                 "loose": false
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
-                                    "map": {
-                                        "b:music:play": {
-                                            "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\nend\n",
-                                            "logs": []
-                                        }
-                                    }
-                                }
                             },
                             "location": {
                                 "container": {
@@ -962,6 +986,18 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {
+                                        "b:make:stone": {
+                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "lua": "\nfunction(s, world, area, item)\n    if math.random() > 0.7 then\n        return area.make_here({\n            kind = item.kind(\"stone-1\"),\n            name = \"Heavy Stone\",\n            quantity = 1,\n        })\n    end\n\n    return area.make({\n        kind = item.kind(\"pebble-1\"),\n        name = \"Pebble\",\n        quantity = 3,\n    })\nend\n",
+                                            "logs": []
+                                        }
+                                    }
+                                }
+                            },
                             "carryable": {
                                 "kind": {
                                     "py/object": "model.kinds.Kind",
@@ -974,18 +1010,6 @@
                                 },
                                 "quantity": 1,
                                 "loose": false
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
-                                    "map": {
-                                        "b:make:stone": {
-                                            "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    if math.random() > 0.7 then\n        return area.make_here({\n            kind = item.kind(\"stone-1\"),\n            name = \"Heavy Stone\",\n            quantity = 1,\n        })\n    end\n\n    return area.make({\n        kind = item.kind(\"pebble-1\"),\n        name = \"Pebble\",\n        quantity = 3,\n    })\nend\n",
-                                            "logs": []
-                                        }
-                                    }
-                                }
                             },
                             "location": {
                                 "container": {
@@ -1072,6 +1096,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -1182,6 +1212,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -1288,6 +1324,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -1398,6 +1440,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
@@ -1498,6 +1546,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -1591,6 +1645,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -1699,6 +1759,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -1792,6 +1858,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -1912,6 +1984,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -2020,19 +2098,6 @@
                                     "name": "World"
                                 }
                             },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
                             "behaviors": {
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
@@ -2049,6 +2114,19 @@
                                         }
                                     }
                                 }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
                             },
                             "location": {
                                 "container": {
@@ -2135,6 +2213,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -2245,6 +2329,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -2353,6 +2443,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
@@ -2453,6 +2549,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -2546,6 +2648,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -2660,6 +2768,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -2766,6 +2880,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -2876,6 +2996,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -2982,6 +3108,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -3096,6 +3228,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -3202,6 +3340,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -3312,6 +3456,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -3420,6 +3570,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
@@ -3524,6 +3680,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -3634,6 +3796,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -3740,6 +3908,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -3854,6 +4028,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -3960,6 +4140,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -4070,6 +4256,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -4176,6 +4368,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -4296,6 +4494,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -4402,6 +4606,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -4512,6 +4722,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -4620,6 +4836,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -4726,6 +4948,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -4840,6 +5068,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -4946,6 +5180,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -5056,6 +5296,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -5164,6 +5410,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
@@ -5268,6 +5520,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -5378,6 +5636,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -5484,6 +5748,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "containing": {
@@ -5598,6 +5868,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -5704,6 +5980,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -5814,6 +6096,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
@@ -5922,6 +6210,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
@@ -6026,6 +6320,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {
@@ -6134,6 +6434,12 @@
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "map": {}
                                 }
                             },
                             "exit": {

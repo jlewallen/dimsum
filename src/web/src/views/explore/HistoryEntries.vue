@@ -74,7 +74,6 @@ export default defineComponent({
 }
 
 .response.editor {
-    padding: 1em;
     background-color: #222;
 }
 .response.clear {
