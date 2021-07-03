@@ -44,20 +44,17 @@ class Observation(game.Reply, visual.Renderable):
         return {"message": "some kind of observation"}
 
 
+@dataclasses.dataclass
 class ObservedEntity:
-    pass
+    entity: entity.Entity
 
 
 class ObservedItem(ObservedEntity):
-    def __init__(self, item: entity.Entity):
-        super().__init__()
-        self.item = item
-
     def accept(self, visitor):
         return visitor.observed_entity(self)
 
     def __str__(self):
-        return str(self.item)
+        return str(self.entity)
 
     def __repr__(self):
         return str(self)
@@ -77,58 +74,45 @@ class HoldingActivity(Activity):
 
 
 class ObservedLiving(ObservedEntity):
-    def __init__(self, living: entity.Entity):
-        super().__init__()
-        self.living = living
-        self.activities: Sequence[Activity] = [
-            HoldingActivity(e) for e in living.make(carryable.Containing).holding
+    @property
+    def activities(self) -> Sequence[Activity]:
+        return [
+            HoldingActivity(e) for e in self.entity.make(carryable.Containing).holding
         ]
 
     @property
     def holding(self):
-        return self.living.make(carryable.Containing).holding
+        return self.entity.make(carryable.Containing).holding
 
     @property
     def memory(self):
-        return self.living.make(mechanics.Memory).memory
-
-    def accept(self, visitor):
-        return visitor.observed_living(self)
+        return self.entity.make(mechanics.Memory).memory
 
     def __str__(self):
         if len(self.activities) == 0:
-            return "%s" % (self.living,)
-        return "%s who is %s" % (self.living, p.join(list(map(str, self.activities))))
+            return "%s" % (self.entity,)
+        return "%s who is %s" % (self.entity, p.join(list(map(str, self.activities))))
 
     def __repr__(self):
         return str(self)
 
 
 class ObservedAnimal(ObservedLiving):
-    def accept(self, visitor):
-        return visitor.observed_animal(self)
-
     @property
     def animal(self):
-        return self.living
+        return self.entity
 
 
 class ObservedPerson(ObservedLiving):
-    def accept(self, visitor):
-        return visitor.observed_person(self)
-
     @property
     def person(self):
-        return self.living
+        return self.entity
 
 
 class ObservedEntities:
     def __init__(self, entities: List[entity.Entity]):
         super().__init__()
         self.entities = entities
-
-    def accept(self, visitor):
-        return visitor.observed_entities(self)
 
     def __str__(self):
         return str(p.join(self.entities))
@@ -164,14 +148,13 @@ class PersonalObservation(Observation):
         )
 
 
+@dataclasses.dataclass
 class DetailedObservation(Observation):
-    def __init__(self, item: ObservedEntity):
-        super().__init__()
-        self.item = item
+    item: ObservedEntity
 
     @property
     def props(self):
-        return self.item.entity.props  # type:ignore
+        return self.item.entity.props
 
     @property
     def properties(self):

@@ -5,13 +5,12 @@
                 "py/object": "model.reply.AreaObservation",
                 "who": {
                     "py/object": "model.reply.ObservedPerson",
-                    "living": {
+                    "entity": {
                         "py/object": "model.entity.Entity",
                         "key": "jlewallen",
                         "klass": "LivingClass",
                         "name": "Jacob"
-                    },
-                    "activities": []
+                    }
                 },
                 "where": {
                     "py/object": "model.entity.Entity",
