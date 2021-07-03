@@ -13,6 +13,7 @@ export function getObjectType(something: Record<string, unknown>) {
 
 export class RootState {
     authenticated = false;
+    key = "";
     headers: { [index: string]: string } = {};
     entities: { [index: string]: Entity } = {};
     areas: { [index: string]: Area } = {};
@@ -89,6 +90,7 @@ export class LogoutAction {
 }
 
 export interface Auth {
+    key: string;
     token: string;
 }
 

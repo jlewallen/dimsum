@@ -4,6 +4,7 @@ schema {
   subscription: Subscription
 }
 
+scalar Auth
 scalar SerializedEntity
 scalar JsonDiff
 scalar Reply
@@ -46,8 +47,6 @@ type Subscription {
   nearby(evaluator: Key): [Reply!]
 }
 
-scalar Token
-
 input Credentials {
   username: String!
   password: String!
@@ -71,7 +70,7 @@ type EntitiesUpdated {
 }
 
 type Mutation {
-  login(credentials: Credentials!): Token!
+  login(credentials: Credentials!): Auth!
   makeSample: EntitiesUpdated
   update(entities: [EntityDiff!]): EntitiesUpdated
   language(criteria: LanguageQueryCriteria!): Evaluation!

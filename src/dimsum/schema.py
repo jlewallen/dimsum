@@ -234,7 +234,7 @@ async def login(obj, info, credentials):
                         jwt_token = jwt.encode(
                             token, info.context.cfg.session_key, algorithm="HS256"
                         )
-                        return jwt_token
+                        return dict(key=person.key, token=jwt_token)
         except:
             log.exception("login")
 

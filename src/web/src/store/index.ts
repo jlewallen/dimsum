@@ -44,21 +44,25 @@ export default createStore<RootState>({
     state: new RootState(),
     mutations: {
         [MutationTypes.INIT]: (state: RootState) => {
-            const stored = window.localStorage["dimsum:headers"];
-            if (stored) {
+            const raw = window.localStorage["dimsum:auth"];
+            if (raw) {
+                const auth = JSON.parse(raw);
                 state.authenticated = true;
-                state.headers = JSON.parse(stored);
+                state.headers = auth.headers;
+                state.key = auth.key;
             }
         },
         [MutationTypes.AUTH]: (state: RootState, auth: Auth | null) => {
             if (auth) {
                 state.headers["Authorization"] = `Bearer ${auth.token}`;
+                state.key = auth.key;
                 state.authenticated = true;
-                window.localStorage["dimsum:headers"] = JSON.stringify(state.headers);
+                window.localStorage["dimsum:auth"] = JSON.stringify({ key: auth.key, headers: state.headers });
             } else {
                 state.headers = {};
+                state.key = "";
                 state.authenticated = false;
-                delete window.localStorage["dimsum:headers"];
+                delete window.localStorage["dimsum:auth"];
             }
         },
         [MutationTypes.PEOPLE]: (state: RootState, people: Person[]) => {
@@ -110,7 +114,7 @@ export default createStore<RootState>({
         },
         [ActionTypes.REPL]: async ({ state, commit }: ActionParameters, payload: ReplAction) => {
             const api = getApi(state.headers);
-            const data = await api.language({ text: payload.command, evaluator: "jlewallen" });
+            const data = await api.language({ text: payload.command, evaluator: state.key });
             if (data.language) {
                 commit(MutationTypes.REPLY, { reply: JSON.parse(data.language.reply) });
             }
