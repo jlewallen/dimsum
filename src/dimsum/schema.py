@@ -415,8 +415,6 @@ async def update(obj, info, entities):
         dict(key=key, serialized=serialized) for key, serialized in updated.items()
     ]
 
-    log.info("affected: %s", affected)
-
     return {"affected": affected}
 
 
