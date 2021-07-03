@@ -128,7 +128,6 @@ body {
 }
 
 #lower {
-    padding: 1em;
     border-top: 2px solid #dfdfdf;
 }
 </style>

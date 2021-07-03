@@ -1,10 +1,10 @@
 <template>
-    <div class="inline-editor">
+    <div class="inline-editor" @keydown.esc="cancel">
         <div class="inline-editor-row">
             <VCodeMirror v-model="form.behavior" />
         </div>
         <div class="inline-editor-row">
-            <form class="" @submit.prevent="saveForm" @keydown.esc="cancel">
+            <form class="inline" @submit.prevent="saveForm">
                 <div class="form-group row">
                     <label class="col-sm-2">Name</label>
                     <div class="col-sm-5">
@@ -79,10 +79,11 @@ export default defineComponent({
 .buttons button {
     margin-right: 1em;
 }
-.inline-editor {
-    padding-top: 1em;
-}
 .inline-editor-row {
     padding-bottom: 1em;
+}
+form.inline {
+    padding-left: 1em;
+    padding-right: 1em;
 }
 </style>

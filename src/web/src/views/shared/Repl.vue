@@ -30,6 +30,10 @@ export default defineComponent({
     margin: 0em;
 }
 
+.repl {
+    padding: 1em;
+}
+
 .form-control {
     background-color: #393e46;
     color: white;
