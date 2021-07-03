@@ -250,7 +250,7 @@ async def test_graphql_login_failed(caplog, snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_graphql_update():
+async def test_graphql_update(snapshot):
     domain = domains.Domain()
 
     serialized = serializing.serialize(
@@ -262,7 +262,10 @@ async def test_graphql_update():
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
-        affected
+        affected {
+            key
+            serialized
+        }
     }
 }
 """,
@@ -271,7 +274,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    assert actual == {"data": {"update": {"affected": 1}}}
+    snapshot.assert_match(test.pretty_json(actual), "response.json")
 
 
 @pytest.mark.asyncio
@@ -288,7 +291,7 @@ async def test_graphql_update_and_requery(snapshot):
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
-        affected
+        affected { key serialized }
     }
 }
 """,
@@ -297,7 +300,7 @@ mutation UpdateEntities($entities: [EntityDiff!]) {
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    assert actual == {"data": {"update": {"affected": 1}}}
+    snapshot.assert_match(test.pretty_json(actual), "response.json")
 
     data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
@@ -318,13 +321,13 @@ async def test_graphql_make_sample(snapshot):
 
     data = {
         "variables": {"entities": [serialized]},
-        "query": "mutation { makeSample { affected } }",
+        "query": "mutation { makeSample { affected { key serialized } } }",
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
-    assert actual == {"data": {"makeSample": {"affected": 59}}}
+    snapshot.assert_match(test.pretty_json(actual), "make_response.json")
 
     data = {"query": "{ world { key serialized } }"}
     ok, actual = await ariadne.graphql(
@@ -353,7 +356,7 @@ async def test_graphql_delete(snapshot):
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
-        affected
+        affected { key serialized }
     }
 }
 """,

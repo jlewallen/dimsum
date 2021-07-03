@@ -384,17 +384,19 @@ async def makeSample(obj, info):
     with domain.session() as session:
         world = await session.prepare()
 
-        number_before = session.registrar.number_of_entities()
-
         generics, area = library.create_example_world(session.world)
         session.register(generics.all)
 
         await session.add_area(area)
         await session.save()
 
-        affected = session.registrar.number_of_entities() - number_before
+        affected = [
+            EntityResolver(session, e)
+            for e in session.registrar.entities.values()
+            if e.modified
+        ]
 
-    return {"affected": affected}
+        return {"affected": affected}
 
 
 @mutation.field("update")
@@ -407,9 +409,16 @@ async def update(obj, info, entities):
         for row in entities
     }
 
-    await domain.store.update(diffs)
+    updated = await domain.store.update(diffs)
 
-    return {"affected": len(diffs)}
+    affected = [
+        dict(key=keys.key, serialized=serialized)
+        for keys, serialized in updated.items()
+    ]
+
+    log.info("affected: %s", affected)
+
+    return {"affected": affected}
 
 
 def create():

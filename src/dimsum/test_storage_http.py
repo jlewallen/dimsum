@@ -37,7 +37,7 @@ def session(url: str):
 
 async def initialize(url: str):
     async with session(url) as s:
-        query = gql("mutation { makeSample { affected } }")
+        query = gql("mutation { makeSample { affected { key } } }")
         await s.execute(query)
 
 

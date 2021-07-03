@@ -20,9 +20,6 @@
                                     "klass": "RootEntityClass",
                                     "name": "World"
                                 }
-                            },
-                            "identifiers": {
-                                "gid": 1
                             }
                         },
                         "klass": {
@@ -30,9 +27,9 @@
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
-                            "public": "NlaoO0m9mo6Tpho/0nNCSMrsyV3fCuS5UBRb4cdyryk=",
+                            "public": "MilYJzNkvDFYzu7Hl7arWWsiJJ6DD17TFR3/sweYfjw=",
                             "signature": null,
-                            "private": "rb5wJG8908euEGwMiAaHD1ywEfccvon85CBC/gqjznA="
+                            "private": "hgJkOMuZ0nRzgriePpKLfC1jjWBB8ZBtogtHXuMiiQE="
                         },
                         "key": "world",
                         "props": {
@@ -40,7 +37,7 @@
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": 0
+                                    "value": -1
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
@@ -64,12 +61,7 @@
                                 },
                                 "destroyed": {
                                     "py/object": "model.properties.Property",
-                                    "value": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "NlaoO0m9mo6Tpho/0nNCSMrsyV3fCuS5UBRb4cdyryk=",
-                                        "signature": null,
-                                        "private": "rb5wJG8908euEGwMiAaHD1ywEfccvon85CBC/gqjznA="
-                                    }
+                                    "value": null
                                 },
                                 "related": {
                                     "py/object": "model.properties.Property",

@@ -47,7 +47,9 @@ class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(
+        self, updates: Dict[entity.Keys, entity.EntityUpdate]
+    ) -> Dict[entity.Keys, str]:
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
@@ -67,7 +69,8 @@ class All(EntityStorage):
 
     async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
         for child in self.children:
-            await child.update(diffs)
+            returning = await child.update(diffs)
+        return returning
 
     async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
         for child in self.children:
@@ -254,16 +257,22 @@ class SqliteStorage(EntityStorage):
             ],
         )
 
-    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(
+        self, updates: Dict[entity.Keys, entity.EntityUpdate]
+    ) -> Dict[entity.Keys, str]:
         await self.open_if_necessary()
         assert self.db
 
         log.debug("applying %d updates", len(updates))
 
+        updating = {
+            key: StorageFields.parse(update.serialized)
+            for key, update in updates.items()
+        }
+
         self.dbc = self.db.cursor()
-        for keys, update in updates.items():
+        for key, fields in updating.items():
             assert not self.frozen
-            fields = StorageFields.parse(update.serialized)
             if fields.destroyed:
                 self._delete_row(fields)
             else:
@@ -271,7 +280,10 @@ class SqliteStorage(EntityStorage):
                     self._insert_row(fields)
                 else:
                     self._update_row(fields)
+
         self.db.commit()
+
+        return {key: f.serialized for key, f in updating.items()}
 
     async def load_by_gid(self, gid: int):
         loaded = await self.load_query(
@@ -315,13 +327,15 @@ class HttpStorage(EntityStorage):
             response = await session.execute(query)
             return response["size"]
 
-    async def update(self, updates: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(
+        self, updates: Dict[entity.Keys, entity.EntityUpdate]
+    ) -> Dict[entity.Keys, str]:
         async with self.session() as session:
             query = gql(
                 """
         mutation Update($entities: [EntityDiff!]) {
             update(entities: $entities) {
-                affected
+                affected { key serialized }
             }
         }
     """
@@ -333,7 +347,9 @@ class HttpStorage(EntityStorage):
             response = await session.execute(
                 query, variable_values={"entities": entities}
             )
-            return response["update"]["affected"]
+
+            affected = response["update"]["affected"]
+            return {entity.Keys(key=row["key"]): row["serialized"] for row in affected}
 
     async def load_by_gid(self, gid: int):
         async with self.session() as session:

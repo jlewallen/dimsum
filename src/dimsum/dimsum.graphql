@@ -67,7 +67,7 @@ input EntityTemplate {
 }
 
 type EntitiesUpdated {
-  affected: Int!
+  affected: [KeyedEntity!]
 }
 
 type Mutation {
