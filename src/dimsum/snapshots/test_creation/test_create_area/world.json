@@ -1,0 +1,372 @@
+[
+    {
+        "py/object": "serializing.RootWorld",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 3
+        },
+        "creator": null,
+        "parent": null,
+        "chimeras": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "welcoming": {
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 4,
+                    "klass": "AreaClass",
+                    "name": "Living room"
+                }
+            },
+            "identifiers": {
+                "gid": 4
+            }
+        },
+        "klass": {
+            "py/type": "model.entity.RootEntityClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 1,
+            "signature": 1,
+            "private": 1
+        },
+        "key": "world",
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 0
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "World"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Ya know, everything"
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 2
+        },
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
+        "parent": null,
+        "chimeras": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "containing": {
+                "pattern": null,
+                "locked": false,
+                "openable": {
+                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                },
+                "holding": [],
+                "capacity": null,
+                "produces": {}
+            },
+            "occupyable": {
+                "occupied": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 6,
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    }
+                ],
+                "occupancy": 100
+            }
+        },
+        "klass": {
+            "py/type": "model.scopes.AreaClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 3,
+            "signature": 3,
+            "private": 3
+        },
+        "key": 4,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 1
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Living room"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Living room"
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 2
+        },
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
+        "parent": null,
+        "chimeras": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "containing": {
+                "pattern": null,
+                "locked": false,
+                "openable": {
+                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                },
+                "holding": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 8,
+                        "klass": "AreaClass",
+                        "name": "Treehouse"
+                    }
+                ],
+                "capacity": null,
+                "produces": {}
+            },
+            "memory": {
+                "memory": {}
+            },
+            "health": {
+                "medical": {
+                    "py/object": "model.scopes.health.Medical",
+                    "nutrition": {
+                        "py/object": "model.scopes.health.Nutrition",
+                        "properties": {}
+                    }
+                }
+            },
+            "occupying": {
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 4,
+                    "klass": "AreaClass",
+                    "name": "Living room"
+                }
+            }
+        },
+        "klass": {
+            "py/type": "model.scopes.LivingClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 5,
+            "signature": 5,
+            "private": 5
+        },
+        "key": 6,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 2
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Jacob"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Curly haired bastard."
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 1
+        },
+        "creator": {
+            "py/object": "model.entity.Entity",
+            "key": 6,
+            "klass": "LivingClass",
+            "name": "Jacob"
+        },
+        "parent": null,
+        "chimeras": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.entity.Entity",
+                    "key": 6,
+                    "klass": "LivingClass",
+                    "name": "Jacob"
+                }
+            },
+            "containing": {
+                "pattern": null,
+                "locked": false,
+                "openable": {
+                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                },
+                "holding": [],
+                "capacity": null,
+                "produces": {}
+            },
+            "occupyable": {
+                "occupied": [],
+                "occupancy": 100
+            },
+            "location": {
+                "container": {
+                    "py/object": "model.entity.Entity",
+                    "key": 6,
+                    "klass": "LivingClass",
+                    "name": "Jacob"
+                }
+            }
+        },
+        "klass": {
+            "py/type": "model.scopes.AreaClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 7,
+            "signature": 7,
+            "private": 7
+        },
+        "key": 8,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 3
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Treehouse"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Treehouse"
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    }
+]

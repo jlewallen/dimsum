@@ -50,6 +50,10 @@ scopes_by_class = {
 }
 
 
+def create_klass(klass: Type[entity.EntityClass], **kwargs) -> entity.Entity:
+    return entity.Entity(scopes=scopes_by_class[klass], klass=klass, **kwargs)
+
+
 def alive(**kwargs) -> entity.Entity:
     return entity.Entity(scopes=Alive, klass=LivingClass, **kwargs)
 

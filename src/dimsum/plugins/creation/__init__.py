@@ -28,17 +28,46 @@ class EntityCreated(StandardEvent):
         return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
 
 
+def default_heard_for(area: entity.Entity = None) -> List[entity.Entity]:
+    if area:
+        with area.make_and_discard(occupyable.Occupyable) as here:
+            return here.occupied
+    return []
+
+
 class Create(PersonAction):
-    def __init__(self, scopes: List[Type] = None, **kwargs):
+    def __init__(
+        self,
+        klass: Type[EntityClass],
+        name: str = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
-        assert scopes
-        self.scopes = scopes
+        assert klass
+        assert name
+        self.klass = klass
+        self.name = name
 
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        log.info("creating %s", self.scopes)
-        return Success()
+        log.info("creating '%s' klass=%s", self.name, self.klass)
+        created = scopes.create_klass(
+            self.klass,
+            creator=person,
+            props=properties.Common(name=self.name, desc=self.name),
+        )  # TODO create
+        with person.make(carryable.Containing) as contain:
+            after_hold = contain.hold(created)
+            # We do this after because we may consolidate this Item and
+            # this keeps us from having to unregister the item.
+            ctx.register(after_hold)
+            return EntityCreated(
+                area=area,
+                living=person,
+                entity=after_hold,
+                heard=default_heard_for(area),
+            )
 
 
 @grammars.grammar()
@@ -64,16 +93,16 @@ class Grammar(grammars.Grammar):
 class Evaluator(BaseEvaluator):
     def create(self, args):
         log.info("create: %s", args[0])
-        return Create(args[0])
+        return Create(args[0], str(args[1]))
 
     def create_entity_kind_thing(self, args):
-        return scopes.Item
+        return scopes.ItemClass
 
     def create_entity_kind_area(self, args):
-        return scopes.Area
+        return scopes.AreaClass
 
     def create_entity_kind_exit(self, args):
-        return scopes.Exit
+        return scopes.ExitClass
 
     def create_entity_kind_living(self, args):
-        return scopes.Alive
+        return scopes.AliveClass
