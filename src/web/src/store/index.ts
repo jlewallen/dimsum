@@ -17,6 +17,7 @@ import {
     AuthenticatedAction,
     ReplResponse,
     ReplAction,
+    RemoveHistoryEntry,
 } from "./types";
 import { getApi, subscribe } from "@/http";
 
@@ -76,6 +77,12 @@ export default createStore<RootState>({
         },
         [MutationTypes.REPLY]: (state: RootState, response: ReplResponse) => {
             state.responses.push(response);
+        },
+        [MutationTypes.REMOVE_HISTORY_ENTRY]: (state: RootState, payload: RemoveHistoryEntry) => {
+            const index = state.responses.indexOf(payload.entry);
+            if (index >= 0) {
+                state.responses.splice(index, 1);
+            }
         },
     },
     actions: {

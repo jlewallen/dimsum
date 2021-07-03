@@ -2,7 +2,7 @@
     <div class="repl">
         <form v-on:submit.prevent="send">
             <div class="form-group">
-                <input class="form-control" type="text" v-model="command" />
+                <input class="form-control" type="text" v-model="command" id="repl-command" autocomplete="off" />
             </div>
         </form>
     </div>
@@ -28,9 +28,6 @@ export default defineComponent({
 <style scoped>
 .form-group {
     margin: 0em;
-}
-
-.repl {
 }
 
 .form-control {

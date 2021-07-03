@@ -1,7 +1,13 @@
 <template>
     <div class="history">
         <div v-for="response in responses" v-bind:key="response.key" class="response">
-            <component v-bind:is="viewFor(response)" :response="response" :reply="response.reply" @selected="onSelected" />
+            <component
+                v-bind:is="viewFor(response)"
+                :response="response"
+                :reply="response.reply"
+                @selected="onSelected"
+                @obsolete="onObsolete(response)"
+            />
         </div>
     </div>
 </template>
@@ -9,7 +15,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Replies from "../shared/replies";
-import store, { getObjectType, Entity, ReplAction, ReplResponse } from "@/store";
+import store, { getObjectType, Entity, ReplAction, ReplResponse, RemoveHistoryEntry } from "@/store";
 
 export default defineComponent({
     name: "ExploreView",
@@ -32,9 +38,12 @@ export default defineComponent({
             this.$emit("scroll-bottom");
         },
     },
-    mounted(): Promise<any> {
+    async mounted(): Promise<void> {
         this.$emit("scroll-bottom");
-        return store.dispatch(new ReplAction("look"));
+        if (this.historyLength == 0) {
+            await store.dispatch(new ReplAction("look"));
+            await store.dispatch(new ReplAction("ed guitar"));
+        }
     },
     methods: {
         send(command: string): Promise<any> {
@@ -57,10 +66,24 @@ export default defineComponent({
                 params: { key: entity.key },
             });
         },
+        onObsolete(response: ReplResponse) {
+            console.log("explore:obsolete", response);
+            store.commit(new RemoveHistoryEntry(response));
+            this.$emit("resume-repl");
+        },
     },
 });
 </script>
 <style>
+.response.clear {
+    padding: 1em;
+    background-color: #30475e;
+    display: none;
+}
+.response.editor {
+    padding: 1em;
+    background-color: #30475e;
+}
 .response.living-entered-area {
     padding: 1em;
     background-color: #30475e;

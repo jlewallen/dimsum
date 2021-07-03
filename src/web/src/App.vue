@@ -33,7 +33,7 @@
             </div>
         </nav>
         <div id="main">
-            <router-view @scroll-bottom="scrollBottom" />
+            <router-view @scroll-bottom="scrollBottom" @resume-repl="resumeRepl" />
         </div>
     </div>
     <div id="lower">
@@ -87,6 +87,12 @@ export default defineComponent({
                     el.scrollTop = el.scrollHeight + 90;
                 }
             });
+        },
+        resumeRepl(): void {
+            const focusing = this.$el.parentNode.querySelector("#repl-command");
+            if (focusing) {
+                focusing.focus();
+            }
         },
     },
 });

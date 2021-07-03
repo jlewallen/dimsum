@@ -39,6 +39,7 @@ export enum MutationTypes {
     AREAS = "AREAS",
     ENTITY = "ENTITY",
     REPLY = "REPLY",
+    REMOVE_HISTORY_ENTRY = "REMOVE_HISTORY_ENTRY",
 }
 
 export class LoadingAction {
@@ -105,4 +106,10 @@ export function entityToClass(entity: Entity): string {
         classes.push("hard-to-see");
     }
     return classes.join(" ");
+}
+
+export class RemoveHistoryEntry {
+    type = MutationTypes.REMOVE_HISTORY_ENTRY;
+
+    constructor(public readonly entry: ReplResponse) {}
 }

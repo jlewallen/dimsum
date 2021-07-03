@@ -7,6 +7,7 @@ import EntitiesObservation from "./EntitiesObservation.vue";
 import Success from "./Success.vue";
 import Failure from "./Failure.vue";
 import DefaultReply from "./DefaultReply.vue";
+import { CommonComponents } from "./index";
 
 const CommonProps = {
     reply: {
@@ -51,6 +52,24 @@ const ItemsDropped = defineComponent({
     template: `<div class="response items">{{ reply.living.name }} dropped {{ reply.items }}</div>`,
 });
 
+import InlineEditor from "@/views/entity/InlineEditor.vue";
+
+const EditingEntity = defineComponent({
+    name: "EditingEntity",
+    props: CommonProps,
+    components: {
+        ...CommonComponents,
+        InlineEditor,
+    },
+    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :entity="withEntity.entity" @saved="$emit('obsolete')" /></WithEntity></div>`,
+});
+
+const ScreenCleared = defineComponent({
+    name: "ScreenCleared",
+    props: CommonProps,
+    template: `<div class="response clear">Screen Cleared</div>`,
+});
+
 export default {
     AreaObservation,
     EntitiesObservation,
@@ -64,4 +83,6 @@ export default {
     DefaultReply,
     ItemsHeld,
     ItemsDropped,
+    EditingEntity,
+    ScreenCleared,
 };
