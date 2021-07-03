@@ -168,7 +168,11 @@ export default createStore<RootState>({
                 key: payload.entity.key,
                 serialized: JSON.stringify(payload.entity),
             });
-            commit(MutationTypes.ENTITY, payload.entity);
+            if (data.update && data.update.affected) {
+                for (const row of data.update.affected) {
+                    commit(MutationTypes.ENTITY, JSON.parse(row.serialized));
+                }
+            }
         },
     },
     getters: {},

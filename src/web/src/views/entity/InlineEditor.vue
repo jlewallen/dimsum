@@ -48,7 +48,6 @@ export default defineComponent({
     },
     methods: {
         async saveForm(): Promise<void> {
-            console.log("save");
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;

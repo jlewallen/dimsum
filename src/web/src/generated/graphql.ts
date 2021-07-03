@@ -27,7 +27,7 @@ export type Credentials = {
 
 export type EntitiesUpdated = {
     __typename?: "EntitiesUpdated";
-    affected: Scalars["Int"];
+    affected?: Maybe<Array<KeyedEntity>>;
 };
 
 export type EntityDiff = {
@@ -155,7 +155,11 @@ export type UpdateEntityMutationVariables = Exact<{
 }>;
 
 export type UpdateEntityMutation = { __typename?: "Mutation" } & {
-    update?: Maybe<{ __typename?: "EntitiesUpdated" } & Pick<EntitiesUpdated, "affected">>;
+    update?: Maybe<
+        { __typename?: "EntitiesUpdated" } & {
+            affected?: Maybe<Array<{ __typename?: "KeyedEntity" } & Pick<KeyedEntity, "key" | "serialized">>>;
+        }
+    >;
 };
 
 export type AreasQueryVariables = Exact<{ [key: string]: never }>;
@@ -202,7 +206,10 @@ export const LanguageDocument = gql`
 export const UpdateEntityDocument = gql`
     mutation updateEntity($key: String!, $serialized: String!) {
         update(entities: [{ key: $key, serialized: $serialized }]) {
-            affected
+            affected {
+                key
+                serialized
+            }
         }
     }
 `;

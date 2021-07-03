@@ -11,7 +11,7 @@ mutation language($text: String!, $evaluator: Key!) {
 
 mutation updateEntity($key: String!, $serialized: String!) {
 	update(entities: [{ key: $key, serialized: $serialized }]) {
-		affected
+		affected { key serialized }
 	}
 }
 
