@@ -29,7 +29,6 @@ export default defineComponent({
         this.$emit("scroll-bottom");
         if (this.length == 0) {
             await store.dispatch(new ReplAction("look"));
-            await store.dispatch(new ReplAction("ed guitar"));
         }
     },
     methods: {},
