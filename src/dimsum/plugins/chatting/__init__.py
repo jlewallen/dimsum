@@ -1,4 +1,4 @@
-from typing import Any, List, Type, Dict
+from typing import Any, List, Type, Dict, Optional
 
 import logging
 import dataclasses
@@ -35,7 +35,7 @@ class PlayerTold(PlayerSpoke):
 
 
 class Say(PersonAction):
-    def __init__(self, message: str = None, **kwargs):
+    def __init__(self, message: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
         assert message
         self.message = message
@@ -53,7 +53,9 @@ class Say(PersonAction):
 
 
 class Tell(PersonAction):
-    def __init__(self, who: ItemFinder = None, message: str = None, **kwargs):
+    def __init__(
+        self, who: Optional[ItemFinder] = None, message: Optional[str] = None, **kwargs
+    ):
         super().__init__(**kwargs)
         assert who
         assert message

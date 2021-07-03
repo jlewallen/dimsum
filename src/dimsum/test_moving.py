@@ -1,3 +1,5 @@
+from typing import Optional
+
 import logging
 import pytest
 
@@ -130,7 +132,10 @@ async def test_directional_moving():
 
 class Bidirectional:
     def __init__(
-        self, there: entity.Entity = None, back: entity.Entity = None, **kwargs
+        self,
+        there: Optional[entity.Entity] = None,
+        back: Optional[entity.Entity] = None,
+        **kwargs
     ):
         assert there
         assert back

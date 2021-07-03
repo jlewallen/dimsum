@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 import logging
 import dataclasses
@@ -40,13 +40,15 @@ class Nutrition:
 
 
 class Medical:
-    def __init__(self, nutrition: Nutrition = None, **kwargs):
+    def __init__(self, nutrition: Optional[Nutrition] = None, **kwargs):
         super().__init__()
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
 class Edible(entity.Scope):
-    def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
+    def __init__(
+        self, nutrition: Optional[Nutrition] = None, servings: int = 1, **kwargs
+    ):
         super().__init__(**kwargs)
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
         self.servings: int = servings

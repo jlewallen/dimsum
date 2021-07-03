@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 import os
 import base64
@@ -71,7 +71,7 @@ class ItemsAppeared(StandardEvent):
     items: List[entity.Entity]
 
 
-def default_heard_for(area: entity.Entity = None) -> List[entity.Entity]:
+def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
     if area:
         with area.make_and_discard(occupyable.Occupyable) as here:
             return here.occupied
@@ -118,7 +118,7 @@ class ItemsDropped(StandardEvent):
 
 
 class Wear(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -152,7 +152,7 @@ class Wear(PersonAction):
 
 
 class Remove(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -184,7 +184,7 @@ class Remove(PersonAction):
 
 
 class Eat(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -214,7 +214,7 @@ class Eat(PersonAction):
 
 
 class Drink(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -274,7 +274,7 @@ class Join(PersonAction):
 
 
 class LookInside(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -299,7 +299,7 @@ class LookInside(PersonAction):
 
 
 class LookFor(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -378,7 +378,12 @@ class Look(PersonAction):
 
 
 class Drop(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, quantity: int = None, **kwargs):
+    def __init__(
+        self,
+        item: Optional[things.ItemFinder] = None,
+        quantity: Optional[int] = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self.quantity = quantity if quantity else None
         self.item = item if item else None
@@ -431,7 +436,12 @@ class ItemsHeld(StandardEvent):
 
 
 class Hold(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, quantity: int = None, **kwargs):
+    def __init__(
+        self,
+        item: Optional[things.ItemFinder] = None,
+        quantity: Optional[int] = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -483,7 +493,7 @@ class Hold(PersonAction):
 
 
 class Open(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -511,7 +521,7 @@ class Open(PersonAction):
 
 
 class Close(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -540,7 +550,10 @@ class Close(PersonAction):
 
 class Lock(PersonAction):
     def __init__(
-        self, item: things.ItemFinder = None, key: things.ItemFinder = None, **kwargs
+        self,
+        item: Optional[things.ItemFinder] = None,
+        key: Optional[things.ItemFinder] = None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         assert item
@@ -581,7 +594,10 @@ class Lock(PersonAction):
 
 class Unlock(PersonAction):
     def __init__(
-        self, item: things.ItemFinder = None, key: things.ItemFinder = None, **kwargs
+        self,
+        item: Optional[things.ItemFinder] = None,
+        key: Optional[things.ItemFinder] = None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         assert item
@@ -617,8 +633,8 @@ class Unlock(PersonAction):
 class PutInside(PersonAction):
     def __init__(
         self,
-        container: things.ItemFinder = None,
-        item: things.ItemFinder = None,
+        container: Optional[things.ItemFinder] = None,
+        item: Optional[things.ItemFinder] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -660,8 +676,8 @@ class PutInside(PersonAction):
 class TakeOut(PersonAction):
     def __init__(
         self,
-        container: things.ItemFinder = None,
-        item: things.ItemFinder = None,
+        container: Optional[things.ItemFinder] = None,
+        item: Optional[things.ItemFinder] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -702,7 +718,10 @@ class TakeOut(PersonAction):
 
 class MovingAction(PersonAction):
     def __init__(
-        self, area: entity.Entity = None, finder: movement.FindsRoute = None, **kwargs
+        self,
+        area: Optional[entity.Entity] = None,
+        finder: Optional[movement.FindsRoute] = None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         self.area = area
@@ -804,7 +823,9 @@ class Remember(PersonAction):
 
 
 class ModifyHardToSee(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, hard_to_see=False, **kwargs):
+    def __init__(
+        self, item: Optional[things.ItemFinder] = None, hard_to_see=False, **kwargs
+    ):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -867,7 +888,11 @@ class ModifyField(PersonAction):
 
 class ModifyActivity(PersonAction):
     def __init__(
-        self, item: things.ItemFinder = None, activity=None, value=None, **kwargs
+        self,
+        item: Optional[things.ItemFinder] = None,
+        activity=None,
+        value=None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         assert item
@@ -898,7 +923,7 @@ class ModifyActivity(PersonAction):
 
 
 class ModifyServings(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, number=None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, number=None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -928,7 +953,9 @@ class ModifyServings(PersonAction):
 
 
 class ModifyCapacity(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, capacity=None, **kwargs):
+    def __init__(
+        self, item: Optional[things.ItemFinder] = None, capacity=None, **kwargs
+    ):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -959,9 +986,9 @@ PourVerb = "pour"
 class Pour(PersonAction):
     def __init__(
         self,
-        item: things.ItemFinder = None,
-        source: things.ItemFinder = None,
-        destination: things.ItemFinder = None,
+        item: Optional[things.ItemFinder] = None,
+        source: Optional[things.ItemFinder] = None,
+        destination: Optional[things.ItemFinder] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -1003,7 +1030,7 @@ class Pour(PersonAction):
 
 
 class PourProducer(carryable.Producer):
-    def __init__(self, template: finders.MaybeItemOrRecipe = None, **kwargs):
+    def __init__(self, template: Optional[finders.MaybeItemOrRecipe] = None, **kwargs):
         super().__init__(**kwargs)  # type: ignore
         assert template
         self.template: finders.MaybeItemOrRecipe = template
@@ -1020,8 +1047,8 @@ class PourProducer(carryable.Producer):
 class ModifyPours(PersonAction):
     def __init__(
         self,
-        item: things.ItemFinder = None,
-        produces: finders.MaybeItemOrRecipe = None,
+        item: Optional[things.ItemFinder] = None,
+        produces: Optional[finders.MaybeItemOrRecipe] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -1055,7 +1082,7 @@ class ModifyPours(PersonAction):
 
 
 class Freeze(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item
@@ -1082,7 +1109,7 @@ class Freeze(PersonAction):
 
 
 class Unfreeze(PersonAction):
-    def __init__(self, item: things.ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item

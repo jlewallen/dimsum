@@ -104,7 +104,9 @@ async def resolve_world(obj, info):
         return EntityResolver(session, await session.prepare())
 
 
-async def materialize(session, key=None, gid=None, reach: int = None, **kwargs):
+async def materialize(
+    session, key=None, gid=None, reach: Optional[int] = None, **kwargs
+):
     loaded = await session.materialize(key=key, gid=gid)
     if loaded:
         entities = [loaded]
@@ -326,7 +328,7 @@ class Template:
             "create key=%s klass=%s scopes=%s", self.key, entity_class, entity_scopes
         )
         return entity.Entity(
-            key=self.key,
+            key=key,
             props=properties.Common(name=self.name, desc=self.desc),
             klass=entity_class,
             scopes=entity_scopes,

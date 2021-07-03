@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+
 import logging
 import datetime
 import abc
@@ -13,7 +14,7 @@ log = logging.getLogger("dimsum.scopes")
 
 
 class Interactable(entity.Scope):
-    def __init__(self, interactions: Dict[str, bool] = None, **kwargs):
+    def __init__(self, interactions: Optional[Dict[str, bool]] = None, **kwargs):
         super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
 
@@ -58,7 +59,7 @@ class Visible:
         self,
         hidden: bool = False,
         hard_to_see: bool = False,
-        observations: Dict[str, List[Observation]] = None,
+        observations: Optional[Dict[str, List[Observation]]] = None,
         **kwargs
     ):
         super().__init__()
@@ -83,7 +84,7 @@ class Visible:
 
 
 class Visibility(entity.Scope):
-    def __init__(self, visible: Visible = None, **kwargs):
+    def __init__(self, visible: Optional[Visible] = None, **kwargs):
         super().__init__(**kwargs)
         self.visible: Visible = visible if visible else Visible()
 
@@ -132,7 +133,7 @@ class Physics:
 
 
 class Memory(entity.Scope):
-    def __init__(self, memory: Dict[str, Memorable] = None, **kwargs):
+    def __init__(self, memory: Optional[Dict[str, Memorable]] = None, **kwargs):
         super().__init__(**kwargs)
         self.memory = memory if memory else {}
 
@@ -159,6 +160,6 @@ class Wind:
 
 
 class Weather(entity.Scope):
-    def __init__(self, wind: Wind = None, **kwargs):
+    def __init__(self, wind: Optional[Wind] = None, **kwargs):
         super().__init__(**kwargs)
         self.wind = wind

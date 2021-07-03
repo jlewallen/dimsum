@@ -30,7 +30,7 @@ class EntityCreated(StandardEvent):
         return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
 
 
-def default_heard_for(area: entity.Entity = None) -> List[entity.Entity]:
+def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
     if area:
         with area.make_and_discard(occupyable.Occupyable) as here:
             return here.occupied
@@ -41,7 +41,7 @@ class Create(PersonAction):
     def __init__(
         self,
         klass: Type[EntityClass],
-        name: str = None,
+        name: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -80,8 +80,8 @@ class ItemsMade(StandardEvent):
 class Make(PersonAction):
     def __init__(
         self,
-        template: finders.MaybeItemOrRecipe = None,
-        item: things.ItemFinder = None,
+        template: Optional[finders.MaybeItemOrRecipe] = None,
+        item: Optional[things.ItemFinder] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -168,7 +168,12 @@ class Obliterate(PersonAction):
 
 
 class CallThis(PersonAction):
-    def __init__(self, name: str = None, item: things.ItemFinder = None, **kwargs):
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        item: Optional[things.ItemFinder] = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         assert item
         self.item = item

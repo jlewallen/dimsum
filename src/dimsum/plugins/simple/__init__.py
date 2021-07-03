@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, List, Type, Optional
 
 import logging
 
@@ -23,7 +23,7 @@ log = logging.getLogger("dimsum")
 
 
 class SimpleVerb(PersonAction):
-    def __init__(self, who=None, item: ItemFinder = None, **kwargs):
+    def __init__(self, who=None, item: Optional[ItemFinder] = None, **kwargs):
         super().__init__()
         self.who = who
         self.item = item if item else finders.FindNone()

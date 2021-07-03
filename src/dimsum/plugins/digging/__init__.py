@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, List, Type, Optional
 
 import logging
 
@@ -22,7 +22,11 @@ log = logging.getLogger("dimsum")
 
 
 class DigDirection:
-    def __init__(self, arbitrary: str = None, direction: movement.Direction = None):
+    def __init__(
+        self,
+        arbitrary: Optional[str] = None,
+        direction: Optional[movement.Direction] = None,
+    ):
         super().__init__()
         self.arbitrary = arbitrary
         self.direction = direction
@@ -39,7 +43,7 @@ class DigDirection:
 class DigLinkage:
     def __init__(
         self,
-        directions: List[DigDirection] = None,
+        directions: Optional[List[DigDirection]] = None,
     ):
         super().__init__()
         self.directions = directions
@@ -61,7 +65,12 @@ class DigLinkage:
 
 
 class Dig(PersonAction):
-    def __init__(self, linkage: DigLinkage = None, area_name: str = None, **kwargs):
+    def __init__(
+        self,
+        linkage: Optional[DigLinkage] = None,
+        area_name: Optional[str] = None,
+        **kwargs
+    ):
         super().__init__()
         assert linkage
         assert area_name

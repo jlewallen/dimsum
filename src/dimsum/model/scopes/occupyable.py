@@ -1,4 +1,4 @@
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Optional
 
 import abc
 import logging
@@ -25,7 +25,7 @@ log = logging.getLogger("dimsum.scopes")
 
 
 class Occupying(entity.Scope):
-    def __init__(self, area: entity.Entity = None, **kwargs):
+    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
 

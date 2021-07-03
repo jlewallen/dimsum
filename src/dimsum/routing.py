@@ -18,7 +18,7 @@ class Target:
 
 
 class Router:
-    def __init__(self, targets: List[Target] = None):
+    def __init__(self, targets: Optional[List[Target]] = None):
         super().__init__()
         self.targets: List[Target] = targets if targets else []
 
@@ -39,7 +39,7 @@ class Router:
 
 
 class Broker:
-    def __init__(self, targets: List[Target] = None):
+    def __init__(self, targets: Optional[List[Target]] = None):
         super().__init__()
         self.router = Router(targets=targets)
 
@@ -52,7 +52,7 @@ class NoRoutesException(Exception):
 
 
 class ProcessTarget(Target):
-    def __init__(self, command: List[str] = None, **kwargs):
+    def __init__(self, command: Optional[List[str]] = None, **kwargs):
         super().__init__(**kwargs)
         assert command
         self.command = command

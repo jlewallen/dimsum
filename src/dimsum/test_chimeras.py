@@ -1,3 +1,5 @@
+from typing import Optional
+
 import sys
 import logging
 import pytest
@@ -19,7 +21,7 @@ log = logging.getLogger("dimsum")
 
 
 class SimpleCore(entity.Scope):
-    def __init__(self, name: str = None, **kwargs):
+    def __init__(self, name: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
 
@@ -65,7 +67,9 @@ async def test_chimeric_entities_serialize(caplog):
 
 
 def make_person(
-    props: properties.Common = None, creator: entity.Entity = None, **kwargs
+    props: Optional[properties.Common] = None,
+    creator: Optional[entity.Entity] = None,
+    **kwargs
 ):
     person = entity.Entity(props=props, creator=creator, scopes=[SimpleCore], **kwargs)
 
@@ -81,7 +85,9 @@ def make_person(
 
 
 def make_thing(
-    props: properties.Common = None, creator: entity.Entity = None, **kwargs
+    props: Optional[properties.Common] = None,
+    creator: Optional[entity.Entity] = None,
+    **kwargs
 ):
     thing = entity.Entity(
         props=props, creator=creator, scopes=[ownership.Ownership], **kwargs

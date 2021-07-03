@@ -1,4 +1,5 @@
-from typing import List, Sequence, Dict
+from typing import List, Sequence, Dict, Optional
+
 import abc
 import sys
 import logging
@@ -179,7 +180,7 @@ class BehaviorCollection(entity.Scope):
 
 
 class Behaviors(entity.Scope):
-    def __init__(self, behaviors: BehaviorMap = None, **kwargs):
+    def __init__(self, behaviors: Optional[BehaviorMap] = None, **kwargs):
         super().__init__(**kwargs)
         self.behaviors = behaviors if behaviors else BehaviorMap()
 

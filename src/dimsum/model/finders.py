@@ -21,7 +21,7 @@ class FindNone(things.ItemFinder):
 
 
 class StaticItem(things.ItemFinder):
-    def __init__(self, item: entity.Entity = None, **kwargs):
+    def __init__(self, item: Optional[entity.Entity] = None, **kwargs):
         super().__init__()
         self.item = item
 
@@ -45,7 +45,10 @@ class AnyItem(things.ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
+        self,
+        person: Optional[entity.Entity] = None,
+        area: Optional[entity.Entity] = None,
+        **kwargs
     ) -> Optional[entity.Entity]:
         assert person
         assert area
@@ -102,7 +105,10 @@ class UnheldItem(things.ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: entity.Entity = None, area: entity.Entity = None, **kwargs
+        self,
+        person: Optional[entity.Entity] = None,
+        area: Optional[entity.Entity] = None,
+        **kwargs
     ) -> Optional[entity.Entity]:
         assert person
         assert area
@@ -124,7 +130,7 @@ class UnheldItem(things.ItemFinder):
 
 class AnyHeldItem(things.ItemFinder):
     async def find_item(
-        self, person: entity.Entity = None, **kwargs
+        self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
@@ -143,7 +149,7 @@ class HeldItem(things.ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: entity.Entity = None, **kwargs
+        self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
@@ -160,7 +166,7 @@ class HeldItem(things.ItemFinder):
 
 class FindHeldContainer(things.ItemFinder):
     async def find_item(
-        self, person: entity.Entity = None, **kwargs
+        self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
@@ -180,7 +186,7 @@ class ContainedItem(things.ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: entity.Entity = None, **kwargs
+        self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
         assert person
 
@@ -199,7 +205,9 @@ class MaybeItemOrRecipe:
         assert q
         self.q = q
 
-    def create_item(self, person: entity.Entity = None, **kwargs) -> entity.Entity:
+    def create_item(
+        self, person: Optional[entity.Entity] = None, **kwargs
+    ) -> entity.Entity:
         assert person
 
         log.info("%s finding brain", self)

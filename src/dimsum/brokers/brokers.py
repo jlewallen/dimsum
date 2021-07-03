@@ -52,7 +52,9 @@ class CustomWatcher(watchgod.DefaultWatcher):
 
 
 class Child(threading.Thread):
-    def __init__(self, pool: "Pool" = None, config: ProcessConfig = None):
+    def __init__(
+        self, pool: Optional["Pool"] = None, config: Optional[ProcessConfig] = None
+    ):
         super().__init__()
         assert pool
         assert config
@@ -161,7 +163,7 @@ class Pool:
             self.procs[key].stop()
             del self.procs[key]
 
-    def provision(self, config: ProcessConfig = None):
+    def provision(self, config: Optional[ProcessConfig] = None):
         assert config
         assert config.key not in self.procs
         p = Child(pool=self, config=config)

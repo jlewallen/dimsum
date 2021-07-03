@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Optional
 
 import abc
 import logging
@@ -66,7 +66,7 @@ class Property:
 
 
 class Map:
-    def __init__(self, map: Dict[str, Property] = None):
+    def __init__(self, map: Optional[Dict[str, Property]] = None):
         self.map = map if map else {}
 
     def __contains__(self, key):
@@ -114,7 +114,9 @@ class Map:
 
 
 class Common(Map):
-    def __init__(self, name: str = None, desc: str = None, **kwargs):
+    def __init__(
+        self, name: Optional[str] = None, desc: Optional[str] = None, **kwargs
+    ):
         super().__init__(kwargs)
         self.set(GlobalId, -1)
         self.set(Name, name)

@@ -1,4 +1,4 @@
-from typing import TextIO, Any, List
+from typing import TextIO, Any, List, Optional
 
 import logging
 import sshd
@@ -27,8 +27,8 @@ class InitializeWorld:
     def __init__(
         self,
         cfg: config.Configuration,
-        subscriptions: bus.SubscriptionManager = None,
-        comms: visual.Comms = None,
+        subscriptions: Optional[bus.SubscriptionManager] = None,
+        comms: Optional[visual.Comms] = None,
     ):
         assert comms
         self.cfg = cfg
@@ -69,10 +69,10 @@ class Interactive(sshd.CommandHandler):
     def __init__(
         self,
         cfg: config.Configuration,
-        username: str = None,
-        subscriptions: bus.SubscriptionManager = None,
-        comms: visual.Comms = None,
-        channel: TextIO = None,
+        username: Optional[str] = None,
+        subscriptions: Optional[bus.SubscriptionManager] = None,
+        comms: Optional[visual.Comms] = None,
+        channel: Optional[TextIO] = None,
     ):
         super().__init__()
         assert username

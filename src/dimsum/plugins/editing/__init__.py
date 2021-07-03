@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, List, Type, Optional
 
 import logging
 import dataclasses
@@ -25,7 +25,7 @@ class EditingEntity(StandardEvent):
 
 
 class EditEntity(PersonAction):
-    def __init__(self, item: ItemFinder = None, **kwargs):
+    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         assert item
         self.item = item

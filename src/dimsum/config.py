@@ -75,7 +75,7 @@ def generate_session_key() -> str:
     return shortuuid.uuid()
 
 
-def symmetrical(file: str, session_key: str = None, **kwargs):
+def symmetrical(file: str, session_key: Optional[str] = None, **kwargs):
     return Configuration(
         persistence=Persistence(read=[file], write=[file]),
         session_key=session_key or generate_session_key(),

@@ -28,7 +28,7 @@ class MaybeItem(ItemFactory):
         super().__init__()
         self.name = name
 
-    def create_item(self, quantity: float = None, **kwargs) -> entity.Entity:
+    def create_item(self, quantity: Optional[float] = None, **kwargs) -> entity.Entity:
         log.info(
             "%s create-item '%s' %s quantity=%s", self, self.name, kwargs, quantity
         )
@@ -73,7 +73,7 @@ class Recipe(entity.Scope, ItemFactory):
         self.template = template if template else None
 
     def create_item(
-        self, quantity: float = None, initialize=None, **kwargs
+        self, quantity: Optional[float] = None, initialize=None, **kwargs
     ) -> entity.Entity:
         assert self.template
 

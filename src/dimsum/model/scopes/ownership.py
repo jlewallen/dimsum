@@ -1,10 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import model.entity as entity
 
 
 class Ownership(entity.Scope):
-    def __init__(self, owner: entity.Entity = None, **kwargs):
+    def __init__(self, owner: Optional[entity.Entity] = None, **kwargs):
         super().__init__(**kwargs)
         default_creator = (
             self.ourselves.creator if self.ourselves.creator else self.ourselves

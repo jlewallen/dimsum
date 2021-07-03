@@ -13,7 +13,7 @@ log = logging.getLogger("dimsum.scopes")
 
 
 class Key(entity.Scope):
-    def __init__(self, patterns: Dict[str, crypto.Identity] = None, **kwargs):
+    def __init__(self, patterns: Optional[Dict[str, crypto.Identity]] = None, **kwargs):
         super().__init__(**kwargs)
         self.patterns = patterns if patterns else {}
 
@@ -22,7 +22,9 @@ class Key(entity.Scope):
 
 
 class Lockable(entity.Scope):
-    def __init__(self, pattern: crypto.Identity = None, locked=None, **kwargs):
+    def __init__(
+        self, pattern: Optional[crypto.Identity] = None, locked=None, **kwargs
+    ):
         super().__init__(**kwargs)
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
@@ -30,7 +32,7 @@ class Lockable(entity.Scope):
     def is_locked(self) -> bool:
         return self.locked
 
-    def lock(self, key: entity.Entity = None, identity=None, **kwargs):
+    def lock(self, key: Optional[entity.Entity] = None, identity=None, **kwargs):
         assert not self.locked
 
         identity = identity if identity else self.ourselves.identity
@@ -66,7 +68,7 @@ class Lockable(entity.Scope):
 
         return key
 
-    def unlock(self, key: entity.Entity = None, **kwargs):
+    def unlock(self, key: Optional[entity.Entity] = None, **kwargs):
         assert key
         assert self.locked
 
@@ -122,7 +124,7 @@ class UnknownOpenClose(OpenClose):
 
 
 class Openable(Lockable):
-    def __init__(self, openable: OpenClose = None, **kwargs):
+    def __init__(self, openable: Optional[OpenClose] = None, **kwargs):
         super().__init__(**kwargs)
         self.openable = openable if openable else UnknownOpenClose()
 
@@ -152,8 +154,8 @@ class Openable(Lockable):
 class Carryable(entity.Scope):
     def __init__(
         self,
-        kind: kinds.Kind = None,
-        quantity: float = None,
+        kind: Optional[kinds.Kind] = None,
+        quantity: Optional[float] = None,
         loose: bool = False,
         **kwargs,
     ):
@@ -177,7 +179,7 @@ class Carryable(entity.Scope):
         return self
 
     def separate(
-        self, quantity: float, ctx: context.Ctx = None, **kwargs
+        self, quantity: float, ctx: Optional[context.Ctx] = None, **kwargs
     ) -> List[entity.Entity]:
         assert ctx
 
@@ -201,7 +203,7 @@ class Producer:
 
 
 class Location(entity.Scope):
-    def __init__(self, container: entity.Entity = None, **kwargs):
+    def __init__(self, container: Optional[entity.Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.container = container
 
@@ -265,7 +267,7 @@ class Containing(Openable):
                 return self.unhold(item, **kwargs)
         return False
 
-    def hold(self, item: entity.Entity, quantity: float = None, **kwargs):
+    def hold(self, item: entity.Entity, quantity: Optional[float] = None, **kwargs):
         log.info("holding %s", item)
         return self.add_item(item, **kwargs)
 
@@ -308,8 +310,8 @@ class Containing(Openable):
     def drop_here(
         self,
         area: entity.Entity,
-        item: entity.Entity = None,
-        quantity: float = None,
+        item: Optional[entity.Entity] = None,
+        quantity: Optional[float] = None,
         **kwargs,
     ):
         if len(self.holding) == 0:

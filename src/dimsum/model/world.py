@@ -36,7 +36,7 @@ class EntityHooks(entity.Hooks):
                     )
         return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
 
-    def cleanup(self, entity: entity.Entity, world: "World" = None, **kwargs):
+    def cleanup(self, entity: entity.Entity, world: Optional["World"] = None, **kwargs):
         assert world
         log.info("cleanup %s", entity)
         with world.make(behavior.BehaviorCollection) as collection:
@@ -54,13 +54,13 @@ class Identifiers(entity.Scope):
 
 
 class Welcoming(entity.Scope):
-    def __init__(self, area: entity.Entity = None, **kwargs):
+    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
 
 
 class Remembering(entity.Scope):
-    def __init__(self, entities: List[entity.Entity] = None, **kwargs):
+    def __init__(self, entities: Optional[List[entity.Entity]] = None, **kwargs):
         super().__init__(**kwargs)
         self.entities = entities if entities else []
 

@@ -192,7 +192,9 @@ class TestWorld:
         return r
 
 
-async def make_simple_domain(password: str = None, store=None) -> domains.Domain:
+async def make_simple_domain(
+    password: Optional[str] = None, store=None
+) -> domains.Domain:
     domain = domains.Domain(store=store)
     with domain.session() as session:
         world = await session.prepare()

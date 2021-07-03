@@ -20,12 +20,13 @@ def configure_logging():
         logging.config.dictConfig(config)
 
 
-def child(port=45600, queue: mp.Queue = None, **kwargs):
+def child(port=45600, queue: Optional[mp.Queue] = None, **kwargs):
+    assert queue
+
     configure_logging()
 
     log.info("child: kwargs=%s", kwargs)
 
-    # assert queue
     # queue.put([dict(reload=True)])
 
     uvicorn.run(

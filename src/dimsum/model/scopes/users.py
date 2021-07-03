@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import os
 import logging
@@ -11,7 +11,7 @@ log = logging.getLogger("dimsum.scopes")
 
 
 class Auth(entity.Scope):
-    def __init__(self, password: List[str] = None, **kwargs):
+    def __init__(self, password: Optional[List[str]] = None, **kwargs):
         super().__init__(**kwargs)
         self.password = password if password else None
 

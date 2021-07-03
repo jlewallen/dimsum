@@ -1,4 +1,5 @@
-from typing import Any, Sequence, List, Dict
+from typing import Any, Sequence, List, Dict, Optional
+
 import logging
 
 import model.entity as entity
@@ -13,7 +14,7 @@ log = logging.getLogger("dimsum.model")
 
 @behavior.conditional(world.WindHook)
 class WindBehavior(behavior.ConditionalBehavior):
-    def enabled(self, entity: entity.Entity = None, **kwargs):
+    def enabled(self, entity: Optional[entity.Entity] = None, **kwargs):
         assert entity
         if entity.has(occupyable.Occupyable):
             with entity.make(mechanics.Weather) as weather:

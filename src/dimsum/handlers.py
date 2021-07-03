@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 import os
 import logging
@@ -19,7 +19,9 @@ log = logging.getLogger("dimsum.handlers")
 class EventHandlers(bus.TextRendering):
     def install(self, bus: bus.EventBus, comms: visual.Comms):
         @bus.handler(StandardEvent)
-        async def handle_standard_event(event: StandardEvent = None, **kwargs):
+        async def handle_standard_event(
+            event: Optional[StandardEvent] = None, **kwargs
+        ):
             assert event
             log.info("%s: event=%s kwargs=%s", type(event), event, kwargs)
             if event.heard:

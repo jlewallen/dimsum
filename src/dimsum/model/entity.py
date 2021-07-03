@@ -183,13 +183,13 @@ class Version:
 class Entity:
     def __init__(
         self,
-        key: str = None,
-        version: Version = None,
-        creator: "Entity" = None,
-        parent: "Entity" = None,
-        klass: Type[EntityClass] = None,
-        identity: crypto.Identity = None,
-        props: properties.Common = None,
+        key: Optional[str] = None,
+        version: Optional[Version] = None,
+        creator: Optional["Entity"] = None,
+        parent: Optional["Entity"] = None,
+        klass: Optional[Type[EntityClass]] = None,
+        identity: Optional[crypto.Identity] = None,
+        props: Optional[properties.Common] = None,
         chimeras=None,
         scopes=None,
         initialize=None,
@@ -305,7 +305,7 @@ class Entity:
     def describe(self) -> str:
         return global_hooks.describe(self)
 
-    def describes(self, q: str = None, **kwargs) -> bool:
+    def describes(self, q: Optional[str] = None, **kwargs) -> bool:
         if q:
             if q.lower() in self.props.name.lower():
                 return True
@@ -345,7 +345,9 @@ class Entity:
 
 
 class Scope:
-    def __init__(self, chimera: Entity = None, discard: bool = False, **kwargs):
+    def __init__(
+        self, chimera: Optional[Entity] = None, discard: bool = False, **kwargs
+    ):
         super().__init__()
         assert chimera
         self.chimera = chimera
@@ -435,7 +437,7 @@ class Registrar:
     def register(
         self,
         entity: Union[Entity, List[Entity]],
-        original: str = None,
+        original: Optional[str] = None,
         depth: int = 0,
     ):
         if isinstance(entity, list):

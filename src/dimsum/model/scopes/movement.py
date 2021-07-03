@@ -1,4 +1,5 @@
 from typing import List, Tuple, Dict, Sequence, Optional
+
 import abc
 import logging
 import enum
@@ -23,7 +24,7 @@ class Direction(enum.Enum):
 
 
 class AreaRoute:
-    def __init__(self, area: entity.Entity = None):
+    def __init__(self, area: Optional[entity.Entity] = None):
         super().__init__()
         assert area
         self.area = area
@@ -36,7 +37,7 @@ class AreaRoute:
 
 
 class VerbRoute(AreaRoute):
-    def __init__(self, verb: str = None, **kwargs):
+    def __init__(self, verb: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
         assert verb
         self.verb = verb
@@ -49,12 +50,12 @@ class VerbRoute(AreaRoute):
 
 
 class DirectionalRoute(AreaRoute):
-    def __init__(self, direction: Direction = None, **kwargs):
+    def __init__(self, direction: Optional[Direction] = None, **kwargs):
         super().__init__(**kwargs)
         assert direction
         self.direction = direction
 
-    def satisfies(self, direction: Direction = None, **kwargs) -> bool:
+    def satisfies(self, direction: Optional[Direction] = None, **kwargs) -> bool:
         return self.direction == direction
 
     def name(self) -> str:
@@ -103,7 +104,7 @@ class Movement(entity.Scope):
 
 
 class Exit(entity.Scope):
-    def __init__(self, area: entity.Entity = None, **kwargs):
+    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area if area else None
 

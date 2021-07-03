@@ -187,14 +187,14 @@ def _deserialize(encoded, lookup):
 
 
 async def materialize(
-    registrar: entity.Registrar = None,
-    store: storage.EntityStorage = None,
-    key: str = None,
-    gid: int = None,
-    json: List[entity.Serialized] = None,
+    registrar: Optional[entity.Registrar] = None,
+    store: Optional[storage.EntityStorage] = None,
+    key: Optional[str] = None,
+    gid: Optional[int] = None,
+    json: Optional[List[entity.Serialized]] = None,
     reach=None,
     depth: int = 0,
-    cache: Dict[str, List[entity.Serialized]] = None,
+    cache: Optional[Dict[str, List[entity.Serialized]]] = None,
 ) -> Union[Optional[entity.Entity], List[entity.Entity]]:
     assert registrar
     assert store

@@ -1,8 +1,10 @@
+from typing import Optional
+
 import model.crypto as crypto
 
 
 class Kind:
-    def __init__(self, identity: crypto.Identity = None, **kwargs):
+    def __init__(self, identity: Optional[crypto.Identity] = None, **kwargs):
         super().__init__()
         assert identity
         self.identity: crypto.Identity = identity

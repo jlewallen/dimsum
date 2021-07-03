@@ -40,9 +40,9 @@ def default_reach(entity: entity.Entity, depth: int):
 class Session:
     def __init__(
         self,
-        store: storage.EntityStorage = None,
-        context_factory: Callable = None,
-        handlers: List[Any] = None,
+        store: Optional[storage.EntityStorage] = None,
+        context_factory: Optional[Callable] = None,
+        handlers: Optional[List[Any]] = None,
     ):
         super().__init__()
         assert store
@@ -75,9 +75,9 @@ class Session:
 
     async def materialize(
         self,
-        key: str = None,
-        gid: int = None,
-        json: List[entity.Serialized] = None,
+        key: Optional[str] = None,
+        gid: Optional[int] = None,
+        json: Optional[List[entity.Serialized]] = None,
         reach=None,
     ) -> Union[Optional[entity.Entity], List[entity.Entity]]:
         materialized = await serializing.materialize(
@@ -174,7 +174,9 @@ class Session:
                     ) as ctx:
                         await ctx.hook(name)
 
-    async def add_area(self, area: entity.Entity, depth=0, seen: Dict[str, str] = None):
+    async def add_area(
+        self, area: entity.Entity, depth=0, seen: Optional[Dict[str, str]] = None
+    ):
         await self.prepare()
 
         assert area
@@ -231,7 +233,10 @@ class Session:
 
 class Domain:
     def __init__(
-        self, store: storage.EntityStorage = None, handlers: List[Any] = None, **kwargs
+        self,
+        store: Optional[storage.EntityStorage] = None,
+        handlers: Optional[List[Any]] = None,
+        **kwargs
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
@@ -252,8 +257,8 @@ class Domain:
 class WorldCtx(context.Ctx):
     def __init__(
         self,
-        session: Session = None,
-        person: entity.Entity = None,
+        session: Optional[Session] = None,
+        person: Optional[entity.Entity] = None,
         context_factory=None,
         **kwargs
     ):
@@ -337,7 +342,7 @@ class WorldCtx(context.Ctx):
                 entity.touch()
 
     def create_item(
-        self, quantity: float = None, initialize=None, **kwargs
+        self, quantity: Optional[float] = None, initialize=None, **kwargs
     ) -> entity.Entity:
         initialize = initialize if initialize else {}
         if quantity:
