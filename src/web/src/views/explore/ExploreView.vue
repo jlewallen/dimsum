@@ -1,5 +1,5 @@
 <template>
-    <HistoryEntries :entries="entries" @selected="(v) => $emit('selected', v)" @obsolete="(v) => $emit('obsolete', v)" />
+    <HistoryEntries :entries="entries" @selected="(v) => $emit('selected', v)" @dismiss="(v) => $emit('dismiss', v)" />
 </template>
 
 <script lang="ts">

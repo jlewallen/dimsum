@@ -6,7 +6,7 @@
                 :response="entry"
                 :reply="entry.reply"
                 @selected="onSelected"
-                @obsolete="onObsolete(entry)"
+                @dismiss="onDismissed(entry)"
             />
         </div>
     </div>
@@ -47,9 +47,9 @@ export default defineComponent({
                 params: { key: entity.key },
             });
         },
-        onObsolete(response: ReplResponse) {
-            console.log("explore:obsolete", response);
-            store.commit(new RemoveHistoryEntry(response));
+        onDismissed(entry: ReplResponse) {
+            console.log("explore:dismissed", entry);
+            store.commit(new RemoveHistoryEntry(entry));
             this.$emit("resume-repl");
         },
     },

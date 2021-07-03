@@ -13,8 +13,9 @@
                     <input class="form-control" type="text" v-model="form.desc" ref="desc" />
                 </div>
             </div>
-            <div class="">
+            <div class="buttons">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
             </div>
         </form>
     </div>
@@ -52,8 +53,22 @@ export default defineComponent({
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
             await store.dispatch(new UpdateEntityAction(updating));
-            this.$emit("saved");
+            console.log("save-form");
+            this.$emit("dismiss");
+        },
+        async cancel(e: Event): Promise<void> {
+            console.log("cancel");
+            this.$emit("dismiss");
+            e.preventDefault();
         },
     },
 });
 </script>
+<style>
+.buttons input {
+    margin-right: 1em;
+}
+.buttons button {
+    margin-right: 1em;
+}
+</style>

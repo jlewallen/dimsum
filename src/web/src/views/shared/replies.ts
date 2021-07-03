@@ -61,7 +61,7 @@ const EditingEntity = defineComponent({
         ...CommonComponents,
         InlineEditor,
     },
-    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :entity="withEntity.entity" @saved="$emit('obsolete')" /></WithEntity></div>`,
+    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
 });
 
 const ScreenCleared = defineComponent({
