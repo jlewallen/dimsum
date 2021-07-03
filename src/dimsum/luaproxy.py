@@ -74,7 +74,11 @@ class LupaEntity:
             ", ".join(["%s=%s" % (key, value) for key, value in table.items()]),
         )
 
-        kind = table["kind"] if "kind" in table else kinds.Kind()
+        kind = (
+            table["kind"]
+            if "kind" in table
+            else kinds.Kind(identity=entity.generate_identity())
+        )
         del table["kind"]
 
         quantity = table["quantity"] if "quantity" in table else 1

@@ -3,9 +3,9 @@ import model.crypto as crypto
 
 class Kind:
     def __init__(self, identity: crypto.Identity = None, **kwargs):
-        self.identity: crypto.Identity = (
-            identity if identity else crypto.generate_identity()
-        )
+        super().__init__()
+        assert identity
+        self.identity: crypto.Identity = identity
 
     def same(self, other: "Kind") -> bool:
         if other is None:

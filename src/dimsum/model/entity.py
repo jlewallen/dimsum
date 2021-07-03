@@ -115,6 +115,10 @@ def identities(fn: Callable):
     return previous
 
 
+def generate_identity(creator=None):
+    return identity_generator_fn(creator=creator)
+
+
 global_hooks = Hooks()
 
 
@@ -196,7 +200,7 @@ class Entity:
         if identity:
             self.identity = identity
         else:
-            self.identity = identity_generator_fn(
+            self.identity = generate_identity(
                 creator=self.creator.identity if self.creator else None
             )
             # If we aren't given a key, the default one is our public key.
@@ -255,7 +259,9 @@ class Entity:
 
     def get_kind(self, name: str) -> kinds.Kind:
         if not name in self.props.related:
-            self.props.related[name] = kinds.Kind()
+            self.props.related[name] = kinds.Kind(
+                identity=generate_identity(creator=self.identity)
+            )
             self.touch()
         return self.props.related[name]
 

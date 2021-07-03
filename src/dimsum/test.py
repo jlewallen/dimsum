@@ -256,8 +256,8 @@ class Deterministic:
         self.previous_identities = entity.identities(self.generate_identity)
 
     def __exit__(self, type, value, traceback):
-        entity.keys(self.previous_keys)
         entity.identities(self.previous_identities)
+        entity.keys(self.previous_keys)
 
     def generate_key(self) -> str:
         self.i += 1

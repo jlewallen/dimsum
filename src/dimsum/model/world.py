@@ -26,13 +26,14 @@ p = inflect.engine()
 
 class EntityHooks(entity.Hooks):
     def describe(self, entity: entity.Entity) -> str:
-        with entity.make_and_discard(carryable.Carryable) as carry:
-            if carry.quantity > 1:
-                return "{0} {1} (#{2})".format(
-                    carry.quantity,
-                    p.plural(entity.props.name, carry.quantity),
-                    entity.props.gid,
-                )
+        if entity.has(carryable.Carryable):
+            with entity.make_and_discard(carryable.Carryable) as carry:
+                if carry.quantity > 1:
+                    return "{0} {1} (#{2})".format(
+                        carry.quantity,
+                        p.plural(entity.props.name, carry.quantity),
+                        entity.props.gid,
+                    )
         return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
 
 

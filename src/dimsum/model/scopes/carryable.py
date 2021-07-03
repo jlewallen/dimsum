@@ -158,7 +158,7 @@ class Carryable(entity.Scope):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.kind = kind if kind else kinds.Kind()
+        self.kind = kind if kind else kinds.Kind(identity=entity.generate_identity())
         self.quantity = quantity if quantity else 1
         self.loose = loose
 
