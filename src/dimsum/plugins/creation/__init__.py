@@ -148,11 +148,6 @@ class Obliterate(PersonAction):
         if len(items) == 0:
             return Failure("you're not holding anything")
 
-        item: Any = None  # TODO Carryable to Entity
-
-        for item in items:
-            item.try_modify()
-
         for item in items:
             ctx.unregister(item)
 

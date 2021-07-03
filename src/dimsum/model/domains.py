@@ -300,8 +300,9 @@ class WorldCtx(context.Ctx):
     def register(self, entity: entity.Entity) -> entity.Entity:
         return self.session.register(entity)
 
-    def unregister(self, entity: entity.Entity) -> entity.Entity:
-        return self.session.unregister(entity)
+    def unregister(self, destroyed: entity.Entity) -> entity.Entity:
+        entity.cleanup(destroyed, world=self.world)
+        return self.session.unregister(destroyed)
 
     async def publish(self, *args, **kwargs):
         for arg in args:

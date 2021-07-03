@@ -95,6 +95,9 @@ class Hooks:
     def describe(self, entity: "Entity") -> str:
         return "{0} (#{1})".format(entity.props.name, entity.props.gid)
 
+    def cleanup(self, entity: "Entity", **kwargs):
+        pass
+
 
 key_generator_fn = shortuuid.uuid
 
@@ -128,6 +131,11 @@ def hooks(new_hooks: Hooks):
     previous = global_hooks
     global_hooks = new_hooks
     return previous
+
+
+def cleanup(entity: "Entity", **kwargs):
+    global global_hooks
+    global_hooks.cleanup(entity, **kwargs)
 
 
 def get_ctor_key(ctor) -> str:

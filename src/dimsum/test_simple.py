@@ -42,27 +42,6 @@ async def test_world_owns_itself(caplog):
 
 
 @pytest.mark.asyncio
-async def test_obliterate():
-    tw = test.TestWorld()
-    await tw.initialize()
-    await tw.success("make Hammer")
-
-    with tw.domain.session() as session:
-        world = await session.prepare()
-        jacob = await session.materialize(key=tw.jacob_key)
-        with jacob.make(carryable.Containing) as pockets:
-            assert len(pockets.holding) == 1
-
-    await tw.success("obliterate")
-
-    with tw.domain.session() as session:
-        world = await session.prepare()
-        jacob = await session.materialize(key=tw.jacob_key)
-        with jacob.make(carryable.Containing) as pockets:
-            assert len(pockets.holding) == 0
-
-
-@pytest.mark.asyncio
 async def test_recipe_simple():
     tw = test.TestWorld()
     await tw.initialize()

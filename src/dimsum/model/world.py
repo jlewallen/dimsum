@@ -36,6 +36,13 @@ class EntityHooks(entity.Hooks):
                     )
         return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
 
+    def cleanup(self, entity: entity.Entity, world: "World" = None, **kwargs):
+        assert world
+        log.info("cleanup %s", entity)
+        with world.make(behavior.BehaviorCollection) as collection:
+            if entity in collection.entities:
+                collection.entities.remove(entity)
+
 
 entity.hooks(EntityHooks())
 
