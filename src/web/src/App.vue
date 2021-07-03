@@ -37,19 +37,19 @@
         </div>
     </div>
     <div id="lower">
-        <Repl @send="send" />
+        <Interactables />
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import store, { MutationTypes, LoadingAction, Entity, ReplAction, ReplResponse } from "@/store";
-import Repl from "./views/shared/Repl.vue";
+import store, { MutationTypes, LoadingAction } from "@/store";
+import Interactables from "./views/shared/Interactables.vue";
 
 export default defineComponent({
     name: "App",
     components: {
-        Repl,
+        Interactables,
     },
     data() {
         return {
@@ -77,9 +77,6 @@ export default defineComponent({
         return Promise.resolve();
     },
     methods: {
-        send(command: string): Promise<any> {
-            return store.dispatch(new ReplAction(command));
-        },
         scrollBottom(): void {
             this.$nextTick(() => {
                 const el = this.$el.parentNode.querySelector("#upper");
