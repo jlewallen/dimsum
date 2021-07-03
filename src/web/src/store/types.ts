@@ -17,6 +17,7 @@ export class RootState {
     entities: { [index: string]: Entity } = {};
     areas: { [index: string]: Area } = {};
     people: { [index: string]: Person } = {};
+    interactables: ReplResponse[] = [];
     responses: ReplResponse[] = [];
 }
 

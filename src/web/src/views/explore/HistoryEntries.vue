@@ -56,15 +56,6 @@ export default defineComponent({
 });
 </script>
 <style>
-.response.clear {
-    padding: 1em;
-    background-color: #30475e;
-    display: none;
-}
-.response.editor {
-    padding: 1em;
-    background-color: #30475e;
-}
 .response.living-entered-area {
     padding: 1em;
     background-color: #30475e;
@@ -80,5 +71,15 @@ export default defineComponent({
 .response.items {
     padding: 1em;
     background-color: #30475e;
+}
+
+.response.editor {
+    padding: 1em;
+    background-color: #222;
+}
+.response.clear {
+    padding: 1em;
+    background-color: #30475e;
+    display: none;
 }
 </style>

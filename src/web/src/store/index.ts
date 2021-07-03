@@ -75,13 +75,22 @@ export default createStore<RootState>({
         [MutationTypes.ENTITY]: (state: RootState, entity: Entity) => {
             state.entities[entity.key] = entity;
         },
-        [MutationTypes.REPLY]: (state: RootState, response: ReplResponse) => {
-            state.responses.push(response);
+        [MutationTypes.REPLY]: (state: RootState, entry: ReplResponse) => {
+            if (entry.reply.interactive === true) {
+                state.interactables.push(entry);
+            } else {
+                state.responses.push(entry);
+            }
         },
         [MutationTypes.REMOVE_HISTORY_ENTRY]: (state: RootState, payload: RemoveHistoryEntry) => {
-            const index = state.responses.indexOf(payload.entry);
-            if (index >= 0) {
-                state.responses.splice(index, 1);
+            const i = state.responses.indexOf(payload.entry);
+            if (i >= 0) {
+                state.responses.splice(i, 1);
+            } else {
+                const j = state.interactables.indexOf(payload.entry);
+                if (j >= 0) {
+                    state.interactables.splice(j, 1);
+                }
             }
         },
     },

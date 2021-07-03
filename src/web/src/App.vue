@@ -37,7 +37,7 @@
         </div>
     </div>
     <div id="lower">
-        <Interactables />
+        <Interactables @scroll-bottom="scrollBottom" @resume-repl="resumeRepl" />
     </div>
 </template>
 

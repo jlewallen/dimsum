@@ -1,5 +1,6 @@
 <template>
     <div class="interactables">
+        <HistoryEntries :entries="interactables" @resume-repl="this.$emit('resume-repl')" />
         <Repl @send="send" />
     </div>
 </template>
@@ -8,14 +9,20 @@
 import { defineComponent } from "vue";
 import Repl from "./Repl.vue";
 import store, { MutationTypes, LoadingAction, Entity, ReplAction, ReplResponse } from "@/store";
+import HistoryEntries from "@/views/explore/HistoryEntries.vue";
 
 export default defineComponent({
     name: "Interactables",
     components: {
+        HistoryEntries,
         Repl,
     },
     props: {},
-    computed: {},
+    computed: {
+        interactables(): ReplResponse[] {
+            return store.state.interactables;
+        },
+    },
     methods: {
         async send(command: string): Promise<void> {
             await store.dispatch(new ReplAction(command));
