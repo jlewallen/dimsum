@@ -21,7 +21,7 @@
                                     "name": "World"
                                 }
                             },
-                            "behaviorcollection": {
+                            "behaviorCollection": {
                                 "entities": [
                                     {
                                         "py/object": "model.entity.Entity",

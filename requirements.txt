@@ -74,6 +74,7 @@ six==1.16.0
 smmap==4.0.0
 sniffio==1.2.0
 starlette==0.14.2
+stringcase==1.2.0
 toml==0.10.2
 types-cryptography==3.3.2
 types-enum34==0.1.5

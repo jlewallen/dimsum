@@ -3,6 +3,7 @@ from typing import Optional, Type, List, Union, Any, Dict, Sequence, Callable, c
 import abc
 import logging
 import dataclasses
+import stringcase
 import time
 import json
 import copy
@@ -130,7 +131,7 @@ def hooks(new_hooks: Hooks):
 
 
 def get_ctor_key(ctor) -> str:
-    return ctor.__name__.lower()
+    return stringcase.camelcase(ctor.__name__)
 
 
 def get_instance_key(instance) -> str:
