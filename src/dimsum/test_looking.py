@@ -58,30 +58,7 @@ async def test_look_living():
     r = await tw.success("look")
     assert isinstance(r, reply.AreaObservation)
 
-    log.info("------------------------------------------------------------------")
-    log.info("------------------------------------------------------------------")
-    log.info("------------------------------------------------------------------")
-
-    with tw.domain.session() as session:
-        world = await session.prepare()
-
-        with world.welcome_area().make(occupyable.Occupyable) as here:
-            log.info("%s", here.occupied)
-            for o in here.occupied:
-                log.info("%s %s", o.key, o)
-
-        # await session.save()
-
-    log.info("executing success.look")
     r = await tw.success("look")
-    log.info("done executing success.look")
-
-    if False:
-        for key, doc in tw.domain.store.by_key.items():
-            log.info(
-                "%s %s", key, json.dumps(json.loads(doc), sort_keys=True, indent=4)
-            )
-
     assert len(r.items) == 0
     assert len(r.living) == 1
 

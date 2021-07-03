@@ -1,6 +1,8 @@
-from typing import Any, List, Type
+from typing import Any, List, Type, Dict, Optional
 
 import logging
+import dataclasses
+import copy
 
 import model.properties as properties
 import model.scopes as scopes

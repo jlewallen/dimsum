@@ -140,8 +140,6 @@ class Session:
             except entity.EntityFrozen:
                 return reply.Failure("whoa, that's frozen")
 
-        log.info("-" * 100)
-
     async def tick(self, now: Optional[float] = None):
         await self.prepare()
 

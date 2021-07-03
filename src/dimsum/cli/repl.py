@@ -55,7 +55,7 @@ class Repl:
             return True
 
         try:
-            await self.loop.handle(command, sys.stdout)
+            await self.loop.handle(command)
         except:
             log.exception("error", exc_info=True)
 

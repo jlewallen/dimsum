@@ -1,6 +1,7 @@
 from typing import Any, List, Type
 
 import logging
+import dataclasses
 
 import grammars
 
@@ -34,7 +35,7 @@ class EditEntity(PersonAction):
     ):
         item = await world.apply_item_finder(person, self.item)
         if item:
-            return EditingEntity(entity=item, living=person, area=area, heard=[])
+            return EditingEntity(living=person, area=area, heard=[], entity=item)
         return Failure("where's that?")
 
 

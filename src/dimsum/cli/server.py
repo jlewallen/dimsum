@@ -115,18 +115,18 @@ async def server(
             )
             await temp.initialize(user)
 
-    if False:
-        with proxy.start(
-            ["--enable-web-server"],
-            hostname=ipaddress.IPv4Address("0.0.0.0"),
-            port=8899,
-            plugins=[proxy.plugin.ReverseProxyPlugin],
-        ):
-            pass
-
     loop = asyncio.get_event_loop()
     gql_config = uvicorn.Config(app=app, loop=loop, port=web_port)
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
     await asyncio.gather(sshd_task, gql_task)
+
+
+# with proxy.start(
+#     ["--enable-web-server"],
+#     hostname=ipaddress.IPv4Address("0.0.0.0"),
+#     port=8899,
+#     plugins=[proxy.plugin.ReverseProxyPlugin],
+# ):
+#     pass

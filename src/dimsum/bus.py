@@ -1,4 +1,4 @@
-from typing import Dict, Union, Any, Callable
+from typing import Dict, Union, Any, Callable, List
 
 import logging
 import inspect
@@ -57,7 +57,8 @@ class SubscriptionManager(visual.Comms):
     async def everybody(self, r: visual.Renderable) -> bool:
         # TODO Parallel
         for key, other in self.by_key.items():
-            await other.write(r)
+            for subscription in other:
+                await subscription.write(r)
         return True
 
 

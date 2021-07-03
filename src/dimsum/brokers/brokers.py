@@ -128,9 +128,8 @@ class Pool:
         log.info("%d: process-pool", os.getpid())
 
     def __enter__(self):
-        if False:
-            for sig in HANDLED_SIGNALS:
-                signal.signal(sig, self.signal_handler)
+        # for sig in HANDLED_SIGNALS:
+        #    signal.signal(sig, self.signal_handler)
         return self
 
     def __exit__(self, type, value, traceback):

@@ -125,7 +125,7 @@ class ScriptEngine:
 
         def debug(*args):
             message = ""
-            if isinstance(args, list) or isinstance(args, tuple):
+            if isinstance(args, list) or isinstance(args, tuple):  # type:ignore
                 message = " ".join([str(e) for e in args])
             else:
                 raise Exception("unexpected debug")
@@ -180,7 +180,7 @@ class BehaviorCollection(entity.Scope):
 
 class Behaviors(entity.Scope):
     def __init__(self, behaviors: BehaviorMap = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.behaviors = behaviors if behaviors else BehaviorMap()
 
     def get_behaviors(self, name):

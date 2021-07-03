@@ -108,11 +108,6 @@ class ShellSession:
         try:
             self.print("\n", end="")
 
-            if False:
-                if self.process.env:
-                    for key, value in self.process.env.items():
-                        self.process.stdout.write("%s=%s\n" % (key, value))
-
             self.print("Welcome to the party, %s!" % (self.username,))
             self.print("%d other users are connected." % len(self.connected))
             self.print("\n", end="")
@@ -131,7 +126,7 @@ class ShellSession:
         return ">> "
 
     async def read_command(self) -> Union[str, None]:
-        line = await self.console.input(prompt=self.prompt(), stream=self.process.stdin)
+        line = self.console.input(prompt=self.prompt(), stream=self.process.stdin)
         if isinstance(line, str):
             if len(line) == 0:
                 return None
@@ -151,7 +146,7 @@ class ShellSession:
                 other.write(self.prompt(), end="")
 
     def control(self, control: rich.control.Control, **kwargs):
-        self.console.control(control, **kwargs)
+        self.console.control(control)
 
     def print(self, msg: str, **kwargs):
         self.console.print(msg, **kwargs)

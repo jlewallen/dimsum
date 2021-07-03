@@ -8,8 +8,7 @@ class Kind:
         self.identity: crypto.Identity = identity
 
     def same(self, other: "Kind") -> bool:
-        if other is None:
-            return False
+        assert other
         return self.identity.public == other.identity.public
 
     def __str__(self):

@@ -28,7 +28,7 @@ Fields = [properties.SumFields(name) for name in NutritionFields]
 
 class Nutrition:
     def __init__(self, properties=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):
@@ -41,13 +41,13 @@ class Nutrition:
 
 class Medical:
     def __init__(self, nutrition: Nutrition = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__()
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
 class Edible(entity.Scope):
     def __init__(self, nutrition: Nutrition = None, servings: int = 1, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
         self.servings: int = servings
 
@@ -57,7 +57,7 @@ class Edible(entity.Scope):
 
 class Health(entity.Scope):
     def __init__(self, medical=None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
         self.medical = medical if medical else Medical()
 
     async def consume(
@@ -68,9 +68,9 @@ class Health(entity.Scope):
             eating.servings -= 1
             if eating.servings == 0:
                 with self.ourselves.make(carryable.Containing) as pockets:
-                    pockets.drop(edible)  # type: ignore
+                    pockets.drop(edible)
                 # TODO Holding chimera
-                eating.ourselves.destroy()  # type:ignore
+                eating.ourselves.destroy()
             self.ourselves.touch()
             edible.touch()
 

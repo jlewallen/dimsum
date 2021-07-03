@@ -353,6 +353,7 @@ async def test_graphql_delete(deterministic, snapshot):
         await session.prepare()
         await session.save()
 
+        assert session.world
         session.world.destroy()
 
         serialized = serializing.serialize(
@@ -404,6 +405,7 @@ async def test_graphql_create_basic(deterministic, snapshot):
         await session.prepare()
         await session.save()
 
+        assert session.world
         session.world.destroy()
 
     data = {
@@ -435,6 +437,7 @@ async def test_graphql_create_two(deterministic, snapshot):
         await session.prepare()
         await session.save()
 
+        assert session.world
         session.world.destroy()
 
     data = {
@@ -471,6 +474,7 @@ async def test_graphql_create_one_containing_another(deterministic, snapshot):
         await session.prepare()
         await session.save()
 
+        assert session.world
         session.world.destroy()
 
     data = {

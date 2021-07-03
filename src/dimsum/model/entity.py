@@ -230,15 +230,7 @@ class Entity:
 
                 log.debug("scope %s %s %s", scope, kwargs, args)
                 with self.make(scope, **args) as change:
-                    if False:
-                        change.constructed(
-                            key=self.key,
-                            identity=self.identity,
-                            parent=self.parent,
-                            creator=self.creator,
-                            props=self.props,
-                            **kwargs
-                        )
+                    pass
 
         log.debug(
             "entity:ctor {0} {1} '{2}' creator={3} id={4} props={5}".format(
@@ -363,10 +355,6 @@ class Scope:
     def chimera_key(self) -> str:
         return get_instance_key(self)
 
-    @abc.abstractmethod
-    def constructed(self, **kwargs):
-        pass
-
     @property
     def ourselves(self):
         return self.chimera
@@ -389,7 +377,7 @@ class RegistrationException(Exception):
 
 class Registrar:
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         log.info("registrar:ctor")
         self.entities: Dict[str, Entity] = {}
         self.garbage: Dict[str, Entity] = {}

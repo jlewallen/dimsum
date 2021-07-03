@@ -1,6 +1,7 @@
-from typing import Any, List, Type
+from typing import Any, List, Type, Dict
 
 import logging
+import dataclasses
 
 import model.properties as properties
 import model.scopes.occupyable as occupyable

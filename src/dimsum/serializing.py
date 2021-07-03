@@ -268,7 +268,7 @@ async def materialize(
                 depth=depths[referenced_key],
                 cache=cache,
             )
-            proxy.__wrapped__ = linked  # type: ignore
+            proxy.__wrapped__ = linked
 
     loaded.validate()
 

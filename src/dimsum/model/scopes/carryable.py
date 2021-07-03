@@ -244,7 +244,7 @@ class Containing(Openable):
             return False
         return True
 
-    def contains(self, e: Carryable) -> bool:
+    def contains(self, e: entity.Entity) -> bool:
         return e in self.holding
 
     def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:

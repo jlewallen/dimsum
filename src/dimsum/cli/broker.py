@@ -25,9 +25,8 @@ def child(port=45600, queue: mp.Queue = None, **kwargs):
 
     log.info("child: kwargs=%s", kwargs)
 
-    if False:
-        assert queue
-        queue.put([dict(reload=True)])
+    # assert queue
+    # queue.put([dict(reload=True)])
 
     uvicorn.run(
         "dimsum:app",
@@ -64,9 +63,8 @@ async def broker():
                 )
             )
 
-        if False:
-            time.sleep(1)
-            pp.remove("proc-1")
+        # time.sleep(1)
+        # pp.remove("proc-1")
 
         while True:
             try:
