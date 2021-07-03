@@ -59,6 +59,11 @@ def commands():
     default=5101,
     help="Port.",
 )
+@click.option(
+    "--user",
+    multiple=True,
+    help="User to create.",
+)
 async def server(
     database: str,
     conf: str,
@@ -66,6 +71,7 @@ async def server(
     write: List[str],
     web_port: int,
     ssh_port: int,
+    user: List[str],
 ):
     """
     Serve a database.
@@ -101,6 +107,13 @@ async def server(
         return interactive.Interactive(
             cfg, subscriptions=subscriptions, comms=subscriptions, **kwargs
         )
+
+    if user:
+        for key in user:
+            temp = interactive.InitializeWorld(
+                cfg, subscriptions=subscriptions, comms=subscriptions
+            )
+            await temp.initialize(user)
 
     if False:
         with proxy.start(
