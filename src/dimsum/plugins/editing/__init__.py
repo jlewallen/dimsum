@@ -62,12 +62,16 @@ class Grammar(grammars.Grammar):
         return """
         start:             edit_entity | clear_screen
 
-        edit_entity:       ("edit" | "ed") noun
+        edit_entity:       ("edit" | "ed") (here | this | noun)
+        here:              "here"
         clear_screen:      "cls"
 """
 
 
 class Evaluator(BaseEvaluator):
+    def here(self, args):
+        return finders.CurrentArea()
+
     def edit_entity(self, args):
         return EditEntity(args[0])
 

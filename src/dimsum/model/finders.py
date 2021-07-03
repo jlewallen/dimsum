@@ -179,6 +179,18 @@ class FindHeldContainer(things.ItemFinder):
         return None
 
 
+class CurrentArea(things.ItemFinder):
+    async def find_item(
+        self,
+        person: Optional[entity.Entity] = None,
+        area: Optional[entity.Entity] = None,
+        **kwargs
+    ) -> Optional[entity.Entity]:
+        assert person
+        assert area
+        return area
+
+
 class ContainedItem(things.ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
