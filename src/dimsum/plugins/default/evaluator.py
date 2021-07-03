@@ -16,13 +16,6 @@ log = logging.getLogger("dimsum")
 class Evaluator(plugins.actions.BaseEvaluator):
     # Item lookup
 
-    def make_quantified(self, args):
-        quantity = args[0]
-        return actions.Make(template=things.MaybeQuantifiedItem(args[1], quantity))
-
-    def makeable_noun(self, args):
-        return finders.MaybeItemOrRecipe(str(args[0]))
-
     def consumable_noun(self, args):
         return finders.AnyConsumableItem(q=str(args[0]))
 
@@ -34,9 +27,6 @@ class Evaluator(plugins.actions.BaseEvaluator):
 
     def unheld_noun(self, args):
         return finders.UnheldItem(str(args[0]))
-
-    def makeable(self, args):
-        return args[0]
 
     def contained(self, args):
         return args[0]
@@ -61,9 +51,6 @@ class Evaluator(plugins.actions.BaseEvaluator):
 
     def named_route(self, args):
         return movement.FindNamedRoute(str(args[0]))
-
-    def this(self, args):
-        return finders.AnyHeldItem()
 
 
 class Default(Evaluator):
@@ -123,9 +110,6 @@ class Default(Evaluator):
     def hold_quantity(self, args):
         return actions.Hold(item=args[1], quantity=args[0])
 
-    def make(self, args):
-        return actions.Make(template=args[0])
-
     def forget(self, args):
         return actions.Forget(name=args[0])
 
@@ -146,12 +130,6 @@ class Default(Evaluator):
 
     def drink(self, args):
         return actions.Drink(item=args[0])
-
-    def obliterate(self, args):
-        return actions.Obliterate()
-
-    def call(self, args):
-        return actions.CallThis(item=args[0], name=str(args[1]))
 
     def pour(self, args):
         return actions.Pour(

@@ -14,6 +14,7 @@ import model.scopes.carryable as carryable
 import model.scopes as scopes
 
 import plugins.default.actions as actions
+import plugins.creation as creation
 
 log = logging.getLogger("dimsum")
 
@@ -139,7 +140,7 @@ class LupaItem(LupaEntity):
 
     def make_hands(self, table) -> Sequence[game.Action]:
         item = self.make_item_from_table(table, creator=self.entity)
-        return [actions.Make(item=finders.StaticItem(item=item))]
+        return [creation.Make(item=finders.StaticItem(item=item))]
 
     def make_here(self, table):
         item = self.make_item_from_table(table, creator=self.ctx.creator)

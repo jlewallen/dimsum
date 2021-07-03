@@ -115,60 +115,6 @@ class ItemsDropped(StandardEvent):
     items: List[entity.Entity]
 
 
-@dataclasses.dataclass
-class ItemsMade(StandardEvent):
-    items: List[entity.Entity]
-
-
-class Make(PersonAction):
-    def __init__(
-        self,
-        template: finders.MaybeItemOrRecipe = None,
-        item: things.ItemFinder = None,
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.template = template
-        self.item = item
-
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        item: Optional[entity.Entity] = None
-        if self.item:
-            item = await world.apply_item_finder(person, self.item)
-
-        if self.template:
-            item = self.template.create_item(
-                person=person, creator=person, owner=person
-            )
-
-        if not item:
-            return Failure("make what now?")
-
-        with person.make(carryable.Containing) as contain:
-            after_hold = contain.hold(item)
-            # We do this after because we may consolidate this Item and
-            # this keeps us from having to unregister the item.
-            ctx.register(after_hold)
-
-        area = world.find_person_area(person)
-        await ctx.publish(
-            ItemsMade(
-                living=person,
-                area=area,
-                heard=default_heard_for(area=area),
-                items=[after_hold],
-            )
-        )
-        return Success("you're now holding %s" % (after_hold,), item=after_hold)
-
-
 class Wear(PersonAction):
     def __init__(self, item: things.ItemFinder = None, **kwargs):
         super().__init__(**kwargs)
@@ -479,11 +425,6 @@ class Drop(PersonAction):
 
 @dataclasses.dataclass
 class ItemsHeld(StandardEvent):
-    items: List[entity.Entity]
-
-
-@dataclasses.dataclass
-class ItemsObliterated(StandardEvent):
     items: List[entity.Entity]
 
 
@@ -820,100 +761,6 @@ class Go(MovingAction):
         **kwargs
     ):
         return await self.move(ctx, world, person)
-
-
-class Obliterate(PersonAction):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        area = world.find_person_area(person)
-        items = None
-        with person.make(carryable.Containing) as pockets:
-            items = pockets.drop_all()
-        if len(items) == 0:
-            return Failure("you're not holding anything")
-
-        item: Any = None  # TODO Carryable to Entity
-
-        for item in items:
-            item.try_modify()
-
-        for item in items:
-            ctx.unregister(item)
-
-        await ctx.publish(
-            ItemsObliterated(
-                living=person,
-                area=area,
-                heard=default_heard_for(area=area),
-                items=items,
-            )
-        )
-
-        await ctx.extend(obliterate=items).hook("obliterate:after")
-
-        return Success("you obliterated %s" % (p.join(list(map(str, items))),))
-
-
-class CallThis(PersonAction):
-    def __init__(self, name: str = None, item: things.ItemFinder = None, **kwargs):
-        super().__init__(**kwargs)
-        assert item
-        self.item = item
-        assert name
-        self.name = name
-
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        item = await world.apply_item_finder(person, self.item)
-        if not item:
-            return Failure("you don't have anything")
-
-        item.try_modify()
-
-        # Copy all of the base props from the item. Exclude stamps.
-        # TODO This looks like it's been broken.
-        template = item
-        recipe = scopes.item(
-            creator=person,
-            owner=person,
-            props=item.props.clone(),
-            behaviors=item.make(behavior.Behaviors).behaviors,
-            kind=item.make(carryable.Carryable).kind,
-        )
-        with recipe.make(Recipe) as makes:
-            # TODO Clone
-            updated = copy.deepcopy(template.__dict__)
-            updated.update(
-                key=None, identity=None, version=None, props=template.props.clone()
-            )
-            cloned = scopes.item(**updated)
-            makes.template = cloned
-            log.info("registering template: %s", cloned.key)
-            ctx.register(cloned)
-
-        ctx.register(recipe)
-        with person.make(mechanics.Memory) as brain:
-            brain.memorize("r:" + self.name, recipe)
-        person.touch()
-
-        return Success(
-            "cool, you'll be able to make another %s easier now" % (self.name,)
-        )
 
 
 class Forget(PersonAction):

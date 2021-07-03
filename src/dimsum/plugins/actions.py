@@ -68,6 +68,9 @@ class BaseEvaluator(lark.Transformer):
     def noun(self, args):
         return args[0]
 
+    def this(self, args):
+        return finders.AnyHeldItem()
+
     def direction(self, args):
         for d in movement.Direction:
             if str(args[0]).lower() == d.name.lower():
@@ -79,3 +82,10 @@ class BaseEvaluator(lark.Transformer):
 
     def object_by_gid(self, args):
         return finders.ObjectNumber(int(args[0]))
+
+    # Would love to move these closer to creation.
+    def makeable_noun(self, args):
+        return finders.MaybeItemOrRecipe(str(args[0]))
+
+    def makeable(self, args):
+        return args[0]

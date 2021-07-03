@@ -27,7 +27,7 @@ class DefaultGrammar(grammars.Grammar):
 
         verbs:             look
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
-                         | make | call | modify | obliterate | freeze | unfreeze
+                         | modify | freeze | unfreeze
                          | eat | drink
                          | go | climb | walk | run | home
                          | pour | water
@@ -40,8 +40,6 @@ class DefaultGrammar(grammars.Grammar):
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
-
-        call:              "call" this NAME
 
         give:              "give"
 
@@ -79,10 +77,6 @@ class DefaultGrammar(grammars.Grammar):
         climb:             "climb" route
         walk:              "walk" route
         run:               "run" route
-
-        obliterate:        "obliterate"
-        make:              "make" makeable                         -> make
-                         | "make" number makeable                  -> make_quantified
 
         think:             "think"
         forget:            "forget" noun
