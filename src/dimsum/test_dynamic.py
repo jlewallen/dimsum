@@ -56,12 +56,12 @@ async def test_multiple_simple_verbs(caplog):
         "Hammer",
         """
 @language('start: "wiggle"')
-def wiggle(entity):
+def wiggle(entity, say=None):
     log.info("wiggle: %s", entity)
     return "hey there!"
 
 @language('start: "burp"')
-def burp(entity):
+def burp(entity, say=None):
     log.info("burp: %s", entity)
     return "hey there!"
 """,
@@ -82,7 +82,7 @@ async def test_dynamic_applies_only_when_held(caplog):
         "Hammer",
         """
 @language('start: "wiggle"', condition=Held())
-def wiggle(entity):
+def wiggle(entity, say=None):
     log.info("wiggle: %s", entity)
     return "hey there!"
 """,
@@ -91,3 +91,24 @@ def wiggle(entity):
     await tw.failure("wiggle")
     await tw.success("hold Hammer")
     await tw.success("wiggle")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_say_everyone(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    hammer = await add_behaviored_thing(
+        tw,
+        "Keys",
+        """
+@language('start: "jingle"', condition=Held())
+def jingle(entity, say=None):
+    log.info("jingle: %s", entity)
+    say.nearby("you hear kings jingling")
+    return "hey there!"
+""",
+    )
+
+    await tw.success("hold Keys")
+    await tw.success("jingle")

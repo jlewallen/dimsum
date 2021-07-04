@@ -17,6 +17,7 @@ from model.things import *
 from model.game import *
 from model.reply import *
 from model.finders import *
+from model.tools import *
 
 from plugins.actions import *
 
@@ -31,13 +32,6 @@ class EntityCreated(StandardEvent):
 
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
-
-
-def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
-    if area:
-        with area.make_and_discard(occupyable.Occupyable) as here:
-            return here.occupied
-    return []
 
 
 class Create(PersonAction):

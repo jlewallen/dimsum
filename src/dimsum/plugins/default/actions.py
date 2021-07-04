@@ -22,6 +22,7 @@ from model.game import *
 from model.things import *
 from model.events import *
 from model.world import *
+from model.tools import *
 
 from plugins.actions import *
 
@@ -69,13 +70,6 @@ class Home(PersonAction):
 @dataclasses.dataclass
 class ItemsAppeared(StandardEvent):
     items: List[entity.Entity]
-
-
-def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
-    if area:
-        with area.make_and_discard(occupyable.Occupyable) as here:
-            return here.occupied
-    return []
 
 
 class AddItemArea(PersonAction):

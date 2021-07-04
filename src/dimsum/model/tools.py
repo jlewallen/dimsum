@@ -54,5 +54,12 @@ def is_holding(container: Entity, e: Entity) -> bool:
         return e in contains.holding
 
 
+def default_heard_for(area: Optional[Entity] = None) -> List[Entity]:
+    if area:
+        with area.make_and_discard(occupyable.Occupyable) as here:
+            return here.occupied
+    return []
+
+
 def flatten(l):
     return [item for sl in l for item in sl]

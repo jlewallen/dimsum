@@ -4,17 +4,20 @@ import logging
 import dataclasses
 import ast
 import functools
+import json
 
 import lark
-import grammars
 
 import model.game as game
 import model.reply as reply
 import model.world as world
 import model.entity as entity
 import model.tools as tools
+import model.events as events
 import model.scopes.behavior as behavior
 
+import context
+import grammars
 import transformers
 
 log = logging.getLogger("dimsum.dynamic")
@@ -25,6 +28,57 @@ class Registered:
     prose: str
     handler: Callable
     condition: "Condition"
+
+
+@dataclasses.dataclass
+class DynamicMessage(events.StandardEvent):
+    message: game.Reply
+
+    def render_string(self) -> Dict[str, str]:
+        return json.loads(json.dumps(self.message))  # TODO json fuckery
+
+
+@dataclasses.dataclass
+class Say:
+    everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
+    nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
+    player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
+
+    def everyone(self, message: Union[game.Reply, str]):
+        if isinstance(message, str):
+            r = game.Success(message)
+        self.everyone_queue.append(r)
+
+    def nearby(self, message: Union[game.Reply, str]):
+        if isinstance(message, str):
+            r = game.Success(message)
+        self.player_queue.append(r)
+
+    def player(self, message: Union[game.Reply, str]):
+        if isinstance(message, str):
+            r = game.Success(message)
+        self.player_queue.append(r)
+
+    async def publish(self, area: entity.Entity, player: entity.Entity):
+        for e in self.player_queue:
+            await context.get().publish(
+                DynamicMessage(
+                    living=player,
+                    area=area,
+                    heard=[player],
+                    message=e,
+                )
+            )
+        heard = tools.default_heard_for(area)
+        for e in self.nearby_queue:
+            await context.get().publish(
+                DynamicMessage(
+                    living=player,
+                    area=area,
+                    heard=heard,
+                    message=e,
+                )
+            )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -38,10 +92,15 @@ class SimplifiedAction(game.Action):
             return game.Success(r)
         return r
 
-    async def perform(self, **kwargs):
+    async def perform(
+        self, world: world.World, area: entity.Entity, person: entity.Entity, **kwargs
+    ):
         try:
-            r = self.registered.handler(self.entity, *self.args)
+            say = Say()
+            r = self.registered.handler(self.entity, *self.args, say=say)
             if r:
+                log.info("say: %s", say)
+                await say.publish(area, person)
                 return self._transform_reply(r)
             return game.Failure("no reply from handler?")
         except Exception as e:
@@ -135,6 +194,8 @@ class Behavior:
         self.world = world
         self.player = player
         self.area = world.find_person_area(player)
+        self.player_queue: List[game.Reply] = []
+        self.everyone_queue: List[game.Reply] = []
         assert self.area
 
     @functools.cached_property
@@ -153,11 +214,12 @@ class Behavior:
     def _say_everyone(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
             r = game.Success(message)
+        self.everyone_queue.append(r)
 
     def _say_player(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
             r = game.Success(message)
-        pass
+        self.player_queue.append(r)
 
     def _get_globals(self, **kwargs):
         return dict(
@@ -165,10 +227,8 @@ class Behavior:
             player=self.player,
             area=self.area,
             world=self.world,
-            say_everyone=self._say_everyone,
-            say_player=self._say_player,
             Held=Held,
-            **kwargs
+            **kwargs,
         )
 
     def _compile_behaviors(self, found: Found) -> Compiled:
