@@ -8,12 +8,12 @@ import model.properties as properties
 import model.scopes.movement as movement
 
 import plugins.default.actions as actions
-import plugins.actions
+import plugins.evaluation as evaluation
 
 log = logging.getLogger("dimsum")
 
 
-class Evaluator(plugins.actions.BaseEvaluator):
+class Evaluator(evaluation.BaseEvaluator):
     # Item lookup
 
     def consumable_noun(self, args):

@@ -149,26 +149,17 @@ class TestWorld:
         return serializing.serialize(item, indent=4)
 
     async def execute(self, command: str, person=None, **kwargs):
-        log.info("executing: %s" % (command,))
-        tree, create_evaluator = self.l.parse(command)
-
-        log.info("=" * 100)
-        log.info("parsed: %s" % (tree,))
-        log.info("=" * 100)
-
         with self.domain.session() as session:
             world = await session.prepare()
-
-            tree_eval = create_evaluator(world, person)
-            action = tree_eval.transform(tree)
-            assert action
-            assert isinstance(action, game.Action)
 
             assert self.jacob_key
             person = await session.materialize(
                 key=self.jacob_key if person is None else person
             )
-            response = await session.perform(action, person)
+
+            log.info("=" * 100)
+
+            response = await session.execute(person, command)
 
             log.info("response: %s" % (response,))
             if isinstance(response, reply.Failure):

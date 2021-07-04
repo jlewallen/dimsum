@@ -287,11 +287,7 @@ async def resolve_language(obj, info, criteria):
         log.debug("materialize world")
         w = await session.materialize(key=world.Key)
         assert w
-        tree, create_evaluator = parser.parse(lqc.text.strip())
-        tree_eval = create_evaluator(w, player)
-        action = tree_eval.transform(tree)
-        reply = await session.perform(action, player)
-
+        reply = await session.execute(player, lqc.text.strip())
         await session.save()
 
         return Evaluation(

@@ -7,6 +7,8 @@ import model.properties as properties
 import grammars
 
 from plugins.actions import *
+from plugins.evaluation import *
+
 from context import *
 
 log = logging.getLogger("dimsum")

@@ -13,6 +13,8 @@ from model.events import *
 from model.world import *
 
 from plugins.actions import *
+from plugins.evaluation import *
+
 from context import *
 
 import model.scopes.movement as movement

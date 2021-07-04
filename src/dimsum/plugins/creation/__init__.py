@@ -17,6 +17,8 @@ from model.reply import *
 from model.finders import *
 
 from plugins.actions import *
+from plugins.evaluation import *
+
 from context import *
 
 log = logging.getLogger("dimsum")

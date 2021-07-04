@@ -37,7 +37,7 @@ class ParseMultipleGrammars:
         for parser, grammar in self.parsers:
             try:
                 tree = parser.parse(command)
-                log.info("parsed=%s", tree)
+                log.debug("parsed=%s", tree)
                 if tree:
                     return tree, grammar.evaluator
             except exceptions.UnexpectedCharacters:
