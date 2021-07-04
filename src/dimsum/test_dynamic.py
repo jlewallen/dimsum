@@ -125,7 +125,7 @@ async def test_dynamic_smash(caplog):
         """
 @received("smash")
 def smashed(entity, hammer, say=None):
-    log.info("%s smashed me, a nail! %s", hammer, entity)
+    say.nearby("%s smashed me, a nail! %s" % (hammer, entity))
 """,
     )
     hammer = await add_behaviored_thing(
@@ -143,5 +143,5 @@ def smash(entity, smashing, say=None):
     )
 
     await tw.success("hold Hammer")
-    await tw.success("smash nail")
     await tw.failure("smash snail")
+    await tw.success("smash nail")

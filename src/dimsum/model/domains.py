@@ -141,10 +141,14 @@ class Session:
         action = evaluators.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
-        return await self.perform(action, player)
+        return await self.perform(action, player, dynamic_behavior=dynamic_behavior)
 
     async def perform(
-        self, action, person: Optional[entity.Entity] = None, **kwargs
+        self,
+        action,
+        person: Optional[entity.Entity] = None,
+        dynamic_behavior: Optional["dynamic.Behavior"] = None,
+        **kwargs
     ) -> game.Reply:
 
         log.info("-" * 100)
@@ -166,7 +170,11 @@ class Session:
         ) as ctx:
             try:
                 return await action.perform(
-                    world=self.world, area=area, person=person, ctx=ctx
+                    world=self.world,
+                    area=area,
+                    person=person,
+                    ctx=ctx,
+                    dynamic_behavior=dynamic_behavior,
                 )
             except entity.EntityFrozen:
                 return game.Failure("whoa, that's frozen")

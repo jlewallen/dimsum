@@ -24,11 +24,33 @@ import transformers
 log = logging.getLogger("dimsum.dynamic")
 
 
+class Condition:
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
+        return True
+
+
+class Held(Condition):
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
+        return tools.is_holding(person, e)
+
+
+class Ground(Condition):
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
+        return not tools.is_holding(person, e)
+
+
 @dataclasses.dataclass(frozen=True)
 class Registered:
     prose: str
     handler: Callable
-    condition: "Condition"
+    condition: Condition
+
+
+@dataclasses.dataclass
+class Receive:
+    hook: str
+    handler: Callable
+    condition: Condition
 
 
 @dataclasses.dataclass
@@ -42,7 +64,7 @@ class DynamicMessage(events.StandardEvent):
 @dataclasses.dataclass
 class Notify:
     entity: entity.Entity
-    message: str
+    hook: str
     kwargs: Dict[str, Any]
 
 
@@ -99,31 +121,39 @@ class SimplifiedAction(game.Action):
     registered: Registered
     args: List[Any]
 
+    def _transform_reply(self, r: Union[game.Reply, str]) -> game.Reply:
+        if isinstance(r, str):
+            return game.Success(r)
+        return r
+
     async def _transform_arg(
         self, arg: things.ItemFinder, world: world.World, person: entity.Entity
     ) -> Optional[entity.Entity]:
         assert isinstance(arg, things.ItemFinder)
         return await world.apply_item_finder(person, arg)
 
-    def _transform_reply(self, r: Union[game.Reply, str]) -> game.Reply:
-        if isinstance(r, str):
-            return game.Success(r)
-        return r
-
     async def _args(self, world: world.World, person: entity.Entity) -> List[Any]:
         return [await self._transform_arg(a, world, person) for a in self.args]
 
     async def perform(
-        self, world: world.World, area: entity.Entity, person: entity.Entity, **kwargs
+        self,
+        world: world.World,
+        area: entity.Entity,
+        person: entity.Entity,
+        dynamic_behavior: Optional["Behavior"] = None,
+        **kwargs
     ):
+        assert dynamic_behavior
         try:
             say = Say()
             args = await self._args(world, person)
-            r = self.registered.handler(self.entity, *args, say=say)
-            if r:
-                log.info("say: %s", say)
+            reply = self.registered.handler(self.entity, *args, say=say)
+            if reply:
+                log.debug("say: %s", say)
+                for notify in say.notified:
+                    await dynamic_behavior.notify(notify, say=say)
                 await say.publish(area, person)
-                return self._transform_reply(r)
+                return self._transform_reply(reply)
             return game.Failure("no reply from handler?")
         except Exception as e:
             log.exception("handler:error", exc_info=True)
@@ -139,24 +169,10 @@ class SimplifiedTransformer(transformers.Base):
         return SimplifiedAction(self.entity, self.registered, args)
 
 
-class Condition:
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return True
-
-
-class Held(Condition):
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return tools.is_holding(person, e)
-
-
-class Ground(Condition):
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return not tools.is_holding(person, e)
-
-
+@dataclasses.dataclass
 class Simplified:
-    def __init__(self):
-        self.registered: List[Registered] = []
+    registered: List[Registered] = dataclasses.field(default_factory=list)
+    receives: List[Receive] = dataclasses.field(default_factory=list)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -171,9 +187,15 @@ class Simplified:
     def received(self, hook: str, condition=None):
         def wrap(fn):
             log.info("hook: '%s' %s", hook, fn)
+            self.receives.append(Receive(hook, fn, condition=condition or Condition()))
             return fn
 
         return wrap
+
+    async def notify(self, entity: entity.Entity, notify: Notify, **kwargs):
+        for receive in self.receives:
+            log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
+            receive.handler(entity, notify.entity, **kwargs)
 
     def evaluate(
         self,
@@ -204,7 +226,7 @@ class Simplified:
 
 
 @dataclasses.dataclass(frozen=True)
-class Found:
+class EntityAndBehavior:
     entity: entity.Entity
     behavior: behavior.Behavior
 
@@ -218,37 +240,29 @@ class Compiled(grammars.CommandEvaluator):
     def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         return self.simplified.evaluate(command, entity=self.entity, **kwargs)
 
+    async def notify(self, notify: Notify, **kwargs):
+        await self.simplified.notify(self.entity, notify, **kwargs)
+
 
 class Behavior:
     def __init__(self, world: world.World, player: entity.Entity):
         self.world = world
         self.player = player
         self.area = world.find_person_area(player)
-        self.player_queue: List[game.Reply] = []
-        self.everyone_queue: List[game.Reply] = []
         assert self.area
 
     @functools.cached_property
     def entities(self) -> tools.EntitySet:
         return tools.get_contributing_entities(self.world, self.area, self.player)
 
-    def _get_behaviors(self, e: entity.Entity) -> List[Found]:
+    def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
         with e.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
-            return [Found(e, b)] if b else []
+            return [EntityAndBehavior(e, b)] if b else []
 
-    def _behaviors(self) -> List[Found]:
+    @functools.cached_property
+    def _behaviors(self) -> List[EntityAndBehavior]:
         return flatten([self._get_behaviors(e) for e in self.entities.all()])
-
-    def _say_everyone(self, message: Union[game.Reply, str]):
-        if isinstance(message, str):
-            r = game.Success(message)
-        self.everyone_queue.append(r)
-
-    def _say_player(self, message: Union[game.Reply, str]):
-        if isinstance(message, str):
-            r = game.Success(message)
-        self.player_queue.append(r)
 
     def _get_globals(self, **kwargs):
         return dict(
@@ -263,7 +277,7 @@ class Behavior:
             **kwargs,
         )
 
-    def _compile_behavior(self, found: Found) -> Compiled:
+    def _compile_behavior(self, found: EntityAndBehavior) -> Compiled:
         simplified = Simplified()
         gs = self._get_globals(
             language=simplified.language,
@@ -280,10 +294,17 @@ class Behavior:
         return Compiled(found.entity, found.behavior, simplified)
 
     @functools.cached_property
+    def compiled(self) -> Sequence[Compiled]:
+        return [self._compile_behavior(f) for f in self._behaviors if f.behavior.python]
+
+    @property
     def evaluators(self) -> List[grammars.CommandEvaluator]:
-        return [
-            self._compile_behavior(f) for f in self._behaviors() if f.behavior.python
-        ]
+        return list(self.compiled)
+
+    async def notify(self, notify: Notify, **kwargs):
+        for target in self.compiled:
+            if target.entity.key == notify.entity.key:
+                await target.notify(notify, **kwargs)
 
 
 def flatten(l):
