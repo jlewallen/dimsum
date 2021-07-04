@@ -20,10 +20,12 @@ from bus import EventBus
 import context
 import luaproxy
 import serializing
+import proxying
 import storage
 
 log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
+scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
 def infinite_reach(entity: entity.Entity, depth: int):
@@ -88,6 +90,7 @@ class Session:
             gid=gid,
             json=json,
             reach=reach if reach else default_reach,
+            proxy_factory=proxying.create,
         )
 
         for updated_world in [e for e in materialized.all() if e.key == world.Key]:

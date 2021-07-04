@@ -58,7 +58,7 @@ class Create(PersonAction):
             self.klass,
             creator=person,
             props=properties.Common(name=self.name, desc=self.name),
-        )  # TODO create
+        )
         with person.make(carryable.Containing) as contain:
             after_hold = contain.hold(created)
             # We do this after because we may consolidate this Item and

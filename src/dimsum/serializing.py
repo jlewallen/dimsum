@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Union, Callable
 
 import copy
 import dataclasses
@@ -218,6 +218,7 @@ async def materialize(
     reach=None,
     depth: int = 0,
     cache: Optional[Dict[str, List[entity.Serialized]]] = None,
+    proxy_factory: Optional[Callable] = None,
 ) -> Materialized:
     assert registrar
     assert store
@@ -267,8 +268,9 @@ async def materialize(
     cache.update(**{se.key: [se] for se in json})
 
     deserialized = _deserialize(json[0].serialized, reference)
-    registrar.register(deserialized, original=json[0].serialized, depth=depth)
-    loaded = deserialized
+    proxied = proxy_factory(deserialized) if proxy_factory else deserialized
+    registrar.register(proxied, original=json[0].serialized, depth=depth)
+    loaded = proxied
 
     deeper = True
     new_depth = depth
@@ -289,6 +291,7 @@ async def materialize(
                 key=referenced_key,
                 reach=reach,
                 depth=depths[referenced_key],
+                proxy_factory=proxy_factory,
                 cache=cache,
             )
             proxy.__wrapped__ = linked.one()

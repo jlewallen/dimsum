@@ -322,17 +322,11 @@ class Template:
 
     def create(self, key_space: str):
         key = self.generate_key(key_space)
-        entity_class = scopes.get_entity_class(self.klass)
-        entity_scopes = scopes.scopes_by_class[entity_class]
-        log.info(
-            "create key=%s klass=%s scopes=%s", self.key, entity_class, entity_scopes
-        )
-        return entity.Entity(
+        return scopes.create_klass(
+            scopes.get_entity_class(self.klass),
             key=key,
             props=properties.Common(name=self.name, desc=self.desc),
-            klass=entity_class,
-            scopes=entity_scopes,
-        )  # TODO create
+        )
 
 
 @mutation.field("create")

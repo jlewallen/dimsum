@@ -1,4 +1,4 @@
-from typing import Type, Optional
+from typing import Type, Optional, Callable
 
 import logging
 
@@ -56,13 +56,29 @@ scopes_by_class = {
 }
 
 
+def _identity(value):
+    return value
+
+
+proxy_factory: Callable = _identity
+
+
+def set_proxy_factory(factory: Callable):
+    global proxy_factory
+    previous = proxy_factory
+    proxy_factory = factory
+    return previous
+
+
 def create_klass(
     desired: Type[entity.EntityClass],
     klass: Optional[Type[entity.EntityClass]] = None,
     **kwargs
 ) -> entity.Entity:
     assert klass is None or klass is desired
-    return entity.Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
+    return proxy_factory(
+        entity.Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
+    )  # TODO create
 
 
 def alive(**kwargs) -> entity.Entity:

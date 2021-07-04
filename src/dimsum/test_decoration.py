@@ -12,8 +12,9 @@ log = logging.getLogger("decoration")
 
 
 class MethodProxy(wrapt.ObjectProxy):
-    def __init__(self, name: str, hook, method):
+    def __init__(self, target, name: str, hook, method):
         super().__init__(method)
+        self._self_target = target
         self._self_name = name
         self._self_hook = hook
         log.info("method-proxy[%s]: created", self._self_name)
@@ -30,9 +31,7 @@ class MethodProxy(wrapt.ObjectProxy):
         def forward(*wargs, **kwargs):
             return self.__wrapped__(*wargs, **kwargs)
 
-        log.info("%s", self._self_hook.fn)
-        log.info("%s", forward)
-        rv = await self._self_hook.fn(forward, *args, **kwargs)
+        rv = await self._self_hook.fn(self._self_target, forward, *args, **kwargs)
 
         log.info("method-proxy[%s]: %s", self._self_name, rv)
 
@@ -90,7 +89,7 @@ class Hooks:
             log.info("hook %s %s (%s)", target.klass, target.function, name)
 
             method = getattr(obj, name)
-            proxy = MethodProxy(name, hook, method)
+            proxy = MethodProxy(obj, name, hook, method)
             setattr(obj, name, proxy)
 
         return obj
@@ -112,7 +111,7 @@ class Hello:
 class TalkingHook:
     @staticmethod
     @hooks.wrap(Hello, Hello.talk)
-    async def talk_hook(forward):
+    async def talk_hook(target, forward):
         log.info("TalkingHook before")
         value = await forward()
         log.info("TalkingHook after '%s'", value)
@@ -120,7 +119,7 @@ class TalkingHook:
 
     @staticmethod
     @hooks.wrap(Hello, Hello.yell)
-    async def yell_hook(forward, what: str):
+    async def yell_hook(target, forward, what: str):
         log.info("TalkingHook before")
         value = await forward(what + " HOOK!")
         log.info("TalkingHook after '%s'", value)
@@ -130,7 +129,7 @@ class TalkingHook:
 class AnotherTalkingHook:
     @staticmethod
     @hooks.wrap(Hello, Hello.talk)
-    async def talk_hook(forward):
+    async def talk_hook(target, forward):
         log.info("AnotherTalkingHook before")
         value = await forward()
         log.info("AnotherTalkingHook after '%s'", value)
@@ -138,7 +137,7 @@ class AnotherTalkingHook:
 
     @staticmethod
     @hooks.wrap(Hello, Hello.yell)
-    async def yell_hook(forward, what: str):
+    async def yell_hook(target, forward, what: str):
         log.info("AnotherTalkingHook before")
         value = await forward(what + " ANOTHER!")
         log.info("AnotherTalkingHook after '%s'", value)
