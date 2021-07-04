@@ -171,6 +171,7 @@ class SimplifiedTransformer(transformers.Base):
 
 @dataclasses.dataclass
 class Simplified:
+    thunk_factory: Callable
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
 
@@ -178,7 +179,9 @@ class Simplified:
         def wrap(fn):
             log.info("prose: '%s' %s", prose, fn)
             self.registered.append(
-                Registered(prose, fn, condition=condition or Condition())
+                Registered(
+                    prose, self.thunk_factory(fn), condition=condition or Condition()
+                )
             )
             return fn
 
@@ -187,15 +190,14 @@ class Simplified:
     def received(self, hook: str, condition=None):
         def wrap(fn):
             log.info("hook: '%s' %s", hook, fn)
-            self.receives.append(Receive(hook, fn, condition=condition or Condition()))
+            self.receives.append(
+                Receive(
+                    hook, self.thunk_factory(fn), condition=condition or Condition()
+                )
+            )
             return fn
 
         return wrap
-
-    async def notify(self, entity: entity.Entity, notify: Notify, **kwargs):
-        for receive in self.receives:
-            log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
-            receive.handler(entity, notify.entity, **kwargs)
 
     def evaluate(
         self,
@@ -224,6 +226,11 @@ class Simplified:
 
         return None
 
+    async def notify(self, entity: entity.Entity, notify: Notify, **kwargs):
+        for receive in self.receives:
+            log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
+            receive.handler(entity, notify.entity, **kwargs)
+
 
 @dataclasses.dataclass(frozen=True)
 class EntityAndBehavior:
@@ -233,15 +240,33 @@ class EntityAndBehavior:
 
 @dataclasses.dataclass(frozen=True)
 class Compiled(grammars.CommandEvaluator):
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        raise NotImplementedError
+
+    async def notify(self, notify: Notify, **kwargs):
+        raise NotImplementedError
+
+
+@dataclasses.dataclass(frozen=True)
+class SuccessfullyCompiled(Compiled):
     entity: entity.Entity
     behavior: behavior.Behavior
     simplified: Simplified
+    declarations: Dict[str, Any]
 
     def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         return self.simplified.evaluate(command, entity=self.entity, **kwargs)
 
     async def notify(self, notify: Notify, **kwargs):
         await self.simplified.notify(self.entity, notify, **kwargs)
+
+
+class NoopCompiled(Compiled):
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        return None
+
+    async def notify(self, notify: Notify, **kwargs):
+        pass
 
 
 class Behavior:
@@ -272,13 +297,22 @@ class Behavior:
             world=self.world,
             Held=Held,
             Ground=Ground,
+            Scope=entity.Scope,
             fail=game.Failure,
             ok=game.Success,
             **kwargs,
         )
 
     def _compile_behavior(self, found: EntityAndBehavior) -> Compiled:
-        simplified = Simplified()
+        declarations: Dict[str, Any] = {}
+
+        def thunk_factory(fn):
+            # TODO Generate a stub that takes a global __call and
+            # performs the function call using just the globals.
+            # eval(fn.__code__, declarations)
+            return fn
+
+        simplified = Simplified(thunk_factory)
         gs = self._get_globals(
             language=simplified.language,
             received=simplified.received,
@@ -288,10 +322,14 @@ class Behavior:
             tree = ast.parse(found.behavior.python)
             # TODO improve filename value here, we have entity.
             compiled = compile(tree, filename="<ast>", mode="exec")
-            eval(compiled, gs, dict())
+            eval(compiled, gs, declarations)
+            log.info("declarations: %s", declarations)
+            return SuccessfullyCompiled(
+                found.entity, found.behavior, simplified, declarations
+            )
         except:
             log.exception("dynamic:error", exc_info=True)
-        return Compiled(found.entity, found.behavior, simplified)
+            return NoopCompiled()
 
     @functools.cached_property
     def compiled(self) -> Sequence[Compiled]:
@@ -302,7 +340,7 @@ class Behavior:
         return list(self.compiled)
 
     async def notify(self, notify: Notify, **kwargs):
-        for target in self.compiled:
+        for target in [c for c in self.compiled if isinstance(c, SuccessfullyCompiled)]:
             if target.entity.key == notify.entity.key:
                 await target.notify(notify, **kwargs)
 

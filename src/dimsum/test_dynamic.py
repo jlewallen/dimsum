@@ -145,3 +145,54 @@ def smash(entity, smashing, say=None):
     await tw.success("hold Hammer")
     await tw.failure("smash snail")
     await tw.success("smash nail")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_maintains_scope(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+class Broken(Scope):
+    pass
+
+def test():
+    log.info("%s", Broken)
+
+@received("smash")
+def smashed(entity, hammer, say=None):
+    class Smashes(Scope):
+        def __init__(self, smashes: int = 0, **kwargs):
+            super().__init__(**kwargs)
+            self.smashes = smashes
+
+        def increase(self):
+            self.smashes += 1
+
+    with entity.make(Smashes) as smashes:
+        smashes.increase()
+        entity.touch()
+        say.nearby("smashes: %d" % (smashes.smashes))
+""",
+    )
+    hammer = await add_behaviored_thing(
+        tw,
+        "Hammer",
+        """
+@language('start: "smash" noun', condition=Held())
+def smash(entity, smashing, say=None):
+    if smashing is None:
+        return fail("smash what now?")
+    log.info("smash: %s", entity)
+    say.notify(smashing, "smash")
+    return ok("you smashed a %s" % (smashing,))
+""",
+    )
+
+    await tw.success("hold Hammer")
+    await tw.success("smash nail")
+    await tw.success("smash nail")
+    await tw.success("smash nail")
