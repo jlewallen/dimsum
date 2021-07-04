@@ -1,4 +1,4 @@
-from typing import Callable, List, Dict, Optional, Any, Union
+from typing import Callable, List, Dict, Optional, Any, Union, Sequence
 
 import logging
 import dataclasses
@@ -12,6 +12,7 @@ import model.game as game
 import model.reply as reply
 import model.world as world
 import model.entity as entity
+import model.tools as tools
 import model.scopes.behavior as behavior
 
 import transformers
@@ -23,6 +24,7 @@ log = logging.getLogger("dimsum.dynamic")
 class Registered:
     prose: str
     handler: Callable
+    condition: "Condition"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -56,14 +58,26 @@ class SimplifiedTransformer(transformers.Base):
         return SimplifiedAction(self.entity, self.registered, args)
 
 
+class Condition:
+    def applies(self, player: entity.Entity, e: entity.Entity) -> bool:
+        return True
+
+
+class Held(Condition):
+    def applies(self, player: entity.Entity, e: entity.Entity) -> bool:
+        return tools.is_holding(player, e)
+
+
 class Simplified:
     def __init__(self):
         self.registered: List[Registered] = []
 
-    def language(self, prose: str):
+    def language(self, prose: str, condition=None):
         def wrap(fn):
             log.info("prose: '%s' %s", prose, fn)
-            self.registered.append(Registered(prose, fn))
+            self.registered.append(
+                Registered(prose, fn, condition=condition or Condition())
+            )
             return fn
 
         return wrap
@@ -75,7 +89,9 @@ class Simplified:
         entity: entity.Entity,
         command: str,
     ) -> Optional[game.Action]:
-        for registered in self.registered:
+        for registered in [
+            r for r in self.registered if r.condition.applies(player, entity)
+        ]:
 
             def transformer_factory(**kwargs):
                 return SimplifiedTransformer(
@@ -104,10 +120,6 @@ class Compiled:
     simplified: Simplified
 
 
-import model.scopes.carryable as carryable
-import model.scopes.occupyable as occupyable
-
-
 class Behavior:
     def __init__(self, world: world.World, player: entity.Entity):
         self.world = world
@@ -116,13 +128,8 @@ class Behavior:
         assert self.area
 
     @functools.cached_property
-    def entities(self) -> List[entity.Entity]:
-        entities: List[entity.Entity] = []
-        with self.player.make_and_discard(carryable.Containing) as pockets:
-            entities += pockets.holding
-        with self.area.make_and_discard(carryable.Containing) as ground:
-            entities += ground.holding
-        return [self.world, self.area, self.player] + entities
+    def entities(self) -> tools.EntitySet:
+        return tools.get_contributing_entities(self.world, self.area, self.player)
 
     def _get_behaviors(self, e: entity.Entity) -> List[Found]:
         with e.make_and_discard(behavior.Behaviors) as behave:
@@ -131,16 +138,26 @@ class Behavior:
 
     @functools.cached_property
     def behaviors(self) -> List[Found]:
-        return flatten([self._get_behaviors(e) for e in self.entities])
+        return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
     def _compile_behaviors(self, found: Found) -> Compiled:
         simplified = Simplified()
+        gs = dict(
+            log=log,
+            language=simplified.language,
+            player=self.player,
+            area=self.area,
+            world=self.world,
+            Held=Held,
+        )
         for b in [b for b in self.behaviors if b.behavior.python]:
-            gs = dict(log=log, language=simplified.language, player=self.player)
-            tree = ast.parse(b.behavior.python)
-            # TODO improve filename value here, we have entity.
-            compiled = compile(tree, filename="<ast>", mode="exec")
-            eval(compiled, gs, dict())
+            try:
+                tree = ast.parse(b.behavior.python)
+                # TODO improve filename value here, we have entity.
+                compiled = compile(tree, filename="<ast>", mode="exec")
+                eval(compiled, gs, dict())
+            except:
+                log.exception("dynamic:error", exc_info=True)
         return Compiled(found.entity, found.behavior, simplified)
 
     @functools.cached_property

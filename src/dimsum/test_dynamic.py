@@ -27,26 +27,34 @@ import test
 log = logging.getLogger("dimsum.tests")
 
 
+async def add_behaviored_thing(tw: test.TestWorld, name: str, python: str):
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        item = tw.add_item_to_welcome_area(
+            scopes.item(creator=world, props=properties.Common(name)),
+            session=session,
+        )
+
+        with item.make(behavior.Behaviors) as behave:
+            behave.add_behavior(None, "b:default", python=python)
+
+        await session.save()
+
+        return item
+
+
 @pytest.mark.asyncio
-async def test_idea(caplog):
+async def test_multiple_simple_verbs(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
     await tw.failure("wiggle")
 
-    with tw.domain.session() as session:
-        world = await session.prepare()
-
-        hammer = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("Hammer")),
-            session=session,
-        )
-
-        with hammer.make(behavior.Behaviors) as behave:
-            behave.add_behavior(
-                None,
-                "b:default",
-                python="""
+    hammer = await add_behaviored_thing(
+        tw,
+        "Hammer",
+        """
 @language('start: "wiggle"')
 def wiggle(entity):
     log.info("wiggle: %s", entity)
@@ -57,10 +65,29 @@ def burp(entity):
     log.info("burp: %s", entity)
     return "hey there!"
 """,
-            )
-
-        await session.save()
+    )
 
     await tw.success("hold Hammer")
     await tw.success("wiggle")
     await tw.success("burp")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_applies_only_when_held(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    hammer = await add_behaviored_thing(
+        tw,
+        "Hammer",
+        """
+@language('start: "wiggle"', condition=Held())
+def wiggle(entity):
+    log.info("wiggle: %s", entity)
+    return "hey there!"
+""",
+    )
+
+    await tw.failure("wiggle")
+    await tw.success("hold Hammer")
+    await tw.success("wiggle")
