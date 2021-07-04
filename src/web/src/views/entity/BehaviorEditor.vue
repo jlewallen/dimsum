@@ -80,7 +80,7 @@ export default defineComponent({
         return {
             behaviors: _.compact(
                 (_.map(this.entity.chimeras.behaviors?.behaviors.map || [], (value: BehaviorApi, key) => {
-                    if (key != "py/object") {
+                    if (key != "py/object" && value.lua) {
                         return new Behavior(key, key, value!.lua, value.logs);
                     }
                     return null;

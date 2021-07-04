@@ -62,7 +62,9 @@ export interface EntityRef {
 }
 
 export interface Behavior {
-    lua: string;
+    "py/object": string;
+    lua: string | null;
+    python: string | null;
     logs: string[];
 }
 

@@ -45,9 +45,10 @@ export default defineComponent({
         },
     },
     data() {
+        const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
         return {
             form: {
-                behavior: this.entity.chimeras.behaviors.behaviors.map["b:default"] || "",
+                behavior: behavior?.python || "",
                 name: this.entity.props.map.name.value,
                 desc: this.entity.props.map.desc.value,
             },
@@ -61,7 +62,12 @@ export default defineComponent({
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            updating.chimeras.behaviors.behaviors.map["b:default"] = this.form.behavior;
+            updating.chimeras.behaviors.behaviors.map["b:default"] = {
+                "py/object": "model.scopes.behavior.Behavior",
+                python: this.form.behavior,
+                lua: null,
+                logs: [],
+            };
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },
