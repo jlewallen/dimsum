@@ -1,9 +1,12 @@
 from typing import List, Type
+
+import logging
+import functools
+
 from lark import Lark
 from lark import exceptions
 from lark import Transformer
 
-import logging
 
 log = logging.getLogger("dimsum.grammars")
 
@@ -63,6 +66,7 @@ def create_parser():
     return ParseMultipleGrammars(sorted(grammars, key=lambda g: g.order))
 
 
+@functools.lru_cache
 def wrap_parser(custom: str):
     return Lark(
         """
