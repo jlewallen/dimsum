@@ -18,13 +18,13 @@ import model.scopes as scopes
 
 import plugins.actions as actions
 
-import test
-
-log = logging.getLogger("dimsum.tests")
-
 import grammars
 import ast
 import dynamic
+
+import test
+
+log = logging.getLogger("dimsum.tests")
 
 
 @pytest.mark.asyncio
@@ -47,13 +47,15 @@ async def test_idea(caplog):
                 None,
                 "b:default",
                 python="""
-@s.language('start: "wiggle"')
+@language('start: "wiggle"')
 def wiggle(entity):
     log.info("wiggle: %s", entity)
+    return "hey there!"
 
-@s.language('start: "burp"')
+@language('start: "burp"')
 def burp(entity):
     log.info("burp: %s", entity)
+    return "hey there!"
 """,
             )
 
@@ -61,3 +63,4 @@ def burp(entity):
 
     await tw.success("hold Hammer")
     await tw.success("wiggle")
+    await tw.success("burp")

@@ -13,6 +13,7 @@ from model.entity import *
 from model.world import *
 from model.events import *
 from model.things import *
+from model.game import *
 from model.reply import *
 from model.finders import *
 

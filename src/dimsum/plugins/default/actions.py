@@ -489,7 +489,7 @@ class Hold(PersonAction):
                         items=[after_hold],
                     )
                 )
-                return Success("you picked up %s" % (after_hold,), item=after_hold)
+                return Success("you picked up %s" % (after_hold,))
 
 
 class Open(PersonAction):

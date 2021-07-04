@@ -1,15 +1,18 @@
-from typing import Callable, List, Dict, Optional, Any
+from typing import Callable, List, Dict, Optional, Any, Union
 
 import logging
 import dataclasses
 import ast
+import functools
 
 import lark
 import grammars
 
 import model.game as game
+import model.reply as reply
 import model.world as world
 import model.entity as entity
+import model.scopes.behavior as behavior
 
 import transformers
 
@@ -22,14 +25,26 @@ class Registered:
     handler: Callable
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class SimplifiedAction(game.Action):
     entity: entity.Entity
     registered: Registered
     args: List[Any]
 
+    def _transform_reply(self, r: Union[game.Reply, str]) -> game.Reply:
+        if isinstance(r, str):
+            return game.Success(r)
+        return r
+
     async def perform(self, **kwargs):
-        return self.registered.handler(self.entity, *self.args)
+        try:
+            r = self.registered.handler(self.entity, *self.args)
+            if r:
+                return self._transform_reply(r)
+            return game.Failure("no reply from handler?")
+        except Exception as e:
+            log.exception("handler:error", exc_info=True)
+            return game.DynamicFailure(str(e), str(self.registered.handler))
 
 
 @dataclasses.dataclass
@@ -74,3 +89,74 @@ class Simplified:
                 return action
 
         return None
+
+
+@dataclasses.dataclass(frozen=True)
+class Found:
+    entity: entity.Entity
+    behavior: behavior.Behavior
+
+
+@dataclasses.dataclass(frozen=True)
+class Compiled:
+    entity: entity.Entity
+    behavior: behavior.Behavior
+    simplified: Simplified
+
+
+import model.scopes.carryable as carryable
+import model.scopes.occupyable as occupyable
+
+
+class Behavior:
+    def __init__(self, world: world.World, player: entity.Entity):
+        self.world = world
+        self.player = player
+        self.area = world.find_person_area(player)
+        assert self.area
+
+    @functools.cached_property
+    def entities(self) -> List[entity.Entity]:
+        entities: List[entity.Entity] = []
+        with self.player.make_and_discard(carryable.Containing) as pockets:
+            entities += pockets.holding
+        with self.area.make_and_discard(carryable.Containing) as ground:
+            entities += ground.holding
+        return [self.world, self.area, self.player] + entities
+
+    def _get_behaviors(self, e: entity.Entity) -> List[Found]:
+        with e.make_and_discard(behavior.Behaviors) as behave:
+            b = behave.get_default()
+            return [Found(e, b)] if b else []
+
+    @functools.cached_property
+    def behaviors(self) -> List[Found]:
+        return flatten([self._get_behaviors(e) for e in self.entities])
+
+    def _compile_behaviors(self, found: Found) -> Compiled:
+        simplified = Simplified()
+        for b in [b for b in self.behaviors if b.behavior.python]:
+            gs = dict(log=log, language=simplified.language, player=self.player)
+            tree = ast.parse(b.behavior.python)
+            # TODO improve filename value here, we have entity.
+            compiled = compile(tree, filename="<ast>", mode="exec")
+            eval(compiled, gs, dict())
+        return Compiled(found.entity, found.behavior, simplified)
+
+    @functools.cached_property
+    def compiled(self) -> List[Compiled]:
+        return [self._compile_behaviors(f) for f in self.behaviors]
+
+    def parse(self, command: str) -> Optional[game.Action]:
+        log.debug("entities=%s", self.entities)
+        log.debug("behaviors=%s", self.behaviors)
+        log.debug("compiled=%s", self.compiled)
+        for c in self.compiled:
+            action = c.simplified.evaluate(self.world, self.player, c.entity, command)
+            if action:
+                return action
+        return None
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]

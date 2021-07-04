@@ -23,6 +23,7 @@ import context
 import luaproxy
 import serializing
 import proxying
+import dynamic
 import grammars
 import storage
 
@@ -41,74 +42,6 @@ def default_reach(entity: entity.Entity, depth: int):
     if entity.klass == scopes.AreaClass:
         return 1
     return 0
-
-
-import functools
-import ast
-import dynamic
-
-
-@dataclasses.dataclass(frozen=True)
-class FoundBehavior:
-    entity: entity.Entity
-    behavior: behavior.Behavior
-
-
-@dataclasses.dataclass(frozen=True)
-class CompiledBehavior:
-    entity: entity.Entity
-    behavior: behavior.Behavior
-    simplified: dynamic.Simplified
-
-
-class LocalBehavior:
-    def __init__(self, world: world.World, person: entity.Entity):
-        self.world = world
-        self.person = person
-        self.area = world.find_person_area(person)
-        assert self.area
-
-    @functools.cached_property
-    def entities(self) -> List[entity.Entity]:
-        entities: List[entity.Entity] = []
-        with self.person.make_and_discard(carryable.Containing) as pockets:
-            entities += pockets.holding
-        with self.area.make_and_discard(carryable.Containing) as ground:
-            entities += ground.holding
-        return [self.world, self.area, self.person] + entities
-
-    def _get_behaviors(self, e: entity.Entity) -> List[FoundBehavior]:
-        with e.make_and_discard(behavior.Behaviors) as behave:
-            b = behave.get_default()
-            return [FoundBehavior(e, b)] if b else []
-
-    @functools.cached_property
-    def behaviors(self) -> List[FoundBehavior]:
-        return flatten([self._get_behaviors(e) for e in self.entities])
-
-    def _compile_behaviors(self, found: FoundBehavior) -> CompiledBehavior:
-        simplified = dynamic.Simplified()
-        for b in [b for b in self.behaviors if b.behavior.python]:
-            gs = dict(log=log, s=simplified)
-            tree = ast.parse(b.behavior.python)
-            # TODO improve filename value here, we have entity.
-            compiled = compile(tree, filename="<ast>", mode="exec")
-            eval(compiled, gs, dict())
-        return CompiledBehavior(found.entity, found.behavior, simplified)
-
-    @functools.cached_property
-    def compiled(self) -> List[CompiledBehavior]:
-        return [self._compile_behaviors(f) for f in self.behaviors]
-
-    def parse(self, command: str) -> Optional[game.Action]:
-        log.debug("entities=%s", self.entities)
-        log.debug("behaviors=%s", self.behaviors)
-        log.debug("compiled=%s", self.compiled)
-        for c in self.compiled:
-            action = c.simplified.evaluate(self.world, self.person, c.entity, command)
-            if action:
-                return action
-        return None
 
 
 class Session:
@@ -201,7 +134,7 @@ class Session:
     async def execute(self, player: entity.Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
-        local = LocalBehavior(self.world, player)
+        local = dynamic.Behavior(self.world, player)
         action = local.parse(command)
         if action is None:
             action = self.evaluator.evaluate(command, world=world, player=player)
@@ -235,7 +168,7 @@ class Session:
                     world=self.world, area=area, person=person, ctx=ctx
                 )
             except entity.EntityFrozen:
-                return reply.Failure("whoa, that's frozen")
+                return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
         await self.prepare()

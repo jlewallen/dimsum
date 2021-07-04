@@ -14,6 +14,7 @@ from model.entity import *
 from model.world import *
 from model.events import *
 from model.things import *
+from model.game import *
 from model.reply import *
 from model.finders import *
 
@@ -125,7 +126,7 @@ class Make(PersonAction):
                 items=[after_hold],
             )
         )
-        return Success("you're now holding %s" % (after_hold,), item=after_hold)
+        return Success("you're now holding %s" % (after_hold,))
 
 
 @dataclasses.dataclass

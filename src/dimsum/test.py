@@ -161,7 +161,7 @@ class TestWorld:
             response = await session.execute(person, command)
 
             log.info("response: %s" % (response,))
-            if isinstance(response, reply.Failure):
+            if isinstance(response, game.Failure):
                 log.info("unsaved!")
             else:
                 await session.save()
@@ -171,14 +171,14 @@ class TestWorld:
     async def success(self, *commands: str, **kwargs):
         for command in commands:
             r = await self.execute(command, **kwargs)
-            if not isinstance(r, reply.Failure):
+            if not isinstance(r, game.Failure):
                 return r
             log.error("reply: %s", r)
-            assert not isinstance(r, reply.Failure)
+            assert not isinstance(r, game.Failure)
 
     async def failure(self, command: str, **kwargs):
         r = await self.execute(command, **kwargs)
-        assert isinstance(r, reply.Failure)
+        assert isinstance(r, game.Failure)
         return r
 
 
