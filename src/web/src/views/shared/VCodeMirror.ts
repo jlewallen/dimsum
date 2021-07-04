@@ -45,6 +45,7 @@ export class VCodeMirror extends VueComponentBase {
     @Prop() readonly options!: CodeMirror.EditorConfiguration;
     /** 是否自适应高度 */
     @Prop() readonly autoHeight!: boolean;
+    @Prop() readonly autoFocus!: boolean;
 
     $el!: HTMLDivElement & { _component: VCodeMirror };
 
@@ -68,6 +69,7 @@ export class VCodeMirror extends VueComponentBase {
                 mode: this.mode,
                 theme: $theme.get() === "white" ? "default" : "blackboard",
                 readOnly: this.readonly,
+                autofocus: this.autoFocus,
                 lineWrapping: this.wrap,
                 lineNumbers: true,
                 foldGutter: true,

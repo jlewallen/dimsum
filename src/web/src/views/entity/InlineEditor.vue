@@ -1,7 +1,7 @@
 <template>
     <div class="inline-editor" @keydown.esc="cancel">
         <div class="inline-editor-row">
-            <VCodeMirror v-model="form.behavior" />
+            <VCodeMirror v-model="form.behavior" :autoFocus="true" />
         </div>
         <div class="inline-editor-row">
             <form class="inline" @submit.prevent="saveForm">
@@ -55,7 +55,9 @@ export default defineComponent({
         };
     },
     mounted() {
-        (this.$refs.name as HTMLInputElement).focus();
+        if (this.form.behavior == "") {
+            (this.$refs.name as HTMLInputElement).focus();
+        }
     },
     methods: {
         async saveForm(): Promise<void> {
