@@ -8,12 +8,13 @@ import model.properties as properties
 import model.scopes.movement as movement
 
 import plugins.default.actions as actions
-import plugins.evaluation as evaluation
+
+import transformers
 
 log = logging.getLogger("dimsum")
 
 
-class Evaluator(evaluation.BaseEvaluator):
+class Transformer(transformers.Base):
     # Item lookup
 
     def consumable_noun(self, args):
@@ -53,7 +54,7 @@ class Evaluator(evaluation.BaseEvaluator):
         return movement.FindNamedRoute(str(args[0]))
 
 
-class Default(Evaluator):
+class Default(Transformer):
     def stimulate(self, args):
         return args[0]
 

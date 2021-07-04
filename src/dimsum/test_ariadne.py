@@ -36,7 +36,7 @@ def get_test_context(domain: domains.Domain, **kwargs):
         config.symmetrical(":memory:"),
         domain,
         subscriptions,
-        grammars.create_parser(),
+        grammars.create_static_evaluator(),
         None,  # type:ignore
         serializing.Identities.HIDDEN,
     )

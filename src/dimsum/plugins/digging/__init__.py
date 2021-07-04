@@ -5,6 +5,7 @@ import logging
 import model.properties as properties
 
 import grammars
+import transformers
 
 from model.reply import *
 from model.game import *
@@ -13,7 +14,6 @@ from model.events import *
 from model.world import *
 
 from plugins.actions import *
-from plugins.evaluation import *
 
 from context import *
 
@@ -125,8 +125,8 @@ class Dig(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -141,7 +141,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def dig(self, args):
         return Dig(args[0], args[1])
 

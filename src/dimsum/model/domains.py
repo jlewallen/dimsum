@@ -100,7 +100,7 @@ class LocalBehavior:
     def compiled(self) -> List[CompiledBehavior]:
         return [self._compile_behaviors(f) for f in self.behaviors]
 
-    def parse(self, command: str) -> Optional[actions.PersonAction]:
+    def parse(self, command: str) -> Optional[game.Action]:
         log.debug("entities=%s", self.entities)
         log.debug("behaviors=%s", self.behaviors)
         log.debug("compiled=%s", self.compiled)
@@ -117,18 +117,18 @@ class Session:
         store: Optional[storage.EntityStorage] = None,
         context_factory: Optional[Callable] = None,
         handlers: Optional[List[Any]] = None,
-        static_parser: Optional[Any] = None,
+        evaluator: Optional[grammars.CommandEvaluator] = None,
     ):
         super().__init__()
         assert store
         assert context_factory
-        assert static_parser
+        assert evaluator
         self.store: storage.EntityStorage = store
         self.context_factory: Callable = context_factory
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
-        self.static_parser = static_parser
+        self.evaluator = evaluator
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
@@ -198,19 +198,16 @@ class Session:
         self.register(self.world)
         return self.world
 
-    async def execute(self, person: entity.Entity, command: str):
+    async def execute(self, player: entity.Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
-        local = LocalBehavior(self.world, person)
+        local = LocalBehavior(self.world, player)
         action = local.parse(command)
         if action is None:
-            tree, create_evaluator = self.static_parser.parse(command)
-            log.info("parsed: %s", tree)
-            tree_eval = create_evaluator(world, person)
-            action = tree_eval.transform(tree)
+            action = self.evaluator.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
-        return await self.perform(action, person)
+        return await self.perform(action, player)
 
     async def perform(
         self, action, person: Optional[entity.Entity] = None, **kwargs
@@ -342,7 +339,7 @@ class Domain:
         self.store = store if store else storage.SqliteStorage(":memory:")
         self.context_factory = luaproxy.context_factory
         self.handlers = handlers or []
-        self.static_parser = grammars.create_parser()
+        self.evaluator = grammars.create_static_evaluator()
 
     def session(self, handlers=None) -> "Session":
         log.info("session:new")
@@ -351,7 +348,7 @@ class Domain:
             store=self.store,
             context_factory=self.context_factory,
             handlers=combined,
-            static_parser=self.static_parser,
+            evaluator=self.evaluator,
         )
 
     async def reload(self):

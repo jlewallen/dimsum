@@ -4,6 +4,7 @@ import logging
 import dataclasses
 
 import grammars
+import transformers
 
 from model.entity import *
 from model.world import *
@@ -11,9 +12,9 @@ from model.events import *
 from model.things import *
 from model.reply import *
 from model.game import *
+from model.finders import *
 
 from plugins.actions import *
-from plugins.evaluation import *
 
 from context import *
 
@@ -56,8 +57,8 @@ class ClearScreen(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -70,9 +71,9 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def here(self, args):
-        return finders.CurrentArea()
+        return CurrentArea()
 
     def edit_entity(self, args):
         return EditEntity(args[0])

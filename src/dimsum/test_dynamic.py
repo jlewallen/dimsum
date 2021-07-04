@@ -17,7 +17,6 @@ import model.scopes.behavior as behavior
 import model.scopes as scopes
 
 import plugins.actions as actions
-import plugins.evaluation as evaluation
 
 import test
 

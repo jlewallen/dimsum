@@ -83,7 +83,7 @@ class Interactive(sshd.CommandHandler):
         self.username = username
         self.comms = comms
         self.channel = channel
-        self.l = grammars.create_parser()
+        self.evaluator = grammars.create_static_evaluator()
         self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
         self.subscription = subscriptions.subscribe(self.username, self.write)
         self.initialize = InitializeWorld(cfg, subscriptions, comms)
@@ -98,9 +98,7 @@ class Interactive(sshd.CommandHandler):
             world, player = await self.initialize.create_player_if_necessary(
                 session, self.username
             )
-            tree, create_evaluator = self.l.parse(line.strip())
-            tree_eval = create_evaluator(world, player)
-            action = tree_eval.transform(tree)
+            action = self.evaluator.evaluate(line.strip(), world=world, player=player)
             reply = await session.perform(action, player)
 
             log.debug("reply: %s", reply)

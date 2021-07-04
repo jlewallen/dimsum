@@ -7,6 +7,7 @@ import model.properties as properties
 import model.scopes.occupyable as occupyable
 
 import grammars
+import transformers
 
 from model.entity import *
 from model.world import *
@@ -16,7 +17,6 @@ from model.reply import *
 from model.finders import *
 
 from plugins.actions import *
-from plugins.evaluation import *
 
 from context import *
 
@@ -79,8 +79,8 @@ class Tell(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -92,7 +92,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def say(self, args):
         return Say(str(args[0]))
 

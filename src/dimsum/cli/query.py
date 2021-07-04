@@ -60,7 +60,11 @@ async def query(config: str, database: str):
     domain = cfg.make_domain()
     subscriptions = bus.SubscriptionManager()
     context = AriadneContext(
-        cfg, domain, subscriptions, grammars.create_parser(), None  # type:ignore
+        cfg,
+        domain,
+        subscriptions,
+        grammars.create_static_evaluator(),
+        None,  # type:ignore
     )
     schema = schema_factory.create()
     ok, actual = await ariadne.graphql(schema, data=body, context_value=context)

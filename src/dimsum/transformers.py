@@ -10,7 +10,7 @@ import model.scopes.movement as movement
 
 
 @dataclasses.dataclass
-class BaseEvaluator(lark.Transformer):
+class Base(lark.Transformer):
     world: world.World
     player: entity.Entity
 

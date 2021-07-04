@@ -8,6 +8,7 @@ import model.properties as properties
 import model.scopes as scopes
 
 import grammars
+import transformers
 
 from model.entity import *
 from model.world import *
@@ -17,7 +18,6 @@ from model.reply import *
 from model.finders import *
 
 from plugins.actions import *
-from plugins.evaluation import *
 
 from context import *
 
@@ -230,8 +230,8 @@ class CallThis(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -253,7 +253,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def create(self, args):
         log.info("create: %s", args[0])
         return Create(args[0], str(args[1]))

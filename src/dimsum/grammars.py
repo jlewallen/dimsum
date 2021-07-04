@@ -1,14 +1,37 @@
-from typing import List, Type
+from typing import List, Type, Optional, Sequence, Callable
 
+import abc
 import logging
 import functools
+import dataclasses
 
-from lark import Lark
-from lark import exceptions
-from lark import Transformer
+from lark import Lark, exceptions, Transformer, Tree
 
+import model.game as game
 
 log = logging.getLogger("dimsum.grammars")
+
+
+class ParsingException(Exception):
+    pass
+
+
+class CommandEvaluator:
+    @abc.abstractmethod
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        raise NotImplementedError
+
+
+@dataclasses.dataclass
+class PrioritizedEvaluator(CommandEvaluator):
+    evaluators: Sequence[CommandEvaluator]
+
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        for evaluator in self.evaluators:
+            action = evaluator.evaluate(command, **kwargs)
+            if action:
+                return action
+        return None
 
 
 class Grammar:
@@ -17,7 +40,7 @@ class Grammar:
         return 1
 
     @property
-    def evaluator(self) -> Type[Transformer]:
+    def transformer_factory(self) -> Type[Transformer]:
         raise NotImplementedError
 
     @property
@@ -25,29 +48,27 @@ class Grammar:
         raise NotImplementedError
 
 
-class ParsingException(Exception):
-    pass
+@dataclasses.dataclass
+class GrammarEvaluator(CommandEvaluator):
+    grammar: str
+    transformer_factory: Callable
 
+    @functools.cached_property
+    def _parser(self) -> Lark:
+        return _wrap_parser(self.grammar)
 
-class ParseMultipleGrammars:
-    def __init__(self, grammars):
-        self.grammars = grammars
-        self.parsers = [
-            (wrap_parser(g.lark), g) for g in sorted(grammars, key=lambda g: g.order)
-        ]
-
-    def parse(self, command: str):
-        for parser, grammar in self.parsers:
-            try:
-                tree = parser.parse(command)
-                log.debug("parsed=%s", tree)
-                if tree:
-                    return tree, grammar.evaluator
-            except exceptions.UnexpectedCharacters:
-                log.debug("parse-failed")
-            except exceptions.UnexpectedEOF:
-                log.debug("parse-failed")
-        raise ParsingException()
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        try:
+            tree = self._parser.parse(command)
+            log.debug("parsed=%s", tree)
+            if tree:
+                transformer = self.transformer_factory(**kwargs)
+                return transformer.transform(tree)
+        except exceptions.UnexpectedCharacters:
+            log.debug("parse-failed")
+        except exceptions.UnexpectedEOF:
+            log.debug("parse-failed")
+        return None
 
 
 grammars: List[Grammar] = []
@@ -61,13 +82,15 @@ def grammar():
     return wrap
 
 
-def create_parser():
-    log.info("create-parser: grammars=%s", grammars)
-    return ParseMultipleGrammars(sorted(grammars, key=lambda g: g.order))
+def create_static_evaluator():
+    log.info("static-evaluator: grammars=%s", grammars)
+    return PrioritizedEvaluator(
+        [GrammarEvaluator(g.lark, g.transformer_factory) for g in grammars]
+    )
 
 
 @functools.lru_cache
-def wrap_parser(custom: str):
+def _wrap_parser(custom: str) -> Lark:
     return Lark(
         """
         {0}

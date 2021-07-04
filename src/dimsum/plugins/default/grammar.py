@@ -4,8 +4,9 @@ from lark import exceptions
 
 import logging
 import grammars
+import transformers
 
-import plugins.default.evaluator as evaluator
+import plugins.default.transformer as transformer
 
 log = logging.getLogger("dimsum")
 
@@ -17,8 +18,8 @@ class DefaultGrammar(grammars.Grammar):
         return 0
 
     @property
-    def evaluator(self):
-        return evaluator.Default
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return transformer.Default
 
     @property
     def lark(self) -> str:

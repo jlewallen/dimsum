@@ -7,6 +7,7 @@ import model.finders as finders
 import model.entity as entity
 
 import grammars
+import transformers
 
 from model.reply import *
 from model.game import *
@@ -15,7 +16,6 @@ from model.events import *
 from model.world import *
 
 from plugins.actions import *
-from plugins.evaluation import *
 from context import *
 
 import model.scopes.movement as movement
@@ -187,8 +187,8 @@ class Hit(SimpleVerb):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self) -> Type[BaseEvaluator]:
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -208,7 +208,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def plant(self, args):
         return Plant(item=args[0])
 

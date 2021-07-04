@@ -44,7 +44,6 @@ def create_empty_world():
 class TestWorld:
     def __init__(self, handlers=None):
         self.domain = domains.Domain(handlers=handlers)
-        self.l = grammars.create_parser()
         self.carla_key = None
         self.jacob_key = None
         self.tomi_key = None
