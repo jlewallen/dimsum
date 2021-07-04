@@ -14,6 +14,7 @@ import model.world as world
 import model.entity as entity
 import model.tools as tools
 import model.events as events
+import model.things as things
 import model.scopes.behavior as behavior
 
 import context
@@ -39,10 +40,21 @@ class DynamicMessage(events.StandardEvent):
 
 
 @dataclasses.dataclass
+class Notify:
+    entity: entity.Entity
+    message: str
+    kwargs: Dict[str, Any]
+
+
+@dataclasses.dataclass
 class Say:
+    notified: List[Notify] = dataclasses.field(default_factory=list)
     everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
     nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
     player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
+
+    def notify(self, entity: entity.Entity, message: str, **kwargs):
+        self.notified.append(Notify(entity, message, kwargs))
 
     def everyone(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
@@ -59,25 +71,25 @@ class Say:
             r = game.Success(message)
         self.player_queue.append(r)
 
+    async def _pub(self, **kwargs):
+        await context.get().publish(DynamicMessage(**kwargs))
+
     async def publish(self, area: entity.Entity, player: entity.Entity):
         for e in self.player_queue:
-            await context.get().publish(
-                DynamicMessage(
-                    living=player,
-                    area=area,
-                    heard=[player],
-                    message=e,
-                )
+            await self._pub(
+                living=player,
+                area=area,
+                heard=[player],
+                message=e,
             )
+
         heard = tools.default_heard_for(area)
         for e in self.nearby_queue:
-            await context.get().publish(
-                DynamicMessage(
-                    living=player,
-                    area=area,
-                    heard=heard,
-                    message=e,
-                )
+            await self._pub(
+                living=player,
+                area=area,
+                heard=heard,
+                message=e,
             )
 
 
@@ -87,17 +99,27 @@ class SimplifiedAction(game.Action):
     registered: Registered
     args: List[Any]
 
+    async def _transform_arg(
+        self, arg: things.ItemFinder, world: world.World, person: entity.Entity
+    ) -> Optional[entity.Entity]:
+        assert isinstance(arg, things.ItemFinder)
+        return await world.apply_item_finder(person, arg)
+
     def _transform_reply(self, r: Union[game.Reply, str]) -> game.Reply:
         if isinstance(r, str):
             return game.Success(r)
         return r
+
+    async def _args(self, world: world.World, person: entity.Entity) -> List[Any]:
+        return [await self._transform_arg(a, world, person) for a in self.args]
 
     async def perform(
         self, world: world.World, area: entity.Entity, person: entity.Entity, **kwargs
     ):
         try:
             say = Say()
-            r = self.registered.handler(self.entity, *self.args, say=say)
+            args = await self._args(world, person)
+            r = self.registered.handler(self.entity, *args, say=say)
             if r:
                 log.info("say: %s", say)
                 await say.publish(area, person)
@@ -118,13 +140,18 @@ class SimplifiedTransformer(transformers.Base):
 
 
 class Condition:
-    def applies(self, player: entity.Entity, e: entity.Entity) -> bool:
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
         return True
 
 
 class Held(Condition):
-    def applies(self, player: entity.Entity, e: entity.Entity) -> bool:
-        return tools.is_holding(player, e)
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
+        return tools.is_holding(person, e)
+
+
+class Ground(Condition):
+    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
+        return not tools.is_holding(person, e)
 
 
 class Simplified:
@@ -141,6 +168,13 @@ class Simplified:
 
         return wrap
 
+    def received(self, hook: str, condition=None):
+        def wrap(fn):
+            log.info("hook: '%s' %s", hook, fn)
+            return fn
+
+        return wrap
+
     def evaluate(
         self,
         command: str,
@@ -148,18 +182,14 @@ class Simplified:
         player: Optional[entity.Entity] = None,
         entity: Optional[entity.Entity] = None,
     ) -> Optional[game.Action]:
-        assert world
         assert player
         assert entity
-
         for registered in [
             r for r in self.registered if r.condition.applies(player, entity)
         ]:
 
             def transformer_factory(**kwargs):
-                assert world
-                assert player
-                assert entity
+                assert world and player and entity
                 return SimplifiedTransformer(
                     registered=registered, entity=entity, world=world, player=player
                 )
@@ -207,8 +237,7 @@ class Behavior:
             b = behave.get_default()
             return [Found(e, b)] if b else []
 
-    @functools.cached_property
-    def behaviors(self) -> List[Found]:
+    def _behaviors(self) -> List[Found]:
         return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
     def _say_everyone(self, message: Union[game.Reply, str]):
@@ -228,27 +257,33 @@ class Behavior:
             area=self.area,
             world=self.world,
             Held=Held,
+            Ground=Ground,
+            fail=game.Failure,
+            ok=game.Success,
             **kwargs,
         )
 
-    def _compile_behaviors(self, found: Found) -> Compiled:
+    def _compile_behavior(self, found: Found) -> Compiled:
         simplified = Simplified()
         gs = self._get_globals(
             language=simplified.language,
+            received=simplified.received,
         )
-        for b in [b for b in self.behaviors if b.behavior.python]:
-            try:
-                tree = ast.parse(b.behavior.python)
-                # TODO improve filename value here, we have entity.
-                compiled = compile(tree, filename="<ast>", mode="exec")
-                eval(compiled, gs, dict())
-            except:
-                log.exception("dynamic:error", exc_info=True)
+        log.info("compiling %s", found)
+        try:
+            tree = ast.parse(found.behavior.python)
+            # TODO improve filename value here, we have entity.
+            compiled = compile(tree, filename="<ast>", mode="exec")
+            eval(compiled, gs, dict())
+        except:
+            log.exception("dynamic:error", exc_info=True)
         return Compiled(found.entity, found.behavior, simplified)
 
     @functools.cached_property
     def evaluators(self) -> List[grammars.CommandEvaluator]:
-        return [self._compile_behaviors(f) for f in self.behaviors]
+        return [
+            self._compile_behavior(f) for f in self._behaviors() if f.behavior.python
+        ]
 
 
 def flatten(l):

@@ -94,7 +94,7 @@ def wiggle(entity, say=None):
 
 
 @pytest.mark.asyncio
-async def test_dynamic_say_everyone(caplog):
+async def test_dynamic_say_nearby(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -112,3 +112,36 @@ def jingle(entity, say=None):
 
     await tw.success("hold Keys")
     await tw.success("jingle")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_smash(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+@received("smash")
+def smashed(entity, hammer, say=None):
+    log.info("%s smashed me, a nail! %s", hammer, entity)
+""",
+    )
+    hammer = await add_behaviored_thing(
+        tw,
+        "Hammer",
+        """
+@language('start: "smash" noun', condition=Held())
+def smash(entity, smashing, say=None):
+    if smashing is None:
+        return fail("smash what now?")
+    log.info("smash: %s", entity)
+    say.notify(smashing, "smash")
+    return ok("you smashed a %s" % (smashing,))
+""",
+    )
+
+    await tw.success("hold Hammer")
+    await tw.success("smash nail")
+    await tw.failure("smash snail")
