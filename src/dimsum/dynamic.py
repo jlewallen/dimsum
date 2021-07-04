@@ -84,18 +84,25 @@ class Simplified:
 
     def evaluate(
         self,
-        w: world.World,
-        player: entity.Entity,
-        entity: entity.Entity,
         command: str,
+        world: Optional[world.World] = None,
+        player: Optional[entity.Entity] = None,
+        entity: Optional[entity.Entity] = None,
     ) -> Optional[game.Action]:
+        assert world
+        assert player
+        assert entity
+
         for registered in [
             r for r in self.registered if r.condition.applies(player, entity)
         ]:
 
             def transformer_factory(**kwargs):
+                assert world
+                assert player
+                assert entity
                 return SimplifiedTransformer(
-                    registered=registered, entity=entity, world=w, player=player
+                    registered=registered, entity=entity, world=world, player=player
                 )
 
             evaluator = grammars.GrammarEvaluator(registered.prose, transformer_factory)
@@ -114,10 +121,13 @@ class Found:
 
 
 @dataclasses.dataclass(frozen=True)
-class Compiled:
+class Compiled(grammars.CommandEvaluator):
     entity: entity.Entity
     behavior: behavior.Behavior
     simplified: Simplified
+
+    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        return self.simplified.evaluate(command, entity=self.entity, **kwargs)
 
 
 class Behavior:
@@ -140,15 +150,31 @@ class Behavior:
     def behaviors(self) -> List[Found]:
         return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
-    def _compile_behaviors(self, found: Found) -> Compiled:
-        simplified = Simplified()
-        gs = dict(
+    def _say_everyone(self, message: Union[game.Reply, str]):
+        if isinstance(message, str):
+            r = game.Success(message)
+
+    def _say_player(self, message: Union[game.Reply, str]):
+        if isinstance(message, str):
+            r = game.Success(message)
+        pass
+
+    def _get_globals(self, **kwargs):
+        return dict(
             log=log,
-            language=simplified.language,
             player=self.player,
             area=self.area,
             world=self.world,
+            say_everyone=self._say_everyone,
+            say_player=self._say_player,
             Held=Held,
+            **kwargs
+        )
+
+    def _compile_behaviors(self, found: Found) -> Compiled:
+        simplified = Simplified()
+        gs = self._get_globals(
+            language=simplified.language,
         )
         for b in [b for b in self.behaviors if b.behavior.python]:
             try:
@@ -161,18 +187,8 @@ class Behavior:
         return Compiled(found.entity, found.behavior, simplified)
 
     @functools.cached_property
-    def compiled(self) -> List[Compiled]:
+    def evaluators(self) -> List[grammars.CommandEvaluator]:
         return [self._compile_behaviors(f) for f in self.behaviors]
-
-    def parse(self, command: str) -> Optional[game.Action]:
-        log.debug("entities=%s", self.entities)
-        log.debug("behaviors=%s", self.behaviors)
-        log.debug("compiled=%s", self.compiled)
-        for c in self.compiled:
-            action = c.simplified.evaluate(self.world, self.player, c.entity, command)
-            if action:
-                return action
-        return None
 
 
 def flatten(l):

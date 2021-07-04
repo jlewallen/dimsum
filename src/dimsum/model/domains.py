@@ -134,10 +134,11 @@ class Session:
     async def execute(self, player: entity.Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
-        local = dynamic.Behavior(self.world, player)
-        action = local.parse(command)
-        if action is None:
-            action = self.evaluator.evaluate(command, world=world, player=player)
+        dynamic_behavior = dynamic.Behavior(self.world, player)
+        evaluators = grammars.PrioritizedEvaluator(
+            dynamic_behavior.evaluators + [self.evaluator]
+        )
+        action = evaluators.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
         return await self.perform(action, player)
