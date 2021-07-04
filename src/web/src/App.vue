@@ -1,5 +1,5 @@
 <template>
-    <div id="upper">
+    <div id="upper" :class="{ obscured: isObscured }">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">Mudsum</a>
 
@@ -59,6 +59,9 @@ export default defineComponent({
     computed: {
         authenticated() {
             return store.state.authenticated;
+        },
+        isObscured(): boolean {
+            return store.state.interactables.length > 0;
         },
     },
     mounted(): Promise<void> {
@@ -129,5 +132,9 @@ body {
 
 #lower {
     border-top: 2px solid #dfdfdf;
+}
+
+.obscured {
+    opacity: 0.5;
 }
 </style>
