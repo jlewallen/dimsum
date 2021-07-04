@@ -546,11 +546,13 @@
                                         "b:drop-leaf:tick": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"leaf-1\"),\n        name = \"Oak Leaf\",\n        quantity = 1,\n        color = \"red\",\n    })\nend\n",
+                                            "python": null,
                                             "logs": []
                                         },
                                         "b:drop-branch:tick": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"branch-1\"),\n        name = \"Oak Branch\",\n        quantity = 1,\n    })\nend\n",
+                                            "python": null,
                                             "logs": []
                                         }
                                     }
@@ -769,6 +771,7 @@
                                         "b:mystery:shake": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "python": null,
                                             "logs": []
                                         }
                                     }
@@ -881,6 +884,7 @@
                                         "b:music:play": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "python": null,
                                             "logs": []
                                         }
                                     }
@@ -993,6 +997,7 @@
                                         "b:make:stone": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\n    if math.random() > 0.7 then\n        return area.make_here({\n            kind = item.kind(\"stone-1\"),\n            name = \"Heavy Stone\",\n            quantity = 1,\n        })\n    end\n\n    return area.make({\n        kind = item.kind(\"pebble-1\"),\n        name = \"Pebble\",\n        quantity = 3,\n    })\nend\n",
+                                            "python": null,
                                             "logs": []
                                         }
                                     }
@@ -2105,11 +2110,13 @@
                                         "b:drop-leaf:tick": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"leaf-1\"),\n        name = \"Maple Leaf\",\n        quantity = 1,\n        color = \"red\",\n    })\nend\n",
+                                            "python": null,
                                             "logs": []
                                         },
                                         "b:drop-branch:tick": {
                                             "py/object": "model.scopes.behavior.Behavior",
                                             "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"branch-1\"),\n        name = \"Maple Branch\",\n        quantity = 1,\n    })\nend\n",
+                                            "python": null,
                                             "logs": []
                                         }
                                     }

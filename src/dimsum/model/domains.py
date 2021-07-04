@@ -15,12 +15,15 @@ import model.scopes.occupyable as occupyable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
+import plugins.actions as actions
+
 from bus import EventBus
 
 import context
 import luaproxy
 import serializing
 import proxying
+import grammars
 import storage
 
 log = logging.getLogger("dimsum.model")
@@ -40,21 +43,92 @@ def default_reach(entity: entity.Entity, depth: int):
     return 0
 
 
+import functools
+import ast
+import dynamic
+
+
+@dataclasses.dataclass(frozen=True)
+class FoundBehavior:
+    entity: entity.Entity
+    behavior: behavior.Behavior
+
+
+@dataclasses.dataclass(frozen=True)
+class CompiledBehavior:
+    entity: entity.Entity
+    behavior: behavior.Behavior
+    simplified: dynamic.Simplified
+
+
+class LocalBehavior:
+    def __init__(self, world: world.World, person: entity.Entity):
+        self.world = world
+        self.person = person
+        self.area = world.find_person_area(person)
+        assert self.area
+
+    @functools.cached_property
+    def entities(self) -> List[entity.Entity]:
+        entities: List[entity.Entity] = []
+        with self.person.make_and_discard(carryable.Containing) as pockets:
+            entities += pockets.holding
+        with self.area.make_and_discard(carryable.Containing) as ground:
+            entities += ground.holding
+        return [self.world, self.area, self.person] + entities
+
+    def _get_behaviors(self, e: entity.Entity) -> List[FoundBehavior]:
+        with e.make_and_discard(behavior.Behaviors) as behave:
+            b = behave.get_default()
+            return [FoundBehavior(e, b)] if b else []
+
+    @functools.cached_property
+    def behaviors(self) -> List[FoundBehavior]:
+        return flatten([self._get_behaviors(e) for e in self.entities])
+
+    def _compile_behaviors(self, found: FoundBehavior) -> CompiledBehavior:
+        simplified = dynamic.Simplified()
+        for b in [b for b in self.behaviors if b.behavior.python]:
+            gs = dict(log=log, s=simplified)
+            tree = ast.parse(b.behavior.python)
+            # TODO improve filename value here, we have entity.
+            compiled = compile(tree, filename="<ast>", mode="exec")
+            eval(compiled, gs, dict())
+        return CompiledBehavior(found.entity, found.behavior, simplified)
+
+    @functools.cached_property
+    def compiled(self) -> List[CompiledBehavior]:
+        return [self._compile_behaviors(f) for f in self.behaviors]
+
+    def parse(self, command: str) -> Optional[actions.PersonAction]:
+        log.debug("entities=%s", self.entities)
+        log.debug("behaviors=%s", self.behaviors)
+        log.debug("compiled=%s", self.compiled)
+        for c in self.compiled:
+            action = c.simplified.evaluate(self.world, self.person, c.entity, command)
+            if action:
+                return action
+        return None
+
+
 class Session:
     def __init__(
         self,
         store: Optional[storage.EntityStorage] = None,
         context_factory: Optional[Callable] = None,
         handlers: Optional[List[Any]] = None,
+        static_parser: Optional[Any] = None,
     ):
         super().__init__()
         assert store
         assert context_factory
+        assert static_parser
         self.store: storage.EntityStorage = store
         self.context_factory: Callable = context_factory
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
+        self.static_parser = static_parser
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
@@ -123,6 +197,20 @@ class Session:
         self.world = world.World()
         self.register(self.world)
         return self.world
+
+    async def execute(self, person: entity.Entity, command: str):
+        assert self.world
+        log.info("executing: '%s'", command)
+        local = LocalBehavior(self.world, person)
+        action = local.parse(command)
+        if action is None:
+            tree, create_evaluator = self.static_parser.parse(command)
+            log.info("parsed: %s", tree)
+            tree_eval = create_evaluator(world, person)
+            action = tree_eval.transform(tree)
+        assert action
+        assert isinstance(action, game.Action)
+        return await self.perform(action, person)
 
     async def perform(
         self, action, person: Optional[entity.Entity] = None, **kwargs
@@ -254,12 +342,16 @@ class Domain:
         self.store = store if store else storage.SqliteStorage(":memory:")
         self.context_factory = luaproxy.context_factory
         self.handlers = handlers or []
+        self.static_parser = grammars.create_parser()
 
     def session(self, handlers=None) -> "Session":
         log.info("session:new")
         combined = (handlers or []) + self.handlers
         return Session(
-            store=self.store, context_factory=self.context_factory, handlers=combined
+            store=self.store,
+            context_factory=self.context_factory,
+            handlers=combined,
+            static_parser=self.static_parser,
         )
 
     async def reload(self):

@@ -77,13 +77,15 @@ class Scope:
 
 
 class Behavior:
-    def __init__(self, lua=None, logs=None, **kwargs):
+    def __init__(self, lua=None, python=None, logs=None, **kwargs):
         self.lua = lua
+        self.python = python
         self.logs = logs if logs else []
 
     def check(self):
-        eng = lupa.LuaRuntime(unpack_returned_tuples=True)
-        eng.eval(self.lua)
+        if self.lua:
+            eng = lupa.LuaRuntime(unpack_returned_tuples=True)
+            eng.eval(self.lua)
 
     def error(self, messages: List[str], error):
         self.logs.extend(messages)
@@ -158,6 +160,9 @@ class BehaviorMap(properties.Map):
         pattern = "b:(.+):%s" % (behavior,)
         return [self.map[key] for key in self.keys_matching(pattern)]
 
+    def get(self, key: str) -> Optional[Behavior]:
+        return self.map[key] if key in self.map else None  # type:ignore
+
     def add(self, name, **kwargs):
         b = self.map[name] = Behavior(**kwargs)  # type:ignore
         b.check()
@@ -184,6 +189,9 @@ class Behaviors(entity.Scope):
         super().__init__(**kwargs)
         self.behaviors = behaviors if behaviors else BehaviorMap()
 
+    def get_default(self) -> Optional[Behavior]:
+        return self.behaviors.get("b:default")
+
     def get_behaviors(self, name):
         returning = self.behaviors.get_all(name)
         for rb in registered_behaviors:
@@ -193,7 +201,8 @@ class Behaviors(entity.Scope):
         return returning
 
     def add_behavior(self, world: entity.Entity, name, **kwargs):
-        with world.make(BehaviorCollection) as world_behaviors:
-            world_behaviors.entities.append(self.ourselves)
+        if world:
+            with world.make(BehaviorCollection) as world_behaviors:
+                world_behaviors.entities.append(self.ourselves)
         self.ourselves.touch()
         return self.behaviors.add(name, **kwargs)
