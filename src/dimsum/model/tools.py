@@ -14,8 +14,11 @@ import model.scopes.occupyable as occupyable
 
 
 class Relation(enum.Enum):
+    WORLD = "world"
+    SELF = "self"
     HOLDING = "holding"
     GROUND = "ground"
+    AREA = "area"
     OTHER = "other"
 
 
@@ -39,13 +42,13 @@ class EntitySet:
 
 def get_contributing_entities(world: World, player: Entity) -> EntitySet:
     entities = EntitySet()
-    entities.add(Relation.OTHER, world)
-    entities.add(Relation.OTHER, player)
+    entities.add(Relation.WORLD, world)
+    entities.add(Relation.SELF, player)
     area = world.find_entity_area(player)
     if area:
         with area.make_and_discard(carryable.Containing) as ground:
             entities.add_all(Relation.GROUND, ground.holding)
-        entities.add(Relation.OTHER, area)
+        entities.add(Relation.AREA, area)
     with player.make_and_discard(carryable.Containing) as pockets:
         entities.add_all(Relation.HOLDING, pockets.holding)
     return entities

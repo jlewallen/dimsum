@@ -31,7 +31,6 @@ import storage
 import saying
 
 log = logging.getLogger("dimsum.model")
-scripting = behavior.ScriptEngine()
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
@@ -193,8 +192,7 @@ class Session:
             everything = world_behaviors.entities
         for entity in everything:
             with entity.make(behavior.Behaviors) as behave:
-                behaviors = behave.get_behaviors(name)
-                if len(behaviors) > 0 or behave.get_default():
+                if behave.get_default():
                     log.info("everywhere: %s", entity)
                     area = self.world.find_entity_area(entity)
                     assert area
@@ -297,19 +295,29 @@ class WorldCtx(context.Ctx):
         self,
         session: Optional[Session] = None,
         person: Optional[entity.Entity] = None,
+        entity: Optional[entity.Entity] = None,
         **kwargs
     ):
         super().__init__()
-        assert session
-        assert world
-        self.person = person
-        self.se = scripting
+        assert session and session.world
         self.session = session
-        self.world = session.world
-        self.registrar = session.registrar
+        self.world: world.World = session.world
+        self.person = person
         self.bus = session.bus
-        self.scope = behavior.Scope(world=world, person=person, **kwargs)  # TODO ?
-        assert isinstance(self.world, world.World)
+        self.entities: tools.EntitySet = self._get_default_entity_set(entity)
+
+    def _get_default_entity_set(
+        self, entity: Optional[entity.Entity]
+    ) -> tools.EntitySet:
+        assert self.world
+        entitySet = tools.EntitySet()
+        if self.person:
+            entitySet = tools.get_contributing_entities(self.world, self.person)
+        else:
+            entitySet.add(tools.Relation.WORLD, self.world)
+        if entity:
+            entitySet.add(tools.Relation.OTHER, entity)
+        return entitySet
 
     def __enter__(self):
         context.set(self)
@@ -320,20 +328,8 @@ class WorldCtx(context.Ctx):
         return False
 
     def extend(self, **kwargs) -> "WorldCtx":
-        self.scope = self.scope.extend(**kwargs)
+        log.debug("%s", kwargs)
         return self
-
-    @property
-    def entities(self) -> tools.EntitySet:
-        assert self.world
-        if self.person:
-            return tools.get_contributing_entities(self.world, self.person)
-        # TODO Eliminate scope all together and just add/remove from EntitySet
-        entitySet = tools.EntitySet()
-        for a in self.scope.values():
-            if isinstance(a, entity.Entity):
-                entitySet.add(tools.Relation.OTHER, a)
-        return entitySet
 
     def register(self, entity: entity.Entity) -> entity.Entity:
         return self.session.register(entity)
