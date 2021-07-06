@@ -26,7 +26,7 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class EntityCreated(StandardEvent):
     entity: Entity
 
@@ -69,7 +69,7 @@ class Create(PersonAction):
             )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ItemsMade(StandardEvent):
     items: List[entity.Entity]
 
@@ -123,7 +123,7 @@ class Make(PersonAction):
         return Success("you're now holding %s" % (after_hold,))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ItemsObliterated(StandardEvent):
     items: List[entity.Entity]
 

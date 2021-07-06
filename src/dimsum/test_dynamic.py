@@ -37,7 +37,7 @@ async def add_behaviored_thing(tw: test.TestWorld, name: str, python: str):
         )
 
         with item.make(behavior.Behaviors) as behave:
-            behave.add_behavior(None, "b:default", python=python)
+            behave.add_behavior(world, "b:default", python=python)
 
         await session.save()
 
@@ -190,3 +190,40 @@ def smash(entity, smashing, say=None):
     await tw.success("smash nail")
     await tw.success("smash nail")
     await tw.success("smash nail")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_receive_tick(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+class Rusting(Scope):
+    def __init__(self, rust: int = 0, **kwargs):
+        super().__init__(**kwargs)
+        self.rust = rust
+
+    def increase(self):
+        self.rust += 1
+
+@received("tick")
+def rusting(entity, say=None):
+    with entity.make(Rusting) as rust:
+        rust.increase()
+        entity.touch()
+        log.info("rusting")
+        say.nearby("rust: %d" % (rust.rust))
+""",
+    )
+
+    with tw.domain.session() as session:
+        await session.tick(0)
+        await session.save()
+
+    with tw.domain.session() as session:
+        nail = await session.materialize(key=nail.key)
+        assert nail
+        assert nail.chimeras["rusting"]["rust"] == 1

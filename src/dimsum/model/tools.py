@@ -37,12 +37,13 @@ class EntitySet:
         return flatten([e for rel, e in self.entities.items()])
 
 
-def get_contributing_entities(world: World, area: Entity, player: Entity) -> EntitySet:
+def get_contributing_entities(world: World, player: Entity) -> EntitySet:
     entities = EntitySet()
-    with player.make_and_discard(carryable.Containing) as pockets:
-        entities.add_all(Relation.HOLDING, pockets.holding)
+    area = world.find_person_area(player)
     with area.make_and_discard(carryable.Containing) as ground:
         entities.add_all(Relation.GROUND, ground.holding)
+    with player.make_and_discard(carryable.Containing) as pockets:
+        entities.add_all(Relation.HOLDING, pockets.holding)
     entities.add(Relation.OTHER, world)
     entities.add(Relation.OTHER, area)
     entities.add(Relation.OTHER, player)

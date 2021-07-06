@@ -34,7 +34,7 @@ class Occupying(entity.Scope):
         self.ourselves.touch()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class LivingEnteredArea(events.StandardEvent):
     living: entity.Entity
     area: entity.Entity
@@ -43,7 +43,7 @@ class LivingEnteredArea(events.StandardEvent):
         return {"text": f"{self.living.props.name} arrived from {self.area}"}
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class LivingLeftArea(events.StandardEvent):
     living: entity.Entity
     area: entity.Entity

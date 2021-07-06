@@ -1,5 +1,6 @@
 from typing import Callable, List, Dict, Optional, Any, Union, Sequence
 
+import abc
 import logging
 import dataclasses
 import ast
@@ -46,14 +47,14 @@ class Registered:
     condition: Condition
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Receive:
     hook: str
     handler: Callable
     condition: Condition
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class DynamicMessage(events.StandardEvent):
     message: game.Reply
 
@@ -61,11 +62,34 @@ class DynamicMessage(events.StandardEvent):
         return json.loads(json.dumps(self.message))  # TODO json fuckery
 
 
-@dataclasses.dataclass
 class Notify:
+    @abc.abstractmethod
+    def applies(self, hook: str) -> bool:
+        raise NotImplementedError
+
+
+@dataclasses.dataclass(frozen=True)
+class NotifyEntity(Notify):
     entity: entity.Entity
     hook: str
     kwargs: Dict[str, Any]
+
+    def applies(self, hook: str) -> bool:
+        return self.hook == hook
+
+
+@dataclasses.dataclass(frozen=True)
+class NotifyAll(Notify):
+    hook: str
+    kwargs: Dict[str, Any]
+
+    def applies(self, hook: str) -> bool:
+        return self.hook == hook
+
+
+class EntityBehavior(grammars.CommandEvaluator):
+    async def notify(self, notify: Notify, **kwargs):
+        raise NotImplementedError
 
 
 @dataclasses.dataclass
@@ -76,7 +100,7 @@ class Say:
     player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
 
     def notify(self, entity: entity.Entity, message: str, **kwargs):
-        self.notified.append(Notify(entity, message, kwargs))
+        self.notified.append(NotifyEntity(entity, message, kwargs))
 
     def everyone(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
@@ -169,8 +193,9 @@ class SimplifiedTransformer(transformers.Base):
         return SimplifiedAction(self.entity, self.registered, args)
 
 
-@dataclasses.dataclass
-class Simplified:
+@dataclasses.dataclass(frozen=True)
+class Simplified(EntityBehavior):
+    entity: entity.Entity
     thunk_factory: Callable
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
@@ -199,23 +224,24 @@ class Simplified:
 
         return wrap
 
-    async def evaluate(
+    async def evaluate(  # type:ignore
         self,
         command: str,
         world: Optional[world.World] = None,
         player: Optional[entity.Entity] = None,
-        entity: Optional[entity.Entity] = None,
     ) -> Optional[game.Action]:
         assert player
-        assert entity
         for registered in [
-            r for r in self.registered if r.condition.applies(player, entity)
+            r for r in self.registered if r.condition.applies(player, self.entity)
         ]:
 
             def transformer_factory(**kwargs):
-                assert world and player and entity
+                assert world and player
                 return SimplifiedTransformer(
-                    registered=registered, entity=entity, world=world, player=player
+                    registered=registered,
+                    world=world,
+                    player=player,
+                    entity=self.entity,
                 )
 
             evaluator = grammars.GrammarEvaluator(registered.prose, transformer_factory)
@@ -226,25 +252,20 @@ class Simplified:
 
         return None
 
-    async def notify(self, entity: entity.Entity, notify: Notify, **kwargs):
+    async def notify(self, notify: Notify, **kwargs):
         for receive in self.receives:
-            log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
-            receive.handler(entity, notify.entity, **kwargs)
+            if notify.applies(receive.hook):
+                log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
+                if isinstance(notify, NotifyEntity):  # Move to notify
+                    receive.handler(self.entity, notify.entity, **kwargs)
+                else:
+                    receive.handler(self.entity, **kwargs)
 
 
 @dataclasses.dataclass(frozen=True)
 class EntityAndBehavior:
     entity: entity.Entity
     behavior: behavior.Behavior
-
-
-@dataclasses.dataclass(frozen=True)
-class EntityBehavior(grammars.CommandEvaluator):
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
-        raise NotImplementedError
-
-    async def notify(self, notify: Notify, **kwargs):
-        raise NotImplementedError
 
 
 class NoopEntityBehavior(EntityBehavior):
@@ -255,46 +276,23 @@ class NoopEntityBehavior(EntityBehavior):
         pass
 
 
-@dataclasses.dataclass(frozen=True)
-class CompiledEntityBehavior(EntityBehavior):
-    entity: entity.Entity
-    behavior: behavior.Behavior
-    simplified: Simplified
-
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
-        return await self.simplified.evaluate(command, entity=self.entity, **kwargs)
-
-    async def notify(self, notify: Notify, **kwargs):
-        if self.entity.key == notify.entity.key:
-            return await self.simplified.notify(self.entity, notify, **kwargs)
-
-
 class Behavior:
-    def __init__(self, world: world.World, player: entity.Entity):
+    def __init__(self, world: world.World, entities: tools.EntitySet):
         self.world = world
-        self.player = player
-        self.area = world.find_person_area(player)
-        self.globals: Dict[str, Any] = self._get_globals()
+        self.entities = entities
+        self.globals: Dict[str, Any] = self._get_default_globals()
         self.locals: Dict[str, Any] = {}
-        assert self.area
 
-    def _get_globals(self, **kwargs):
+    def _get_default_globals(self):
         return dict(
             log=log,
-            player=self.player,
-            area=self.area,
             world=self.world,
             Held=Held,
             Ground=Ground,
             Scope=entity.Scope,
             fail=game.Failure,
             ok=game.Success,
-            **kwargs,
         )
-
-    @functools.cached_property
-    def _entities(self) -> tools.EntitySet:
-        return tools.get_contributing_entities(self.world, self.area, self.player)
 
     def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
         with e.make_and_discard(behavior.Behaviors) as behave:
@@ -303,7 +301,7 @@ class Behavior:
 
     @functools.cached_property
     def _behaviors(self) -> List[EntityAndBehavior]:
-        return flatten([self._get_behaviors(e) for e in self._entities.all()])
+        return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
     def _compile_behavior(self, found: EntityAndBehavior) -> EntityBehavior:
         def thunk_factory(fn):
@@ -323,7 +321,7 @@ class Behavior:
 
             return thunk
 
-        simplified = Simplified(thunk_factory)
+        simplified = Simplified(found.entity, thunk_factory)
         self.globals.update(
             dict(language=simplified.language, received=simplified.received)
         )
@@ -340,7 +338,7 @@ class Behavior:
             declarations: Dict[str, Any] = {}
             eval(compiled, self.globals, declarations)
             self.globals.update(**declarations)
-            return CompiledEntityBehavior(found.entity, found.behavior, simplified)
+            return simplified
         except:
             log.exception("dynamic:error", exc_info=True)
             return NoopEntityBehavior()
@@ -353,9 +351,13 @@ class Behavior:
     def evaluators(self) -> List[grammars.CommandEvaluator]:
         return list(self._compiled)
 
-    async def notify(self, notify: Notify, **kwargs):
+    async def notify(self, notify: Notify, say=None, **kwargs):
+        say = Say()
         for target in [c for c in self._compiled]:
-            await target.notify(notify, **kwargs)
+            await target.notify(notify, say=say, **kwargs)
+        for notify in say.notified:
+            await self.notify(notify)
+        # await say.publish(area, person)
 
 
 def flatten(l):

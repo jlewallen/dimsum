@@ -67,7 +67,7 @@ class Home(PersonAction):
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ItemsAppeared(StandardEvent):
     items: List[entity.Entity]
 
@@ -106,7 +106,7 @@ class AddItemArea(PersonAction):
         return Success("%s appeared" % (p.join([self.item]),))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ItemsDropped(StandardEvent):
     items: List[entity.Entity]
 
@@ -237,7 +237,7 @@ class Drink(PersonAction):
         return Success("you drank %s" % (item))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class PlayerJoined(StandardEvent):
     pass
 
@@ -424,7 +424,7 @@ class Drop(PersonAction):
             return Failure(failure)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ItemsHeld(StandardEvent):
     items: List[entity.Entity]
 

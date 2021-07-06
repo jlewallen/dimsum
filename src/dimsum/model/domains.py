@@ -8,6 +8,7 @@ import model.game as game
 import model.reply as reply
 import model.entity as entity
 import model.world as world
+import model.tools as tools
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
@@ -134,7 +135,8 @@ class Session:
     async def execute(self, player: entity.Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
-        dynamic_behavior = dynamic.Behavior(self.world, player)
+        contributing = tools.get_contributing_entities(self.world, player)
+        dynamic_behavior = dynamic.Behavior(self.world, contributing)
         evaluators = grammars.PrioritizedEvaluator(
             dynamic_behavior.evaluators + [self.evaluator]
         )
@@ -198,6 +200,11 @@ class Session:
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
+            contributing = tools.EntitySet()
+            contributing.add_all(tools.Relation.OTHER, everything)
+            dynamic_behavior = dynamic.Behavior(self.world, contributing)
+            await dynamic_behavior.notify(dynamic.NotifyAll(name, {}))
+
             with entity.make(behavior.Behaviors) as behave:
                 behaviors = behave.get_behaviors(name)
                 if len(behaviors) > 0:

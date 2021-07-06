@@ -13,7 +13,7 @@ class Event:
     pass
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class StandardEvent(Event, visual.Renderable):
     living: Any
     area: Any

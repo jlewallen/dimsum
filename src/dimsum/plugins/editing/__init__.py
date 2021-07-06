@@ -21,7 +21,7 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class EditingEntity(StandardEvent):
     entity: Entity
     interactive: bool = True
@@ -42,7 +42,7 @@ class EditEntity(PersonAction):
         return Failure("where's that?")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ScreenCleared(Reply):
     pass
 

@@ -24,7 +24,7 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class PlayerSpoke(StandardEvent):
     message: str
 
