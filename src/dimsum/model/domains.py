@@ -138,7 +138,7 @@ class Session:
         evaluators = grammars.PrioritizedEvaluator(
             dynamic_behavior.evaluators + [self.evaluator]
         )
-        action = evaluators.evaluate(command, world=world, player=player)
+        action = await evaluators.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
         return await self.perform(action, player, dynamic_behavior=dynamic_behavior)

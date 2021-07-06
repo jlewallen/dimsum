@@ -12,13 +12,9 @@ import model.game as game
 log = logging.getLogger("dimsum.grammars")
 
 
-class ParsingException(Exception):
-    pass
-
-
 class CommandEvaluator:
     @abc.abstractmethod
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         raise NotImplementedError
 
 
@@ -26,12 +22,16 @@ class CommandEvaluator:
 class PrioritizedEvaluator(CommandEvaluator):
     evaluators: Sequence[CommandEvaluator]
 
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         for evaluator in self.evaluators:
-            action = evaluator.evaluate(command, **kwargs)
+            action = await evaluator.evaluate(command, **kwargs)
             if action:
                 return action
         return None
+
+
+class ParsingException(Exception):
+    pass
 
 
 class Grammar:
@@ -57,7 +57,7 @@ class GrammarEvaluator(CommandEvaluator):
     def _parser(self) -> Lark:
         return _wrap_parser(self.grammar)
 
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         try:
             tree = self._parser.parse(command)
             log.debug("parsed=%s", tree)

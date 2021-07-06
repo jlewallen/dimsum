@@ -199,7 +199,7 @@ class Simplified:
 
         return wrap
 
-    def evaluate(
+    async def evaluate(
         self,
         command: str,
         world: Optional[world.World] = None,
@@ -220,7 +220,7 @@ class Simplified:
 
             evaluator = grammars.GrammarEvaluator(registered.prose, transformer_factory)
 
-            action = evaluator.evaluate(command)
+            action = await evaluator.evaluate(command)
             if action:
                 return action
 
@@ -239,33 +239,34 @@ class EntityAndBehavior:
 
 
 @dataclasses.dataclass(frozen=True)
-class Compiled(grammars.CommandEvaluator):
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+class EntityBehavior(grammars.CommandEvaluator):
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         raise NotImplementedError
 
     async def notify(self, notify: Notify, **kwargs):
         raise NotImplementedError
 
 
-@dataclasses.dataclass(frozen=True)
-class SuccessfullyCompiled(Compiled):
-    entity: entity.Entity
-    behavior: behavior.Behavior
-    simplified: Simplified
-
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
-        return self.simplified.evaluate(command, entity=self.entity, **kwargs)
-
-    async def notify(self, notify: Notify, **kwargs):
-        await self.simplified.notify(self.entity, notify, **kwargs)
-
-
-class NoopCompiled(Compiled):
-    def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+class NoopEntityBehavior(EntityBehavior):
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         return None
 
     async def notify(self, notify: Notify, **kwargs):
         pass
+
+
+@dataclasses.dataclass(frozen=True)
+class CompiledEntityBehavior(EntityBehavior):
+    entity: entity.Entity
+    behavior: behavior.Behavior
+    simplified: Simplified
+
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        return await self.simplified.evaluate(command, entity=self.entity, **kwargs)
+
+    async def notify(self, notify: Notify, **kwargs):
+        if self.entity.key == notify.entity.key:
+            return await self.simplified.notify(self.entity, notify, **kwargs)
 
 
 class Behavior:
@@ -273,23 +274,9 @@ class Behavior:
         self.world = world
         self.player = player
         self.area = world.find_person_area(player)
-        self.globals: Dict[str, Any] = {}
+        self.globals: Dict[str, Any] = self._get_globals()
         self.locals: Dict[str, Any] = {}
-        self.globals.update(**self._get_globals())
         assert self.area
-
-    @functools.cached_property
-    def entities(self) -> tools.EntitySet:
-        return tools.get_contributing_entities(self.world, self.area, self.player)
-
-    def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
-        with e.make_and_discard(behavior.Behaviors) as behave:
-            b = behave.get_default()
-            return [EntityAndBehavior(e, b)] if b else []
-
-    @functools.cached_property
-    def _behaviors(self) -> List[EntityAndBehavior]:
-        return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
     def _get_globals(self, **kwargs):
         return dict(
@@ -305,7 +292,20 @@ class Behavior:
             **kwargs,
         )
 
-    def _compile_behavior(self, found: EntityAndBehavior) -> Compiled:
+    @functools.cached_property
+    def _entities(self) -> tools.EntitySet:
+        return tools.get_contributing_entities(self.world, self.area, self.player)
+
+    def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
+        with e.make_and_discard(behavior.Behaviors) as behave:
+            b = behave.get_default()
+            return [EntityAndBehavior(e, b)] if b else []
+
+    @functools.cached_property
+    def _behaviors(self) -> List[EntityAndBehavior]:
+        return flatten([self._get_behaviors(e) for e in self._entities.all()])
+
+    def _compile_behavior(self, found: EntityAndBehavior) -> EntityBehavior:
         def thunk_factory(fn):
             # TODO Generate a stub that takes a global __call and
             # performs the function call using just the globals.
@@ -340,23 +340,22 @@ class Behavior:
             declarations: Dict[str, Any] = {}
             eval(compiled, self.globals, declarations)
             self.globals.update(**declarations)
-            return SuccessfullyCompiled(found.entity, found.behavior, simplified)
+            return CompiledEntityBehavior(found.entity, found.behavior, simplified)
         except:
             log.exception("dynamic:error", exc_info=True)
-            return NoopCompiled()
+            return NoopEntityBehavior()
 
     @functools.cached_property
-    def compiled(self) -> Sequence[Compiled]:
+    def _compiled(self) -> Sequence[EntityBehavior]:
         return [self._compile_behavior(f) for f in self._behaviors if f.behavior.python]
 
     @property
     def evaluators(self) -> List[grammars.CommandEvaluator]:
-        return list(self.compiled)
+        return list(self._compiled)
 
     async def notify(self, notify: Notify, **kwargs):
-        for target in [c for c in self.compiled if isinstance(c, SuccessfullyCompiled)]:
-            if target.entity.key == notify.entity.key:
-                await target.notify(notify, **kwargs)
+        for target in [c for c in self._compiled]:
+            await target.notify(notify, **kwargs)
 
 
 def flatten(l):
