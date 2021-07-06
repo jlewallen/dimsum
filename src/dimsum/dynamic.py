@@ -252,7 +252,6 @@ class SuccessfullyCompiled(Compiled):
     entity: entity.Entity
     behavior: behavior.Behavior
     simplified: Simplified
-    declarations: Dict[str, Any]
 
     def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         return self.simplified.evaluate(command, entity=self.entity, **kwargs)
@@ -274,6 +273,9 @@ class Behavior:
         self.world = world
         self.player = player
         self.area = world.find_person_area(player)
+        self.globals: Dict[str, Any] = {}
+        self.locals: Dict[str, Any] = {}
+        self.globals.update(**self._get_globals())
         assert self.area
 
     @functools.cached_property
@@ -304,29 +306,41 @@ class Behavior:
         )
 
     def _compile_behavior(self, found: EntityAndBehavior) -> Compiled:
-        declarations: Dict[str, Any] = {}
-
         def thunk_factory(fn):
             # TODO Generate a stub that takes a global __call and
             # performs the function call using just the globals.
             # eval(fn.__code__, declarations)
-            return fn
+            def thunk(*args, **kwargs):
+                log.debug("thunking: %s %s %s", fn, args, kwargs)
+                try:
+                    return eval(
+                        """thunk[0](*thunk[1], **thunk[2])""",
+                        self.globals,
+                        dict(thunk=(fn, args, kwargs)),
+                    )
+                except:
+                    log.exception("exception", exc_info=True)
+
+            return thunk
 
         simplified = Simplified(thunk_factory)
-        gs = self._get_globals(
-            language=simplified.language,
-            received=simplified.received,
+        self.globals.update(
+            dict(language=simplified.language, received=simplified.received)
         )
         log.info("compiling %s", found)
         try:
             tree = ast.parse(found.behavior.python)
             # TODO improve filename value here, we have entity.
             compiled = compile(tree, filename="<ast>", mode="exec")
-            eval(compiled, gs, declarations)
-            log.info("declarations: %s", declarations)
-            return SuccessfullyCompiled(
-                found.entity, found.behavior, simplified, declarations
-            )
+
+            # We squash any declarations left in locals into our
+            # globals so they're available in future calls via a
+            # rebinding in our thunk factory above. I'm pretty sure
+            # this is the only way to get this to behave.
+            declarations: Dict[str, Any] = {}
+            eval(compiled, self.globals, declarations)
+            self.globals.update(**declarations)
+            return SuccessfullyCompiled(found.entity, found.behavior, simplified)
         except:
             log.exception("dynamic:error", exc_info=True)
             return NoopCompiled()

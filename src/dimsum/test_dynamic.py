@@ -156,22 +156,16 @@ async def test_dynamic_maintains_scope(caplog):
         tw,
         "Nail",
         """
-class Broken(Scope):
-    pass
+class Smashes(Scope):
+    def __init__(self, smashes: int = 0, **kwargs):
+        super().__init__(**kwargs)
+        self.smashes = smashes
 
-def test():
-    log.info("%s", Broken)
+    def increase(self):
+        self.smashes += 1
 
 @received("smash")
 def smashed(entity, hammer, say=None):
-    class Smashes(Scope):
-        def __init__(self, smashes: int = 0, **kwargs):
-            super().__init__(**kwargs)
-            self.smashes = smashes
-
-        def increase(self):
-            self.smashes += 1
-
     with entity.make(Smashes) as smashes:
         smashes.increase()
         entity.touch()
