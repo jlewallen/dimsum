@@ -21,6 +21,7 @@ import model.scopes.behavior as behavior
 import context
 import grammars
 import transformers
+import saying
 
 log = logging.getLogger("dimsum.dynamic")
 
@@ -54,89 +55,9 @@ class Receive:
     condition: Condition
 
 
-@dataclasses.dataclass(frozen=True)
-class DynamicMessage(events.StandardEvent):
-    message: game.Reply
-
-    def render_string(self) -> Dict[str, str]:
-        return json.loads(json.dumps(self.message))  # TODO json fuckery
-
-
-class Notify:
-    @abc.abstractmethod
-    def applies(self, hook: str) -> bool:
-        raise NotImplementedError
-
-
-@dataclasses.dataclass(frozen=True)
-class NotifyEntity(Notify):
-    entity: entity.Entity
-    hook: str
-    kwargs: Dict[str, Any]
-
-    def applies(self, hook: str) -> bool:
-        return self.hook == hook
-
-
-@dataclasses.dataclass(frozen=True)
-class NotifyAll(Notify):
-    hook: str
-    kwargs: Dict[str, Any]
-
-    def applies(self, hook: str) -> bool:
-        return self.hook == hook
-
-
 class EntityBehavior(grammars.CommandEvaluator):
-    async def notify(self, notify: Notify, **kwargs):
+    async def notify(self, notify: saying.Notify, **kwargs):
         raise NotImplementedError
-
-
-@dataclasses.dataclass
-class Say:
-    notified: List[Notify] = dataclasses.field(default_factory=list)
-    everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-    nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-    player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-
-    def notify(self, entity: entity.Entity, message: str, **kwargs):
-        self.notified.append(NotifyEntity(entity, message, kwargs))
-
-    def everyone(self, message: Union[game.Reply, str]):
-        if isinstance(message, str):
-            r = game.Success(message)
-        self.everyone_queue.append(r)
-
-    def nearby(self, message: Union[game.Reply, str]):
-        if isinstance(message, str):
-            r = game.Success(message)
-        self.player_queue.append(r)
-
-    def player(self, message: Union[game.Reply, str]):
-        if isinstance(message, str):
-            r = game.Success(message)
-        self.player_queue.append(r)
-
-    async def _pub(self, **kwargs):
-        await context.get().publish(DynamicMessage(**kwargs))
-
-    async def publish(self, area: entity.Entity, player: entity.Entity):
-        for e in self.player_queue:
-            await self._pub(
-                living=player,
-                area=area,
-                heard=[player],
-                message=e,
-            )
-
-        heard = tools.default_heard_for(area)
-        for e in self.nearby_queue:
-            await self._pub(
-                living=player,
-                area=area,
-                heard=heard,
-                message=e,
-            )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -169,7 +90,7 @@ class SimplifiedAction(game.Action):
     ):
         assert dynamic_behavior
         try:
-            say = Say()
+            say = saying.Say()
             args = await self._args(world, person)
             reply = self.registered.handler(self.entity, *args, say=say)
             if reply:
@@ -252,14 +173,11 @@ class Simplified(EntityBehavior):
 
         return None
 
-    async def notify(self, notify: Notify, **kwargs):
+    async def notify(self, notify: saying.Notify, **kwargs):
         for receive in self.receives:
             if notify.applies(receive.hook):
                 log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
-                if isinstance(notify, NotifyEntity):  # Move to notify
-                    receive.handler(self.entity, notify.entity, **kwargs)
-                else:
-                    receive.handler(self.entity, **kwargs)
+                notify.invoke(receive.handler, self.entity, **kwargs)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -272,7 +190,7 @@ class NoopEntityBehavior(EntityBehavior):
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         return None
 
-    async def notify(self, notify: Notify, **kwargs):
+    async def notify(self, notify: saying.Notify, **kwargs):
         pass
 
 
@@ -351,8 +269,8 @@ class Behavior:
     def evaluators(self) -> List[grammars.CommandEvaluator]:
         return list(self._compiled)
 
-    async def notify(self, notify: Notify, say=None, **kwargs):
-        say = Say()
+    async def notify(self, notify: saying.Notify, say=None, **kwargs):
+        say = saying.Say()
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say, **kwargs)
         for notify in say.notified:

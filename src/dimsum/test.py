@@ -15,7 +15,6 @@ import model.game as game
 import model.world as world
 import model.things as things
 import model.reply as reply
-import model.sugar as sugar
 import model.domains as domains
 
 import model.scopes.movement as movement

@@ -18,7 +18,6 @@ import model.scopes as scopes
 
 DefaultMoveVerb = "walk"
 TickHook = "tick"
-WindHook = "wind"
 Key = "world"
 log = logging.getLogger("dimsum.model")
 p = inflect.engine()

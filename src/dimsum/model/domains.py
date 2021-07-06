@@ -27,6 +27,7 @@ import proxying
 import dynamic
 import grammars
 import storage
+import saying
 
 log = logging.getLogger("dimsum.model")
 scripting = behavior.ScriptEngine()
@@ -188,7 +189,6 @@ class Session:
             now = time.time()
 
         await self.everywhere(world.TickHook, time=now)
-        await self.everywhere(world.WindHook, time=now)
 
         return now
 
@@ -200,10 +200,19 @@ class Session:
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
-            contributing = tools.EntitySet()
-            contributing.add_all(tools.Relation.OTHER, everything)
-            dynamic_behavior = dynamic.Behavior(self.world, contributing)
-            await dynamic_behavior.notify(dynamic.NotifyAll(name, {}))
+            area = self.world.find_entity_area(entity)
+            assert area
+            with WorldCtx(
+                area=area,
+                entity=entity,
+                session=self,
+                context_factory=self.context_factory,
+                **kwargs
+            ) as ctx:
+                contributing = tools.EntitySet()
+                contributing.add_all(tools.Relation.OTHER, everything)
+                dynamic_behavior = dynamic.Behavior(self.world, contributing)
+                await dynamic_behavior.notify(saying.NotifyAll(name, {}))
 
             with entity.make(behavior.Behaviors) as behave:
                 behaviors = behave.get_behaviors(name)
