@@ -10,7 +10,9 @@ log = logging.getLogger("dimsum.model")
 
 
 class Event:
-    pass
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
 
 
 @dataclasses.dataclass(frozen=True)

@@ -1,4 +1,4 @@
-from typing import List, Union, Dict, Optional, Any
+from typing import List, Union, Dict, Optional, Any, Callable
 
 import abc
 import logging
@@ -11,6 +11,8 @@ import model.entity as entity
 import model.game as game
 import model.events as events
 import model.tools as tools
+
+log = logging.getLogger("dimsum")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -27,7 +29,7 @@ class Notify:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def invoke(self, *args, **kwargs):
+    async def invoke(self, handler: Callable, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -40,31 +42,28 @@ class NotifyEntity(Notify):
     def applies(self, hook: str) -> bool:
         return self.hook == hook
 
-    def invoke(self, handler, *args, **kwargs):
-        return handler(*args, self.entity, **kwargs)
+    async def invoke(self, handler: Callable, *args, **kwargs):
+        return await handler(*args, self.entity, **kwargs)
 
 
 @dataclasses.dataclass(frozen=True)
 class NotifyAll(Notify):
     hook: str
+    event: events.Event
     kwargs: Dict[str, Any]
 
     def applies(self, hook: str) -> bool:
         return self.hook == hook
 
     def invoke(self, handler, *args, **kwargs):
-        return handler(*args, **kwargs)
+        return handler(*args, self.event, **kwargs)
 
 
 @dataclasses.dataclass
 class Say:
-    notified: List[Notify] = dataclasses.field(default_factory=list)
     everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
     nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
     player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-
-    def notify(self, entity: entity.Entity, message: str, **kwargs):
-        self.notified.append(NotifyEntity(entity, message, kwargs))
 
     def everyone(self, message: Union[game.Reply, str]):
         if isinstance(message, str):

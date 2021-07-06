@@ -2,6 +2,7 @@ from typing import Optional, List, Sequence, Dict, Union, Any, Literal, Callable
 
 import logging
 import dataclasses
+import functools
 import time
 
 import model.game as game
@@ -9,6 +10,7 @@ import model.reply as reply
 import model.entity as entity
 import model.world as world
 import model.tools as tools
+import model.events as events
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
@@ -21,7 +23,6 @@ import plugins.actions as actions
 from bus import EventBus
 
 import context
-import luaproxy
 import serializing
 import proxying
 import dynamic
@@ -50,16 +51,13 @@ class Session:
     def __init__(
         self,
         store: Optional[storage.EntityStorage] = None,
-        context_factory: Optional[Callable] = None,
         handlers: Optional[List[Any]] = None,
         evaluator: Optional[grammars.CommandEvaluator] = None,
     ):
         super().__init__()
         assert store
-        assert context_factory
         assert evaluator
         self.store: storage.EntityStorage = store
-        self.context_factory: Callable = context_factory
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
@@ -164,13 +162,7 @@ class Session:
 
         area = self.world.find_entity_area(person) if person else None
 
-        with WorldCtx(
-            person=person,
-            area=area,
-            session=self,
-            context_factory=self.context_factory,
-            **kwargs
-        ) as ctx:
+        with WorldCtx(person=person, session=self, **kwargs) as ctx:
             try:
                 return await action.perform(
                     world=self.world,
@@ -200,33 +192,13 @@ class Session:
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
-            area = self.world.find_entity_area(entity)
-            assert area
-            with WorldCtx(
-                area=area,
-                entity=entity,
-                session=self,
-                context_factory=self.context_factory,
-                **kwargs
-            ) as ctx:
-                contributing = tools.EntitySet()
-                contributing.add_all(tools.Relation.OTHER, everything)
-                dynamic_behavior = dynamic.Behavior(self.world, contributing)
-                await dynamic_behavior.notify(saying.NotifyAll(name, {}))
-
             with entity.make(behavior.Behaviors) as behave:
                 behaviors = behave.get_behaviors(name)
-                if len(behaviors) > 0:
+                if len(behaviors) > 0 or behave.get_default():
                     log.info("everywhere: %s", entity)
                     area = self.world.find_entity_area(entity)
                     assert area
-                    with WorldCtx(
-                        area=area,
-                        entity=entity,
-                        session=self,
-                        context_factory=self.context_factory,
-                        **kwargs
-                    ) as ctx:
+                    with WorldCtx(entity=entity, session=self, **kwargs) as ctx:
                         await ctx.hook(name)
 
     async def add_area(
@@ -295,7 +267,6 @@ class Domain:
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
-        self.context_factory = luaproxy.context_factory
         self.handlers = handlers or []
         self.evaluator = grammars.create_static_evaluator()
 
@@ -304,7 +275,6 @@ class Domain:
         combined = (handlers or []) + self.handlers
         return Session(
             store=self.store,
-            context_factory=self.context_factory,
             handlers=combined,
             evaluator=self.evaluator,
         )
@@ -313,12 +283,20 @@ class Domain:
         return Domain(empty=True, store=self.store)
 
 
+@dataclasses.dataclass
+class HookEvent(events.Event):
+    hook: str
+
+    @property
+    def name(self) -> str:
+        return self.hook
+
+
 class WorldCtx(context.Ctx):
     def __init__(
         self,
         session: Optional[Session] = None,
         person: Optional[entity.Entity] = None,
-        context_factory=None,
         **kwargs
     ):
         super().__init__()
@@ -330,8 +308,7 @@ class WorldCtx(context.Ctx):
         self.world = session.world
         self.registrar = session.registrar
         self.bus = session.bus
-        self.context_factory = context_factory
-        self.scope = behavior.Scope(world=world, person=person, **kwargs)
+        self.scope = behavior.Scope(world=world, person=person, **kwargs)  # TODO ?
         assert isinstance(self.world, world.World)
 
     def __enter__(self):
@@ -346,18 +323,17 @@ class WorldCtx(context.Ctx):
         self.scope = self.scope.extend(**kwargs)
         return self
 
-    def entities(self) -> List[entity.Entity]:
-        def get_entities_inside(array):
-            return flatten([get_entities(e) for e in array])
-
-        def get_entities(thing):
-            if isinstance(thing, entity.Entity):
-                return [thing]
-            if isinstance(thing, list):
-                return get_entities_inside(thing)
-            return []
-
-        return get_entities_inside(self.scope.values())
+    @property
+    def entities(self) -> tools.EntitySet:
+        assert self.world
+        if self.person:
+            return tools.get_contributing_entities(self.world, self.person)
+        # TODO Eliminate scope all together and just add/remove from EntitySet
+        entitySet = tools.EntitySet()
+        for a in self.scope.values():
+            if isinstance(a, entity.Entity):
+                entitySet.add(tools.Relation.OTHER, a)
+        return entitySet
 
     def register(self, entity: entity.Entity) -> entity.Entity:
         return self.session.register(entity)
@@ -366,39 +342,26 @@ class WorldCtx(context.Ctx):
         entity.cleanup(destroyed, world=self.world)
         return self.session.unregister(destroyed)
 
-    async def publish(self, *args, **kwargs):
+    async def standard(self, klass, *args, **kwargs):
+        assert self.world
+        if self.person:
+            assert self.person
+            area = self.world.find_person_area(self.person)
+            a = (self.person, area, []) + args
+            await self.publish(klass(*a, **kwargs))
+
+    async def publish(self, *args: events.Event, **kwargs):
+        assert self.world
+        dynamic_behavior = dynamic.Behavior(self.world, self.entities)
         for arg in args:
+            log.info("publish %s entities=%s", arg, self.entities)
             await self.bus.publish(arg)
+            await dynamic_behavior.notify(saying.NotifyAll(arg.name, arg, {}))
 
     async def hook(self, name: str) -> None:
-        found = {}
-        entities = self.entities()
-        log.info("hook:%s %s" % (name, entities))
-        for entity in entities:
-            behaviors = entity.make(behavior.Behaviors).get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info(
-                    "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
-                )
-            found[entity] = behaviors
+        assert self.world
 
-        scope = self.scope
-        for entity, behaviors in found.items():
-
-            def create_context():
-                return self.context_factory(creator=entity)
-
-            for b in behaviors:
-                prepared = self.se.prepare(scope, create_context)
-                thunk = behavior.GenericThunk
-                if "person" in scope.map and scope.map["person"]:
-                    thunk = behavior.PersonThunk
-                actions = self.se.execute(thunk, prepared, b)
-                if actions:
-                    for action in actions:
-                        await self.session.perform(action, person=self.person)
-                        log.info("performing: %s", action)
-                entity.touch()
+        await self.publish(HookEvent(name))
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs

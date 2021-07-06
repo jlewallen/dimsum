@@ -1,4 +1,4 @@
-from typing import Callable, List, Dict, Optional, Any, Union, Sequence
+from typing import Callable, List, Dict, Optional, Any, Union, Sequence, Type
 
 import abc
 import logging
@@ -86,17 +86,15 @@ class SimplifiedAction(game.Action):
         area: entity.Entity,
         person: entity.Entity,
         dynamic_behavior: Optional["Behavior"] = None,
-        **kwargs
+        **kwargs,
     ):
         assert dynamic_behavior
         try:
             say = saying.Say()
             args = await self._args(world, person)
-            reply = self.registered.handler(self.entity, *args, say=say)
+            reply = await self.registered.handler(self.entity, *args, say=say)
             if reply:
                 log.debug("say: %s", say)
-                for notify in say.notified:
-                    await dynamic_behavior.notify(notify, say=say)
                 await say.publish(area, person)
                 return self._transform_reply(reply)
             return game.Failure("no reply from handler?")
@@ -133,13 +131,15 @@ class Simplified(EntityBehavior):
 
         return wrap
 
-    def received(self, hook: str, condition=None):
+    def received(self, hook: Union[type, str], condition=None):
         def wrap(fn):
-            log.info("hook: '%s' %s", hook, fn)
+            if isinstance(hook, str):
+                h = hook
+            else:
+                h = hook.__name__
+            log.info("hook: '%s' %s", h, fn)
             self.receives.append(
-                Receive(
-                    hook, self.thunk_factory(fn), condition=condition or Condition()
-                )
+                Receive(h, self.thunk_factory(fn), condition=condition or Condition())
             )
             return fn
 
@@ -176,8 +176,7 @@ class Simplified(EntityBehavior):
     async def notify(self, notify: saying.Notify, **kwargs):
         for receive in self.receives:
             if notify.applies(receive.hook):
-                log.info("notifying %s notify=%s kwargs=%s", receive, notify, kwargs)
-                notify.invoke(receive.handler, self.entity, **kwargs)
+                await notify.invoke(receive.handler, self.entity, **kwargs)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -208,6 +207,9 @@ class Behavior:
             Held=Held,
             Ground=Ground,
             Scope=entity.Scope,
+            Entity=entity.Entity,
+            dataclass=dataclasses.dataclass,
+            Event=events.StandardEvent,
             fail=game.Failure,
             ok=game.Success,
         )
@@ -223,25 +225,39 @@ class Behavior:
 
     def _compile_behavior(self, found: EntityAndBehavior) -> EntityBehavior:
         def thunk_factory(fn):
-            # TODO Generate a stub that takes a global __call and
-            # performs the function call using just the globals.
-            # eval(fn.__code__, declarations)
-            def thunk(*args, **kwargs):
-                log.debug("thunking: %s %s %s", fn, args, kwargs)
-                try:
-                    return eval(
-                        """thunk[0](*thunk[1], **thunk[2])""",
+            async def thunk(*args, **kwargs):
+                async def aexec():
+                    lokals = dict(thunk=(fn, args, kwargs))
+                    exec(
+                        """
+# This seems to be an easy clever trick for capturing the global
+# during the eval into the method?
+async def __ex(t=thunk):
+    return await t[0](*t[1], **t[2])""",
                         self.globals,
-                        dict(thunk=(fn, args, kwargs)),
+                        lokals,
                     )
-                except:
-                    log.exception("exception", exc_info=True)
+                    try:
+                        return await lokals["__ex"]()  # type:ignore
+                    except:
+                        log.exception("exception", exc_info=True)
+                        log.error("globals: %s", self.globals.keys())
+                        log.error("locals: %s", lokals)
+                        log.error("args: %s", args)
+                        log.error("kwargs: %s", kwargs)
+
+                log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
+                self.globals.update(dict(ctx=context.get()))
+                return await aexec()
 
             return thunk
 
         simplified = Simplified(found.entity, thunk_factory)
         self.globals.update(
-            dict(language=simplified.language, received=simplified.received)
+            dict(
+                language=simplified.language,
+                received=simplified.received,
+            )
         )
         log.info("compiling %s", found)
         try:
@@ -270,11 +286,10 @@ class Behavior:
         return list(self._compiled)
 
     async def notify(self, notify: saying.Notify, say=None, **kwargs):
+        log.info("notify=%s kwargs=%s n=%d", notify, kwargs, len(self._compiled))
         say = saying.Say()
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say, **kwargs)
-        for notify in say.notified:
-            await self.notify(notify)
         # await say.publish(area, person)
 
 

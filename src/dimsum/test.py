@@ -26,7 +26,6 @@ import model.scopes as scopes
 import bus
 import grammars
 import serializing
-import luaproxy
 import pytest
 
 import plugins.default.actions as actions

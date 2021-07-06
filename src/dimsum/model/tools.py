@@ -39,14 +39,15 @@ class EntitySet:
 
 def get_contributing_entities(world: World, player: Entity) -> EntitySet:
     entities = EntitySet()
-    area = world.find_person_area(player)
-    with area.make_and_discard(carryable.Containing) as ground:
-        entities.add_all(Relation.GROUND, ground.holding)
+    entities.add(Relation.OTHER, world)
+    entities.add(Relation.OTHER, player)
+    area = world.find_entity_area(player)
+    if area:
+        with area.make_and_discard(carryable.Containing) as ground:
+            entities.add_all(Relation.GROUND, ground.holding)
+        entities.add(Relation.OTHER, area)
     with player.make_and_discard(carryable.Containing) as pockets:
         entities.add_all(Relation.HOLDING, pockets.holding)
-    entities.add(Relation.OTHER, world)
-    entities.add(Relation.OTHER, area)
-    entities.add(Relation.OTHER, player)
     return entities
 
 
