@@ -10,6 +10,7 @@ import ast
 import model.properties as properties
 import model.entity as entity
 
+DefaultKey = "b:default"
 log = logging.getLogger("dimsum.scopes")
 
 
@@ -31,33 +32,6 @@ class Behavior:
     def done(self, messages: List[str]):
         self.logs.extend(messages)
         self.logs = self.logs[-20:]
-
-
-class ConditionalBehavior(Behavior):
-    def __init__(self, **kwargs):
-        super().__init__()
-
-    @abc.abstractmethod
-    def enabled(self, **kwargs) -> bool:
-        raise NotImplementedError
-
-
-class RegisteredBehavior:
-    def __init__(self, name: str, behavior: ConditionalBehavior):
-        super().__init__()
-        self.name = name
-        self.behavior = behavior
-
-
-registered_behaviors: List[RegisteredBehavior] = []
-
-
-def conditional(name):
-    def wrap(klass):
-        log.info("registered behavior: %s %s", name, klass)
-        registered_behaviors.append(RegisteredBehavior(name, klass()))
-
-    return wrap
 
 
 class BehaviorMap(properties.Map):
@@ -95,11 +69,14 @@ class Behaviors(entity.Scope):
         self.behaviors = behaviors if behaviors else BehaviorMap()
 
     def get_default(self) -> Optional[Behavior]:
-        return self.behaviors.get("b:default")
+        return self.behaviors.get(DefaultKey)
 
     def add_behavior(self, world: entity.Entity, **kwargs):
+        # TODO This should be smarter. Only necessary for tick
+        # receivers currently. Maye we just make tick special and run
+        # over everything? This has elegance.
         if world:
             with world.make(BehaviorCollection) as world_behaviors:
                 world_behaviors.entities.append(self.ourselves)
         self.ourselves.touch()
-        return self.behaviors.add("b:default", **kwargs)
+        return self.behaviors.add(DefaultKey, **kwargs)
