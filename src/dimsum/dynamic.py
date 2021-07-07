@@ -192,7 +192,8 @@ class NoopEntityBehavior(EntityBehavior):
 @dataclasses.dataclass(frozen=True)
 class CompiledEntityBehavior(EntityBehavior):
     simplified: Simplified
-    assigned: Optional[grammars.CommandEvaluator] = None
+    assigned: Optional[grammars.CommandEvaluator]
+    frame: Dict[str, Any]
 
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         action = await self.simplified.evaluate(command, **kwargs)
@@ -209,31 +210,95 @@ class CompiledEntityBehavior(EntityBehavior):
         return await self.simplified.notify(notify, **kwargs)
 
 
+def _get_default_globals():
+    # TODO Can we pass an exploded module here?
+    event_classes = {k.__name__: k for k in events.get_all()}
+    return dict(
+        log=log,
+        Held=Held,
+        Ground=Ground,
+        Scope=entity.Scope,
+        properties=properties,
+        Entity=entity.Entity,
+        Carryable=carryable.Carryable,
+        dataclass=dataclasses.dataclass,
+        Event=events.StandardEvent,
+        fail=game.Failure,
+        tools=tools,
+        ok=game.Success,
+        **event_classes,
+    )
+
+
+def _compile(found: EntityAndBehavior) -> EntityBehavior:
+    frame = _get_default_globals()
+
+    def thunk_factory(fn):
+        async def thunk(*args, **kwargs):
+            async def aexec():
+                lokals = dict(thunk=(fn, args, kwargs))
+                exec(
+                    """
+# This seems to be an easy clever trick for capturing the global
+# during the eval into the method?
+async def __ex(t=thunk):
+    return await t[0](*t[1], **t[2])""",
+                    frame,
+                    lokals,
+                )
+                try:
+                    return await lokals["__ex"]()  # type:ignore
+                except:
+                    log.exception("exception", exc_info=True)
+                    log.error("globals: %s", frame.keys())
+                    log.error("locals: %s", lokals)
+                    log.error("args: %s", args)
+                    log.error("kwargs: %s", kwargs)
+
+            log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
+            log.debug("thunking: %s", inspect.signature(fn))
+            frame.update(dict(ctx=context.get()))
+            return await aexec()
+
+        return thunk
+
+    simplified = Simplified(found.entity, thunk_factory)
+    frame.update(
+        dict(
+            language=simplified.language,
+            received=simplified.received,
+        )
+    )
+
+    log.info("compiling %s", found)
+    try:
+        tree = ast.parse(found.behavior.python)
+        # TODO improve filename value here, we have entity.
+        compiled = compile(tree, filename="<ast>", mode="exec")
+
+        # We squash any declarations left in locals into our
+        # globals so they're available in future calls via a
+        # rebinding in our thunk factory above. I'm pretty sure
+        # this is the only way to get this to behave.
+        declarations: Dict[str, Any] = {}
+        eval(compiled, frame, declarations)
+        evaluator: Optional[grammars.CommandEvaluator] = None
+        EvaluatorsName = "evaluators"
+        if EvaluatorsName in declarations:
+            evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
+            del declarations[EvaluatorsName]
+        frame.update(**declarations)
+        return CompiledEntityBehavior(simplified, evaluator, declarations)
+    except:
+        log.exception("dynamic:error", exc_info=True)
+        return NoopEntityBehavior()
+
+
 class Behavior:
     def __init__(self, world: world.World, entities: tools.EntitySet):
         self.world = world
         self.entities = entities
-        self.globals: Dict[str, Any] = self._get_default_globals()
-        self.locals: Dict[str, Any] = {}
-
-    def _get_default_globals(self):
-        # TODO Can we pass an exploded module here?
-        event_classes = {k.__name__: k for k in events.get_all()}
-        return dict(
-            log=log,
-            Held=Held,
-            Ground=Ground,
-            Scope=entity.Scope,
-            properties=properties,
-            Entity=entity.Entity,
-            Carryable=carryable.Carryable,
-            dataclass=dataclasses.dataclass,
-            Event=events.StandardEvent,
-            fail=game.Failure,
-            tools=tools,
-            ok=game.Success,
-            **event_classes,
-        )
+        self.globals: Dict[str, Any] = {}
 
     def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
         with e.make_and_discard(behavior.Behaviors) as behave:
@@ -245,65 +310,7 @@ class Behavior:
         return flatten([self._get_behaviors(e) for e in self.entities.all()])
 
     def _compile_behavior(self, found: EntityAndBehavior) -> EntityBehavior:
-        def thunk_factory(fn):
-            async def thunk(*args, **kwargs):
-                async def aexec():
-                    lokals = dict(thunk=(fn, args, kwargs))
-                    exec(
-                        """
-# This seems to be an easy clever trick for capturing the global
-# during the eval into the method?
-async def __ex(t=thunk):
-    return await t[0](*t[1], **t[2])""",
-                        self.globals,
-                        lokals,
-                    )
-                    try:
-                        return await lokals["__ex"]()  # type:ignore
-                    except:
-                        log.exception("exception", exc_info=True)
-                        log.error("globals: %s", self.globals.keys())
-                        log.error("locals: %s", lokals)
-                        log.error("args: %s", args)
-                        log.error("kwargs: %s", kwargs)
-
-                log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
-                log.debug("thunking: %s", inspect.signature(fn))
-                self.globals.update(dict(ctx=context.get()))
-                return await aexec()
-
-            return thunk
-
-        simplified = Simplified(found.entity, thunk_factory)
-        self.globals.update(
-            dict(
-                language=simplified.language,
-                received=simplified.received,
-            )
-        )
-
-        log.info("compiling %s", found)
-        try:
-            tree = ast.parse(found.behavior.python)
-            # TODO improve filename value here, we have entity.
-            compiled = compile(tree, filename="<ast>", mode="exec")
-
-            # We squash any declarations left in locals into our
-            # globals so they're available in future calls via a
-            # rebinding in our thunk factory above. I'm pretty sure
-            # this is the only way to get this to behave.
-            declarations: Dict[str, Any] = {}
-            eval(compiled, self.globals, declarations)
-            evaluator: Optional[grammars.CommandEvaluator] = None
-            EvaluatorsName = "evaluators"
-            if EvaluatorsName in declarations:
-                evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
-                del declarations[EvaluatorsName]
-            self.globals.update(**declarations)
-            return CompiledEntityBehavior(simplified, evaluator)
-        except:
-            log.exception("dynamic:error", exc_info=True)
-            return NoopEntityBehavior()
+        return _compile(found)  # TODO We should be using entity.key here
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
@@ -318,7 +325,6 @@ async def __ex(t=thunk):
         say = saying.Say()
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say)
-        # await say.publish(area, person) # TODO
 
 
 def flatten(l):
