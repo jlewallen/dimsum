@@ -23,13 +23,13 @@ async def test_multiple_simple_verbs(caplog):
         "Hammer",
         """
 @language('start: "wiggle"')
-async def wiggle(entity, person, say):
-    log.info("wiggle: %s", entity)
+async def wiggle(this, person, say):
+    log.info("wiggle: %s", this)
     return "hey there!"
 
 @language('start: "burp"')
-async def burp(entity, person, say):
-    log.info("burp: %s", entity)
+async def burp(this, person, say):
+    log.info("burp: %s", this)
     return "hey there!"
 """,
     )
@@ -49,8 +49,8 @@ async def test_dynamic_applies_only_when_held(caplog):
         "Hammer",
         """
 @language('start: "wiggle"', condition=Held())
-async def wiggle(entity, person, say):
-    log.info("wiggle: %s", entity)
+async def wiggle(this, person, say):
+    log.info("wiggle: %s", this)
     return "hey there!"
 """,
     )
@@ -70,8 +70,8 @@ async def test_dynamic_say_nearby(caplog):
         "Keys",
         """
 @language('start: "jingle"', condition=Held())
-async def jingle(entity, person, say):
-    log.info("jingle: %s", entity)
+async def jingle(this, person, say):
+    log.info("jingle: %s", this)
     say.nearby("you hear kings jingling")
     return "hey there!"
 """,
@@ -279,8 +279,14 @@ evaluators = []
     await tw.failure("hold Nail")
 
 
+@pytest.fixture(scope="function")
+def silence_dynamic_errors(caplog):
+    caplog.set_level(logging.CRITICAL, "dimsum.dynamic.errors")
+    yield
+
+
 @pytest.mark.asyncio
-async def test_exception_in_parse(caplog):
+async def test_exception_in_parse(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -306,7 +312,7 @@ asdf;
 
 
 @pytest.mark.asyncio
-async def test_exception_in_compile(caplog):
+async def test_exception_in_compile(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -322,7 +328,7 @@ og.info("hello")
 
 
 @pytest.mark.asyncio
-async def test_exception_in_event_handler(caplog):
+async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -353,7 +359,7 @@ def tick(this, ev, say=None):
 
 
 @pytest.mark.asyncio
-async def test_exception_in_language_handler(caplog):
+async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 

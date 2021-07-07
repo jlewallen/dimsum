@@ -39,7 +39,7 @@ async def dropped(this, ev, say):
         if bank.gold < 2:
             bank.gold += 1
             ev.living.touch()
-        log.info("gold=%d kwargs=%s", bank.gold, kwargs)
+        log.info("gold=%d", bank.gold)
 """,
             )
 
