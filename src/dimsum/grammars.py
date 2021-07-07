@@ -78,6 +78,7 @@ def grammar():
     def wrap(klass):
         log.info("registered: %s", klass)
         grammars.append(klass())
+        return klass
 
     return wrap
 
