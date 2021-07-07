@@ -111,6 +111,16 @@ class ItemsDropped(StandardEvent):
     items: List[entity.Entity]
 
 
+@dataclasses.dataclass(frozen=True)
+class ItemsWorn(StandardEvent):
+    items: List[entity.Entity]
+
+
+@dataclasses.dataclass(frozen=True)
+class ItemsUnworn(StandardEvent):
+    items: List[entity.Entity]
+
+
 class Wear(PersonAction):
     def __init__(self, item: Optional[things.ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
@@ -140,8 +150,14 @@ class Wear(PersonAction):
                 if wearing.wear(item):
                     contain.drop(item)
 
-        # TODO Publish
-        await ctx.extend(wear=[item]).hook("wear:after")
+        await ctx.publish(
+            ItemsWorn(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=[item],
+            )
+        )
         return Success("you wore %s" % (item))
 
 
@@ -173,7 +189,14 @@ class Remove(PersonAction):
                 with person.make(carryable.Containing) as contain:
                     contain.hold(item)
 
-        await ctx.extend(remove=[item]).hook("remove:after")
+        await ctx.publish(
+            ItemsUnworn(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=[item],
+            )
+        )
         return Success("you removed %s" % (item))
 
 
@@ -418,7 +441,6 @@ class Drop(PersonAction):
                         items=dropped,
                     )
                 )
-                await ctx.extend(dropped=dropped).hook("drop:after")
                 return Success("you dropped %s" % (p.join(dropped),))
 
             return Failure(failure)

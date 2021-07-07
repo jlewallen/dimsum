@@ -75,29 +75,27 @@ class LargeMapleTree(Factory):
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:drop-leaf:tick",
-                lua="""
-function(s, world, area, item)
-    return area.make_here({
-        kind = item.kind("leaf-1"),
-        name = "Maple Leaf",
-        quantity = 1,
-        color = "red",
-    })
-end
+                python="""
+#function(s, world, area, item)
+#    return area.make_here({
+#        kind = item.kind("leaf-1"),
+#        name = "Maple Leaf",
+#        quantity = 1,
+#        color = "red",
+#    })
+#end
 """,
             )
             behave.add_behavior(
                 world,
-                "b:drop-branch:tick",
-                lua="""
-function(s, world, area, item)
-    return area.make_here({
-        kind = item.kind("branch-1"),
-        name = "Maple Branch",
-        quantity = 1,
-    })
-end
+                python="""
+#function(s, world, area, item)
+#    return area.make_here({
+#        kind = item.kind("branch-1"),
+#        name = "Maple Branch",
+#        quantity = 1,
+#    })
+#end
 """,
             )
         return item
@@ -113,29 +111,27 @@ class LargeOakTree(Factory):
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:drop-leaf:tick",
-                lua="""
-function(s, world, area, item)
-    return area.make_here({
-        kind = item.kind("leaf-1"),
-        name = "Oak Leaf",
-        quantity = 1,
-        color = "red",
-    })
-end
+                python="""
+#function(s, world, area, item)
+#    return area.make_here({
+#        kind = item.kind("leaf-1"),
+#        name = "Oak Leaf",
+#        quantity = 1,
+#        color = "red",
+#    })
+#end
 """,
             )
             behave.add_behavior(
                 world,
-                "b:drop-branch:tick",
-                lua="""
-function(s, world, area, item)
-    return area.make_here({
-        kind = item.kind("branch-1"),
-        name = "Oak Branch",
-        quantity = 1,
-    })
-end
+                python="""
+#function(s, world, area, item)
+#    return area.make_here({
+#        kind = item.kind("branch-1"),
+#        name = "Oak Branch",
+#        quantity = 1,
+#    })
+#end
 """,
             )
         return item
@@ -169,11 +165,7 @@ class MysteriousBox(Factory):
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:mystery:shake",
-                lua="""
-function(s, world, area, item)
-end
-""",
+                python="#",
             )
         return item
 
@@ -191,23 +183,22 @@ class LargeSteepCliff(Factory):
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:make:stone",
-                lua="""
-function(s, world, area, item)
-    if math.random() > 0.7 then
-        return area.make_here({
-            kind = item.kind("stone-1"),
-            name = "Heavy Stone",
-            quantity = 1,
-        })
-    end
-
-    return area.make({
-        kind = item.kind("pebble-1"),
-        name = "Pebble",
-        quantity = 3,
-    })
-end
+                python="""
+#function(s, world, area, item)
+#    if math.random() > 0.7 then
+#        return area.make_here({
+#            kind = item.kind("stone-1"),
+#            name = "Heavy Stone",
+#            quantity = 1,
+#        })
+#    end
+#
+#    return area.make({
+#        kind = item.kind("pebble-1"),
+#        name = "Pebble",
+#        quantity = 3,
+#    })
+#end
 """,
             )
         return item
@@ -225,11 +216,7 @@ class Guitar(Factory):
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:music:play",
-                lua="""
-function(s, world, area, item)
-end
-""",
+                python="",
             )
         return item
 

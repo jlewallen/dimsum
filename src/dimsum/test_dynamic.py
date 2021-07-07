@@ -37,7 +37,7 @@ async def add_behaviored_thing(tw: test.TestWorld, name: str, python: str):
         )
 
         with item.make(behavior.Behaviors) as behave:
-            behave.add_behavior(world, "b:default", python=python)
+            behave.add_behavior(world, python=python)
 
         await session.save()
 
@@ -56,12 +56,12 @@ async def test_multiple_simple_verbs(caplog):
         "Hammer",
         """
 @language('start: "wiggle"')
-async def wiggle(entity, say=None):
+async def wiggle(entity, person=None, say=None):
     log.info("wiggle: %s", entity)
     return "hey there!"
 
 @language('start: "burp"')
-async def burp(entity, say=None):
+async def burp(entity, person=None, say=None):
     log.info("burp: %s", entity)
     return "hey there!"
 """,
@@ -82,7 +82,7 @@ async def test_dynamic_applies_only_when_held(caplog):
         "Hammer",
         """
 @language('start: "wiggle"', condition=Held())
-async def wiggle(entity, say=None):
+async def wiggle(entity, person=None, say=None):
     log.info("wiggle: %s", entity)
     return "hey there!"
 """,
@@ -103,7 +103,7 @@ async def test_dynamic_say_nearby(caplog):
         "Keys",
         """
 @language('start: "jingle"', condition=Held())
-async def jingle(entity, say=None):
+async def jingle(entity, person=None, say=None):
     log.info("jingle: %s", entity)
     say.nearby("you hear kings jingling")
     return "hey there!"
@@ -144,7 +144,7 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(entity, smashing, say=None):
+async def smash(entity, smashing, person=None, say=None):
     if smashing is None:
         return fail("smash what now?")
     log.info("smash: %s", entity)
@@ -198,7 +198,7 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(entity, smashing, say=None):
+async def smash(entity, smashing, person=None, say=None):
     if smashing is None:
         return fail("smash what now?")
     log.info("smash: %s", entity)
@@ -271,7 +271,7 @@ class Rusting(Scope):
     def increase(self):
         self.rust += 1
 
-@received("drop:after")
+@received("ItemsDropped")
 async def dropped(entity, ev, say=None):
     with entity.make(Rusting) as rust:
         rust.increase()

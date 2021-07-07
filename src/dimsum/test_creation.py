@@ -89,12 +89,7 @@ async def test_obliterate_thing_with_behavior():
         with hammer.make(behavior.Behaviors) as behave:
             behave.add_behavior(
                 world,
-                "b:test:drop:after",
-                lua="""
-function(s, world, area, player)
-    debug("ok")
-end
-""",
+                python="#",
             )
 
         await session.save()

@@ -466,6 +466,8 @@ class Registrar:
             self.numbered[assigned] = entity
             self.key_to_number[entity.key] = assigned
 
+        return entity
+
     def contains(self, key) -> bool:
         return key in self.entities
 

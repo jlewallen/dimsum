@@ -10,13 +10,19 @@ from model.entity import Entity
 import model.game as game
 
 import model.scopes.carryable as carryable
+import model.scopes.apparel as apparel
 import model.scopes.occupyable as occupyable
+import model.scopes.mechanics as mechanics
+
+
+log = logging.getLogger("dimsum.tools")
 
 
 class Relation(enum.Enum):
     WORLD = "world"
     SELF = "self"
     HOLDING = "holding"
+    WEARING = "wearing"
     GROUND = "ground"
     AREA = "area"
     OTHER = "other"
@@ -51,6 +57,8 @@ def get_contributing_entities(world: World, player: Entity) -> EntitySet:
         entities.add(Relation.AREA, area)
     with player.make_and_discard(carryable.Containing) as pockets:
         entities.add_all(Relation.HOLDING, pockets.holding)
+    with player.make_and_discard(apparel.Apparel) as clothes:
+        entities.add_all(Relation.WEARING, clothes.wearing)
     return entities
 
 
@@ -64,6 +72,31 @@ def default_heard_for(area: Optional[Entity] = None) -> List[Entity]:
         with area.make_and_discard(occupyable.Occupyable) as here:
             return here.occupied
     return []
+
+
+def hide(e: Entity):
+    with e.make(mechanics.Visibility) as vis:
+        vis.make_invisible()
+
+
+def show(e: Entity):
+    with e.make(mechanics.Visibility) as vis:
+        vis.make_visible()
+
+
+def hold(c: Entity, e: Entity):
+    with c.make(carryable.Containing) as contains:
+        contains.hold(e)
+
+
+def area_of(c: Entity) -> Entity:
+    with c.make_and_discard(carryable.Location) as location:
+        if location.container:
+            return location.container
+    with c.make_and_discard(occupyable.Occupying) as occupying:
+        if occupying.area:
+            return occupying.area
+    raise Exception()
 
 
 def flatten(l):

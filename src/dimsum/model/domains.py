@@ -328,7 +328,13 @@ class WorldCtx(context.Ctx):
         return False
 
     def extend(self, **kwargs) -> "WorldCtx":
-        log.debug("%s", kwargs)
+        for key, l in kwargs.items():
+            log.info("extend '%s' %s", key, l)
+            if isinstance(l, list):
+                for e in l:
+                    self.entities.add(tools.Relation.OTHER, e)
+            else:
+                self.entities.add(tools.Relation.OTHER, l)
         return self
 
     def register(self, entity: entity.Entity) -> entity.Entity:
@@ -365,7 +371,7 @@ class WorldCtx(context.Ctx):
         initialize = initialize if initialize else {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
-        return scopes.item(initialize=initialize, **kwargs)
+        return self.register(scopes.item(initialize=initialize, **kwargs))
 
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs

@@ -10,13 +10,16 @@ import json
 import lark
 
 import model.game as game
+import model.properties as properties
 import model.reply as reply
 import model.world as world
 import model.entity as entity
 import model.tools as tools
 import model.events as events
 import model.things as things
+
 import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
 
 import context
 import grammars
@@ -92,7 +95,9 @@ class SimplifiedAction(game.Action):
         try:
             say = saying.Say()
             args = await self._args(world, person)
-            reply = await self.registered.handler(self.entity, *args, say=say)
+            reply = await self.registered.handler(
+                self.entity, *args, person=person, say=say
+            )
             if reply:
                 log.debug("say: %s", say)
                 await say.publish(area, person)
@@ -201,16 +206,20 @@ class Behavior:
         self.locals: Dict[str, Any] = {}
 
     def _get_default_globals(self):
+        # TODO Can we pass an exploded module here?
         return dict(
             log=log,
             world=self.world,
             Held=Held,
             Ground=Ground,
             Scope=entity.Scope,
+            properties=properties,
             Entity=entity.Entity,
+            Carryable=carryable.Carryable,
             dataclass=dataclasses.dataclass,
             Event=events.StandardEvent,
             fail=game.Failure,
+            tools=tools,
             ok=game.Success,
         )
 

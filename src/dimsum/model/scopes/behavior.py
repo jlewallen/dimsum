@@ -95,9 +95,9 @@ class Behaviors(entity.Scope):
     def get_default(self) -> Optional[Behavior]:
         return self.behaviors.get("b:default")
 
-    def add_behavior(self, world: entity.Entity, name, **kwargs):
+    def add_behavior(self, world: entity.Entity, **kwargs):
         if world:
             with world.make(BehaviorCollection) as world_behaviors:
                 world_behaviors.entities.append(self.ourselves)
         self.ourselves.touch()
-        return self.behaviors.add(name, **kwargs)
+        return self.behaviors.add("b:default", **kwargs)
