@@ -1,13 +1,12 @@
-import pytest
 import logging
 
-import model.properties as properties
 import model.domains as domains
-import model.world as world
+import model.properties as properties
 import model.scopes as scopes
-
-import storage
+import model.world as world
+import pytest
 import serializing
+import storage
 
 log = logging.getLogger("dimsum")
 

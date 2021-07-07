@@ -1,12 +1,9 @@
-from typing import List, Type
-from lark import Lark
-from lark import exceptions
-
 import logging
-import grammars
-import transformers
+from typing import Type
 
+import grammars
 import plugins.default.transformer as transformer
+import transformers
 
 log = logging.getLogger("dimsum")
 

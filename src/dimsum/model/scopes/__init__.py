@@ -1,17 +1,14 @@
-from typing import Type, Optional, Callable
-
 import logging
+from typing import Callable, Optional, Type
 
 import model.entity as entity
-import model.world as world
-
-import model.scopes.ownership as ownership
+import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
 import model.scopes.health as health
 import model.scopes.mechanics as mechanics
-import model.scopes.occupyable as occupyable
-import model.scopes.carryable as carryable
 import model.scopes.movement as movement
-import model.scopes.behavior as behavior
+import model.scopes.occupyable as occupyable
+import model.scopes.ownership as ownership
 
 log = logging.getLogger("dimsum.scopes")
 

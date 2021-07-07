@@ -1,16 +1,12 @@
-from typing import Dict, Any, TextIO, Optional, List
-
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
-
-import logging
 import dataclasses
-import sqlite3
 import json
+import logging
+import sqlite3
+from typing import Any, Dict, List, Optional, TextIO
 
+from gql import Client, gql
+from gql.transport.aiohttp import AIOHTTPTransport
 import model.entity as entity
-
-import storage
 
 log = logging.getLogger("dimsum.storage")
 

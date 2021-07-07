@@ -1,12 +1,8 @@
-from typing import List, Type
-
-import logging
-import wrapt
-import pytest
 import inspect
+import logging
 
-import model.entity as entity
-import model.scopes.carryable as carryable
+import pytest
+import wrapt
 
 log = logging.getLogger("decoration")
 

@@ -1,6 +1,6 @@
-import plugins.default
-import plugins.chatting
-import plugins.digging
-import plugins.editing
-import plugins.creation
-import plugins.fallback
+import plugins.chatting  # noqa
+import plugins.creation  # noqa
+import plugins.default  # noqa
+import plugins.digging  # noqa
+import plugins.editing  # noqa
+import plugins.fallback  # noqa

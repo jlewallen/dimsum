@@ -1,14 +1,11 @@
-import pytest
-import freezegun
 import logging
+
 import ariadne
-import base64
-
-import routing
-
 import brokers.schema as schema_factory
 from brokers.schema import AriadneContext
-from graphql import GraphQLError
+import freezegun
+import pytest
+import routing
 
 log = logging.getLogger("dimsum")
 

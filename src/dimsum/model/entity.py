@@ -1,20 +1,18 @@
-from typing import Optional, Type, List, Union, Any, Dict, Sequence, Callable, cast
-
-import abc
-import logging
-import dataclasses
-import stringcase
-import time
-import json
 import copy
-import wrapt
-import inflect
-import shortuuid
-import jsondiff
+import dataclasses
+import json
+import logging
+import time
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
-import model.properties as properties
+import inflect
+import jsondiff
 import model.crypto as crypto
 import model.kinds as kinds
+import model.properties as properties
+import shortuuid
+import stringcase
+import wrapt
 
 log = logging.getLogger("dimsum.model.entity")
 p = inflect.engine()

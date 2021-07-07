@@ -1,11 +1,7 @@
-import pytest
-
-import model.game as game
-import model.properties as properties
+import test
 
 import model.scopes.users as users
-
-import test
+import pytest
 
 
 @pytest.mark.asyncio

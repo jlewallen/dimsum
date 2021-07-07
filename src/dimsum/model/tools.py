@@ -1,17 +1,13 @@
-from typing import List, Optional, Dict, Sequence
-
 import dataclasses
-import logging
 import enum
+import logging
+from typing import Dict, List, Optional, Sequence
 
 from model.entity import Entity
-
-import model.game as game
-
-import model.scopes.carryable as carryable
 import model.scopes.apparel as apparel
-import model.scopes.occupyable as occupyable
+import model.scopes.carryable as carryable
 import model.scopes.mechanics as mechanics
+import model.scopes.occupyable as occupyable
 
 
 log = logging.getLogger("dimsum.tools")

@@ -1,21 +1,13 @@
-from typing import Any, Optional, Dict, List, Sequence, cast, Type
-import time
 import logging
+from typing import Dict, List, Optional, Sequence, Type
+
 import inflect
-
-import bus
-import context
-
 import model.entity as entity
-import model.game as game
 import model.properties as properties
-import model.tools as tools
-
-import model.scopes.behavior as behavior
-import model.scopes.occupyable as occupyable
-import model.scopes.carryable as carryable
-import model.scopes.movement as movement
 import model.scopes as scopes
+import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
+import model.tools as tools
 
 Key = "world"
 log = logging.getLogger("dimsum.model")

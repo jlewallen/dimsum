@@ -1,17 +1,15 @@
-from typing import List, Tuple
 import logging
+from typing import Tuple
 
-import model.game as game
-import model.properties as properties
-import model.world as world
 import model.entity as entity
-
-import model.scopes.movement as movement
-import model.scopes.mechanics as mechanics
-import model.scopes.occupyable as occupyable
-import model.scopes.carryable as carryable
-import model.scopes.behavior as behavior
+import model.properties as properties
 import model.scopes as scopes
+import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
+import model.scopes.movement as movement
+import model.scopes.occupyable as occupyable
+import model.world as world
 
 log = logging.getLogger("dimsum.model")
 

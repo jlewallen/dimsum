@@ -1,20 +1,17 @@
 #!env/bin/python3
 
-import sys
+import json
 import logging
 import logging.config
-import asyncio
-import asyncclick as click
-import json
-import os
 
-import cli.repl
-import cli.graph
-import cli.export
-import cli.query
-import cli.server
+import asyncclick as click
 import cli.broker
 import cli.dummy
+import cli.export
+import cli.graph
+import cli.query
+import cli.repl
+import cli.server
 
 log = logging.getLogger("dimsum.cli")
 

@@ -1,9 +1,7 @@
-import pytest
 import logging
 
 import model.properties as properties
-
-import serializing
+import pytest
 
 log = logging.getLogger("dimsum")
 

@@ -1,14 +1,9 @@
-from typing import List, Sequence, Dict, Optional
-
-import abc
-import sys
-import logging
-import datetime
-import time
 import ast
+import logging
+from typing import List, Optional
 
-import model.properties as properties
 import model.entity as entity
+import model.properties as properties
 
 DefaultKey = "b:default"
 log = logging.getLogger("dimsum.scopes")

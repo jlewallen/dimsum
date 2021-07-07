@@ -1,14 +1,12 @@
-from typing import List, Dict, Optional
-
-import logging
 import dataclasses
+import json
+import logging
 import os
 import os.path
-import json
-import shortuuid
+from typing import Dict, List, Optional
 
 import model.domains as domains
-
+import shortuuid
 import storage
 
 log = logging.getLogger("dimsum.config")

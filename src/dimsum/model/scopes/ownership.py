@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import Optional
 
 import model.entity as entity
 

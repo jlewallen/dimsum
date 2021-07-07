@@ -1,16 +1,13 @@
-from typing import Any, List, Optional, cast
 import logging
+from typing import List, Optional
 
 import context
-
 import model.entity as entity
-import model.things as things
-import model.world as world
-
-import model.scopes.carryable as carryable
-import model.scopes.occupyable as occupyable
-import model.scopes.mechanics as mechanics
 import model.scopes.apparel as apparel
+import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
+import model.scopes.occupyable as occupyable
+import model.things as things
 
 log = logging.getLogger("dimsum.model")
 

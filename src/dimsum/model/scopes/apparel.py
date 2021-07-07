@@ -1,7 +1,5 @@
 from typing import List
 
-import abc
-
 import model.entity as entity
 
 

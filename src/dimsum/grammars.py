@@ -1,12 +1,10 @@
-from typing import List, Type, Optional, Sequence, Callable
-
 import abc
-import logging
-import functools
 import dataclasses
+import functools
+import logging
+from typing import Callable, List, Optional, Sequence, Type
 
-from lark import Lark, exceptions, Transformer, Tree
-
+from lark import exceptions, Lark, Transformer
 import model.game as game
 
 log = logging.getLogger("dimsum.grammars")

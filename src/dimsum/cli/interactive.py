@@ -1,18 +1,13 @@
-from typing import TextIO, Any, List, Optional
-
 import logging
-import sshd
+from typing import List, Optional, TextIO
 
 import model.domains as domains
-import model.scopes as scopes
-import model.properties as properties
-import model.world as world
 import model.library as library
+import model.properties as properties
+import model.scopes as scopes
 import model.visual as visual
-
-import config
 import plugins.default
-import everything
+import sshd
 
 log = logging.getLogger("dimsum.cli")
 

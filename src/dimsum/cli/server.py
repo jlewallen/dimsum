@@ -1,24 +1,18 @@
-from typing import TextIO, List
-
-import logging
-import asyncclick as click
 import asyncio
-import ipaddress
-
-import proxy
+import logging
+from typing import List
 
 import ariadne.asgi
-import uvicorn
-
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
-from starlette.middleware.cors import CORSMiddleware
-
+import asyncclick as click
+import cli.interactive as interactive
 import config
+import everything  # noqa
+import model.domains as domains
 import schema as schema_factory
 import sshd
-
-import model.domains as domains
-import cli.interactive as interactive
+from starlette.middleware.cors import CORSMiddleware
+import uvicorn
 
 log = logging.getLogger("dimsum.cli")
 

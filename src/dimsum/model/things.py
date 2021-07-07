@@ -1,13 +1,12 @@
-from typing import List, Optional, Any, Sequence, cast
-
-import logging
 import copy
-import inflect
+import logging
+from typing import List, Optional, Sequence
 
-import model.properties as properties
+import inflect
 import model.entity as entity
-import model.scopes.carryable as carryable
+import model.properties as properties
 import model.scopes as scopes
+import model.scopes.carryable as carryable
 
 log = logging.getLogger("dimsum.model")
 p = inflect.engine()

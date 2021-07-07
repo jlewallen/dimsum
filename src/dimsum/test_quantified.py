@@ -1,14 +1,10 @@
 import logging
-import pytest
-
-import model.game as game
-import model.reply as reply
-import model.things as things
+import test
 
 import model.scopes.carryable as carryable
 import model.scopes.mechanics as mechanics
-
-import test
+import model.things as things
+import pytest
 
 log = logging.getLogger("dimsum")
 

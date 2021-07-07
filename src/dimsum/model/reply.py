@@ -1,18 +1,15 @@
-from typing import List, Sequence, Any, Dict, Optional
-
-import logging
 import dataclasses
-import inflect
+import logging
+from typing import Any, Dict, List, Sequence
 
+import inflect
 import model.entity as entity
 import model.game as game
-import model.things as things
-import model.visual as visual
-
-import model.scopes.movement as movement
-import model.scopes.mechanics as mechanics
-import model.scopes.occupyable as occupyable
 import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
+import model.scopes.movement as movement
+import model.scopes.occupyable as occupyable
+import model.visual as visual
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.model")

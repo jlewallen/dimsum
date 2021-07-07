@@ -1,28 +1,11 @@
-from typing import Callable, List, Dict, Optional, Any
-
-import sys
 import logging
-import dataclasses
-import pytest
-
-import model.game as game
-import model.properties as properties
-import model.world as world
-import model.entity as entity
-import model.reply as reply
-
-import model.scopes.mechanics as mechanics
-import model.scopes.carryable as carryable
-import model.scopes.behavior as behavior
-import model.scopes as scopes
-
-import plugins.actions as actions
-
-import grammars
-import ast
-import dynamic
-
 import test
+from typing import Dict, List, Optional
+
+import model.properties as properties
+import model.scopes as scopes
+import model.scopes.behavior as behavior
+import pytest
 
 log = logging.getLogger("dimsum.tests")
 

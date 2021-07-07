@@ -1,14 +1,11 @@
+import dataclasses
+import logging
+import os.path
 from typing import Optional
 
-import logging
 import ariadne
-import os.path
-import dataclasses
-import base64
-import jwt
-import starlette.requests
-
 import routing
+import starlette.requests
 
 log = logging.getLogger("dimsum")
 

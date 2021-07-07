@@ -1,17 +1,9 @@
-import pytest
 import logging
-
-import model.game as game
-import model.entity as entity
-import model.things as things
-import model.world as world
-import model.reply as reply
-
-import model.scopes.carryable as carryable
-
-import serializing
-
 import test
+
+import model.reply as reply
+import model.scopes.carryable as carryable
+import pytest
 
 log = logging.getLogger("dimsum")
 

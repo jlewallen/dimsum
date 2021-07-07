@@ -1,10 +1,9 @@
-import asyncclick as click
 import logging
 import sys
 
-import config
-
+import asyncclick as click
 import cli.interactive as interactive
+import config
 
 log = logging.getLogger("dimsum.cli")
 

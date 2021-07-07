@@ -1,9 +1,8 @@
-from typing import Tuple, List, Optional
-
-import os
-import logging
-import hashlib
 import base64
+import hashlib
+import logging
+import os
+from typing import List, Optional
 
 import model.entity as entity
 

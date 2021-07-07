@@ -1,12 +1,10 @@
-from typing import Any, Optional, cast
-
-import logging
 import dataclasses
+import logging
+from typing import Optional
 
 import model.entity as entity
-import model.properties as properties
 import model.events as events
-
+import model.properties as properties
 import model.scopes.carryable as carryable
 
 log = logging.getLogger("dimsum.scopes")

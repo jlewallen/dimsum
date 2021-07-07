@@ -1,8 +1,6 @@
-from typing import Dict, List, Any, Optional, Type
-
-import logging
-import enum
 import dataclasses
+import logging
+from typing import Any, Dict, List, Optional, Type
 
 import model.visual as visual
 

@@ -1,22 +1,18 @@
-from typing import Any, List, Type, Optional
-
-import logging
 import dataclasses
-
-import grammars
-import transformers
-
-from model.entity import *
-from model.world import *
-from model.events import *
-from model.things import *
-from model.reply import *
-from model.game import *
-from model.finders import *
-
-from plugins.actions import *
+import logging
+from typing import Optional, Type
 
 from context import *
+import grammars
+from model.entity import *
+from model.events import *
+from model.finders import *
+from model.game import *
+from model.reply import *
+from model.things import *
+from model.world import *
+from plugins.actions import *
+import transformers
 
 log = logging.getLogger("dimsum")
 

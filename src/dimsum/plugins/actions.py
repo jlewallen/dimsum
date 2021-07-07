@@ -1,10 +1,7 @@
-import logging
-
-import model.entity as entity
-import model.world as world
-import model.game as game
-
 import context
+import model.entity as entity
+import model.game as game
+import model.world as world
 
 
 class PersonAction(game.Action):

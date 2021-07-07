@@ -1,12 +1,10 @@
-import logging
 import dataclasses
+
 import lark
-
 import model.entity as entity
-import model.world as world
 import model.finders as finders
-
 import model.scopes.movement as movement
+import model.world as world
 
 
 @dataclasses.dataclass

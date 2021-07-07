@@ -1,19 +1,12 @@
-import sys
 import logging
-import pytest
-
-import model.game as game
-import model.properties as properties
-import model.world as world
-
-import model.scopes.mechanics as mechanics
-import model.scopes.carryable as carryable
-import model.scopes.behavior as behavior
-import model.scopes as scopes
-
-import plugins.default.actions
-
 import test
+
+import model.properties as properties
+import model.scopes as scopes
+import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
+import model.scopes.mechanics as mechanics
+import pytest
 
 log = logging.getLogger("dimsum.tests")
 

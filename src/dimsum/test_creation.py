@@ -1,23 +1,14 @@
 import logging
-import freezegun
-import pytest
+import test
 
-import model.entity as entity
-import model.game as game
-import model.things as things
-import model.world as world
-import model.reply as reply
-import model.visual as visual
+import freezegun
+import handlers
 import model.properties as properties
 import model.scopes as scopes
 import model.scopes.behavior as behavior
 import model.scopes.carryable as carryable
-
-import serializing
-
-import handlers
-
-import test
+import model.visual as visual
+import pytest
 
 log = logging.getLogger("dimsum")
 

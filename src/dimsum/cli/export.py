@@ -1,12 +1,8 @@
 import logging
-import asyncclick as click
 import os
 import sys
 
-import model.world as world
-import model.entity as entity
-import model.scopes as scopes
-
+import asyncclick as click
 import cli.utils as utils
 
 log = logging.getLogger("dimsum.cli")

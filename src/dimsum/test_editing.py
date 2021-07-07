@@ -1,19 +1,9 @@
-import pytest
 import logging
-import lark
-
-import model.entity as entity
-import model.game as game
-import model.things as things
-import model.world as world
-import model.reply as reply
-import model.visual as visual
-
-import serializing
+import test
 
 import handlers
-
-import test
+import model.visual as visual
+import pytest
 
 log = logging.getLogger("dimsum")
 

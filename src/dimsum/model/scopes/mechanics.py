@@ -1,14 +1,11 @@
-from typing import List, Dict, Any, Optional
-
-import logging
-import datetime
 import abc
+import datetime
+import logging
+from typing import Dict, List, Optional
 
 import model.crypto as crypto
-import model.properties as properties
 import model.entity as entity
-
-import model.scopes.behavior as behavior
+import model.properties as properties
 
 log = logging.getLogger("dimsum.scopes")
 

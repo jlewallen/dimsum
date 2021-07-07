@@ -1,7 +1,6 @@
-from typing import Dict, Union, Any, Callable, List
-
-import logging
 import inspect
+import logging
+from typing import Any, Callable, Dict, List, Union
 
 import model.events as events
 import model.visual as visual

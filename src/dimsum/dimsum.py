@@ -1,9 +1,8 @@
 #!env/bin/python3
 
-import logging
 import ariadne.asgi
-import schema as schema_factory
 import config
+import schema as schema_factory
 
 
 def app():

@@ -1,9 +1,7 @@
-from typing import Optional, List, Any
-
-import logging
-import datetime
 import abc
 import contextvars
+import logging
+from typing import Any, Optional
 
 import model.entity as entity
 import model.events as events

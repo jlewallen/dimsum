@@ -1,31 +1,23 @@
-from typing import Callable, List, Dict, Optional, Any, Union, Sequence, Type
-
-import abc
-import logging
-import dataclasses
 import ast
+import dataclasses
 import functools
-import json
 import inspect
-
-import lark
-
-import model.game as game
-import model.properties as properties
-import model.reply as reply
-import model.world as world
-import model.entity as entity
-import model.tools as tools
-import model.events as events
-import model.things as things
-
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
+import logging
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import context
 import grammars
-import transformers
+import model.entity as entity
+import model.events as events
+import model.game as game
+import model.properties as properties
+import model.scopes.behavior as behavior
+import model.scopes.carryable as carryable
+import model.things as things
+import model.tools as tools
+import model.world as world
 import saying
+import transformers
 
 log = logging.getLogger("dimsum.dynamic")
 

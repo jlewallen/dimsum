@@ -1,16 +1,9 @@
-import sys
-import logging
-import pytest
+import test
 
 import context
-
-import model.properties as properties
-import model.game as game
-import model.things as things
 import model.entity as entity
 import model.world as world
-
-import test
+import pytest
 
 
 class Verb:

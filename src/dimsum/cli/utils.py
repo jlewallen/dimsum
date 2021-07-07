@@ -1,7 +1,4 @@
-from typing import Tuple
-
 import model.domains as domains
-
 import storage
 
 

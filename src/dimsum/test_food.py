@@ -1,12 +1,8 @@
-import pytest
-
-import model.game as game
-import model.reply as reply
-
-import model.scopes.health as health
-import model.scopes.carryable as carryable
-
 import test
+
+import model.scopes.carryable as carryable
+import model.scopes.health as health
+import pytest
 
 
 @pytest.mark.asyncio

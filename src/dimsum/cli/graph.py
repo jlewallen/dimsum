@@ -1,13 +1,11 @@
 import logging
-import asyncclick as click
 import os
-import jinja2
 
-import model.world as world
+import asyncclick as click
+import cli.utils as utils
+import jinja2
 import model.entity as entity
 import model.scopes as scopes
-
-import cli.utils as utils
 
 log = logging.getLogger("dimsum.cli")
 
