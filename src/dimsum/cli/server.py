@@ -30,7 +30,7 @@ async def ticks(domain: domains.Domain):
             try:
                 with domain.session() as session:
                     await session.prepare()
-                    await session.tick(0)
+                    await session.tick()
                     await session.save()
             except:
                 log.exception("error", exc_info=True)

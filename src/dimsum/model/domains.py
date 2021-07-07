@@ -341,13 +341,12 @@ class WorldCtx(context.Ctx):
             a = (self.person, area, []) + args
             await self.publish(klass(*a, **kwargs))
 
-    async def publish(self, *args: events.Event):
+    async def publish(self, ev: events.Event):
         assert self.world
+        log.info("publish %s entities=%s", ev, self.entities)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        for arg in args:
-            log.info("publish %s entities=%s", arg, self.entities)
-            await self.bus.publish(arg)
-            await dynamic_behavior.notify(saying.NotifyAll(arg.name, arg))
+        await dynamic_behavior.notify(saying.NotifyAll(ev.name, ev))
+        await self.bus.publish(ev)
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs

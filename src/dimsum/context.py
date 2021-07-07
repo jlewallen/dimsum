@@ -6,6 +6,7 @@ import abc
 import contextvars
 
 import model.entity as entity
+import model.events as events
 
 worldCtx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
@@ -21,7 +22,7 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def publish(self, *args):
+    async def publish(self, ev: events.Event):
         raise NotImplementedError
 
     @abc.abstractmethod
