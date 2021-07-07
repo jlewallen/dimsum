@@ -159,6 +159,8 @@ class Simplified:
         entity = await session.get().materialize(key=self.entity_key)
         assert entity
 
+        log.debug("%s evaluate %s", self, entity)
+
         for registered in [
             r for r in self.registered if r.condition.applies(player, entity)
         ]:
@@ -171,6 +173,9 @@ class Simplified:
                     player=player,
                     entity=entity,
                 )
+
+            log.debug("%s evaluate '%s'", self, command)
+            log.debug("%s prose=%s", self, registered.prose)
 
             evaluator = grammars.GrammarEvaluator(
                 grammars.DYNAMIC, registered.prose, transformer_factory
@@ -217,6 +222,7 @@ class CompiledEntityBehavior(EntityBehavior):
     frame: Dict[str, Any] = dataclasses.field(repr=False)
 
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        log.debug("%s evaluate '%s'", self, command)
         action = await self.simplified.evaluate(command, **kwargs)
         if action:
             return action
@@ -338,14 +344,17 @@ class Behavior:
         self.world = world
         self.entities = entities
 
-    def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
-        with e.make_and_discard(behavior.Behaviors) as behave:
+    def _get_behaviors(
+        self, e: entity.Entity, c: entity.Entity
+    ) -> List[EntityAndBehavior]:
+        inherited = self._get_behaviors(e, c.parent) if c.parent else []
+        with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
-            return [EntityAndBehavior(e.key, b.python)] if b else []
+            return ([EntityAndBehavior(e.key, b.python)] if b else []) + inherited
 
     @functools.cached_property
     def _behaviors(self) -> Dict[entity.Entity, List[EntityAndBehavior]]:
-        return {e: self._get_behaviors(e) for e in self.entities.all()}
+        return {e: self._get_behaviors(e, e) for e in self.entities.all()}
 
     def _compile_behavior(
         self, entity: entity.Entity, found: EntityAndBehavior

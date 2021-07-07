@@ -375,3 +375,34 @@ def break_nail(this, person=None, say=None):
 
     reply = await tw.success("break")
     assert isinstance(reply, game.DynamicFailure)
+
+
+@pytest.mark.asyncio
+async def test_dynamic_inherited(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    jingles_base = await tw.add_behaviored_thing(
+        tw,
+        "base:jingles",
+        """
+@language('start: "jingle"', condition=Held())
+async def jingle(this, person, say):
+    log.info("jingle: %s", this)
+    say.nearby("you hear kings jingling")
+    return "hey there!"
+""",
+    )
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        keys = tw.add_item_to_welcome_area(
+            scopes.item(
+                creator=world, parent=jingles_base, props=properties.Common("Keys")
+            ),
+            session=session,
+        )
+        await session.save()
+
+    await tw.success("hold Keys")
+    await tw.success("jingle")
