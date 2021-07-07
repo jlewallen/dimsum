@@ -224,7 +224,7 @@ class SqliteStorage(EntityStorage):
             fields.version,
             fields.original,
         )
-        self.dbc.execute(
+        rv = self.dbc.execute(
             "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
             [
                 fields.version,
@@ -234,6 +234,8 @@ class SqliteStorage(EntityStorage):
                 fields.original,
             ],
         )
+        if rv.rowcount != 1:
+            raise Exception("update failed")
 
     def _insert_row(self, fields: StorageFields):
         assert self.dbc
