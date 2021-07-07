@@ -114,16 +114,7 @@ class Default(Transformer):
     def forget(self, args):
         return actions.Forget(name=args[0])
 
-    def climb(self, args):
-        return actions.Climb(finder=args[0])
-
-    def run(self, args):
-        return actions.Climb(finder=args[0])
-
     def go(self, args):
-        return actions.Go(finder=args[0])
-
-    def walk(self, args):
         return actions.Go(finder=args[0])
 
     def eat(self, args):

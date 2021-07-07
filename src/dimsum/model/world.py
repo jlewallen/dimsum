@@ -16,8 +16,6 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes as scopes
 
-DefaultMoveVerb = "walk"
-TickHook = "tick"
 Key = "world"
 log = logging.getLogger("dimsum.model")
 p = inflect.engine()

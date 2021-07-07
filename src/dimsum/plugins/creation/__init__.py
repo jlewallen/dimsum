@@ -159,8 +159,6 @@ class Obliterate(PersonAction):
             )
         )
 
-        await ctx.extend(obliterate=items).hook("obliterate:after")
-
         return Success("you obliterated %s" % (p.join(list(map(str, items))),))
 
 

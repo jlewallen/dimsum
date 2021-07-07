@@ -29,10 +29,6 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def hook(self, name: str) -> None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
     def create_item(self, **kwargs) -> entity.Entity:
         raise NotImplementedError
 

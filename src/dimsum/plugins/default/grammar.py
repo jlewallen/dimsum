@@ -30,7 +30,7 @@ class DefaultGrammar(grammars.Grammar):
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
                          | modify | freeze | unfreeze
                          | eat | drink
-                         | go | climb | walk | run | home
+                         | go | home
                          | pour | water
                          | remember | forget | think
                          | auth
@@ -75,9 +75,6 @@ class DefaultGrammar(grammars.Grammar):
 
         home:              "home"
         go:                "go" route
-        climb:             "climb" route
-        walk:              "walk" route
-        run:               "run" route
 
         think:             "think"
         forget:            "forget" noun

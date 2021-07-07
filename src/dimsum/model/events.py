@@ -15,6 +15,24 @@ class Event:
         return self.__class__.__name__
 
 
+@dataclasses.dataclass
+class HookEvent(Event):
+    hook: str
+
+    @property
+    def name(self) -> str:
+        return self.hook
+
+
+@dataclasses.dataclass
+class TickEvent(Event):
+    time: float
+
+    @property
+    def name(self) -> str:
+        return "tick"
+
+
 @dataclasses.dataclass(frozen=True)
 class StandardEvent(Event, visual.Renderable):
     living: Any

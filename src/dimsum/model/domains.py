@@ -161,7 +161,7 @@ class Session:
 
         area = self.world.find_entity_area(person) if person else None
 
-        with WorldCtx(person=person, session=self, **kwargs) as ctx:
+        with WorldCtx(session=self, person=person, **kwargs) as ctx:
             try:
                 return await action.perform(
                     world=self.world,
@@ -179,14 +179,14 @@ class Session:
         if now is None:
             now = time.time()
 
-        await self.everywhere(world.TickHook, time=now)
+        await self.everywhere(events.TickEvent(now))
 
         return now
 
-    async def everywhere(self, name: str, **kwargs):
+    async def everywhere(self, ev: events.Event, **kwargs):
         assert self.world
 
-        log.info("everywhere:%s %s", name, kwargs)
+        log.info("everywhere:%s %s", ev, kwargs)
         everything: List[entity.Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
@@ -196,8 +196,8 @@ class Session:
                     log.info("everywhere: %s", entity)
                     area = self.world.find_entity_area(entity)
                     assert area
-                    with WorldCtx(entity=entity, session=self, **kwargs) as ctx:
-                        await ctx.hook(name)
+                    with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
+                        await ctx.publish(ev)
 
     async def add_area(
         self, area: entity.Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -281,15 +281,6 @@ class Domain:
         return Domain(empty=True, store=self.store)
 
 
-@dataclasses.dataclass
-class HookEvent(events.Event):
-    hook: str
-
-    @property
-    def name(self) -> str:
-        return self.hook
-
-
 class WorldCtx(context.Ctx):
     def __init__(
         self,
@@ -359,11 +350,6 @@ class WorldCtx(context.Ctx):
             log.info("publish %s entities=%s", arg, self.entities)
             await self.bus.publish(arg)
             await dynamic_behavior.notify(saying.NotifyAll(arg.name, arg, {}))
-
-    async def hook(self, name: str) -> None:
-        assert self.world
-
-        await self.publish(HookEvent(name))
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs

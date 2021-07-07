@@ -61,7 +61,6 @@ class Home(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.extend().hook("home:before")
         return await Go(area=world.welcome_area()).perform(
             world=world, area=area, person=person, ctx=ctx, **kwargs
         )
@@ -102,7 +101,6 @@ class AddItemArea(PersonAction):
                 items=[self.item],
             )
         )
-        await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
 
 
@@ -225,7 +223,6 @@ class Eat(PersonAction):
         area = world.find_person_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
-        await ctx.extend(eat=item).hook("eat:after")
 
         return Success("you ate %s" % (item))
 
@@ -255,7 +252,6 @@ class Drink(PersonAction):
         area = world.find_person_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
-        await ctx.extend(eat=item).hook("drink:after")
 
         return Success("you drank %s" % (item))
 
@@ -337,7 +333,6 @@ class LookFor(PersonAction):
             vis.add_observation(item.identity)
 
         with person.make(carryable.Containing) as contain:
-            await ctx.extend(holding=contain.holding, item=item).hook("look-for")
             return EntitiesObservation([item])
 
 
@@ -353,7 +348,6 @@ class LookMyself(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.hook("look-myself")
         return PersonalObservation(person)
 
 
@@ -369,7 +363,6 @@ class LookDown(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.hook("look-down")
         with person.make(carryable.Containing) as contain:
             return EntitiesObservation(contain.holding)
 
@@ -743,9 +736,7 @@ class MovingAction(PersonAction):
         self.area = area
         self.finder = finder
 
-    async def move(
-        self, ctx: Ctx, world: World, person: entity.Entity, verb=DefaultMoveVerb
-    ):
+    async def move(self, ctx: Ctx, world: World, person: entity.Entity):
         area = world.find_person_area(person)
 
         destination = self.area
@@ -754,7 +745,7 @@ class MovingAction(PersonAction):
             log.info("finder: {0}".format(self.finder))
             area = world.find_person_area(person)
             route = await self.finder.find_route(
-                area, person, world=world, verb=verb, builder=world
+                area, person, world=world, builder=world
             )
             if route:
                 routed: Any = route.area
@@ -765,27 +756,10 @@ class MovingAction(PersonAction):
 
         with destination.make(occupyable.Occupyable) as entering:
             with area.make(occupyable.Occupyable) as leaving:
-                await ctx.extend(area=area).hook("left:before")
                 await leaving.left(person)
-                await ctx.extend(area=area).hook("left:after")
-                await ctx.extend(area=destination).hook("entered:before")
                 await entering.entered(person)
-                await ctx.extend(area=destination).hook("entered:after")
 
         return AreaObservation(world.find_person_area(person), person)
-
-
-class Climb(MovingAction):
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        # If climb ever becomes a string outside of this function, rethink.
-        return await self.move(ctx, world, person, verb="climb")
 
 
 class Go(MovingAction):
