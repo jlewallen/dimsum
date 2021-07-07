@@ -73,11 +73,13 @@ class Say:
     async def _pub(self, **kwargs):
         await context.get().publish(DynamicMessage(**kwargs))
 
-    async def publish(self, area: entity.Entity):
+    async def publish(
+        self, area: entity.Entity, person: Optional[entity.Entity] = None
+    ):
         for player, queue in self.player_queue.items():
             for e in queue:
                 await self._pub(
-                    living=player,
+                    living=person,
                     area=area,
                     heard=[player],
                     message=e,
@@ -86,7 +88,7 @@ class Say:
         heard = tools.default_heard_for(area)
         for e in self.nearby_queue:
             await self._pub(
-                living=None,
+                living=person,
                 area=area,
                 heard=heard,
                 message=e,

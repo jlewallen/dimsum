@@ -86,17 +86,18 @@ class SimplifiedAction(game.Action):
         world: world.World,
         area: entity.Entity,
         person: entity.Entity,
+        say: Optional[saying.Say] = None,
         **kwargs,
     ):
+        assert say
         try:
-            say = saying.Say()
             args = await self._args(world, person)
             reply = await self.registered.handler(
                 *args, this=self.entity, person=person, say=say, **kwargs
             )
             if reply:
                 log.debug("say: %s", say)
-                await say.publish(area)
+                await say.publish(area, person=person)
                 return self._transform_reply(reply)
             return game.Failure("no reply from handler?")
         except Exception as e:
@@ -373,9 +374,9 @@ class Behavior:
     def lazy_evaluator(self) -> grammars.CommandEvaluator:
         return grammars.LazyCommandEvaluator(lambda: self.evaluators)
 
-    async def notify(self, notify: saying.Notify, say=None):
+    async def notify(self, notify: saying.Notify, say: Optional[saying.Say] = None):
+        assert say
         log.info("notify=%s n=%d", notify, len(self._compiled))
-        say = saying.Say()
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say)
 

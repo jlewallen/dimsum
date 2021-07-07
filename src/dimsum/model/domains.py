@@ -60,6 +60,7 @@ class Session:
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
+        self.saying = saying.Say()
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
@@ -168,7 +169,7 @@ class Session:
                     area=area,
                     person=person,
                     ctx=ctx,
-                    dynamic_behavior=dynamic_behavior,
+                    say=self.saying,
                 )
             except entity.EntityFrozen:
                 return game.Failure("whoa, that's frozen")
@@ -195,7 +196,7 @@ class Session:
                 if behave.get_default():
                     log.info("everywhere: %s", entity)
                     with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
-                        await ctx.publish(ev)
+                        await ctx.notify(ev)
 
     async def add_area(
         self, area: entity.Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -342,12 +343,18 @@ class WorldCtx(context.Ctx):
             a = (self.person, area, []) + args
             await self.publish(klass(*a, **kwargs))
 
+    async def notify(self, ev: events.Event):
+        assert self.world
+        log.info("notify=%s entities=%s", ev, self.entities)
+        dynamic_behavior = dynamic.Behavior(self.world, self.entities)
+        await dynamic_behavior.notify(
+            saying.NotifyAll(ev.name, ev), say=self.session.saying
+        )
+
     async def publish(self, ev: events.Event):
         assert self.world
-        log.info("publish %s entities=%s", ev, self.entities)
-        dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        await dynamic_behavior.notify(saying.NotifyAll(ev.name, ev))
         await self.bus.publish(ev)
+        await self.notify(ev)
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs
