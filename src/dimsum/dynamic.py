@@ -238,6 +238,7 @@ def _get_default_globals():
     )
 
 
+@functools.lru_cache
 def _compile(found: EntityAndBehavior) -> EntityBehavior:
     frame = _get_default_globals()
 
