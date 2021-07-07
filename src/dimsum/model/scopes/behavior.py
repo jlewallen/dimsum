@@ -5,9 +5,7 @@ import sys
 import logging
 import datetime
 import time
-import asyncio
-
-import context
+import ast
 
 import model.properties as properties
 import model.entity as entity
@@ -21,7 +19,11 @@ class Behavior:
         self.logs = logs if logs else []
 
     def check(self):
-        pass
+        try:
+            ast.parse(self.python)
+            return True
+        except:
+            return False
 
     def error(self, messages: List[str], error):
         self.logs.extend(messages)
