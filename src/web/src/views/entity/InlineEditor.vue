@@ -57,10 +57,9 @@ export default defineComponent({
     },
     data() {
         const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
-        console.log(behavior);
         return {
             editor: true,
-            logs: behavior?.logs || [],
+            logs: _.reverse(behavior?.logs || []),
             form: {
                 behavior: behavior?.python || "",
                 name: this.entity.props.map.name.value,

@@ -3,6 +3,8 @@ import dataclasses
 import functools
 import inspect
 import logging
+import time
+
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import context
@@ -185,6 +187,7 @@ class Simplified:
             if notify.applies(receive.hook):
                 try:
                     await notify.invoke(receive.handler, entity, **kwargs)
+                    tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
                     tools.log_behavior_exception(entity)
