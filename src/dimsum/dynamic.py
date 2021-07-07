@@ -6,6 +6,7 @@ import dataclasses
 import ast
 import functools
 import json
+import inspect
 
 import lark
 
@@ -205,10 +206,8 @@ class CompiledEntityBehavior(EntityBehavior):
         action = await self.simplified.evaluate(command, **kwargs)
         if action:
             return action
-        log.info("assigned %s", self.assigned)
         if self.assigned is not None:
             action = await self.assigned.evaluate(command, **kwargs)
-            log.info("OK: %s", action)
             if action:
                 return action
             return game.Unknown()
@@ -278,6 +277,7 @@ async def __ex(t=thunk):
                         log.error("kwargs: %s", kwargs)
 
                 log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
+                log.debug("thunking: %s", inspect.signature(fn))
                 self.globals.update(dict(ctx=context.get()))
                 return await aexec()
 
@@ -290,6 +290,7 @@ async def __ex(t=thunk):
                 received=simplified.received,
             )
         )
+
         log.info("compiling %s", found)
         try:
             tree = ast.parse(found.behavior.python)
