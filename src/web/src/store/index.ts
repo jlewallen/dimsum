@@ -89,7 +89,11 @@ export default createStore<RootState>({
             if (entry.reply.interactive === true) {
                 state.interactables.push(entry);
             } else {
-                state.responses.push(entry);
+                if ((entry.reply as any)["py/object"] == "plugins.editing.ScreenCleared") {
+                    state.responses = [];
+                } else {
+                    state.responses.push(entry);
+                }
             }
         },
         [MutationTypes.REMOVE_HISTORY_ENTRY]: (state: RootState, payload: RemoveHistoryEntry) => {
