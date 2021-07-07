@@ -2,6 +2,7 @@ import logging
 import test
 from typing import Dict, List, Optional
 
+import model.game as game
 import model.properties as properties
 import model.scopes as scopes
 import model.scopes.behavior as behavior
@@ -293,3 +294,95 @@ evaluators = []
     )
 
     await tw.failure("hold Nail")
+
+
+@pytest.mark.asyncio
+async def test_exception_in_parse(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+asdf;
+""",
+    )
+
+    with tw.domain.session() as session:
+        nail = await session.materialize(key=nail.key)
+        with nail.make(behavior.Behaviors) as behave:
+            assert len(behave.get_default().logs) == 0
+
+    await tw.success("hold Nail")
+
+    with tw.domain.session() as session:
+        nail = await session.materialize(key=nail.key)
+        with nail.make(behavior.Behaviors) as behave:
+            assert len(behave.get_default().logs) == 2
+
+
+@pytest.mark.asyncio
+async def test_exception_in_compile(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+og.info("hello")
+""",
+    )
+
+    await tw.success("hold Nail")
+
+
+@pytest.mark.asyncio
+async def test_exception_in_event_handler(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+@received(TickEvent)
+def tick(entity, ev, say=None):
+    og.info("hello")
+""",
+    )
+
+    with tw.domain.session() as session:
+        nail = await session.materialize(key=nail.key)
+        with nail.make(behavior.Behaviors) as behave:
+            assert len(behave.get_default().logs) == 0
+
+    with tw.domain.session() as session:
+        await session.prepare()
+        await session.tick(10)
+        await session.save()
+
+    with tw.domain.session() as session:
+        nail = await session.materialize(key=nail.key)
+        with nail.make(behavior.Behaviors) as behave:
+            assert len(behave.get_default().logs) == 1
+
+
+@pytest.mark.asyncio
+async def test_exception_in_language_handler(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+@language('start: "break"')
+def break_nail(entity, person=None, say=None):
+    og.info("hello")
+""",
+    )
+
+    reply = await tw.success("break")
+    assert isinstance(reply, game.DynamicFailure)

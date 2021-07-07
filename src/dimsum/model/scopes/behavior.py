@@ -1,6 +1,6 @@
 import ast
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional, Any
 
 import model.entity as entity
 import model.properties as properties
@@ -12,7 +12,7 @@ log = logging.getLogger("dimsum.scopes")
 class Behavior:
     def __init__(self, python=None, logs=None, **kwargs):
         self.python = python
-        self.logs = logs if logs else []
+        self.logs: List[Dict[str, Any]] = logs if logs else []
 
     def check(self):
         try:
@@ -21,11 +21,8 @@ class Behavior:
         except:
             return False
 
-    def error(self, messages: List[str], error):
-        self.logs.extend(messages)
-
-    def done(self, messages: List[str]):
-        self.logs.extend(messages)
+    def append(self, entry: Dict[str, Any]):
+        self.logs.append(entry)
         self.logs = self.logs[-20:]
 
     def __hash__(self):

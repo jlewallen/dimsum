@@ -21,6 +21,8 @@ import saying
 import transformers
 
 log = logging.getLogger("dimsum.dynamic")
+user_log = logging.getLogger("dimsum.dynamic.user")
+errors_log = logging.getLogger("dimsum.dynamic.errors")
 
 
 class Condition:
@@ -96,7 +98,8 @@ class SimplifiedAction(game.Action):
                 return self._transform_reply(reply)
             return game.Failure("no reply from handler?")
         except Exception as e:
-            log.exception("handler:error", exc_info=True)
+            errors_log.exception("handler:error", exc_info=True)
+            tools.log_behavior_exception(self.entity)
             return game.DynamicFailure(str(e), str(self.registered.handler))
 
 
@@ -180,7 +183,11 @@ class Simplified:
 
         for receive in self.receives:
             if notify.applies(receive.hook):
-                await notify.invoke(receive.handler, entity, **kwargs)
+                try:
+                    await notify.invoke(receive.handler, entity, **kwargs)
+                except:
+                    errors_log.exception("notify:exception", exc_info=True)
+                    tools.log_behavior_exception(entity)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -222,7 +229,7 @@ def _get_default_globals():
     # TODO Can we pass an exploded module here?
     event_classes = {k.__name__: k for k in events.get_all()}
     return dict(
-        log=log,
+        log=user_log,
         Held=Held,
         Ground=Ground,
         Scope=entity.Scope,
@@ -244,30 +251,39 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
 
     def thunk_factory(fn):
         async def thunk(*args, **kwargs):
+            lokals = dict(thunk=(fn, args, kwargs))
+
             async def aexec():
-                lokals = dict(thunk=(fn, args, kwargs))
                 exec(
                     """
 # This seems to be an easy clever trick for capturing the global
 # during the eval into the method?
 async def __ex(t=thunk):
-    return await t[0](*t[1], **t[2])""",
+    __thunk_ex = None
+    try:
+        return await t[0](*t[1], **t[2])
+    except Exception as e:
+        __thunk_ex = e
+        raise e
+""",
                     frame,
                     lokals,
                 )
                 try:
                     return await lokals["__ex"]()  # type:ignore
-                except:
-                    log.exception("exception", exc_info=True)
-                    log.error("globals: %s", frame.keys())
-                    log.error("locals: %s", lokals)
-                    log.error("args: %s", args)
-                    log.error("kwargs: %s", kwargs)
+                except Exception as e:
+                    errors_log.exception("exception", exc_info=True)
+                    errors_log.error("globals: %s", frame.keys())
+                    errors_log.error("locals: %s", lokals)
+                    errors_log.error("args: %s", args)
+                    errors_log.error("kwargs: %s", kwargs)
+                    raise e
 
             log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
             log.debug("thunking: %s", inspect.signature(fn))
             frame.update(dict(ctx=context.get()))
-            return await aexec()
+            rv = await aexec()
+            return rv
 
         return thunk
 
@@ -280,27 +296,24 @@ async def __ex(t=thunk):
     )
 
     log.info("compiling %s", found)
-    try:
-        tree = ast.parse(found.behavior)
-        # TODO improve filename value here, we have entity.
-        compiled = compile(tree, filename="<ast>", mode="exec")
 
-        # We squash any declarations left in locals into our
-        # globals so they're available in future calls via a
-        # rebinding in our thunk factory above. I'm pretty sure
-        # this is the only way to get this to behave.
-        declarations: Dict[str, Any] = {}
-        eval(compiled, frame, declarations)
-        evaluator: Optional[grammars.CommandEvaluator] = None
-        EvaluatorsName = "evaluators"
-        if EvaluatorsName in declarations:
-            evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
-            del declarations[EvaluatorsName]
-        frame.update(**declarations)
-        return CompiledEntityBehavior(simplified, evaluator, declarations)
-    except:
-        log.exception("dynamic:error", exc_info=True)
-        return NoopEntityBehavior()
+    tree = ast.parse(found.behavior)
+    # TODO improve filename value here, we have entity.
+    compiled = compile(tree, filename="<ast>", mode="exec")
+
+    # We squash any declarations left in locals into our
+    # globals so they're available in future calls via a
+    # rebinding in our thunk factory above. I'm pretty sure
+    # this is the only way to get this to behave.
+    declarations: Dict[str, Any] = {}
+    eval(compiled, frame, declarations)
+    evaluator: Optional[grammars.CommandEvaluator] = None
+    EvaluatorsName = "evaluators"
+    if EvaluatorsName in declarations:
+        evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
+        del declarations[EvaluatorsName]
+    frame.update(**declarations)
+    return CompiledEntityBehavior(simplified, evaluator, declarations)
 
 
 class Behavior:
@@ -315,15 +328,27 @@ class Behavior:
             return [EntityAndBehavior(e.key, b.python)] if b else []
 
     @functools.cached_property
-    def _behaviors(self) -> List[EntityAndBehavior]:
-        return flatten([self._get_behaviors(e) for e in self.entities.all()])
+    def _behaviors(self) -> Dict[entity.Entity, List[EntityAndBehavior]]:
+        return {e: self._get_behaviors(e) for e in self.entities.all()}
 
-    def _compile_behavior(self, found: EntityAndBehavior) -> EntityBehavior:
-        return _compile(found)  # TODO We should be using entity.key here
+    def _compile_behavior(
+        self, entity: entity.Entity, found: EntityAndBehavior
+    ) -> EntityBehavior:
+        try:
+            return _compile(found)
+        except Exception as e:
+            errors_log.exception("dynamic:compile", exc_info=True)
+            tools.log_behavior_exception(entity)
+            return NoopEntityBehavior()
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
-        return [self._compile_behavior(f) for f in self._behaviors if f.behavior]
+        return flatten(
+            [
+                [self._compile_behavior(entity, found) for found in all_for_entity]
+                for entity, all_for_entity in self._behaviors.items()
+            ]
+        )
 
     @property
     def evaluator(self) -> grammars.CommandEvaluator:

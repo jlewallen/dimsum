@@ -1,13 +1,18 @@
+import sys
 import dataclasses
 import enum
 import logging
-from typing import Dict, List, Optional, Sequence
+import traceback
+import time
+
+from typing import Any, Dict, List, Optional, Sequence
 
 from model.entity import Entity
 import model.scopes.apparel as apparel
 import model.scopes.carryable as carryable
 import model.scopes.mechanics as mechanics
 import model.scopes.occupyable as occupyable
+import model.scopes.behavior as behavior
 
 
 log = logging.getLogger("dimsum.tools")
@@ -101,6 +106,30 @@ def area_of(entity: Entity) -> Optional[Entity]:
             return location.container
 
     return None
+
+
+def log_behavior(entity: Entity, entry: Dict[str, Any]):
+    assert entity
+    log.info("logging '%s' behavior", entity)
+    with entity.make(behavior.Behaviors) as behave:
+        b = behave.get_default()
+        assert b
+        b.append(entry)
+        entity.touch()
+
+
+def log_behavior_exception(entity: Entity):
+    assert entity
+    ex_type, ex_value, tb = sys.exc_info()
+    log_behavior(
+        entity,
+        dict(
+            time=time.time(),
+            exception=ex_type,
+            value=ex_value,
+            traceback=traceback.format_exc(),
+        ),
+    )
 
 
 def flatten(l):
