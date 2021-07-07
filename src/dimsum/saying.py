@@ -17,7 +17,10 @@ log = logging.getLogger("dimsum")
 
 @events.event
 @dataclasses.dataclass(frozen=True)
-class DynamicMessage(events.StandardEvent):
+class DynamicMessage(events.Event):
+    living: Optional[entity.Entity]
+    area: entity.Entity
+    heard: Optional[List[entity.Entity]]
     message: game.Reply
 
     def render_string(self) -> Dict[str, str]:
@@ -35,23 +38,9 @@ class Notify:
 
 
 @dataclasses.dataclass(frozen=True)
-class NotifyEntity(Notify):
-    entity: entity.Entity
-    hook: str
-    kwargs: Dict[str, Any]
-
-    def applies(self, hook: str) -> bool:
-        return self.hook == hook
-
-    async def invoke(self, handler: Callable, *args, **kwargs):
-        return await handler(*args, self.entity, **kwargs)
-
-
-@dataclasses.dataclass(frozen=True)
 class NotifyAll(Notify):
     hook: str
     event: events.Event
-    kwargs: Dict[str, Any]
 
     def applies(self, hook: str) -> bool:
         return self.hook == hook
@@ -64,7 +53,9 @@ class NotifyAll(Notify):
 class Say:
     everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
     nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-    player_queue: List[game.Reply] = dataclasses.field(default_factory=list)
+    player_queue: Dict[entity.Entity, List[game.Reply]] = dataclasses.field(
+        default_factory=dict
+    )
 
     def everyone(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
@@ -74,29 +65,30 @@ class Say:
     def nearby(self, message: Union[game.Reply, str]):
         if isinstance(message, str):
             r = game.Success(message)
-        self.player_queue.append(r)
+        self.nearby_queue.append(r)
 
-    def player(self, message: Union[game.Reply, str]):
+    def player(self, person: entity.Entity, message: Union[game.Reply, str]):
         if isinstance(message, str):
             r = game.Success(message)
-        self.player_queue.append(r)
+        self.player_queue.setdefault(person, []).append(r)
 
     async def _pub(self, **kwargs):
         await context.get().publish(DynamicMessage(**kwargs))
 
-    async def publish(self, area: entity.Entity, player: entity.Entity):
-        for e in self.player_queue:
-            await self._pub(
-                living=player,
-                area=area,
-                heard=[player],
-                message=e,
-            )
+    async def publish(self, area: entity.Entity):
+        for player, queue in self.player_queue.items():
+            for e in queue:
+                await self._pub(
+                    living=player,
+                    area=area,
+                    heard=[player],
+                    message=e,
+                )
 
         heard = tools.default_heard_for(area)
         for e in self.nearby_queue:
             await self._pub(
-                living=player,
+                living=None,
                 area=area,
                 heard=heard,
                 message=e,

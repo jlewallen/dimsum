@@ -31,7 +31,7 @@ class DefaultGrammar(grammars.Grammar):
                          | modify | freeze | unfreeze
                          | eat | drink
                          | go | home
-                         | pour | water
+                         | pour
                          | remember | forget | think
                          | auth
 
@@ -82,8 +82,6 @@ class DefaultGrammar(grammars.Grammar):
 
         wear:              "wear" noun
         remove:            "remove" noun
-
-        water:             "water" noun ("with" noun)?
 
         pour:              "pour" "from" noun                      -> pour_from
                          | "pour" noun ("from"|"on"|"over") noun   -> pour

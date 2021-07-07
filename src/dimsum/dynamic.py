@@ -98,7 +98,7 @@ class SimplifiedAction(game.Action):
             )
             if reply:
                 log.debug("say: %s", say)
-                await say.publish(area, person)
+                await say.publish(area)
                 return self._transform_reply(reply)
             return game.Failure("no reply from handler?")
         except Exception as e:
@@ -294,11 +294,11 @@ async def __ex(t=thunk):
     def evaluators(self) -> List[grammars.CommandEvaluator]:
         return list(self._compiled)
 
-    async def notify(self, notify: saying.Notify, say=None, **kwargs):
-        log.info("notify=%s kwargs=%s n=%d", notify, kwargs, len(self._compiled))
+    async def notify(self, notify: saying.Notify, say=None):
+        log.info("notify=%s n=%d", notify, len(self._compiled))
         say = saying.Say()
         for target in [c for c in self._compiled]:
-            await target.notify(notify, say=say, **kwargs)
+            await target.notify(notify, say=say)
         # await say.publish(area, person)
 
 

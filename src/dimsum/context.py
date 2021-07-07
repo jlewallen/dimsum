@@ -21,7 +21,7 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def publish(self, *args, **kwargs):
+    async def publish(self, *args):
         raise NotImplementedError
 
     @abc.abstractmethod
