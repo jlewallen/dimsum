@@ -205,6 +205,7 @@ class Behavior:
 
     def _get_default_globals(self):
         # TODO Can we pass an exploded module here?
+        event_classes = {k.__name__: k for k in events.get_all()}
         return dict(
             log=log,
             world=self.world,
@@ -219,6 +220,7 @@ class Behavior:
             fail=game.Failure,
             tools=tools,
             ok=game.Success,
+            **event_classes,
         )
 
     def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:

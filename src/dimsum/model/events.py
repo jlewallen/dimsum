@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Type
 
 import logging
 import enum
@@ -15,24 +15,28 @@ class Event:
         return self.__class__.__name__
 
 
-@dataclasses.dataclass
-class HookEvent(Event):
-    hook: str
-
-    @property
-    def name(self) -> str:
-        return self.hook
+_all_events: List[Type[Event]] = []
 
 
+def event(klass):
+    global _all_events
+    _all_events.append(klass)
+    log.debug("event: %s", klass)
+    return klass
+
+
+def get_all():
+    global _all_events
+    return _all_events
+
+
+@event
 @dataclasses.dataclass
 class TickEvent(Event):
     time: float
 
-    @property
-    def name(self) -> str:
-        return "tick"
 
-
+@event
 @dataclasses.dataclass(frozen=True)
 class StandardEvent(Event, visual.Renderable):
     living: Any

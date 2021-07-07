@@ -234,7 +234,7 @@ class Rusting(Scope):
     def increase(self):
         self.rust += 1
 
-@received("tick")
+@received(TickEvent)
 async def rusting(entity, ev, say=None):
     with entity.make(Rusting) as rust:
         rust.increase()
@@ -271,7 +271,7 @@ class Rusting(Scope):
     def increase(self):
         self.rust += 1
 
-@received("ItemsDropped")
+@received(ItemsDropped)
 async def dropped(entity, ev, say=None):
     with entity.make(Rusting) as rust:
         rust.increase()

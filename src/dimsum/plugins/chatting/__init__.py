@@ -24,6 +24,7 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
+@event
 @dataclasses.dataclass(frozen=True)
 class PlayerSpoke(StandardEvent):
     message: str
@@ -32,6 +33,7 @@ class PlayerSpoke(StandardEvent):
         return {"text": f"{self.living.props.name} said '{self.message}'"}
 
 
+@event
 class PlayerTold(PlayerSpoke):
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} whispered '{self.message}'"}

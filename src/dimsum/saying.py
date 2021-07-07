@@ -15,6 +15,7 @@ import model.tools as tools
 log = logging.getLogger("dimsum")
 
 
+@events.event
 @dataclasses.dataclass(frozen=True)
 class DynamicMessage(events.StandardEvent):
     message: game.Reply

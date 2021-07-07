@@ -40,7 +40,7 @@ class Bank(Scope):
         super().__init__(**kwargs)
         self.gold = gold
 
-@received("ItemsDropped")
+@received(ItemsDropped)
 async def dropped(entity, ev=None, say=None, **kwargs):
     with ev.living.make(Bank) as bank:
         if bank.gold < 2:
@@ -84,11 +84,11 @@ async def test_wear_cape(caplog):
             behave.add_behavior(
                 world,
                 python="""
-@received("ItemsWorn")
+@received(ItemsWorn)
 async def worn(entity, ev=None, say=None, **kwargs):
     tools.hide(ev.living)
 
-@received("ItemsUnworn")
+@received(ItemsUnworn)
 async def unworn(entity, ev=None, say=None, **kwargs):
     tools.show(ev.living)
 """,
@@ -236,7 +236,7 @@ async def test_behavior_time_passing(caplog):
             behave.add_behavior(
                 world,
                 python="""
-@received("tick")
+@received(TickEvent)
 async def tick(entity, ev, say=None):
     item = ctx.create_item(
         creator=entity,

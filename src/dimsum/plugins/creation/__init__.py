@@ -26,12 +26,25 @@ from context import *
 log = logging.getLogger("dimsum")
 
 
+@event
 @dataclasses.dataclass(frozen=True)
 class EntityCreated(StandardEvent):
     entity: Entity
 
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsMade(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsObliterated(StandardEvent):
+    items: List[entity.Entity]
 
 
 class Create(PersonAction):
@@ -67,11 +80,6 @@ class Create(PersonAction):
                 entity=after_hold,
                 heard=default_heard_for(area),
             )
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsMade(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Make(PersonAction):
@@ -121,11 +129,6 @@ class Make(PersonAction):
             )
         )
         return Success("you're now holding %s" % (after_hold,))
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsObliterated(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Obliterate(PersonAction):

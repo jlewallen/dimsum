@@ -30,6 +30,42 @@ MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
 
 
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsAppeared(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsDropped(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsWorn(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsUnworn(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class PlayerJoined(StandardEvent):
+    pass
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsHeld(StandardEvent):
+    items: List[entity.Entity]
+
+
 class Auth(PersonAction):
     def __init__(self, password=None, **kwargs):
         super().__init__(**kwargs)
@@ -66,11 +102,6 @@ class Home(PersonAction):
         )
 
 
-@dataclasses.dataclass(frozen=True)
-class ItemsAppeared(StandardEvent):
-    items: List[entity.Entity]
-
-
 class AddItemArea(PersonAction):
     def __init__(self, item=None, area=None, **kwargs):
         super().__init__(**kwargs)
@@ -102,21 +133,6 @@ class AddItemArea(PersonAction):
             )
         )
         return Success("%s appeared" % (p.join([self.item]),))
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsDropped(StandardEvent):
-    items: List[entity.Entity]
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsWorn(StandardEvent):
-    items: List[entity.Entity]
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsUnworn(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Wear(PersonAction):
@@ -254,11 +270,6 @@ class Drink(PersonAction):
             await p.consume(item, area=area, ctx=ctx)
 
         return Success("you drank %s" % (item))
-
-
-@dataclasses.dataclass(frozen=True)
-class PlayerJoined(StandardEvent):
-    pass
 
 
 class Join(PersonAction):
@@ -437,11 +448,6 @@ class Drop(PersonAction):
                 return Success("you dropped %s" % (p.join(dropped),))
 
             return Failure(failure)
-
-
-@dataclasses.dataclass(frozen=True)
-class ItemsHeld(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Hold(PersonAction):
