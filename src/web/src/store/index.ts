@@ -80,6 +80,11 @@ export default createStore<RootState>({
         [MutationTypes.ENTITY]: (state: RootState, entity: Entity) => {
             state.entities[entity.key] = entity;
         },
+        [MutationTypes.ENTITIES]: (state: RootState, entities: Entity[]) => {
+            for (const row of entities) {
+                state.entities[row.key] = row;
+            }
+        },
         [MutationTypes.REPLY]: (state: RootState, entry: ReplResponse) => {
             if (entry.reply.interactive === true) {
                 state.interactables.push(entry);
@@ -117,6 +122,12 @@ export default createStore<RootState>({
             const data = await api.language({ text: payload.command, evaluator: state.key });
             if (data.language) {
                 commit(MutationTypes.REPLY, { reply: JSON.parse(data.language.reply) });
+                if (data.language.entities) {
+                    commit(
+                        MutationTypes.ENTITIES,
+                        data.language.entities.map((row) => JSON.parse(row.serialized))
+                    );
+                }
             }
         },
         [ActionTypes.LOADING]: async ({ state, commit }: ActionParameters) => {

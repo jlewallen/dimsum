@@ -1,7 +1,18 @@
 <template>
     <div class="inline-editor" @keydown.esc="cancel">
-        <div class="inline-editor-row">
+        <div class="buttons" v-if="logs.length">
+            <span v-on:click="showEditor" :class="{ btn: true, 'btn-primary': editor }">Editor</span>
+            <span v-on:click="showLogs" :class="{ btn: true, 'btn-primary': !editor }">Logs</span>
+        </div>
+        <div class="inline-editor-row" v-if="editor">
             <VCodeMirror v-model="form.behavior" :autoFocus="true" />
+        </div>
+        <div class="inline-editor-row" v-else>
+            <div class="logs">
+                <div v-for="(entry, index) in logs" v-bind:key="index">
+                    {{ entry }}
+                </div>
+            </div>
         </div>
         <div class="inline-editor-row">
             <form class="inline" @submit.prevent="saveForm">
@@ -46,7 +57,10 @@ export default defineComponent({
     },
     data() {
         const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
+        console.log(behavior);
         return {
+            editor: true,
+            logs: behavior?.logs || [],
             form: {
                 behavior: behavior?.python || "",
                 name: this.entity.props.map.name.value,
@@ -60,16 +74,26 @@ export default defineComponent({
         }
     },
     methods: {
+        showEditor(): void {
+            this.editor = true;
+        },
+        showLogs(): void {
+            this.editor = false;
+        },
         async saveForm(): Promise<void> {
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            updating.chimeras.behaviors.behaviors.map["b:default"] = {
-                "py/object": "model.scopes.behavior.Behavior",
-                python: this.form.behavior,
-                lua: null,
-                logs: [],
-            };
+            const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
+            updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
+                {
+                    "py/object": "model.scopes.behavior.Behavior",
+                },
+                behavior,
+                {
+                    python: this.form.behavior,
+                }
+            );
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },
@@ -93,5 +117,15 @@ export default defineComponent({
 form.inline {
     padding-left: 1em;
     padding-right: 1em;
+}
+.buttons {
+}
+.buttons span {
+    padding: 0.2em;
+}
+.logs {
+    height: 300px;
+    padding: 1em;
+    overflow-y: scroll;
 }
 </style>

@@ -41,6 +41,7 @@ export enum MutationTypes {
     PEOPLE = "PEOPLE",
     AREAS = "AREAS",
     ENTITY = "ENTITY",
+    ENTITIES = "ENTITIES",
     REPLY = "REPLY",
     REMOVE_HISTORY_ENTRY = "REMOVE_HISTORY_ENTRY",
 }
