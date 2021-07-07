@@ -15,7 +15,6 @@ import model.game as game
 import model.world as world
 import model.things as things
 import model.reply as reply
-import model.sugar as sugar
 import model.domains as domains
 
 import model.scopes.movement as movement
@@ -27,7 +26,6 @@ import model.scopes as scopes
 import bus
 import grammars
 import serializing
-import luaproxy
 import pytest
 
 import plugins.default.actions as actions
@@ -44,7 +42,6 @@ def create_empty_world():
 class TestWorld:
     def __init__(self, handlers=None):
         self.domain = domains.Domain(handlers=handlers)
-        self.l = grammars.create_parser()
         self.carla_key = None
         self.jacob_key = None
         self.tomi_key = None
@@ -149,29 +146,20 @@ class TestWorld:
         return serializing.serialize(item, indent=4)
 
     async def execute(self, command: str, person=None, **kwargs):
-        log.info("executing: %s" % (command,))
-        tree, create_evaluator = self.l.parse(command)
-
-        log.info("=" * 100)
-        log.info("parsed: %s" % (tree,))
-        log.info("=" * 100)
-
         with self.domain.session() as session:
             world = await session.prepare()
-
-            tree_eval = create_evaluator(world, person)
-            action = tree_eval.transform(tree)
-            assert action
-            assert isinstance(action, game.Action)
 
             assert self.jacob_key
             person = await session.materialize(
                 key=self.jacob_key if person is None else person
             )
-            response = await session.perform(action, person)
+
+            log.info("=" * 100)
+
+            response = await session.execute(person, command)
 
             log.info("response: %s" % (response,))
-            if isinstance(response, reply.Failure):
+            if isinstance(response, game.Failure):
                 log.info("unsaved!")
             else:
                 await session.save()
@@ -181,14 +169,14 @@ class TestWorld:
     async def success(self, *commands: str, **kwargs):
         for command in commands:
             r = await self.execute(command, **kwargs)
-            if not isinstance(r, reply.Failure):
+            if not isinstance(r, game.Failure):
                 return r
             log.error("reply: %s", r)
-            assert not isinstance(r, reply.Failure)
+            assert not isinstance(r, game.Failure)
 
     async def failure(self, command: str, **kwargs):
         r = await self.execute(command, **kwargs)
-        assert isinstance(r, reply.Failure)
+        assert isinstance(r, game.Failure)
         return r
 
 

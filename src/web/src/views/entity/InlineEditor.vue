@@ -1,7 +1,7 @@
 <template>
     <div class="inline-editor" @keydown.esc="cancel">
         <div class="inline-editor-row">
-            <VCodeMirror v-model="form.behavior" />
+            <VCodeMirror v-model="form.behavior" :autoFocus="true" />
         </div>
         <div class="inline-editor-row">
             <form class="inline" @submit.prevent="saveForm">
@@ -45,23 +45,31 @@ export default defineComponent({
         },
     },
     data() {
+        const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
         return {
             form: {
-                behavior: this.entity.chimeras.behaviors.behaviors.map["b:default"] || "",
+                behavior: behavior?.python || "",
                 name: this.entity.props.map.name.value,
                 desc: this.entity.props.map.desc.value,
             },
         };
     },
     mounted() {
-        (this.$refs.name as HTMLInputElement).focus();
+        if (this.form.behavior == "") {
+            (this.$refs.name as HTMLInputElement).focus();
+        }
     },
     methods: {
         async saveForm(): Promise<void> {
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            updating.chimeras.behaviors.behaviors.map["b:default"] = this.form.behavior;
+            updating.chimeras.behaviors.behaviors.map["b:default"] = {
+                "py/object": "model.scopes.behavior.Behavior",
+                python: this.form.behavior,
+                lua: null,
+                logs: [],
+            };
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },

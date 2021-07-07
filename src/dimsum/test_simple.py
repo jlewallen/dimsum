@@ -20,21 +20,6 @@ log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
-async def test_simple_action_verbs():
-    tw = test.TestWorld()
-    await tw.initialize()
-    await tw.add_carla()
-    for verb in ["kiss", "heal", "hug", "tickle", "poke"]:
-        await tw.success(verb + " carla")
-
-    with tw.domain.session() as session:
-        world = await session.prepare()
-        jacob = await session.materialize(key=tw.jacob_key)
-        with jacob.make(carryable.Containing) as pockets:
-            assert len(pockets.holding) == 0
-
-
-@pytest.mark.asyncio
 async def test_world_owns_itself(caplog):
     whatever = test.create_empty_world()
     with whatever.make(ownership.Ownership) as props:

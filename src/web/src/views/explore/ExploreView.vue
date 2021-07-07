@@ -26,10 +26,12 @@ export default defineComponent({
         },
     },
     async mounted(): Promise<void> {
-        this.$emit("scroll-bottom");
         if (this.length == 0) {
             await store.dispatch(new ReplAction("look"));
+        } else {
+            this.$emit("scroll-bottom");
         }
+        this.$emit("resume-repl");
     },
     methods: {},
 });

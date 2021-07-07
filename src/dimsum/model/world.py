@@ -9,6 +9,7 @@ import context
 import model.entity as entity
 import model.game as game
 import model.properties as properties
+import model.tools as tools
 
 import model.scopes.behavior as behavior
 import model.scopes.occupyable as occupyable
@@ -16,9 +17,6 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes as scopes
 
-DefaultMoveVerb = "walk"
-TickHook = "tick"
-WindHook = "wind"
 Key = "world"
 log = logging.getLogger("dimsum.model")
 p = inflect.engine()
@@ -103,22 +101,7 @@ class World(entity.Entity):
             self.touch()
 
     def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
-        if entity.has(occupyable.Occupyable):
-            log.info("finding area for %s (self)", entity)
-            return entity
-
-        log.info("finding area for %s", entity)
-        with entity.make_and_discard(occupyable.Occupying) as occupying:
-            if occupying.area:
-                log.debug("finding area for %s (occupying)", entity)
-                return occupying.area
-
-        with entity.make_and_discard(carryable.Location) as location:
-            if location.container:
-                log.debug("finding area for %s (container)", entity)
-                return location.container
-
-        return None
+        return tools.area_of(entity)
 
     def find_person_area(self, person: entity.Entity) -> entity.Entity:
         area = self.find_entity_area(person)

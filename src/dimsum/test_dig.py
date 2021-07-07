@@ -72,6 +72,7 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip(reason="custom movement verb 'climb'")
 async def test_dig_wall_and_climb_wall(caplog):
     tw = test.TestWorld()
     await tw.initialize()

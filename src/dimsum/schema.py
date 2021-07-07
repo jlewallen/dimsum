@@ -276,7 +276,6 @@ class Evaluation:
 @mutation.field("language")
 async def resolve_language(obj, info, criteria):
     domain = info.context.domain
-    parser = info.context.parser
     lqc = make_language_query_criteria(**criteria)
     log.info("ariadne:language criteria=%s", lqc)
 
@@ -287,11 +286,7 @@ async def resolve_language(obj, info, criteria):
         log.debug("materialize world")
         w = await session.materialize(key=world.Key)
         assert w
-        tree, create_evaluator = parser.parse(lqc.text.strip())
-        tree_eval = create_evaluator(w, player)
-        action = tree_eval.transform(tree)
-        reply = await session.perform(action, player)
-
+        reply = await session.execute(player, lqc.text.strip())
         await session.save()
 
         return Evaluation(
@@ -429,14 +424,14 @@ class AriadneContext:
     cfg: config.Configuration
     domain: domains.Domain
     subscriptions: bus.SubscriptionManager
-    parser: grammars.ParseMultipleGrammars
+    evaluator: grammars.CommandEvaluator
     request: starlette.requests.Request
     identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
 def context(cfg, subscriptions: bus.SubscriptionManager, comms: visual.Comms):
     domain = cfg.make_domain(handlers=[handlers.create(comms)])
-    parser = grammars.create_parser()
+    evaluator = grammars.create_static_evaluator()
 
     def wrap(request):
         log.info("ariadne:context %s", request)
@@ -444,7 +439,7 @@ def context(cfg, subscriptions: bus.SubscriptionManager, comms: visual.Comms):
             cfg=cfg,
             domain=domain,
             subscriptions=subscriptions,
-            parser=parser,
+            evaluator=evaluator,
             request=request,
         )
 

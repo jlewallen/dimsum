@@ -201,14 +201,20 @@ async def test_quantified_from_recipe_holding_template(caplog):
     await tw.initialize()
     await tw.success("make Gold Coin")
     await tw.success("call this cash")
-    r = await tw.success("make 4 cash")
-    assert r.item.make(carryable.Carryable).quantity == 5
+    await tw.success("make 4 cash")
 
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         area = world.find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
+        assert (
+            jacob.make(carryable.Containing)
+            .holding[0]
+            .make(carryable.Carryable)
+            .quantity
+            == 5
+        )
         assert len(area.make(carryable.Containing).holding) == 0
 
     await tw.success("look down")

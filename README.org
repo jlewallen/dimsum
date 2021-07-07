@@ -1,8 +1,5 @@
 * DimSum
-** TODO Vim Session
-
-   I would love to be able to dump the user into a vim session.
-
+** TODO Allow 'Scopes' to be @dataclasses
 ** TODO SSB Storage Backend
 ** TODO Distance Effects.
 

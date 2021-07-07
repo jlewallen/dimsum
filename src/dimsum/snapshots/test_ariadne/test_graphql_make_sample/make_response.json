@@ -543,14 +543,9 @@
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
                                     "map": {
-                                        "b:drop-leaf:tick": {
+                                        "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"leaf-1\"),\n        name = \"Oak Leaf\",\n        quantity = 1,\n        color = \"red\",\n    })\nend\n",
-                                            "logs": []
-                                        },
-                                        "b:drop-branch:tick": {
-                                            "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"branch-1\"),\n        name = \"Oak Branch\",\n        quantity = 1,\n    })\nend\n",
+                                            "python": "\n#function(s, world, area, item)\n#    return area.make_here({\n#        kind = item.kind(\"branch-1\"),\n#        name = \"Oak Branch\",\n#        quantity = 1,\n#    })\n#end\n",
                                             "logs": []
                                         }
                                     }
@@ -766,9 +761,9 @@
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
                                     "map": {
-                                        "b:mystery:shake": {
+                                        "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "python": "#",
                                             "logs": []
                                         }
                                     }
@@ -878,9 +873,9 @@
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
                                     "map": {
-                                        "b:music:play": {
+                                        "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\nend\n",
+                                            "python": "",
                                             "logs": []
                                         }
                                     }
@@ -990,9 +985,9 @@
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
                                     "map": {
-                                        "b:make:stone": {
+                                        "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    if math.random() > 0.7 then\n        return area.make_here({\n            kind = item.kind(\"stone-1\"),\n            name = \"Heavy Stone\",\n            quantity = 1,\n        })\n    end\n\n    return area.make({\n        kind = item.kind(\"pebble-1\"),\n        name = \"Pebble\",\n        quantity = 3,\n    })\nend\n",
+                                            "python": "\n#function(s, world, area, item)\n#    if math.random() > 0.7 then\n#        return area.make_here({\n#            kind = item.kind(\"stone-1\"),\n#            name = \"Heavy Stone\",\n#            quantity = 1,\n#        })\n#    end\n#\n#    return area.make({\n#        kind = item.kind(\"pebble-1\"),\n#        name = \"Pebble\",\n#        quantity = 3,\n#    })\n#end\n",
                                             "logs": []
                                         }
                                     }
@@ -2102,14 +2097,9 @@
                                 "behaviors": {
                                     "py/object": "model.scopes.behavior.BehaviorMap",
                                     "map": {
-                                        "b:drop-leaf:tick": {
+                                        "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"leaf-1\"),\n        name = \"Maple Leaf\",\n        quantity = 1,\n        color = \"red\",\n    })\nend\n",
-                                            "logs": []
-                                        },
-                                        "b:drop-branch:tick": {
-                                            "py/object": "model.scopes.behavior.Behavior",
-                                            "lua": "\nfunction(s, world, area, item)\n    return area.make_here({\n        kind = item.kind(\"branch-1\"),\n        name = \"Maple Branch\",\n        quantity = 1,\n    })\nend\n",
+                                            "python": "\n#function(s, world, area, item)\n#    return area.make_here({\n#        kind = item.kind(\"branch-1\"),\n#        name = \"Maple Branch\",\n#        quantity = 1,\n#    })\n#end\n",
                                             "logs": []
                                         }
                                     }

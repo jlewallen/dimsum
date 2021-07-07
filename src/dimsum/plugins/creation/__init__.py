@@ -8,21 +8,26 @@ import model.properties as properties
 import model.scopes as scopes
 
 import grammars
+import transformers
 
 from model.entity import *
 from model.world import *
 from model.events import *
 from model.things import *
+from model.game import *
 from model.reply import *
 from model.finders import *
+from model.tools import *
 
 from plugins.actions import *
+
 from context import *
 
 log = logging.getLogger("dimsum")
 
 
-@dataclasses.dataclass
+@event
+@dataclasses.dataclass(frozen=True)
 class EntityCreated(StandardEvent):
     entity: Entity
 
@@ -30,11 +35,16 @@ class EntityCreated(StandardEvent):
         return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
 
 
-def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
-    if area:
-        with area.make_and_discard(occupyable.Occupyable) as here:
-            return here.occupied
-    return []
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsMade(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsObliterated(StandardEvent):
+    items: List[entity.Entity]
 
 
 class Create(PersonAction):
@@ -70,11 +80,6 @@ class Create(PersonAction):
                 entity=after_hold,
                 heard=default_heard_for(area),
             )
-
-
-@dataclasses.dataclass
-class ItemsMade(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Make(PersonAction):
@@ -123,12 +128,7 @@ class Make(PersonAction):
                 items=[after_hold],
             )
         )
-        return Success("you're now holding %s" % (after_hold,), item=after_hold)
-
-
-@dataclasses.dataclass
-class ItemsObliterated(StandardEvent):
-    items: List[entity.Entity]
+        return Success("you're now holding %s" % (after_hold,))
 
 
 class Obliterate(PersonAction):
@@ -161,8 +161,6 @@ class Obliterate(PersonAction):
                 items=items,
             )
         )
-
-        await ctx.extend(obliterate=items).hook("obliterate:after")
 
         return Success("you obliterated %s" % (p.join(list(map(str, items))),))
 
@@ -228,8 +226,8 @@ class CallThis(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -251,7 +249,7 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def create(self, args):
         log.info("create: %s", args[0])
         return Create(args[0], str(args[1]))

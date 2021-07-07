@@ -22,11 +22,48 @@ from model.game import *
 from model.things import *
 from model.events import *
 from model.world import *
+from model.tools import *
 
 from plugins.actions import *
 
 MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsAppeared(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsDropped(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsWorn(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsUnworn(StandardEvent):
+    items: List[entity.Entity]
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class PlayerJoined(StandardEvent):
+    pass
+
+
+@event
+@dataclasses.dataclass(frozen=True)
+class ItemsHeld(StandardEvent):
+    items: List[entity.Entity]
 
 
 class Auth(PersonAction):
@@ -60,22 +97,9 @@ class Home(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.extend().hook("home:before")
         return await Go(area=world.welcome_area()).perform(
             world=world, area=area, person=person, ctx=ctx, **kwargs
         )
-
-
-@dataclasses.dataclass
-class ItemsAppeared(StandardEvent):
-    items: List[entity.Entity]
-
-
-def default_heard_for(area: Optional[entity.Entity] = None) -> List[entity.Entity]:
-    if area:
-        with area.make_and_discard(occupyable.Occupyable) as here:
-            return here.occupied
-    return []
 
 
 class AddItemArea(PersonAction):
@@ -108,13 +132,7 @@ class AddItemArea(PersonAction):
                 items=[self.item],
             )
         )
-        await ctx.extend(area=self.area, appeared=[self.item]).hook("appeared:after")
         return Success("%s appeared" % (p.join([self.item]),))
-
-
-@dataclasses.dataclass
-class ItemsDropped(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Wear(PersonAction):
@@ -146,8 +164,14 @@ class Wear(PersonAction):
                 if wearing.wear(item):
                     contain.drop(item)
 
-        # TODO Publish
-        await ctx.extend(wear=[item]).hook("wear:after")
+        await ctx.publish(
+            ItemsWorn(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=[item],
+            )
+        )
         return Success("you wore %s" % (item))
 
 
@@ -179,7 +203,14 @@ class Remove(PersonAction):
                 with person.make(carryable.Containing) as contain:
                     contain.hold(item)
 
-        await ctx.extend(remove=[item]).hook("remove:after")
+        await ctx.publish(
+            ItemsUnworn(
+                living=person,
+                area=area,
+                heard=default_heard_for(area=area),
+                items=[item],
+            )
+        )
         return Success("you removed %s" % (item))
 
 
@@ -208,7 +239,6 @@ class Eat(PersonAction):
         area = world.find_person_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
-        await ctx.extend(eat=item).hook("eat:after")
 
         return Success("you ate %s" % (item))
 
@@ -238,14 +268,8 @@ class Drink(PersonAction):
         area = world.find_person_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
-        await ctx.extend(eat=item).hook("drink:after")
 
         return Success("you drank %s" % (item))
-
-
-@dataclasses.dataclass
-class PlayerJoined(StandardEvent):
-    pass
 
 
 class Join(PersonAction):
@@ -320,7 +344,6 @@ class LookFor(PersonAction):
             vis.add_observation(item.identity)
 
         with person.make(carryable.Containing) as contain:
-            await ctx.extend(holding=contain.holding, item=item).hook("look-for")
             return EntitiesObservation([item])
 
 
@@ -336,7 +359,6 @@ class LookMyself(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.hook("look-myself")
         return PersonalObservation(person)
 
 
@@ -352,7 +374,6 @@ class LookDown(PersonAction):
         ctx: Ctx,
         **kwargs
     ):
-        await ctx.hook("look-down")
         with person.make(carryable.Containing) as contain:
             return EntitiesObservation(contain.holding)
 
@@ -424,15 +445,9 @@ class Drop(PersonAction):
                         items=dropped,
                     )
                 )
-                await ctx.extend(dropped=dropped).hook("drop:after")
                 return Success("you dropped %s" % (p.join(dropped),))
 
             return Failure(failure)
-
-
-@dataclasses.dataclass
-class ItemsHeld(StandardEvent):
-    items: List[entity.Entity]
 
 
 class Hold(PersonAction):
@@ -489,7 +504,7 @@ class Hold(PersonAction):
                         items=[after_hold],
                     )
                 )
-                return Success("you picked up %s" % (after_hold,), item=after_hold)
+                return Success("you picked up %s" % (after_hold,))
 
 
 class Open(PersonAction):
@@ -727,9 +742,7 @@ class MovingAction(PersonAction):
         self.area = area
         self.finder = finder
 
-    async def move(
-        self, ctx: Ctx, world: World, person: entity.Entity, verb=DefaultMoveVerb
-    ):
+    async def move(self, ctx: Ctx, world: World, person: entity.Entity):
         area = world.find_person_area(person)
 
         destination = self.area
@@ -738,7 +751,7 @@ class MovingAction(PersonAction):
             log.info("finder: {0}".format(self.finder))
             area = world.find_person_area(person)
             route = await self.finder.find_route(
-                area, person, world=world, verb=verb, builder=world
+                area, person, world=world, builder=world
             )
             if route:
                 routed: Any = route.area
@@ -749,27 +762,10 @@ class MovingAction(PersonAction):
 
         with destination.make(occupyable.Occupyable) as entering:
             with area.make(occupyable.Occupyable) as leaving:
-                await ctx.extend(area=area).hook("left:before")
                 await leaving.left(person)
-                await ctx.extend(area=area).hook("left:after")
-                await ctx.extend(area=destination).hook("entered:before")
                 await entering.entered(person)
-                await ctx.extend(area=destination).hook("entered:after")
 
         return AreaObservation(world.find_person_area(person), person)
-
-
-class Climb(MovingAction):
-    async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
-    ):
-        # If climb ever becomes a string outside of this function, rethink.
-        return await self.move(ctx, world, person, verb="climb")
 
 
 class Go(MovingAction):

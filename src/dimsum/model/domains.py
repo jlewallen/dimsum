@@ -2,12 +2,15 @@ from typing import Optional, List, Sequence, Dict, Union, Any, Literal, Callable
 
 import logging
 import dataclasses
+import functools
 import time
 
 import model.game as game
 import model.reply as reply
 import model.entity as entity
 import model.world as world
+import model.tools as tools
+import model.events as events
 
 import model.scopes.movement as movement
 import model.scopes.carryable as carryable
@@ -15,16 +18,19 @@ import model.scopes.occupyable as occupyable
 import model.scopes.behavior as behavior
 import model.scopes as scopes
 
+import plugins.actions as actions
+
 from bus import EventBus
 
 import context
-import luaproxy
 import serializing
 import proxying
+import dynamic
+import grammars
 import storage
+import saying
 
 log = logging.getLogger("dimsum.model")
-scripting = behavior.ScriptEngine()
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
@@ -44,14 +50,11 @@ class Session:
     def __init__(
         self,
         store: Optional[storage.EntityStorage] = None,
-        context_factory: Optional[Callable] = None,
         handlers: Optional[List[Any]] = None,
     ):
         super().__init__()
         assert store
-        assert context_factory
         self.store: storage.EntityStorage = store
-        self.context_factory: Callable = context_factory
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
@@ -124,33 +127,47 @@ class Session:
         self.register(self.world)
         return self.world
 
+    async def execute(self, player: entity.Entity, command: str):
+        assert self.world
+        log.info("executing: '%s'", command)
+        contributing = tools.get_contributing_entities(self.world, player)
+        dynamic_behavior = dynamic.Behavior(self.world, contributing)
+        evaluator = grammars.PrioritizedEvaluator(
+            [dynamic_behavior.evaluator, grammars.create_static_evaluator()]
+        )
+        log.info("evaluator: '%s'", evaluator)
+        action = await evaluator.evaluate(command, world=world, player=player)
+        assert action
+        assert isinstance(action, game.Action)
+        return await self.perform(action, player)
+
     async def perform(
-        self, action, person: Optional[entity.Entity] = None, **kwargs
+        self,
+        action,
+        person: Optional[entity.Entity] = None,
+        dynamic_behavior: Optional["dynamic.Behavior"] = None,
+        **kwargs
     ) -> game.Reply:
 
         log.info("-" * 100)
         log.info("%s", action)
         log.info("-" * 100)
 
-        await self.prepare()
+        world = await self.prepare()
 
-        assert self.world
+        area = world.find_entity_area(person) if person else None
 
-        area = self.world.find_entity_area(person) if person else None
-
-        with WorldCtx(
-            person=person,
-            area=area,
-            session=self,
-            context_factory=self.context_factory,
-            **kwargs
-        ) as ctx:
+        with WorldCtx(session=self, person=person, **kwargs) as ctx:
             try:
                 return await action.perform(
-                    world=self.world, area=area, person=person, ctx=ctx
+                    world=world,
+                    area=area,
+                    person=person,
+                    ctx=ctx,
+                    dynamic_behavior=dynamic_behavior,
                 )
             except entity.EntityFrozen:
-                return reply.Failure("whoa, that's frozen")
+                return game.Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
         await self.prepare()
@@ -158,33 +175,25 @@ class Session:
         if now is None:
             now = time.time()
 
-        await self.everywhere(world.TickHook, time=now)
-        await self.everywhere(world.WindHook, time=now)
+        await self.everywhere(events.TickEvent(now))
 
         return now
 
-    async def everywhere(self, name: str, **kwargs):
+    async def everywhere(self, ev: events.Event, **kwargs):
         assert self.world
 
-        log.info("everywhere:%s %s", name, kwargs)
+        log.info("everywhere:%s %s", ev, kwargs)
         everything: List[entity.Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
             with entity.make(behavior.Behaviors) as behave:
-                behaviors = behave.get_behaviors(name)
-                if len(behaviors) > 0:
+                if behave.get_default():
                     log.info("everywhere: %s", entity)
                     area = self.world.find_entity_area(entity)
                     assert area
-                    with WorldCtx(
-                        area=area,
-                        entity=entity,
-                        session=self,
-                        context_factory=self.context_factory,
-                        **kwargs
-                    ) as ctx:
-                        await ctx.hook(name)
+                    with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
+                        await ctx.publish(ev)
 
     async def add_area(
         self, area: entity.Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -252,14 +261,14 @@ class Domain:
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
-        self.context_factory = luaproxy.context_factory
         self.handlers = handlers or []
 
     def session(self, handlers=None) -> "Session":
         log.info("session:new")
         combined = (handlers or []) + self.handlers
         return Session(
-            store=self.store, context_factory=self.context_factory, handlers=combined
+            store=self.store,
+            handlers=combined,
         )
 
     async def reload(self):
@@ -271,21 +280,29 @@ class WorldCtx(context.Ctx):
         self,
         session: Optional[Session] = None,
         person: Optional[entity.Entity] = None,
-        context_factory=None,
+        entity: Optional[entity.Entity] = None,
         **kwargs
     ):
         super().__init__()
-        assert session
-        assert world
-        self.person = person
-        self.se = scripting
+        assert session and session.world
         self.session = session
-        self.world = session.world
-        self.registrar = session.registrar
+        self.world: world.World = session.world
+        self.person = person
         self.bus = session.bus
-        self.context_factory = context_factory
-        self.scope = behavior.Scope(world=world, person=person, **kwargs)
-        assert isinstance(self.world, world.World)
+        self.entities: tools.EntitySet = self._get_default_entity_set(entity)
+
+    def _get_default_entity_set(
+        self, entity: Optional[entity.Entity]
+    ) -> tools.EntitySet:
+        assert self.world
+        entitySet = tools.EntitySet()
+        if self.person:
+            entitySet = tools.get_contributing_entities(self.world, self.person)
+        else:
+            entitySet.add(tools.Relation.WORLD, self.world)
+        if entity:
+            entitySet.add(tools.Relation.OTHER, entity)
+        return entitySet
 
     def __enter__(self):
         context.set(self)
@@ -296,21 +313,14 @@ class WorldCtx(context.Ctx):
         return False
 
     def extend(self, **kwargs) -> "WorldCtx":
-        self.scope = self.scope.extend(**kwargs)
+        for key, l in kwargs.items():
+            log.info("extend '%s' %s", key, l)
+            if isinstance(l, list):
+                for e in l:
+                    self.entities.add(tools.Relation.OTHER, e)
+            else:
+                self.entities.add(tools.Relation.OTHER, l)
         return self
-
-    def entities(self) -> List[entity.Entity]:
-        def get_entities_inside(array):
-            return flatten([get_entities(e) for e in array])
-
-        def get_entities(thing):
-            if isinstance(thing, entity.Entity):
-                return [thing]
-            if isinstance(thing, list):
-                return get_entities_inside(thing)
-            return []
-
-        return get_entities_inside(self.scope.values())
 
     def register(self, entity: entity.Entity) -> entity.Entity:
         return self.session.register(entity)
@@ -319,39 +329,21 @@ class WorldCtx(context.Ctx):
         entity.cleanup(destroyed, world=self.world)
         return self.session.unregister(destroyed)
 
-    async def publish(self, *args, **kwargs):
+    async def standard(self, klass, *args, **kwargs):
+        assert self.world
+        if self.person:
+            assert self.person
+            area = self.world.find_person_area(self.person)
+            a = (self.person, area, []) + args
+            await self.publish(klass(*a, **kwargs))
+
+    async def publish(self, *args: events.Event):
+        assert self.world
+        dynamic_behavior = dynamic.Behavior(self.world, self.entities)
         for arg in args:
+            log.info("publish %s entities=%s", arg, self.entities)
             await self.bus.publish(arg)
-
-    async def hook(self, name: str) -> None:
-        found = {}
-        entities = self.entities()
-        log.info("hook:%s %s" % (name, entities))
-        for entity in entities:
-            behaviors = entity.make(behavior.Behaviors).get_behaviors(name)
-            if len(behaviors) > 0:
-                log.info(
-                    "hook:%s invoke '%s' %d behavior" % (name, entity, len(behaviors))
-                )
-            found[entity] = behaviors
-
-        scope = self.scope
-        for entity, behaviors in found.items():
-
-            def create_context():
-                return self.context_factory(creator=entity)
-
-            for b in behaviors:
-                prepared = self.se.prepare(scope, create_context)
-                thunk = behavior.GenericThunk
-                if "person" in scope.map and scope.map["person"]:
-                    thunk = behavior.PersonThunk
-                actions = self.se.execute(thunk, prepared, b)
-                if actions:
-                    for action in actions:
-                        await self.session.perform(action, person=self.person)
-                        log.info("performing: %s", action)
-                entity.touch()
+            await dynamic_behavior.notify(saying.NotifyAll(arg.name, arg))
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs
@@ -359,7 +351,7 @@ class WorldCtx(context.Ctx):
         initialize = initialize if initialize else {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
-        return scopes.item(initialize=initialize, **kwargs)
+        return self.register(scopes.item(initialize=initialize, **kwargs))
 
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs

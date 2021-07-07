@@ -3,10 +3,13 @@ from typing import Any, List, Type
 import logging
 
 import model.properties as properties
+import model.game as game
 
 import grammars
+import transformers
 
 from plugins.actions import *
+
 from context import *
 
 log = logging.getLogger("dimsum")
@@ -19,8 +22,8 @@ class Grammar(grammars.Grammar):
         return 65536
 
     @property
-    def evaluator(self):
-        return Evaluator
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
 
     @property
     def lark(self) -> str:
@@ -30,6 +33,6 @@ class Grammar(grammars.Grammar):
 """
 
 
-class Evaluator(BaseEvaluator):
+class Transformer(transformers.Base):
     def verb(self, args):
-        return Unknown()
+        return game.Unknown()

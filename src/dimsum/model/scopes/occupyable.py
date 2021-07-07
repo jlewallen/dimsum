@@ -24,17 +24,8 @@ And then using that to maintain our state.
 log = logging.getLogger("dimsum.scopes")
 
 
-class Occupying(entity.Scope):
-    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.area = area
-
-    def update(self, area: entity.Entity):
-        self.area = area
-        self.ourselves.touch()
-
-
-@dataclasses.dataclass
+@events.event
+@dataclasses.dataclass(frozen=True)
 class LivingEnteredArea(events.StandardEvent):
     living: entity.Entity
     area: entity.Entity
@@ -43,13 +34,24 @@ class LivingEnteredArea(events.StandardEvent):
         return {"text": f"{self.living.props.name} arrived from {self.area}"}
 
 
-@dataclasses.dataclass
+@events.event
+@dataclasses.dataclass(frozen=True)
 class LivingLeftArea(events.StandardEvent):
     living: entity.Entity
     area: entity.Entity
 
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} went to {self.area}"}
+
+
+class Occupying(entity.Scope):
+    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.area = area
+
+    def update(self, area: entity.Entity):
+        self.area = area
+        self.ourselves.touch()
 
 
 class Occupyable(entity.Scope):

@@ -18,27 +18,6 @@ p = inflect.engine()
 log = logging.getLogger("dimsum.model")
 
 
-@dataclasses.dataclass
-class SimpleReply(game.Reply):
-    message: Optional[str] = None
-    item: Optional[entity.Entity] = None
-
-
-@dataclasses.dataclass
-class Success(SimpleReply):
-    def __str__(self):
-        if self.message:
-            return "Success<%s>" % (self.message,)
-        return "Success"
-
-
-class Failure(SimpleReply):
-    def __str__(self):
-        if self.message:
-            return "Failure<%s>" % (self.message,)
-        return "Failure"
-
-
 class Observation(game.Reply, visual.Renderable):
     def render_string(self) -> Dict[str, str]:
         return {"message": "some kind of observation"}

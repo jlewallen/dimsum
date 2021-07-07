@@ -21,11 +21,11 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def publish(self, *args, **kwargs):
+    async def publish(self, *args):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def hook(self, name: str) -> None:
+    async def standard(self, klass, *args, **kwargs):
         raise NotImplementedError
 
     @abc.abstractmethod

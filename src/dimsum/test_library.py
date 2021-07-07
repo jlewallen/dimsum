@@ -27,7 +27,7 @@ async def test_library(caplog):
 
         await session.add_area(area)
         await session.save()
-        assert len(session.registrar.entities) == 60  # ?
+        assert len(session.registrar.entities) == 60
 
     with tw.domain.session() as session:
         world = await session.prepare(reach=domains.infinite_reach)
@@ -46,9 +46,9 @@ async def test_library(caplog):
     with reloaded.session() as session:
         assert len(session.registrar.entities) == 0
         await session.prepare(reach=domains.infinite_reach)
-        assert len(session.registrar.entities) == 64
+        assert len(session.registrar.entities) == 60
 
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 64
+        assert len(session.registrar.entities) == 60

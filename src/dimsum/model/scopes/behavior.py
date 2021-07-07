@@ -5,85 +5,26 @@ import sys
 import logging
 import datetime
 import time
-import asyncio
-import lupa
-
-import context
+import ast
 
 import model.properties as properties
 import model.entity as entity
 
+DefaultKey = "b:default"
 log = logging.getLogger("dimsum.scopes")
 
 
-class ConditionalBehavior:
-    def __init__(self, **kwargs):
-        super().__init__()
-
-    @abc.abstractmethod
-    def enabled(self, **kwargs) -> bool:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def lua(self, **kwargs) -> str:
-        raise NotImplementedError
-
-
-class RegisteredBehavior:
-    def __init__(self, name: str, behavior: ConditionalBehavior):
-        super().__init__()
-        self.name = name
-        self.behavior = behavior
-
-
-registered_behaviors: List[RegisteredBehavior] = []
-
-
-def conditional(name):
-    def wrap(klass):
-        log.info("registered behavior: %s %s", name, klass)
-        registered_behaviors.append(RegisteredBehavior(name, klass()))
-
-    return wrap
-
-
-class Scope:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
-
-    @property
-    def map(self):
-        return self.__dict__
-
-    def keys(self):
-        return self.map.keys()
-
-    def values(self):
-        return self.map.values()
-
-    def items(self):
-        return self.map.items()
-
-    def extend(self, **kwargs):
-        copy = self.__dict__.copy()
-        copy.update(**kwargs)
-        return Scope(**copy)
-
-    def prepare(self, wrap):
-        prepared = {}
-        for key, value in self.map.items():
-            prepared[key] = wrap(value)
-        return prepared
-
-
 class Behavior:
-    def __init__(self, lua=None, logs=None, **kwargs):
-        self.lua = lua
+    def __init__(self, python=None, logs=None, **kwargs):
+        self.python = python
         self.logs = logs if logs else []
 
     def check(self):
-        eng = lupa.LuaRuntime(unpack_returned_tuples=True)
-        eng.eval(self.lua)
+        try:
+            ast.parse(self.python)
+            return True
+        except:
+            return False
 
     def error(self, messages: List[str], error):
         self.logs.extend(messages)
@@ -93,70 +34,13 @@ class Behavior:
         self.logs = self.logs[-20:]
 
 
-GenericThunk = """
-function(scope, g)
-    assert(scope, "scope is required (generic)")
-    assert(scope.world, "world is required (generic)")
-    assert(scope.area, "area is required (generic)")
-    return g(scope, scope.world, scope.area, scope.entity)
-end
-"""
-
-PersonThunk = """
-function(scope, g)
-    assert(scope, "scope is required (person)")
-    assert(scope.world, "world is required (person)")
-    assert(scope.area, "area is required (person)")
-    return g(scope, scope.world, scope.area, scope.person)
-end
-"""
-
-
-class ScriptEngine:
-    def __init__(self):
-        self.lua = lupa.LuaRuntime(unpack_returned_tuples=True)
-        self.lua.eval("math.randomseed(os.time())")
-
-    def prepare(self, scope: Scope, context_factory):
-        ctx = context_factory()
-        return scope.prepare(ctx.wrap)
-
-    def execute(self, thunk: str, scope: Scope, main: Behavior):
-        messages: List[str] = []
-
-        def debug(*args):
-            message = ""
-            if isinstance(args, list) or isinstance(args, tuple):  # type:ignore
-                message = " ".join([str(e) for e in args])
-            else:
-                raise Exception("unexpected debug")
-            log.info("lua:debug: " + message)
-            now = datetime.datetime.now()
-            stamped = now.strftime("%Y/%m/%d %H:%M:%S") + " " + message
-            messages.append(stamped)
-
-        g = self.lua.globals()
-        for key, value in scope.items():
-            log.debug("lua: %s = %s", key, value)
-            g[key] = value
-        g.debug = debug
-
-        thunker = self.lua.eval(thunk)
-        fn = self.lua.eval(main.lua)
-        try:
-            rv = thunker(scope, fn)
-            main.done(messages)
-            return rv
-        except Exception as err:
-            log.error("error: %s" % (err,), exc_info=True)
-            main.error(messages, err)
-        return None
-
-
 class BehaviorMap(properties.Map):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
         return [self.map[key] for key in self.keys_matching(pattern)]
+
+    def get(self, key: str) -> Optional[Behavior]:
+        return self.map[key] if key in self.map else None  # type:ignore
 
     def add(self, name, **kwargs):
         b = self.map[name] = Behavior(**kwargs)  # type:ignore
@@ -184,16 +68,15 @@ class Behaviors(entity.Scope):
         super().__init__(**kwargs)
         self.behaviors = behaviors if behaviors else BehaviorMap()
 
-    def get_behaviors(self, name):
-        returning = self.behaviors.get_all(name)
-        for rb in registered_behaviors:
-            if rb.name == name:
-                if rb.behavior.enabled(entity=self.ourselves):
-                    returning.append(Behavior(lua=rb.behavior.lua, logs=[]))
-        return returning
+    def get_default(self) -> Optional[Behavior]:
+        return self.behaviors.get(DefaultKey)
 
-    def add_behavior(self, world: entity.Entity, name, **kwargs):
-        with world.make(BehaviorCollection) as world_behaviors:
-            world_behaviors.entities.append(self.ourselves)
+    def add_behavior(self, world: entity.Entity, **kwargs):
+        # TODO This should be smarter. Only necessary for tick
+        # receivers currently. Maye we just make tick special and run
+        # over everything? This has elegance.
+        if world:
+            with world.make(BehaviorCollection) as world_behaviors:
+                world_behaviors.entities.append(self.ourselves)
         self.ourselves.touch()
-        return self.behaviors.add(name, **kwargs)
+        return self.behaviors.add(DefaultKey, **kwargs)

@@ -8,12 +8,13 @@ import model.properties as properties
 import model.scopes.movement as movement
 
 import plugins.default.actions as actions
-import plugins.actions
+
+import transformers
 
 log = logging.getLogger("dimsum")
 
 
-class Evaluator(plugins.actions.BaseEvaluator):
+class Transformer(transformers.Base):
     # Item lookup
 
     def consumable_noun(self, args):
@@ -53,7 +54,7 @@ class Evaluator(plugins.actions.BaseEvaluator):
         return movement.FindNamedRoute(str(args[0]))
 
 
-class Default(Evaluator):
+class Default(Transformer):
     def stimulate(self, args):
         return args[0]
 
@@ -113,16 +114,7 @@ class Default(Evaluator):
     def forget(self, args):
         return actions.Forget(name=args[0])
 
-    def climb(self, args):
-        return actions.Climb(finder=args[0])
-
-    def run(self, args):
-        return actions.Climb(finder=args[0])
-
     def go(self, args):
-        return actions.Go(finder=args[0])
-
-    def walk(self, args):
         return actions.Go(finder=args[0])
 
     def eat(self, args):

@@ -4,8 +4,9 @@ from lark import exceptions
 
 import logging
 import grammars
+import transformers
 
-import plugins.default.evaluator as evaluator
+import plugins.default.transformer as transformer
 
 log = logging.getLogger("dimsum")
 
@@ -17,8 +18,8 @@ class DefaultGrammar(grammars.Grammar):
         return 0
 
     @property
-    def evaluator(self):
-        return evaluator.Default
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return transformer.Default
 
     @property
     def lark(self) -> str:
@@ -29,8 +30,8 @@ class DefaultGrammar(grammars.Grammar):
                          | drop | hold | put | take | lock | unlock | give | wear | remove | open | close
                          | modify | freeze | unfreeze
                          | eat | drink
-                         | go | climb | walk | run | home
-                         | pour | water
+                         | go | home
+                         | pour
                          | remember | forget | think
                          | auth
 
@@ -74,9 +75,6 @@ class DefaultGrammar(grammars.Grammar):
 
         home:              "home"
         go:                "go" route
-        climb:             "climb" route
-        walk:              "walk" route
-        run:               "run" route
 
         think:             "think"
         forget:            "forget" noun
@@ -84,8 +82,6 @@ class DefaultGrammar(grammars.Grammar):
 
         wear:              "wear" noun
         remove:            "remove" noun
-
-        water:             "water" noun ("with" noun)?
 
         pour:              "pour" "from" noun                      -> pour_from
                          | "pour" noun ("from"|"on"|"over") noun   -> pour
