@@ -2645,13 +2645,13 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "85",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "87",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
@@ -2801,11 +2801,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -2915,11 +2915,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3105,19 +3105,19 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "91",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "93",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "97",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -3261,11 +3261,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3375,11 +3375,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3489,11 +3489,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3565,13 +3565,13 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "100",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "102",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -3715,11 +3715,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3829,11 +3829,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3905,19 +3905,19 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "127",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "129",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "133",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -4061,11 +4061,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4175,11 +4175,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4289,11 +4289,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4365,25 +4365,25 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "115",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "117",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "121",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "124",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -4527,11 +4527,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4641,11 +4641,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4755,11 +4755,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4869,11 +4869,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -4945,19 +4945,19 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "106",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "108",
                                         "klass": "ExitClass",
-                                        "name": "EAST"
+                                        "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "112",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -5101,11 +5101,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5215,11 +5215,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "EAST"
+                                    "value": "East Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5329,11 +5329,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5405,13 +5405,13 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "136",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "138",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -5555,11 +5555,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5669,11 +5669,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5745,19 +5745,19 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "142",
                                         "klass": "ExitClass",
-                                        "name": "NORTH"
+                                        "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "144",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "148",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -5901,11 +5901,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "NORTH"
+                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -6015,11 +6015,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -6129,11 +6129,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -6205,13 +6205,13 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "151",
                                         "klass": "ExitClass",
-                                        "name": "SOUTH"
+                                        "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
                                         "key": "153",
                                         "klass": "ExitClass",
-                                        "name": "WEST"
+                                        "name": "West Exit"
                                     }
                                 ],
                                 "capacity": null,
@@ -6355,11 +6355,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "SOUTH"
+                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -6469,11 +6469,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "WEST"
+                                    "value": "West Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",

@@ -1,4 +1,5 @@
 import logging
+import stringcase
 from typing import Tuple
 
 import model.entity as entity
@@ -309,7 +310,9 @@ class RoomGrid(Factory):
                 scopes.exit(
                     creator=world,
                     parent=generics.thing,
-                    props=properties.Common(name=direction.exiting),
+                    props=properties.Common(
+                        name="%s Exit" % (direction.exiting.title(),)
+                    ),
                     initialize={movement.Exit: dict(area=to_cell)},
                 ),
             )
