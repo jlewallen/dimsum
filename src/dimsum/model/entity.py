@@ -341,6 +341,9 @@ class Entity:
     def __repr__(self):
         return self.describe()
 
+    def __hash__(self):
+        return hash(self.key)
+
 
 class Scope:
     def __init__(

@@ -9,6 +9,7 @@ import context
 import grammars
 import model.entity as entity
 import model.events as events
+import model.domains as session
 import model.game as game
 import model.properties as properties
 import model.scopes.behavior as behavior
@@ -110,7 +111,7 @@ class SimplifiedTransformer(transformers.Base):
 
 @dataclasses.dataclass(frozen=True)
 class Simplified:
-    entity: entity.Entity
+    entity_key: str
     thunk_factory: Callable
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
@@ -148,8 +149,12 @@ class Simplified:
         player: Optional[entity.Entity] = None,
     ) -> Optional[game.Action]:
         assert player
+
+        entity = await session.get().materialize(key=self.entity_key)
+        assert entity
+
         for registered in [
-            r for r in self.registered if r.condition.applies(player, self.entity)
+            r for r in self.registered if r.condition.applies(player, entity)
         ]:
 
             def transformer_factory(**kwargs):
@@ -158,7 +163,7 @@ class Simplified:
                     registered=registered,
                     world=world,
                     player=player,
-                    entity=self.entity,
+                    entity=entity,
                 )
 
             evaluator = grammars.GrammarEvaluator(registered.prose, transformer_factory)
@@ -170,15 +175,18 @@ class Simplified:
         return None
 
     async def notify(self, notify: saying.Notify, **kwargs):
+        entity = await session.get().materialize(key=self.entity_key)
+        assert entity
+
         for receive in self.receives:
             if notify.applies(receive.hook):
-                await notify.invoke(receive.handler, self.entity, **kwargs)
+                await notify.invoke(receive.handler, entity, **kwargs)
 
 
 @dataclasses.dataclass(frozen=True)
 class EntityAndBehavior:
-    entity: entity.Entity
-    behavior: behavior.Behavior
+    key: str
+    behavior: str
 
 
 class NoopEntityBehavior(EntityBehavior):
@@ -262,7 +270,7 @@ async def __ex(t=thunk):
 
         return thunk
 
-    simplified = Simplified(found.entity, thunk_factory)
+    simplified = Simplified(found.key, thunk_factory)
     frame.update(
         dict(
             language=simplified.language,
@@ -272,7 +280,7 @@ async def __ex(t=thunk):
 
     log.info("compiling %s", found)
     try:
-        tree = ast.parse(found.behavior.python)
+        tree = ast.parse(found.behavior)
         # TODO improve filename value here, we have entity.
         compiled = compile(tree, filename="<ast>", mode="exec")
 
@@ -303,7 +311,7 @@ class Behavior:
     def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
         with e.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
-            return [EntityAndBehavior(e, b)] if b else []
+            return [EntityAndBehavior(e.key, b.python)] if b else []
 
     @functools.cached_property
     def _behaviors(self) -> List[EntityAndBehavior]:
@@ -314,7 +322,7 @@ class Behavior:
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
-        return [self._compile_behavior(f) for f in self._behaviors if f.behavior.python]
+        return [self._compile_behavior(f) for f in self._behaviors if f.behavior]
 
     @property
     def evaluator(self) -> grammars.CommandEvaluator:

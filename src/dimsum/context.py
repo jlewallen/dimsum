@@ -6,7 +6,7 @@ from typing import Any, Optional
 import model.entity as entity
 import model.events as events
 
-worldCtx: Any = contextvars.ContextVar("dimsum:ctx")
+world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
 
 
@@ -41,10 +41,10 @@ class Ctx:
 
 
 def get() -> Ctx:
-    ctx = worldCtx.get()
+    ctx = world_ctx.get()
     assert ctx
     return ctx
 
 
 def set(ctx: Optional[Ctx]):
-    worldCtx.set(ctx)
+    world_ctx.set(ctx)

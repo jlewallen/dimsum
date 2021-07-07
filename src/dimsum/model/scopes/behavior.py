@@ -28,6 +28,9 @@ class Behavior:
         self.logs.extend(messages)
         self.logs = self.logs[-20:]
 
+    def __hash__(self):
+        return hash(self.python)
+
 
 class BehaviorMap(properties.Map):
     def get_all(self, behavior: str):

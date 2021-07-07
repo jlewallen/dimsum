@@ -3,6 +3,7 @@ import time
 from typing import Any, cast, Dict, List, Literal, Optional, Union
 
 import bus
+import contextvars
 from bus import EventBus
 import context
 import dynamic
@@ -26,6 +27,13 @@ import storage
 
 log = logging.getLogger("dimsum.model")
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
+active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session")
+
+
+def get() -> "Session":
+    session = active_session.get()
+    assert session
+    return session
 
 
 def infinite_reach(entity: entity.Entity, depth: int):
@@ -61,9 +69,11 @@ class Session:
         await self.store.update(modified)
 
     def __enter__(self) -> "Session":
+        active_session.set(self)
         return self
 
     def __exit__(self, type, value, traceback) -> Literal[False]:
+        active_session.set(None)
         # TODO Warn on unsaved changes?
         return False
 
