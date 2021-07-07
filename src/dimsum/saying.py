@@ -44,7 +44,7 @@ class NotifyAll(Notify):
         return self.hook == hook
 
     def invoke(self, handler, *args, **kwargs):
-        return handler(*args, self.event, **kwargs)
+        return handler(*args, ev=self.event, **kwargs)
 
 
 @dataclasses.dataclass

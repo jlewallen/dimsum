@@ -40,12 +40,12 @@ async def test_multiple_simple_verbs(caplog):
         "Hammer",
         """
 @language('start: "wiggle"')
-async def wiggle(entity, person=None, say=None):
+async def wiggle(entity, person, say):
     log.info("wiggle: %s", entity)
     return "hey there!"
 
 @language('start: "burp"')
-async def burp(entity, person=None, say=None):
+async def burp(entity, person, say):
     log.info("burp: %s", entity)
     return "hey there!"
 """,
@@ -66,7 +66,7 @@ async def test_dynamic_applies_only_when_held(caplog):
         "Hammer",
         """
 @language('start: "wiggle"', condition=Held())
-async def wiggle(entity, person=None, say=None):
+async def wiggle(entity, person, say):
     log.info("wiggle: %s", entity)
     return "hey there!"
 """,
@@ -87,7 +87,7 @@ async def test_dynamic_say_nearby(caplog):
         "Keys",
         """
 @language('start: "jingle"', condition=Held())
-async def jingle(entity, person=None, say=None):
+async def jingle(entity, person, say):
     log.info("jingle: %s", entity)
     say.nearby("you hear kings jingling")
     return "hey there!"
@@ -113,7 +113,7 @@ class Smashed(Event):
     smashed: Entity
 
 @received(Smashed)
-async def smashed(entity: Entity, ev: Smashed, say=None):
+async def smashed(this: Entity, ev: Smashed, say):
     log.info("smashed! %s", ev)
     say.nearby("%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
 """,
@@ -128,11 +128,11 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(entity, smashing, person=None, say=None):
+async def smash(this, smashing, person, say):
     if smashing is None:
         return fail("smash what now?")
-    log.info("smash: %s", entity)
-    await ctx.standard(Smashed, entity, smashing)
+    log.info("smash: %s", this)
+    await ctx.standard(Smashed, this, smashing)
     return ok("you smashed a %s" % (smashing,))
 """,
     )
@@ -165,10 +165,10 @@ class Smashes(Scope):
         self.smashes += 1
 
 @received(Smashed)
-async def smashed(entity, hammer, say=None):
-    with entity.make(Smashes) as smashes:
+async def smashed(this, ev, say):
+    with this.make(Smashes) as smashes:
         smashes.increase()
-        entity.touch()
+        this.touch()
         say.nearby("smashes: %d" % (smashes.smashes))
 """,
     )
@@ -182,11 +182,11 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(entity, smashing, person=None, say=None):
+async def smash(this, smashing, person, say):
     if smashing is None:
         return fail("smash what now?")
-    log.info("smash: %s", entity)
-    await ctx.standard(Smashed, entity, smashing)
+    log.info("smash: %s", this)
+    await ctx.standard(Smashed, this, smashing)
     return ok("you smashed a %s" % (smashing,))
 """,
     )
@@ -219,10 +219,10 @@ class Rusting(Scope):
         self.rust += 1
 
 @received(TickEvent)
-async def rusting(entity, ev, say=None):
-    with entity.make(Rusting) as rust:
+async def rusting(this, ev, say):
+    with this.make(Rusting) as rust:
         rust.increase()
-        entity.touch()
+        this.touch()
         log.info("rusting")
         say.nearby("rust: %d" % (rust.rust))
 """,
@@ -256,10 +256,10 @@ class Rusting(Scope):
         self.rust += 1
 
 @received(ItemsDropped)
-async def dropped(entity, ev, say=None):
-    with entity.make(Rusting) as rust:
+async def dropped(this, ev, say):
+    with this.make(Rusting) as rust:
         rust.increase()
-        entity.touch()
+        this.touch()
         log.info("dropped, rusting %d", rust.rust)
         say.nearby("rust: %d" % (rust.rust))
 """,
@@ -348,7 +348,7 @@ async def test_exception_in_event_handler(caplog):
         "Nail",
         """
 @received(TickEvent)
-def tick(entity, ev, say=None):
+def tick(this, ev, say=None):
     og.info("hello")
 """,
     )
@@ -379,7 +379,7 @@ async def test_exception_in_language_handler(caplog):
         "Nail",
         """
 @language('start: "break"')
-def break_nail(entity, person=None, say=None):
+def break_nail(this, person=None, say=None):
     og.info("hello")
 """,
     )

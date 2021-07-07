@@ -92,7 +92,7 @@ class SimplifiedAction(game.Action):
             say = saying.Say()
             args = await self._args(world, person)
             reply = await self.registered.handler(
-                self.entity, *args, person=person, say=say
+                *args, this=self.entity, person=person, say=say, **kwargs
             )
             if reply:
                 log.debug("say: %s", say)
@@ -186,7 +186,7 @@ class Simplified:
         for receive in self.receives:
             if notify.applies(receive.hook):
                 try:
-                    await notify.invoke(receive.handler, entity, **kwargs)
+                    await notify.invoke(receive.handler, this=entity, **kwargs)
                     tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
@@ -248,13 +248,28 @@ def _get_default_globals():
     )
 
 
+def _prepare_args(fn, args, kwargs):
+    def _get_arg(name):
+        if name in kwargs:
+            return kwargs[name]
+        if args:
+            return args.pop(0)
+        raise Exception("unknown parameter: '%s'" % (name,))
+
+    signature = inspect.signature(fn)
+    return [_get_arg(p) for p in signature.parameters]
+
+
 @functools.lru_cache
 def _compile(found: EntityAndBehavior) -> EntityBehavior:
     frame = _get_default_globals()
 
     def thunk_factory(fn):
         async def thunk(*args, **kwargs):
-            lokals = dict(thunk=(fn, args, kwargs))
+            log.info("thunking: args=%s kwargs=%s", args, kwargs)
+            actual_args = _prepare_args(fn, list(args), kwargs)
+            lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
+            frame.update(dict(ctx=context.get()))
 
             async def aexec():
                 exec(
@@ -273,7 +288,7 @@ async def __ex(t=thunk):
                     lokals,
                 )
                 try:
-                    return await lokals["__ex"]()  # type:ignore
+                    return await lokals["__ex"]()
                 except Exception as e:
                     errors_log.exception("exception", exc_info=True)
                     errors_log.error("globals: %s", frame.keys())
@@ -282,11 +297,7 @@ async def __ex(t=thunk):
                     errors_log.error("kwargs: %s", kwargs)
                     raise e
 
-            log.debug("thunking: %s args=%s kwargs=%s", fn, args, kwargs)
-            log.debug("thunking: %s", inspect.signature(fn))
-            frame.update(dict(ctx=context.get()))
-            rv = await aexec()
-            return rv
+            return await aexec()
 
         return thunk
 
@@ -323,7 +334,6 @@ class Behavior:
     def __init__(self, world: world.World, entities: tools.EntitySet):
         self.world = world
         self.entities = entities
-        self.globals: Dict[str, Any] = {}
 
     def _get_behaviors(self, e: entity.Entity) -> List[EntityAndBehavior]:
         with e.make_and_discard(behavior.Behaviors) as behave:

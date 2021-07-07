@@ -34,7 +34,7 @@ class Bank(Scope):
         self.gold = gold
 
 @received(ItemsDropped)
-async def dropped(entity, ev=None, say=None, **kwargs):
+async def dropped(this, ev, say):
     with ev.living.make(Bank) as bank:
         if bank.gold < 2:
             bank.gold += 1
@@ -78,11 +78,11 @@ async def test_wear_cape(caplog):
                 world,
                 python="""
 @received(ItemsWorn)
-async def worn(entity, ev=None, say=None, **kwargs):
+async def worn(this, ev, say):
     tools.hide(ev.living)
 
 @received(ItemsUnworn)
-async def unworn(entity, ev=None, say=None, **kwargs):
+async def unworn(this, ev, say):
     tools.show(ev.living)
 """,
             )
@@ -125,8 +125,11 @@ async def test_behavior_create_item(caplog):
                 w,
                 python="""
 @language('start: "shake"')
-async def shake(entity, person=None, say=None):
-    item = ctx.create_item(creator=person, props=properties.Common("Flower Petal"))
+async def shake(this, person=None, say=None):
+    item = ctx.create_item(
+        creator=person,
+        props=properties.Common("Flower Petal")
+    )
     tools.hold(person, item)
     return "oh wow look at that!"
 """,
@@ -169,7 +172,7 @@ async def test_behavior_create_quantified_item(caplog):
                 world,
                 python="""
 @language('start: "shake"')
-async def shake(entity, person=None, say=None):
+async def shake(this, person, say):
     item = ctx.create_item(
         creator=person,
         props=properties.Common("Flower Petal"),
@@ -230,13 +233,13 @@ async def test_behavior_time_passing(caplog):
                 world,
                 python="""
 @received(TickEvent)
-async def tick(entity, ev, say=None):
+async def tick(this, ev, say):
     item = ctx.create_item(
-        creator=entity,
+        creator=this,
         props=properties.Common("Flower Petal"),
         initialize={ Carryable: dict(quantity=10) }
     )
-    tools.hold(tools.area_of(entity), item)
+    tools.hold(tools.area_of(this), item)
 """,
             )
         await session.save()
