@@ -10,29 +10,16 @@ import model.world as world
 import model.library as library
 import model.visual as visual
 
-import bus
 import config
-import grammars
-
 import plugins.default
-
-import handlers
-
 import everything
 
 log = logging.getLogger("dimsum.cli")
 
 
 class InitializeWorld:
-    def __init__(
-        self,
-        cfg: config.Configuration,
-        subscriptions: Optional[bus.SubscriptionManager] = None,
-        comms: Optional[visual.Comms] = None,
-    ):
-        assert comms
-        self.cfg = cfg
-        self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
+    def __init__(self, domain: domains.Domain):
+        self.domain: domains.Domain = domain
 
     async def create_player_if_necessary(self, session: domains.Session, key: str):
         world = await session.prepare()
@@ -68,25 +55,21 @@ class InitializeWorld:
 class Interactive(sshd.CommandHandler):
     def __init__(
         self,
-        cfg: config.Configuration,
+        domain: domains.Domain,
         username: Optional[str] = None,
-        subscriptions: Optional[bus.SubscriptionManager] = None,
-        comms: Optional[visual.Comms] = None,
         channel: Optional[TextIO] = None,
     ):
         super().__init__()
         assert username
-        assert subscriptions
-        assert comms
+        assert domain
         assert channel
-        self.cfg = cfg
+        self.domain = domain
         self.username = username
-        self.comms = comms
         self.channel = channel
-        self.evaluator = grammars.create_static_evaluator()
-        self.domain = cfg.make_domain(handlers=[handlers.create(comms)])
-        self.subscription = subscriptions.subscribe(self.username, self.write)
-        self.initialize = InitializeWorld(cfg, subscriptions, comms)
+        self.subscription = self.domain.subscriptions.subscribe(
+            self.username, self.write
+        )
+        self.initialize = InitializeWorld(self.domain)
 
     async def write(self, item: visual.Renderable, **kwargs):
         self.channel.write("\n" + str(item.render_string()) + "\n\n")
@@ -98,8 +81,7 @@ class Interactive(sshd.CommandHandler):
             world, player = await self.initialize.create_player_if_necessary(
                 session, self.username
             )
-            action = self.evaluator.evaluate(line.strip(), world=world, player=player)
-            reply = await session.perform(action, player)
+            reply = await session.execute(player, line.strip())
 
             log.debug("reply: %s", reply)
 

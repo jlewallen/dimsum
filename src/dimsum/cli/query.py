@@ -5,18 +5,11 @@ import sys
 import jsonpickle
 import json
 
-import model.world as world
-import model.entity as entity
-import model.scopes as scopes
-import model.domains as domains
-
 import cli.utils as utils
 
 import ariadne
 import config as configuration
-import grammars
 import serializing
-import bus
 
 import schema as schema_factory
 from schema import AriadneContext
@@ -58,12 +51,9 @@ async def query(config: str, database: str):
 
     cfg = get_config()
     domain = cfg.make_domain()
-    subscriptions = bus.SubscriptionManager()
     context = AriadneContext(
         cfg,
         domain,
-        subscriptions,
-        grammars.create_static_evaluator(),
         None,  # type:ignore
     )
     schema = schema_factory.create()

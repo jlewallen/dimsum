@@ -10,6 +10,7 @@ import model.reply as reply
 import model.entity as entity
 import model.world as world
 import model.tools as tools
+import model.visual as visual
 import model.events as events
 
 import model.scopes.movement as movement
@@ -29,6 +30,8 @@ import dynamic
 import grammars
 import storage
 import saying
+import handlers
+import bus
 
 log = logging.getLogger("dimsum.model")
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
@@ -190,8 +193,6 @@ class Session:
             with entity.make(behavior.Behaviors) as behave:
                 if behave.get_default():
                     log.info("everywhere: %s", entity)
-                    area = self.world.find_entity_area(entity)
-                    assert area
                     with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
                         await ctx.publish(ev)
 
@@ -256,19 +257,22 @@ class Domain:
     def __init__(
         self,
         store: Optional[storage.EntityStorage] = None,
-        handlers: Optional[List[Any]] = None,
+        subscriptions: Optional[bus.SubscriptionManager] = None,
         **kwargs
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
-        self.handlers = handlers or []
+        self.subscriptions = (
+            subscriptions if subscriptions else bus.SubscriptionManager()
+        )
+        self.comms: visual.Comms = self.subscriptions
+        self.handlers = [handlers.create(self.subscriptions)]
 
-    def session(self, handlers=None) -> "Session":
+    def session(self) -> "Session":
         log.info("session:new")
-        combined = (handlers or []) + self.handlers
         return Session(
             store=self.store,
-            handlers=combined,
+            handlers=self.handlers,
         )
 
     async def reload(self):

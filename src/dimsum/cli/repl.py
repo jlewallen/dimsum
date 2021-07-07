@@ -40,7 +40,8 @@ class Repl:
     def __init__(self, cfg: config.Configuration, name: str):
         super().__init__()
         self.cfg = cfg
-        self.loop = interactive.Interactive(self.cfg, name)
+        self.domain = cfg.make_domain()
+        self.loop = interactive.Interactive(self.domain, name)
 
     async def read_command(self):
         return sys.stdin.readline().strip()

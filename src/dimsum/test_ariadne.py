@@ -30,13 +30,9 @@ log = logging.getLogger("dimsum")
 
 
 def get_test_context(domain: domains.Domain, **kwargs):
-    subscriptions = bus.SubscriptionManager()
-
     return AriadneContext(
         config.symmetrical(":memory:"),
         domain,
-        subscriptions,
-        grammars.create_static_evaluator(),
         None,  # type:ignore
         serializing.Identities.HIDDEN,
     )

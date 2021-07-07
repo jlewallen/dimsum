@@ -15,12 +15,27 @@ from starlette.middleware.cors import CORSMiddleware
 
 import config
 import schema as schema_factory
-import bus
 import sshd
 
+import model.domains as domains
 import cli.interactive as interactive
 
 log = logging.getLogger("dimsum.cli")
+
+
+async def ticks(domain: domains.Domain):
+    while True:
+        try:
+            await asyncio.sleep(60)
+            try:
+                with domain.session() as session:
+                    await session.prepare()
+                    await session.tick(0)
+                    await session.save()
+            except:
+                log.exception("error", exc_info=True)
+        except asyncio.exceptions.CancelledError:
+            return
 
 
 @click.group()
@@ -86,14 +101,13 @@ async def server(
             session_key=config.generate_session_key(),
         )
 
-    subscriptions = bus.SubscriptionManager()
+    domain = cfg.make_domain()
     schema = schema_factory.create()
     gql_app = ariadne.asgi.GraphQL(
         schema,
-        context_value=schema_factory.context(cfg, subscriptions, subscriptions),
-        debug=True,
-        # extensions=[],
+        context_value=schema_factory.context(cfg, domain),
         extensions=[ApolloTracingExtension],
+        debug=True,
     )
 
     app = CORSMiddleware(
@@ -104,15 +118,11 @@ async def server(
     )
 
     def create_ssh_session(**kwargs):
-        return interactive.Interactive(
-            cfg, subscriptions=subscriptions, comms=subscriptions, **kwargs
-        )
+        return interactive.Interactive(domain, **kwargs)
 
     if user:
         for key in user:
-            temp = interactive.InitializeWorld(
-                cfg, subscriptions=subscriptions, comms=subscriptions
-            )
+            temp = interactive.InitializeWorld(domain)
             await temp.initialize(user)
 
     loop = asyncio.get_event_loop()
@@ -120,7 +130,12 @@ async def server(
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
+    tick_task = loop.create_task(ticks(domain))
     await asyncio.gather(sshd_task, gql_task)
+
+    tick_task.cancel()
+
+    await asyncio.gather(tick_task)
 
 
 # with proxy.start(

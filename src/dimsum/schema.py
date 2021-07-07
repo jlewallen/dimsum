@@ -29,7 +29,6 @@ import serializing
 import grammars
 import storage
 import config
-import handlers
 import bus
 
 log = logging.getLogger("dimsum")
@@ -184,7 +183,7 @@ subscription = ariadne.SubscriptionType()
 @subscription.source("nearby")
 async def nearby_generator(obj, info, evaluator: str):
     q: asyncio.Queue = asyncio.Queue()
-    subscriptions = info.context.subscriptions
+    subscriptions = info.context.domain.subscriptions
 
     async def publish(item: visual.Renderable, **kwargs):
         await q.put(item)
@@ -423,23 +422,16 @@ def create():
 class AriadneContext:
     cfg: config.Configuration
     domain: domains.Domain
-    subscriptions: bus.SubscriptionManager
-    evaluator: grammars.CommandEvaluator
     request: starlette.requests.Request
     identities: serializing.Identities = serializing.Identities.PRIVATE
 
 
-def context(cfg, subscriptions: bus.SubscriptionManager, comms: visual.Comms):
-    domain = cfg.make_domain(handlers=[handlers.create(comms)])
-    evaluator = grammars.create_static_evaluator()
-
+def context(cfg: config.Configuration, domain: domains.Domain):
     def wrap(request):
         log.info("ariadne:context %s", request)
         return AriadneContext(
             cfg=cfg,
             domain=domain,
-            subscriptions=subscriptions,
-            evaluator=evaluator,
             request=request,
         )
 
