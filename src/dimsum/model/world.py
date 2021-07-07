@@ -16,6 +16,8 @@ p = inflect.engine()
 
 class EntityHooks(entity.Hooks):
     def describe(self, entity: entity.Entity) -> str:
+        if entity.klass == scopes.LivingClass:
+            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
         if entity.has(carryable.Carryable):
             with entity.make_and_discard(carryable.Carryable) as carry:
                 if carry.quantity > 1:
