@@ -45,14 +45,14 @@ class Ground(Condition):
 @dataclasses.dataclass(frozen=True)
 class Registered:
     prose: str
-    handler: Callable
+    handler: Callable = dataclasses.field(repr=False)
     condition: Condition
 
 
 @dataclasses.dataclass(frozen=True)
 class Receive:
     hook: str
-    handler: Callable
+    handler: Callable = dataclasses.field(repr=False)
     condition: Condition
 
 
@@ -117,7 +117,7 @@ class SimplifiedTransformer(transformers.Base):
 @dataclasses.dataclass(frozen=True)
 class Simplified:
     entity_key: str
-    thunk_factory: Callable
+    thunk_factory: Callable = dataclasses.field(repr=False)
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
 
@@ -171,7 +171,9 @@ class Simplified:
                     entity=entity,
                 )
 
-            evaluator = grammars.GrammarEvaluator(registered.prose, transformer_factory)
+            evaluator = grammars.GrammarEvaluator(
+                grammars.DYNAMIC, registered.prose, transformer_factory
+            )
 
             action = await evaluator.evaluate(command)
             if action:
@@ -211,7 +213,7 @@ class NoopEntityBehavior(EntityBehavior):
 class CompiledEntityBehavior(EntityBehavior):
     simplified: Simplified
     assigned: Optional[grammars.CommandEvaluator]
-    frame: Dict[str, Any]
+    frame: Dict[str, Any] = dataclasses.field(repr=False)
 
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         action = await self.simplified.evaluate(command, **kwargs)
@@ -364,8 +366,12 @@ class Behavior:
         )
 
     @property
-    def evaluator(self) -> grammars.CommandEvaluator:
-        return grammars.PrioritizedEvaluator(self._compiled)
+    def evaluators(self) -> Sequence[grammars.CommandEvaluator]:
+        return self._compiled
+
+    @property
+    def lazy_evaluator(self) -> grammars.CommandEvaluator:
+        return grammars.LazyCommandEvaluator(lambda: self.evaluators)
 
     async def notify(self, notify: saying.Notify, say=None):
         log.info("notify=%s n=%d", notify, len(self._compiled))

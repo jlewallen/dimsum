@@ -11,10 +11,6 @@ log = logging.getLogger("dimsum")
 @grammars.grammar()
 class DefaultGrammar(grammars.Grammar):
     @property
-    def order(self) -> int:
-        return 0
-
-    @property
     def transformer_factory(self) -> Type[transformers.Base]:
         return transformer.Default
 

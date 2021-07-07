@@ -28,3 +28,23 @@ async def test_edit_item():
     await tw.initialize()
     await tw.success("create thing Box")
     await tw.success("edit box")
+
+
+@pytest.mark.asyncio
+async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged():
+    tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
+    await tw.initialize()
+
+    box = await tw.add_behaviored_thing(
+        tw,
+        "Box",
+        """
+og.info("hello")
+""",
+    )
+
+    await tw.success("edit box")
+
+    with tw.domain.session() as session:
+        box = await session.materialize(key=box.key)
+        assert box.version.i == 1

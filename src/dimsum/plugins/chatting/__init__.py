@@ -76,6 +76,10 @@ class Tell(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
+    def order(self) -> int:
+        return grammars.CHATTING
+
+    @property
     def transformer_factory(self) -> Type[transformers.Base]:
         return Transformer
 

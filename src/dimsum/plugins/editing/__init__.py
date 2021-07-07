@@ -54,6 +54,10 @@ class ClearScreen(PersonAction):
 @grammars.grammar()
 class Grammar(grammars.Grammar):
     @property
+    def order(self) -> int:
+        return grammars.HIGHEST
+
+    @property
     def transformer_factory(self) -> Type[transformers.Base]:
         return Transformer
 

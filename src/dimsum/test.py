@@ -11,6 +11,7 @@ import model.entity as entity
 import model.game as game
 import model.properties as properties
 import model.scopes as scopes
+import model.scopes.behavior as behavior
 import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes.users as users
@@ -164,6 +165,22 @@ class TestWorld:
         r = await self.execute(command, **kwargs)
         assert isinstance(r, game.Failure)
         return r
+
+    async def add_behaviored_thing(self, tw: "TestWorld", name: str, python: str):
+        with tw.domain.session() as session:
+            world = await session.prepare()
+
+            item = tw.add_item_to_welcome_area(
+                scopes.item(creator=world, props=properties.Common(name)),
+                session=session,
+            )
+
+            with item.make(behavior.Behaviors) as behave:
+                behave.add_behavior(world, python=python)
+
+            await session.save()
+
+            return item
 
 
 async def make_simple_domain(

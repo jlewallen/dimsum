@@ -9,8 +9,17 @@ import model.game as game
 
 log = logging.getLogger("dimsum.grammars")
 
+HIGHEST = 0
+CHATTING = 10
+DYNAMIC = 50
+LOWEST = 100
+
 
 class CommandEvaluator:
+    @property
+    def order(self) -> int:
+        return DYNAMIC + 1
+
     @abc.abstractmethod
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         raise NotImplementedError
@@ -26,12 +35,28 @@ class AlwaysUnknown(CommandEvaluator):
 class PrioritizedEvaluator(CommandEvaluator):
     evaluators: Sequence[CommandEvaluator]
 
+    def __post_init__(self):
+        self.evaluators = sorted(self.evaluators, key=lambda e: e.order)
+
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         for evaluator in self.evaluators:
             action = await evaluator.evaluate(command, **kwargs)
             if action:
                 return action
         return None
+
+
+@dataclasses.dataclass
+class LazyCommandEvaluator(CommandEvaluator):
+    factory: Callable
+    gorder: int = DYNAMIC
+
+    @functools.cached_property
+    def evaluator(self) -> CommandEvaluator:
+        return PrioritizedEvaluator(self.factory())
+
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        return await self.evaluator.evaluate(command, **kwargs)
 
 
 class ParsingException(Exception):
@@ -41,7 +66,7 @@ class ParsingException(Exception):
 class Grammar:
     @property
     def order(self) -> int:
-        return 1
+        return DYNAMIC + 1
 
     @property
     def transformer_factory(self) -> Type[Transformer]:
@@ -54,8 +79,13 @@ class Grammar:
 
 @dataclasses.dataclass
 class GrammarEvaluator(CommandEvaluator):
+    gorder: int
     grammar: str = dataclasses.field(repr=False)
     transformer_factory: Callable
+
+    @property
+    def order(self) -> int:
+        return self.gorder
 
     @functools.cached_property
     def _parser(self) -> Lark:
@@ -87,11 +117,9 @@ def grammar():
     return wrap
 
 
-def create_static_evaluator():
+def create_static_evaluators():
     log.debug("static-evaluator: grammars=%s", grammars)
-    return PrioritizedEvaluator(
-        [GrammarEvaluator(g.lark, g.transformer_factory) for g in grammars]
-    )
+    return [GrammarEvaluator(g.order, g.lark, g.transformer_factory) for g in grammars]
 
 
 @functools.lru_cache

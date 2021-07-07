@@ -137,7 +137,7 @@ class Session:
         contributing = tools.get_contributing_entities(self.world, player)
         dynamic_behavior = dynamic.Behavior(self.world, contributing)
         evaluator = grammars.PrioritizedEvaluator(
-            [dynamic_behavior.evaluator, grammars.create_static_evaluator()]
+            [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
         )
         log.info("evaluator: '%s'", evaluator)
         action = await evaluator.evaluate(command, world=world, player=player)

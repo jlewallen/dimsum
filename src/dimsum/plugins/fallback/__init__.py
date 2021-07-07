@@ -12,7 +12,7 @@ log = logging.getLogger("dimsum")
 class Grammar(grammars.Grammar):
     @property
     def order(self) -> int:
-        return 65536
+        return grammars.LOWEST
 
     @property
     def transformer_factory(self) -> Type[transformers.Base]:

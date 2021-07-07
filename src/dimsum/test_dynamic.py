@@ -11,23 +11,6 @@ import pytest
 log = logging.getLogger("dimsum.tests")
 
 
-async def add_behaviored_thing(tw: test.TestWorld, name: str, python: str):
-    with tw.domain.session() as session:
-        world = await session.prepare()
-
-        item = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common(name)),
-            session=session,
-        )
-
-        with item.make(behavior.Behaviors) as behave:
-            behave.add_behavior(world, python=python)
-
-        await session.save()
-
-        return item
-
-
 @pytest.mark.asyncio
 async def test_multiple_simple_verbs(caplog):
     tw = test.TestWorld()
@@ -35,7 +18,7 @@ async def test_multiple_simple_verbs(caplog):
 
     await tw.failure("wiggle")
 
-    hammer = await add_behaviored_thing(
+    hammer = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -61,7 +44,7 @@ async def test_dynamic_applies_only_when_held(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = await add_behaviored_thing(
+    hammer = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -82,7 +65,7 @@ async def test_dynamic_say_nearby(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = await add_behaviored_thing(
+    hammer = await tw.add_behaviored_thing(
         tw,
         "Keys",
         """
@@ -103,7 +86,7 @@ async def test_dynamic_smash(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -118,7 +101,7 @@ async def smashed(this: Entity, ev: Smashed, say):
     say.nearby("%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
 """,
     )
-    hammer = await add_behaviored_thing(
+    hammer = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -147,7 +130,7 @@ async def test_dynamic_maintains_scope(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -172,7 +155,7 @@ async def smashed(this, ev, say):
         say.nearby("smashes: %d" % (smashes.smashes))
 """,
     )
-    hammer = await add_behaviored_thing(
+    hammer = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -206,7 +189,7 @@ async def test_dynamic_receive_tick(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -243,7 +226,7 @@ async def test_dynamic_receive_drop_hook(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -285,7 +268,7 @@ async def test_no_evaluators_understands_nothing(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -301,7 +284,7 @@ async def test_exception_in_parse(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -327,7 +310,7 @@ async def test_exception_in_compile(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -343,7 +326,7 @@ async def test_exception_in_event_handler(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -374,7 +357,7 @@ async def test_exception_in_language_handler(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await add_behaviored_thing(
+    nail = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
