@@ -88,10 +88,8 @@ class SimplifiedAction(game.Action):
         world: world.World,
         area: entity.Entity,
         person: entity.Entity,
-        dynamic_behavior: Optional["Behavior"] = None,
         **kwargs,
     ):
-        assert dynamic_behavior
         try:
             say = saying.Say()
             args = await self._args(world, person)

@@ -141,7 +141,7 @@ class Session:
         action = await evaluators.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
-        return await self.perform(action, player, dynamic_behavior=dynamic_behavior)
+        return await self.perform(action, player)
 
     async def perform(
         self,
