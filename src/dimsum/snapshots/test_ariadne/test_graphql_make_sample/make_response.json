@@ -37,12 +37,6 @@
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "18",
-                                        "klass": "ItemClass",
-                                        "name": "Large Oak Tree"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
                                         "key": "24",
                                         "klass": "ItemClass",
                                         "name": "Mysterious Box"
@@ -58,12 +52,6 @@
                                         "key": "30",
                                         "klass": "ItemClass",
                                         "name": "Large Steep Cliff"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "56",
-                                        "klass": "ItemClass",
-                                        "name": "Large Maple Tree"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",

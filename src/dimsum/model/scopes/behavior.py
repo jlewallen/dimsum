@@ -77,6 +77,7 @@ class Behaviors(entity.Scope):
         # over everything? This has elegance.
         if world:
             with world.make(BehaviorCollection) as world_behaviors:
-                world_behaviors.entities.append(self.ourselves)
+                if self.ourselves not in world_behaviors.entities:
+                    world_behaviors.entities.append(self.ourselves)
         self.ourselves.touch()
         return self.behaviors.add(DefaultKey, **kwargs)
