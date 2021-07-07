@@ -3,7 +3,6 @@ import Home from "../views/Home.vue";
 import Login from "../views/auth/Login.vue";
 import Logout from "../views/auth/Logout.vue";
 import GeneralView from "../views/entity/GeneralView.vue";
-import BehaviorView from "../views/entity/BehaviorView.vue";
 import ExploreView from "../views/explore/ExploreView.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -26,11 +25,6 @@ const routes: Array<RouteRecordRaw> = [
         path: "/entities/:key",
         name: "entity",
         component: GeneralView,
-    },
-    {
-        path: "/entities/:key/behavior",
-        name: "entity-behavior",
-        component: BehaviorView,
     },
     {
         path: "/explore",
