@@ -125,7 +125,7 @@ async def test_behavior_create_item(caplog):
                 w,
                 python="""
 @language('start: "shake"')
-async def shake(this, person=None, say=None):
+async def shake(this, person, say):
     item = ctx.create_item(
         creator=person,
         props=properties.Common("Flower Petal")
@@ -144,6 +144,72 @@ async def shake(this, person=None, say=None):
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 1
+
+    await tw.success("shake")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 2
+        assert jacob.make(carryable.Containing).holding[1].creator == jacob
+
+    await tw.success("shake")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 3
+        assert jacob.make(carryable.Containing).holding[1].creator == jacob
+
+    await tw.success("look")
+
+
+@pytest.mark.asyncio
+async def test_behavior_create_item_same_kind(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    with tw.domain.session() as session:
+        w = await session.prepare()
+
+        box = tw.add_item_to_welcome_area(
+            scopes.item(creator=w, props=properties.Common("A Colorful Box")),
+            session=session,
+        )
+        with box.make(behavior.Behaviors) as behave:
+            behave.add_behavior(
+                w,
+                python="""
+@language('start: "shake"')
+async def shake(this, person, say):
+    item = ctx.create_item(
+        creator=person,
+        kind=this.get_kind("petal-1"),
+        props=properties.Common("Flower Petal"),
+        initialize={ Carryable: dict(kind=this.get_kind("petal-1")) },
+    )
+    tools.hold(person, item)
+    return "oh wow look at that!"
+""",
+            )
+
+        await session.save()
+
+    await tw.success("look")
+    await tw.success("hold box")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 1
+
+    await tw.success("shake")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert len(jacob.make(carryable.Containing).holding) == 2
+        assert jacob.make(carryable.Containing).holding[1].creator == jacob
 
     await tw.success("shake")
 
