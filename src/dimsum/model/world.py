@@ -28,10 +28,12 @@ class EntityHooks(entity.Hooks):
 
     def cleanup(self, entity: entity.Entity, world: Optional["World"] = None, **kwargs):
         assert world
-        log.info("cleanup %s", entity)
-        with world.make(behavior.BehaviorCollection) as collection:
-            if entity in collection.entities:
-                collection.entities.remove(entity)
+        if world.has(behavior.BehaviorCollection):
+            log.info("cleanup %s", entity)
+            with world.make(behavior.BehaviorCollection) as collection:
+                if entity in collection.entities:
+                    collection.entities.remove(entity)
+                    world.touch()
 
 
 entity.hooks(EntityHooks())
