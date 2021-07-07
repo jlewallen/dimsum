@@ -108,9 +108,3 @@ async def test_taking_multiple_sips():
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 0
-
-
-@pytest.mark.asyncio
-@pytest.mark.skip(reason="todo")
-async def test_modifying_servings_on_unedible_things():
-    pass
