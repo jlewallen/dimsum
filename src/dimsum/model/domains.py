@@ -357,12 +357,15 @@ class WorldCtx(context.Ctx):
         await self.notify(ev)
 
     def create_item(
-        self, quantity: Optional[float] = None, initialize=None, **kwargs
+        self, quantity: Optional[float] = None, initialize=None, register=True, **kwargs
     ) -> entity.Entity:
         initialize = initialize if initialize else {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
-        return self.register(scopes.item(initialize=initialize, **kwargs))
+        created = scopes.item(initialize=initialize, **kwargs)
+        if register:
+            return self.register(created)
+        return created
 
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs

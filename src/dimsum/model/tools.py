@@ -7,6 +7,8 @@ import time
 
 from typing import Any, Dict, List, Optional, Sequence
 
+import context
+
 from model.entity import Entity
 import model.scopes.apparel as apparel
 import model.scopes.carryable as carryable
@@ -86,7 +88,8 @@ def show(e: Entity):
 
 def hold(c: Entity, e: Entity):
     with c.make(carryable.Containing) as contains:
-        contains.hold(e)
+        held = contains.hold(e)
+        context.get().register(held)
 
 
 def area_of(entity: Entity) -> Optional[Entity]:
