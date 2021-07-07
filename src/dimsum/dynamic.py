@@ -221,7 +221,6 @@ class Behavior:
         event_classes = {k.__name__: k for k in events.get_all()}
         return dict(
             log=log,
-            world=self.world,
             Held=Held,
             Ground=Ground,
             Scope=entity.Scope,
