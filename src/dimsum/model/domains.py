@@ -155,16 +155,14 @@ class Session:
         log.info("%s", action)
         log.info("-" * 100)
 
-        await self.prepare()
+        world = await self.prepare()
 
-        assert self.world
-
-        area = self.world.find_entity_area(person) if person else None
+        area = world.find_entity_area(person) if person else None
 
         with WorldCtx(session=self, person=person, **kwargs) as ctx:
             try:
                 return await action.perform(
-                    world=self.world,
+                    world=world,
                     area=area,
                     person=person,
                     ctx=ctx,

@@ -4,7 +4,6 @@ import dataclasses
 import logging
 import enum
 
-from model.world import World
 from model.entity import Entity
 
 import model.game as game
@@ -46,11 +45,11 @@ class EntitySet:
         return flatten([e for rel, e in self.entities.items()])
 
 
-def get_contributing_entities(world: World, player: Entity) -> EntitySet:
+def get_contributing_entities(world: Entity, player: Entity) -> EntitySet:
     entities = EntitySet()
     entities.add(Relation.WORLD, world)
     entities.add(Relation.SELF, player)
-    area = world.find_entity_area(player)
+    area = area_of(player)
     if area:
         with area.make_and_discard(carryable.Containing) as ground:
             entities.add_all(Relation.GROUND, ground.holding)
@@ -89,14 +88,23 @@ def hold(c: Entity, e: Entity):
         contains.hold(e)
 
 
-def area_of(c: Entity) -> Entity:
-    with c.make_and_discard(carryable.Location) as location:
-        if location.container:
-            return location.container
-    with c.make_and_discard(occupyable.Occupying) as occupying:
+def area_of(entity: Entity) -> Optional[Entity]:
+    if entity.has(occupyable.Occupyable):
+        log.info("finding area for %s (self)", entity)
+        return entity
+
+    log.info("finding area for %s", entity)
+    with entity.make_and_discard(occupyable.Occupying) as occupying:
         if occupying.area:
+            log.debug("finding area for %s (occupying)", entity)
             return occupying.area
-    raise Exception()
+
+    with entity.make_and_discard(carryable.Location) as location:
+        if location.container:
+            log.debug("finding area for %s (container)", entity)
+            return location.container
+
+    return None
 
 
 def flatten(l):
