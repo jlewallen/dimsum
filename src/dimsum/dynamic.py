@@ -116,7 +116,7 @@ class SimplifiedTransformer(transformers.Base):
 
 
 @dataclasses.dataclass(frozen=True)
-class Simplified(EntityBehavior):
+class Simplified:
     entity: entity.Entity
     thunk_factory: Callable
     registered: List[Registered] = dataclasses.field(default_factory=list)
@@ -148,7 +148,7 @@ class Simplified(EntityBehavior):
 
         return wrap
 
-    async def evaluate(  # type:ignore
+    async def evaluate(
         self,
         command: str,
         world: Optional[world.World] = None,
@@ -194,6 +194,28 @@ class NoopEntityBehavior(EntityBehavior):
 
     async def notify(self, notify: saying.Notify, **kwargs):
         pass
+
+
+@dataclasses.dataclass(frozen=True)
+class CompiledEntityBehavior(EntityBehavior):
+    simplified: Simplified
+    assigned: Optional[grammars.CommandEvaluator] = None
+
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        action = await self.simplified.evaluate(command, **kwargs)
+        if action:
+            return action
+        log.info("assigned %s", self.assigned)
+        if self.assigned is not None:
+            action = await self.assigned.evaluate(command, **kwargs)
+            log.info("OK: %s", action)
+            if action:
+                return action
+            return game.Unknown()
+        return None
+
+    async def notify(self, notify: saying.Notify, **kwargs):
+        return await self.simplified.notify(notify, **kwargs)
 
 
 class Behavior:
@@ -280,8 +302,13 @@ async def __ex(t=thunk):
             # this is the only way to get this to behave.
             declarations: Dict[str, Any] = {}
             eval(compiled, self.globals, declarations)
+            evaluator: Optional[grammars.CommandEvaluator] = None
+            EvaluatorsName = "evaluators"
+            if EvaluatorsName in declarations:
+                evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
+                del declarations[EvaluatorsName]
             self.globals.update(**declarations)
-            return simplified
+            return CompiledEntityBehavior(simplified, evaluator)
         except:
             log.exception("dynamic:error", exc_info=True)
             return NoopEntityBehavior()
@@ -291,15 +318,15 @@ async def __ex(t=thunk):
         return [self._compile_behavior(f) for f in self._behaviors if f.behavior.python]
 
     @property
-    def evaluators(self) -> List[grammars.CommandEvaluator]:
-        return list(self._compiled)
+    def evaluator(self) -> grammars.CommandEvaluator:
+        return grammars.PrioritizedEvaluator(self._compiled)
 
     async def notify(self, notify: saying.Notify, say=None):
         log.info("notify=%s n=%d", notify, len(self._compiled))
         say = saying.Say()
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say)
-        # await say.publish(area, person)
+        # await say.publish(area, person) # TODO
 
 
 def flatten(l):

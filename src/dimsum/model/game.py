@@ -1,7 +1,8 @@
 from typing import Optional
 
-import dataclasses
 import abc
+import logging
+import dataclasses
 
 
 class Reply:
@@ -11,6 +12,13 @@ class Reply:
 class Action:
     def __init__(self, **kwargs):
         super().__init__()
+
+
+class Unknown(Action):
+    async def perform(self, **kwargs):
+        log = logging.getLogger("dimsum.unknown")
+        log.warning("{0} performed".format(self))
+        return Failure("sorry, i don't understand")
 
 
 @dataclasses.dataclass

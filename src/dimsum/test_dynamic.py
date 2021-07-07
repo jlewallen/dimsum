@@ -294,3 +294,19 @@ async def dropped(entity, ev, say=None):
         nail = await session.materialize(key=nail.key)
         assert nail
         assert nail.chimeras["rusting"]["rust"] == 1
+
+
+@pytest.mark.asyncio
+async def test_no_evaluators_understands_nothing(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    nail = await add_behaviored_thing(
+        tw,
+        "Nail",
+        """
+evaluators = []
+""",
+    )
+
+    await tw.failure("hold Nail")

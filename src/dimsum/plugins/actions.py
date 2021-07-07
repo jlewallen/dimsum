@@ -17,10 +17,3 @@ class PersonAction(game.Action):
         **kwargs
     ) -> game.Reply:
         raise NotImplementedError
-
-
-class Unknown(PersonAction):
-    async def perform(self, **kwargs):
-        log = logging.getLogger("dimsum.unknown")
-        log.warning("{0} performed".format(self))
-        return game.Failure("sorry, i don't understand")

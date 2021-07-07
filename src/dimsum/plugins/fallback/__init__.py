@@ -3,6 +3,7 @@ from typing import Any, List, Type
 import logging
 
 import model.properties as properties
+import model.game as game
 
 import grammars
 import transformers
@@ -34,4 +35,4 @@ class Grammar(grammars.Grammar):
 
 class Transformer(transformers.Base):
     def verb(self, args):
-        return Unknown()
+        return game.Unknown()

@@ -18,6 +18,12 @@ class CommandEvaluator:
         raise NotImplementedError
 
 
+class AlwaysUnknown(CommandEvaluator):
+    @abc.abstractmethod
+    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+        raise NotImplementedError
+
+
 @dataclasses.dataclass
 class PrioritizedEvaluator(CommandEvaluator):
     evaluators: Sequence[CommandEvaluator]
@@ -50,7 +56,7 @@ class Grammar:
 
 @dataclasses.dataclass
 class GrammarEvaluator(CommandEvaluator):
-    grammar: str
+    grammar: str = dataclasses.field(repr=False)
     transformer_factory: Callable
 
     @functools.cached_property
@@ -76,7 +82,7 @@ grammars: List[Grammar] = []
 
 def grammar():
     def wrap(klass):
-        log.info("registered: %s", klass)
+        log.debug("registered: %s", klass)
         grammars.append(klass())
         return klass
 
@@ -84,7 +90,7 @@ def grammar():
 
 
 def create_static_evaluator():
-    log.info("static-evaluator: grammars=%s", grammars)
+    log.debug("static-evaluator: grammars=%s", grammars)
     return PrioritizedEvaluator(
         [GrammarEvaluator(g.lark, g.transformer_factory) for g in grammars]
     )

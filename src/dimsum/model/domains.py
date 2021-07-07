@@ -51,16 +51,13 @@ class Session:
         self,
         store: Optional[storage.EntityStorage] = None,
         handlers: Optional[List[Any]] = None,
-        evaluator: Optional[grammars.CommandEvaluator] = None,
     ):
         super().__init__()
         assert store
-        assert evaluator
         self.store: storage.EntityStorage = store
         self.world: Optional[world.World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = entity.Registrar()
-        self.evaluator = evaluator
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
@@ -135,10 +132,11 @@ class Session:
         log.info("executing: '%s'", command)
         contributing = tools.get_contributing_entities(self.world, player)
         dynamic_behavior = dynamic.Behavior(self.world, contributing)
-        evaluators = grammars.PrioritizedEvaluator(
-            dynamic_behavior.evaluators + [self.evaluator]
+        evaluator = grammars.PrioritizedEvaluator(
+            [dynamic_behavior.evaluator, grammars.create_static_evaluator()]
         )
-        action = await evaluators.evaluate(command, world=world, player=player)
+        log.info("evaluator: '%s'", evaluator)
+        action = await evaluator.evaluate(command, world=world, player=player)
         assert action
         assert isinstance(action, game.Action)
         return await self.perform(action, player)
@@ -264,7 +262,6 @@ class Domain:
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
         self.handlers = handlers or []
-        self.evaluator = grammars.create_static_evaluator()
 
     def session(self, handlers=None) -> "Session":
         log.info("session:new")
@@ -272,7 +269,6 @@ class Domain:
         return Session(
             store=self.store,
             handlers=combined,
-            evaluator=self.evaluator,
         )
 
     async def reload(self):
