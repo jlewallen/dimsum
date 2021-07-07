@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Dict
+from typing import Dict, List, Any
 
 log = logging.getLogger("dimsum.visual")
 
@@ -34,3 +34,9 @@ class NoopComms(Comms):
     async def everybody(self, r: Renderable) -> bool:
         log.info("noop-comms: everybody")
         return True
+
+
+@dataclasses.dataclass
+class Updated(Renderable):
+    entities: List[Dict[str, Any]]
+    information: bool = True

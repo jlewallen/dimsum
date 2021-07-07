@@ -86,6 +86,14 @@ export default createStore<RootState>({
             }
         },
         [MutationTypes.REPLY]: (state: RootState, entry: ReplResponse) => {
+            if (entry.reply.information === true) {
+                if (entry.reply.entities) {
+                    for (const row of entry.reply.entities) {
+                        state.entities[row.key] = JSON.parse(row.serialized);
+                    }
+                }
+                return;
+            }
             if (entry.reply.interactive === true) {
                 state.interactables.push(entry);
             } else {
@@ -160,7 +168,6 @@ export default createStore<RootState>({
                 }
             });
         },
-
         [ActionTypes.REFRESH_ENTITY]: async ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
             if (state.entities[payload.key]) {
                 return Promise.resolve();

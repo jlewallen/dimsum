@@ -18,6 +18,7 @@ export interface AreaRoute {
 
 export interface AreaObservation {
     interactive: false;
+    information: false;
     where: EntityRef;
     people: ObservedPerson[];
     items: ObservedItem[];
@@ -26,16 +27,26 @@ export interface AreaObservation {
 
 export interface DetailedObservation {
     interactive: false;
+    information: false;
     person: ObservedPerson;
     item: ObservedItem;
 }
 
 export interface InteractiveReply {
     interactive: boolean;
+    information: false;
 }
 
 export interface ReplResponse {
-    reply: AreaObservation | EntitiesObservation | DetailedObservation | PersonalObservation | Success | Failure | InteractiveReply;
+    reply:
+        | { interactive: false; information: boolean; entities?: { key: string; serialized: string }[] }
+        | AreaObservation
+        | EntitiesObservation
+        | DetailedObservation
+        | PersonalObservation
+        | Success
+        | Failure
+        | InteractiveReply;
 }
 
 export type PropertyMap = { [index: string]: any };
@@ -135,20 +146,24 @@ export class Reply {}
 
 export interface Success extends Reply {
     interactive: false;
+    information: false;
     message: string;
 }
 
 export interface Failure extends Reply {
     interactive: false;
+    information: false;
     message: string;
 }
 
 export interface EntitiesObservation {
     interactive: false;
+    information: false;
     entities: EntityRef[];
 }
 
 export interface PersonalObservation {
     interactive: false;
+    information: false;
     who: ObservedPerson;
 }

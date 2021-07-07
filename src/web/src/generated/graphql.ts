@@ -13,11 +13,11 @@ export type Scalars = {
     Boolean: boolean;
     Int: number;
     Float: number;
+    Auth: any;
     JsonDiff: any;
     Key: any;
     Reply: any;
     SerializedEntity: any;
-    Token: any;
 };
 
 export type Credentials = {
@@ -60,12 +60,13 @@ export type LanguageQueryCriteria = {
     text: Scalars["String"];
     evaluator: Scalars["Key"];
     reach?: Maybe<Scalars["Int"]>;
+    subscription?: Maybe<Scalars["Boolean"]>;
     persistence?: Maybe<PersistenceCriteria>;
 };
 
 export type Mutation = {
     __typename?: "Mutation";
-    login: Scalars["Token"];
+    login: Scalars["Auth"];
     makeSample?: Maybe<EntitiesUpdated>;
     update?: Maybe<EntitiesUpdated>;
     language: Evaluation;
@@ -193,7 +194,7 @@ export const LoginDocument = gql`
 `;
 export const LanguageDocument = gql`
     mutation language($text: String!, $evaluator: Key!) {
-        language(criteria: { text: $text, evaluator: $evaluator, reach: 1 }) {
+        language(criteria: { text: $text, evaluator: $evaluator, reach: 1, subscription: true }) {
             reply
             entities {
                 key

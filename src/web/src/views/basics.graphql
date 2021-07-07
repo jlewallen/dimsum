@@ -3,7 +3,7 @@ mutation login($username: String!, $password: String!) {
 }
 
 mutation language($text: String!, $evaluator: Key!) {
-	language(criteria: { text: $text, evaluator: $evaluator, reach: 1 }) {
+	language(criteria: { text: $text, evaluator: $evaluator, reach: 1, subscription: true }) {
 		reply
 		entities { key serialized diff }
 	}

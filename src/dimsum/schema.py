@@ -246,6 +246,7 @@ class LanguageQueryCriteria:
     text: str
     evaluator: str
     reach: int = 0
+    subscription: bool = False
     persistence: Optional[PersistenceCriteria] = None
 
 
@@ -281,14 +282,29 @@ async def resolve_language(obj, info, criteria):
         reply = await session.execute(player, lqc.text.strip())
         await session.save()
 
-        return Evaluation(
-            serialize_reply(reply),
-            [
-                EntityResolver(session, e)
-                for e in session.registrar.entities.values()
-                if e.modified or lqc.reach > 0
-            ],
-        )
+        async def send_entities(entities: List[EntityResolver]):
+            subscriptions = info.context.domain.subscriptions
+            await subscriptions.somebody(
+                lqc.evaluator,
+                visual.Updated(
+                    entities=[
+                        dict(key=row.key(info), serialized=row.serialized(info))
+                        for row in entities
+                    ]
+                ),
+            )
+
+        entities = [
+            EntityResolver(session, e)
+            for e in session.registrar.entities.values()
+            if e.modified or lqc.reach > 0
+        ]
+
+        if lqc.subscription:
+            asyncio.create_task(send_entities(entities))
+            return Evaluation(serialize_reply(reply), [])
+        else:
+            return Evaluation(serialize_reply(reply), entities)
 
 
 @dataclasses.dataclass

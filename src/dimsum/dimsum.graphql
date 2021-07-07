@@ -19,6 +19,7 @@ input LanguageQueryCriteria {
   text: String!
   evaluator: Key!
   reach: Int
+  subscription: Boolean
   persistence: PersistenceCriteria
 }
 
