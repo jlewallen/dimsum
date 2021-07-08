@@ -73,6 +73,7 @@ export default defineComponent({
 }
 .entities {
     display: flex;
+    flex-wrap: wrap;
 }
 .card {
     background-color: transparent;
