@@ -74,16 +74,7 @@ async def test_look_people_invisible():
 
 
 @pytest.mark.asyncio
-async def test_think():
-    tw = test.TestWorld()
-    await tw.initialize()
-
-    await tw.success("think")
-
-
-@pytest.mark.asyncio
-async def test_making_item_hard_to_see(caplog):
-    caplog.set_level(logging.INFO)
+async def test_making_item_hard_to_see():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.add_carla()
