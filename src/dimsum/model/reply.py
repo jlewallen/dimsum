@@ -3,6 +3,7 @@ import logging
 from typing import Any, Dict, List, Sequence
 
 import inflect
+import model.hooks as hooks
 import model.entity as entity
 import model.game as game
 import model.visual as visual

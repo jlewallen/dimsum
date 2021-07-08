@@ -55,4 +55,4 @@ class EntityHooks(entity.Hooks):
                     world.touch()
 
 
-entity.hooks(EntityHooks())
+entity.install_hooks(EntityHooks())
