@@ -39,7 +39,7 @@ async def test_materialize_infinite_reach(caplog):
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 60
+        assert len(session.registrar.entities) == 63
 
 
 @pytest.mark.asyncio

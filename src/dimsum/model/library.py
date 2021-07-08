@@ -75,26 +75,16 @@ class LargeMapleTree(Factory):
             behave.add_behavior(
                 world,
                 python="""
-#function(s, world, area, item)
-#    return area.make_here({
-#        kind = item.kind("leaf-1"),
-#        name = "Maple Leaf",
-#        quantity = 1,
-#        color = "red",
-#    })
-#end
-""",
-            )
-            behave.add_behavior(
-                world,
-                python="""
-#function(s, world, area, item)
-#    return area.make_here({
-#        kind = item.kind("branch-1"),
-#        name = "Maple Branch",
-#        quantity = 1,
-#    })
-#end
+@received(TickEvent)
+async def tick(this, ev, say):
+  item = ctx.create_item(
+    creator=this,
+    kind=this.get_kind("leaf-1"),
+    props=properties.Common("Maple Leaf"),
+    initialize={ Carryable: dict(quantity=1, kind=this.get_kind("leaf-1")) },
+    register=False,
+  )
+  tools.hold(tools.area_of(this), item)
 """,
             )
         return item
@@ -111,26 +101,16 @@ class LargeOakTree(Factory):
             behave.add_behavior(
                 world,
                 python="""
-#function(s, world, area, item)
-#    return area.make_here({
-#        kind = item.kind("leaf-1"),
-#        name = "Oak Leaf",
-#        quantity = 1,
-#        color = "red",
-#    })
-#end
-""",
-            )
-            behave.add_behavior(
-                world,
-                python="""
-#function(s, world, area, item)
-#    return area.make_here({
-#        kind = item.kind("branch-1"),
-#        name = "Oak Branch",
-#        quantity = 1,
-#    })
-#end
+@received(TickEvent)
+async def tick(this, ev, say):
+  item = ctx.create_item(
+    creator=this,
+    kind=this.get_kind("leaf-1"),
+    props=properties.Common("Oak Leaf"),
+    initialize={ Carryable: dict(quantity=1, kind=this.get_kind("leaf-1")) },
+    register=False,
+  )
+  tools.hold(tools.area_of(this), item)
 """,
             )
         return item
@@ -183,21 +163,16 @@ class LargeSteepCliff(Factory):
             behave.add_behavior(
                 world,
                 python="""
-#function(s, world, area, item)
-#    if math.random() > 0.7 then
-#        return area.make_here({
-#            kind = item.kind("stone-1"),
-#            name = "Heavy Stone",
-#            quantity = 1,
-#        })
-#    end
-#
-#    return area.make({
-#        kind = item.kind("pebble-1"),
-#        name = "Pebble",
-#        quantity = 3,
-#    })
-#end
+@received(TickEvent)
+async def tick(this, ev, say):
+  item = ctx.create_item(
+    creator=this,
+    kind=this.get_kind("pebble-1"),
+    props=properties.Common("Pebble"),
+    initialize={ Carryable: dict(quantity=1, kind=this.get_kind("pebble-1")) },
+    register=False,
+  )
+  tools.hold(tools.area_of(this), item)
 """,
             )
         return item

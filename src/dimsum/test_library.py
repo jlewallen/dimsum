@@ -41,9 +41,9 @@ async def test_library(caplog):
     with reloaded.session() as session:
         assert len(session.registrar.entities) == 0
         await session.prepare(reach=domains.infinite_reach)
-        assert len(session.registrar.entities) == 60
+        assert len(session.registrar.entities) == 63
 
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 60
+        assert len(session.registrar.entities) == 63

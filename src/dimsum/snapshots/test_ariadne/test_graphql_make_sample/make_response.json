@@ -533,7 +533,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "python": "\n#function(s, world, area, item)\n#    return area.make_here({\n#        kind = item.kind(\"branch-1\"),\n#        name = \"Oak Branch\",\n#        quantity = 1,\n#    })\n#end\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
                                     }
@@ -975,7 +975,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "python": "\n#function(s, world, area, item)\n#    if math.random() > 0.7 then\n#        return area.make_here({\n#            kind = item.kind(\"stone-1\"),\n#            name = \"Heavy Stone\",\n#            quantity = 1,\n#        })\n#    end\n#\n#    return area.make({\n#        kind = item.kind(\"pebble-1\"),\n#        name = \"Pebble\",\n#        quantity = 3,\n#    })\n#end\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=properties.Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
                                     }
@@ -2087,7 +2087,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "model.scopes.behavior.Behavior",
-                                            "python": "\n#function(s, world, area, item)\n#    return area.make_here({\n#        kind = item.kind(\"branch-1\"),\n#        name = \"Maple Branch\",\n#        quantity = 1,\n#    })\n#end\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
                                     }
