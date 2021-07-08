@@ -23,7 +23,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -44,7 +44,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -59,7 +59,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -128,7 +128,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -155,7 +155,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",

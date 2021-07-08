@@ -4,13 +4,14 @@ from typing import Tuple
 
 import model.entity as entity
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import model.scopes.movement as movement
-import model.scopes.occupyable as occupyable
 import model.world as world
+
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import scopes.movement as movement
+import scopes.occupyable as occupyable
+import scopes as scopes
 
 log = logging.getLogger("dimsum.model")
 

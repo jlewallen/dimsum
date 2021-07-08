@@ -6,12 +6,11 @@ from context import *
 import grammars
 from model.entity import *
 from model.events import *
-from model.finders import *
 from model.game import *
 from model.reply import *
-import model.scopes.occupyable as occupyable
-from model.things import *
 from model.world import *
+from finders import *
+import scopes.occupyable as occupyable
 from plugins.actions import *
 import transformers
 

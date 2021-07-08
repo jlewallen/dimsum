@@ -27,7 +27,7 @@
                         },
                         "behaviors": {
                             "behaviors": {
-                                "py/object": "model.scopes.behavior.BehaviorMap",
+                                "py/object": "scopes.behavior.BehaviorMap",
                                 "map": {}
                             }
                         },
@@ -35,7 +35,7 @@
                             "pattern": null,
                             "locked": false,
                             "openable": {
-                                "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                "py/object": "scopes.carryable.UnknownOpenClose"
                             },
                             "holding": [],
                             "capacity": null,
@@ -54,7 +54,7 @@
                         }
                     },
                     "klass": {
-                        "py/type": "model.scopes.AreaClass"
+                        "py/type": "scopes.AreaClass"
                     },
                     "identity": {
                         "py/object": "model.crypto.Identity",

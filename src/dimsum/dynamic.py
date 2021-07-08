@@ -11,14 +11,14 @@ import context
 import grammars
 import model.entity as entity
 import model.events as events
-import model.domains as session
 import model.game as game
 import model.properties as properties
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.things as things
-import model.tools as tools
 import model.world as world
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import domains as session
+import tools
+import finders
 import saying
 import transformers
 
@@ -73,9 +73,9 @@ class SimplifiedAction(game.Action):
         return r
 
     async def _transform_arg(
-        self, arg: things.ItemFinder, world: world.World, person: entity.Entity
+        self, arg: finders.ItemFinder, world: world.World, person: entity.Entity
     ) -> Optional[entity.Entity]:
-        assert isinstance(arg, things.ItemFinder)
+        assert isinstance(arg, finders.ItemFinder)
         return await world.apply_item_finder(person, arg)
 
     async def _args(self, world: world.World, person: entity.Entity) -> List[Any]:

@@ -2,9 +2,11 @@ import dataclasses
 
 import lark
 import model.entity as entity
-import model.finders as finders
-import model.scopes.movement as movement
 import model.world as world
+
+import scopes.movement as movement
+
+import finders as finders
 
 
 @dataclasses.dataclass

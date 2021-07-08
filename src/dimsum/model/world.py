@@ -4,43 +4,10 @@ from typing import Dict, List, Optional, Sequence, Type
 import inflect
 import model.entity as entity
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.tools as tools
+import tools as tools
 
 Key = "world"
 log = logging.getLogger("dimsum.model")
-p = inflect.engine()
-
-
-class EntityHooks(entity.Hooks):
-    def describe(self, entity: entity.Entity) -> str:
-        if entity.klass == scopes.LivingClass:
-            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
-        if entity.klass == scopes.AreaClass:
-            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
-        if entity.has(carryable.Carryable):
-            with entity.make_and_discard(carryable.Carryable) as carry:
-                if carry.quantity > 1:
-                    return "{0} {1} (#{2})".format(
-                        carry.quantity,
-                        p.plural(entity.props.name, carry.quantity),
-                        entity.props.gid,
-                    )
-        return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
-
-    def cleanup(self, entity: entity.Entity, world: Optional["World"] = None, **kwargs):
-        assert world
-        if world.has(behavior.BehaviorCollection):
-            log.info("cleanup %s", entity)
-            with world.make(behavior.BehaviorCollection) as collection:
-                if entity in collection.entities:
-                    collection.entities.remove(entity)
-                    world.touch()
-
-
-entity.hooks(EntityHooks())
 
 
 class Identifiers(entity.Scope):
@@ -69,7 +36,6 @@ class World(entity.Entity):
             props=props
             if props
             else properties.Common("World", desc="Ya know, everything"),
-            scopes=scopes.World,
             **kwargs
         )
 

@@ -6,12 +6,11 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
-from model.things import *
 from model.events import *
-from model.finders import *
-from model.tools import *
-import model.scopes.apparel as apparel
+import scopes.apparel as apparel
 from plugins.actions import *
+from tools import *
+from finders import *
 import grammars
 import transformers
 

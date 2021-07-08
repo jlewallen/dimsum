@@ -1,7 +1,7 @@
 import logging
 import test
 
-import model.library as library
+import library
 import pytest
 
 log = logging.getLogger("dimsum")

@@ -2,13 +2,15 @@ import logging
 from typing import Callable, Optional, Type
 
 import model.entity as entity
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.scopes.health as health
-import model.scopes.mechanics as mechanics
-import model.scopes.movement as movement
-import model.scopes.occupyable as occupyable
-import model.scopes.ownership as ownership
+
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes.health as health
+import scopes.mechanics as mechanics
+import scopes.movement as movement
+import scopes.occupyable as occupyable
+import scopes.ownership as ownership
+import scopes
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -43,7 +45,6 @@ Area = [
     carryable.Containing,
     occupyable.Occupyable,
 ]
-World = [ownership.Ownership, behavior.Behaviors]
 
 scopes_by_class = {
     LivingClass: Alive,

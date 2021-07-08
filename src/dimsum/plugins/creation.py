@@ -7,14 +7,13 @@ from context import *
 import grammars
 from model.entity import *
 from model.events import *
-from model.finders import *
 from model.game import *
 import model.properties as properties
 from model.reply import *
-import model.scopes as scopes
-from model.things import *
-from model.tools import *
 from model.world import *
+import scopes as scopes
+from finders import *
+from tools import *
 from plugins.actions import *
 import transformers
 
@@ -80,8 +79,8 @@ class Create(PersonAction):
 class Make(PersonAction):
     def __init__(
         self,
-        template: Optional[things.ItemFactory] = None,
-        item: Optional[things.ItemFinder] = None,
+        template: Optional[ItemFactory] = None,
+        item: Optional[ItemFinder] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -164,7 +163,7 @@ class CallThis(PersonAction):
     def __init__(
         self,
         name: Optional[str] = None,
-        item: Optional[things.ItemFinder] = None,
+        item: Optional[ItemFinder] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -270,7 +269,7 @@ class Transformer(transformers.Base):
 
     def make_quantified(self, args):
         quantity = args[0]
-        return Make(template=things.MaybeQuantifiedItem(args[1], quantity))
+        return Make(template=MaybeQuantifiedItem(args[1], quantity))
 
     def call(self, args):
         return CallThis(item=args[0], name=str(args[1]))

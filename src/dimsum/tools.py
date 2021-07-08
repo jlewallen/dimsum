@@ -10,11 +10,11 @@ from typing import Any, Dict, List, Optional, Sequence
 import context
 
 from model.entity import Entity
-import model.scopes.apparel as apparel
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import model.scopes.occupyable as occupyable
-import model.scopes.behavior as behavior
+import scopes.apparel as apparel
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import scopes.occupyable as occupyable
+import scopes.behavior as behavior
 
 
 log = logging.getLogger("dimsum.tools")

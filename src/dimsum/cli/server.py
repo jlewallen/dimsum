@@ -8,7 +8,7 @@ import asyncclick as click
 import cli.interactive as interactive
 import config
 import everything  # noqa
-import model.domains as domains
+import domains
 import schema as schema_factory
 import sshd
 from starlette.middleware.cors import CORSMiddleware

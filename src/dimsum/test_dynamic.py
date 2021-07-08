@@ -1,12 +1,14 @@
 import logging
-import test
+import pytest
 from typing import Dict, List, Optional
 
 import model.game as game
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import pytest
+
+import scopes.behavior as behavior
+import scopes as scopes
+
+import test
 
 log = logging.getLogger("dimsum.tests")
 

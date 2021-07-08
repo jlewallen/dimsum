@@ -1,9 +1,11 @@
 import logging
 
-import model.domains as domains
 import model.properties as properties
-import model.scopes as scopes
 import model.world as world
+
+import domains
+import scopes
+
 import pytest
 import serializing
 import storage

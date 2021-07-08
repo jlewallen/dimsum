@@ -13,20 +13,6 @@
                         "creator": null,
                         "parent": null,
                         "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
                             "behaviorCollection": {
                                 "entities": [
                                     {
@@ -153,7 +139,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -161,7 +147,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -235,7 +221,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -316,7 +302,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [],
                                 "capacity": null,
@@ -327,9 +313,9 @@
                             },
                             "health": {
                                 "medical": {
-                                    "py/object": "model.scopes.health.Medical",
+                                    "py/object": "scopes.health.Medical",
                                     "nutrition": {
-                                        "py/object": "model.scopes.health.Nutrition",
+                                        "py/object": "scopes.health.Nutrition",
                                         "properties": {}
                                     }
                                 }
@@ -344,7 +330,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.LivingClass"
+                            "py/type": "scopes.LivingClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -423,7 +409,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -450,7 +436,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -529,10 +515,10 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {
                                         "b:default": {
-                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
@@ -562,7 +548,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -641,7 +627,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -668,7 +654,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -747,10 +733,10 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {
                                         "b:default": {
-                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "py/object": "scopes.behavior.Behavior",
                                             "python": "#",
                                             "logs": []
                                         }
@@ -780,7 +766,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -859,10 +845,10 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {
                                         "b:default": {
-                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "py/object": "scopes.behavior.Behavior",
                                             "python": "",
                                             "logs": []
                                         }
@@ -892,7 +878,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -971,10 +957,10 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {
                                         "b:default": {
-                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=properties.Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
@@ -1004,7 +990,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1083,7 +1069,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1118,7 +1104,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1197,7 +1183,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1232,7 +1218,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1311,7 +1297,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1346,7 +1332,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1425,7 +1411,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1433,7 +1419,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -1452,7 +1438,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1531,7 +1517,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1553,7 +1539,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1632,7 +1618,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1640,7 +1626,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -1659,13 +1645,13 @@
                             },
                             "weather": {
                                 "wind": {
-                                    "py/object": "model.scopes.mechanics.Wind",
+                                    "py/object": "scopes.mechanics.Wind",
                                     "magnitude": 50
                                 }
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1744,7 +1730,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1766,7 +1752,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1845,7 +1831,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -1853,7 +1839,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -1890,7 +1876,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -1969,7 +1955,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2004,7 +1990,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2083,10 +2069,10 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {
                                         "b:default": {
-                                            "py/object": "model.scopes.behavior.Behavior",
+                                            "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
                                             "logs": []
                                         }
@@ -2116,7 +2102,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2195,7 +2181,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2230,7 +2216,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2309,7 +2295,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2344,7 +2330,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2423,7 +2409,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2431,7 +2417,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -2450,7 +2436,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2529,7 +2515,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2551,7 +2537,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2630,7 +2616,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2638,7 +2624,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -2669,7 +2655,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2748,7 +2734,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2783,7 +2769,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2862,7 +2848,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -2897,7 +2883,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -2976,7 +2962,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3011,7 +2997,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3090,7 +3076,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3098,7 +3084,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -3129,7 +3115,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3208,7 +3194,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3243,7 +3229,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3322,7 +3308,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3357,7 +3343,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3436,7 +3422,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3471,7 +3457,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3550,7 +3536,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3558,7 +3544,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -3583,7 +3569,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3662,7 +3648,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3697,7 +3683,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3776,7 +3762,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3811,7 +3797,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -3890,7 +3876,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -3898,7 +3884,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -3929,7 +3915,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4008,7 +3994,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4043,7 +4029,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4122,7 +4108,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4157,7 +4143,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4236,7 +4222,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4271,7 +4257,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4350,7 +4336,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4358,7 +4344,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -4395,7 +4381,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4474,7 +4460,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4509,7 +4495,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4588,7 +4574,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4623,7 +4609,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4702,7 +4688,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4737,7 +4723,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4816,7 +4802,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4851,7 +4837,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -4930,7 +4916,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -4938,7 +4924,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -4969,7 +4955,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5048,7 +5034,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5083,7 +5069,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5162,7 +5148,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5197,7 +5183,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5276,7 +5262,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5311,7 +5297,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5390,7 +5376,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5398,7 +5384,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -5423,7 +5409,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5502,7 +5488,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5537,7 +5523,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5616,7 +5602,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5651,7 +5637,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5730,7 +5716,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5738,7 +5724,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -5769,7 +5755,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5848,7 +5834,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5883,7 +5869,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -5962,7 +5948,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -5997,7 +5983,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -6076,7 +6062,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -6111,7 +6097,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -6190,7 +6176,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -6198,7 +6184,7 @@
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
-                                    "py/object": "model.scopes.carryable.UnknownOpenClose"
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
                                 },
                                 "holding": [
                                     {
@@ -6223,7 +6209,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.AreaClass"
+                            "py/type": "scopes.AreaClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -6302,7 +6288,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -6337,7 +6323,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -6416,7 +6402,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -6451,7 +6437,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ExitClass"
+                            "py/type": "scopes.ExitClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",

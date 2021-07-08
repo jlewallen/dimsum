@@ -5,10 +5,9 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
-from model.finders import *
-from model.things import *
-import model.scopes.users as users
+import scopes.users as users
 from plugins.actions import *
+from finders import *
 import grammars
 import transformers
 

@@ -6,12 +6,11 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
-from model.things import *
 from model.events import *
-from model.tools import *
-from model.finders import *
-import model.scopes.carryable as carryable
+from finders import *
+from tools import *
 from plugins.actions import *
+import scopes.carryable as carryable
 import grammars
 import transformers
 
@@ -416,7 +415,7 @@ class Pour(PersonAction):
 
 class PourProducer(carryable.Producer):
     def __init__(self, template: Optional[MaybeItemOrRecipe] = None, **kwargs):
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__()
         assert template
         self.template: MaybeItemOrRecipe = template
 

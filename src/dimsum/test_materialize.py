@@ -1,10 +1,11 @@
 import logging
-import test
-
-import model.domains as domains
-import model.library as library
-import model.scopes as scopes
 import pytest
+
+import scopes
+import domains
+import library
+
+import test
 
 log = logging.getLogger("dimsum")
 

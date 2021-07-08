@@ -102,7 +102,7 @@ export class AuthenticatedAction {
 }
 
 export function entityToKind(entity: Entity): string {
-    return entity.klass["py/type"].replace("model.scopes.", "").replace("Class", "");
+    return entity.klass["py/type"].replace("scopes.", "").replace("Class", "");
 }
 
 export function entityToClass(entity: Entity): string {

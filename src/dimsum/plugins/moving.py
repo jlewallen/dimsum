@@ -5,7 +5,6 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
-from model.things import *
 from plugins.actions import *
 import grammars
 import transformers

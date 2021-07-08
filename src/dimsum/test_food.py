@@ -1,8 +1,9 @@
-import test
-
-import model.scopes.carryable as carryable
-import model.scopes.health as health
 import pytest
+
+import scopes.carryable as carryable
+import scopes.health as health
+
+import test
 
 
 @pytest.mark.asyncio

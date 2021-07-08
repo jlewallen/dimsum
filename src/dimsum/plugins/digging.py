@@ -7,10 +7,10 @@ from model.events import *
 from model.game import *
 import model.properties as properties
 from model.reply import *
-import model.scopes.carryable as carryable
-import model.scopes.movement as movement
-from model.things import *
 from model.world import *
+import scopes.carryable as carryable
+import scopes.movement as movement
+import scopes
 from plugins.actions import *
 import transformers
 

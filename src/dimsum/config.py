@@ -5,8 +5,9 @@ import os
 import os.path
 from typing import Dict, List, Optional
 
-import model.domains as domains
 import shortuuid
+
+import domains
 import storage
 
 log = logging.getLogger("dimsum.config")

@@ -1,12 +1,14 @@
-import test
 from typing import Optional
+import pytest
 
 import model.entity as entity
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.carryable as carryable
-import model.scopes.movement as movement
-import pytest
+
+import scopes.carryable as carryable
+import scopes.movement as movement
+import scopes as scopes
+
+import test
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,4 @@
-import model.domains as domains
+import domains
 import storage
 
 

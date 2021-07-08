@@ -1,11 +1,13 @@
 import logging
+import pytest
 from typing import Optional
 
-import model.domains as domains
 import model.entity as entity
 import model.properties as properties
-import model.scopes.ownership as ownership
-import pytest
+
+import domains
+
+import scopes.ownership as ownership
 
 
 log = logging.getLogger("dimsum")

@@ -6,13 +6,12 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
-from model.things import *
-from model.finders import *
 from model.events import *
-from model.tools import *
 import model.properties
-import model.scopes.health as health
+import scopes.health as health
 from plugins.actions import *
+from finders import *
+from tools import *
 import grammars
 import transformers
 

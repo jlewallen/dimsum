@@ -1,10 +1,11 @@
 import logging
-import test
-
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import model.things as things
 import pytest
+
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import finders
+
+import test
 
 log = logging.getLogger("dimsum")
 
@@ -244,7 +245,7 @@ async def test_quantified_from_recipe(caplog):
         brain = jacob.make(mechanics.Memory)
         assert "r:cash" in brain.memory
         coins = brain.memory["r:cash"]
-        assert coins.make(things.Recipe).template
+        assert coins.make(finders.Recipe).template
 
     await tw.success("obliterate")
 

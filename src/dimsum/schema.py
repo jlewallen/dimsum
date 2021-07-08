@@ -7,17 +7,20 @@ from typing import List, Optional
 import ariadne
 import config
 import jwt
-import model.domains as domains
 import model.entity as entity
 import model.entity as entities
 import model.game as game
-import model.library as library
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.carryable as carryable
-import model.scopes.users as users
 import model.visual as visual
 import model.world as world
+
+import library
+import scopes as scopes
+import scopes.carryable as carryable
+import scopes.users as users
+
+import domains
+
 import serializing
 import shortuuid
 import starlette.requests

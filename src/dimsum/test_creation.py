@@ -1,14 +1,17 @@
 import logging
-import test
+import pytest
 
 import freezegun
 import handlers
+
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
 import model.visual as visual
-import pytest
+
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes as scopes
+
+import test
 
 log = logging.getLogger("dimsum")
 

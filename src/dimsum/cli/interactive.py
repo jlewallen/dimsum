@@ -1,11 +1,11 @@
 import logging
 from typing import List, Optional, TextIO
 
-import model.domains as domains
-import model.library as library
 import model.properties as properties
-import model.scopes as scopes
 import model.visual as visual
+import scopes
+import domains
+import library
 import plugins.default
 import sshd
 

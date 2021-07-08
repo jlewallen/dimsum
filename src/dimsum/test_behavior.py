@@ -1,12 +1,14 @@
 import logging
-import test
+import pytest
 
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import pytest
+
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import scopes as scopes
+
+import test
 
 log = logging.getLogger("dimsum.tests")
 

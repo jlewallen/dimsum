@@ -5,11 +5,12 @@ from typing import Any, Dict, List, Sequence
 import inflect
 import model.entity as entity
 import model.game as game
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import model.scopes.movement as movement
-import model.scopes.occupyable as occupyable
 import model.visual as visual
+
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import scopes.movement as movement
+import scopes.occupyable as occupyable
 
 p = inflect.engine()
 log = logging.getLogger("dimsum.model")

@@ -1,11 +1,11 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
-import context
 import model.crypto as crypto
 import model.entity as entity
 import model.kinds as kinds
 import model.properties as properties
+import context
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -176,11 +176,7 @@ class Carryable(entity.Scope):
         self.quantity -= q
         return self
 
-    def separate(
-        self, quantity: float, ctx: Optional[context.Ctx] = None, **kwargs
-    ) -> List[entity.Entity]:
-        assert ctx
-
+    def separate(self, quantity: float, **kwargs) -> List[entity.Entity]:
         self.decrease_quantity(quantity)
         self.ourselves.touch()
 
@@ -190,7 +186,7 @@ class Carryable(entity.Scope):
             **kwargs,
         )
 
-        ctx.register(item)
+        context.get().register(item)
 
         return [item]
 

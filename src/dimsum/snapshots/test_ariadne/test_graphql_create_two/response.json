@@ -23,7 +23,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -42,7 +42,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
@@ -111,7 +111,7 @@
                             },
                             "behaviors": {
                                 "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
+                                    "py/object": "scopes.behavior.BehaviorMap",
                                     "map": {}
                                 }
                             },
@@ -130,7 +130,7 @@
                             }
                         },
                         "klass": {
-                            "py/type": "model.scopes.ItemClass"
+                            "py/type": "scopes.ItemClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",

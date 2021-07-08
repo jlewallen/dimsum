@@ -4,7 +4,8 @@ from typing import List, Optional, Tuple
 
 import context
 import model.entity as entity
-import model.scopes.carryable as carryable
+
+import scopes.carryable as carryable
 
 DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum.scopes")

@@ -8,7 +8,7 @@ import context
 import model.entity as entity
 import model.events as events
 import model.game as game
-import model.tools as tools
+import tools
 
 log = logging.getLogger("dimsum")
 

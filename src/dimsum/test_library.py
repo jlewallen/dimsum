@@ -1,10 +1,12 @@
 import logging
-import test
+import pytest
 
 import freezegun
-import model.domains as domains
-import model.library as library
-import pytest
+
+import domains
+import library
+
+import test
 
 log = logging.getLogger("dimsum")
 

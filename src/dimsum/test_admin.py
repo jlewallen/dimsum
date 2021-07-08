@@ -1,7 +1,8 @@
-import test
-
-import model.scopes.users as users
 import pytest
+
+import scopes.users as users
+
+import test
 
 
 @pytest.mark.asyncio

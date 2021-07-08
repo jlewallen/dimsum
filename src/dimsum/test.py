@@ -6,16 +6,16 @@ from typing import Any, Callable, Dict, Optional, Union
 
 import everything  # noqa
 import model.crypto as crypto
-import model.domains as domains
 import model.entity as entity
 import model.game as game
 import model.properties as properties
-import model.scopes as scopes
-import model.scopes.behavior as behavior
-import model.scopes.carryable as carryable
-import model.scopes.movement as movement
-import model.scopes.users as users
 import model.world as world
+import scopes as scopes
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes.movement as movement
+import scopes.users as users
+import domains
 import plugins.default as actions
 import serializing
 

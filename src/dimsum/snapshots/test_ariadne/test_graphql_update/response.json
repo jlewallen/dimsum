@@ -12,22 +12,7 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "model.scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            }
-                        },
+                        "chimeras": {},
                         "klass": {
                             "py/type": "model.entity.RootEntityClass"
                         },

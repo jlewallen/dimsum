@@ -7,8 +7,8 @@ from typing import Callable, Dict, List, Optional
 import jsonpickle
 import model.crypto as crypto
 import model.entity as entity
-import model.scopes.movement as movement
 import model.world as world
+import scopes.movement as movement
 import storage
 
 log = logging.getLogger("dimsum")

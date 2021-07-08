@@ -1,21 +1,21 @@
 import base64
 import json
 import logging
-import test
+import pytest
 from typing import List
 
 import ariadne
 import config
 import freezegun
-import model.domains as domains
 import model.properties as properties
-import model.scopes as scopes
 import model.world as world
 import plugins.default as actions
-import pytest
+import scopes
+import domains
 import schema as schema_factory
 from schema import AriadneContext
 import serializing
+import test
 
 log = logging.getLogger("dimsum")
 

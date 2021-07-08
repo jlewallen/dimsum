@@ -1,11 +1,13 @@
 import logging
 import test
 
-import model.scopes.carryable as carryable
-import model.scopes.health as health
-import model.scopes.mechanics as mechanics
-import model.scopes.ownership as ownership
 import model.world as world
+
+import scopes.carryable as carryable
+import scopes.health as health
+import scopes.mechanics as mechanics
+import scopes.ownership as ownership
+
 import pytest
 
 log = logging.getLogger("dimsum")

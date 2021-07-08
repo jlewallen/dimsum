@@ -1,23 +1,30 @@
 import logging
+import copy
 from typing import List, Optional
 
 import context
+import model.properties as properties
 import model.entity as entity
-import model.scopes.apparel as apparel
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
-import model.scopes.occupyable as occupyable
-import model.things as things
+import scopes.apparel as apparel
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+import scopes.occupyable as occupyable
+import scopes
 
 log = logging.getLogger("dimsum.model")
 
 
-class FindNone(things.ItemFinder):
+class ItemFinder:
+    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+        raise NotImplementedError
+
+
+class FindNone(ItemFinder):
     async def find_item(self, **kwargs) -> Optional[entity.Entity]:
         return None
 
 
-class StaticItem(things.ItemFinder):
+class StaticItem(ItemFinder):
     def __init__(self, item: Optional[entity.Entity] = None, **kwargs):
         super().__init__()
         self.item = item
@@ -26,7 +33,7 @@ class StaticItem(things.ItemFinder):
         return self.item
 
 
-class ObjectNumber(things.ItemFinder):
+class ObjectNumber(ItemFinder):
     def __init__(self, number: int, **kwargs):
         super().__init__()
         self.number = number
@@ -35,7 +42,7 @@ class ObjectNumber(things.ItemFinder):
         return await context.get().find_item(number=self.number, **kwargs)
 
 
-class AnyItem(things.ItemFinder):
+class AnyItem(ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
         assert q
@@ -95,7 +102,7 @@ class AnyConsumableItem(AnyItem):
     pass
 
 
-class UnheldItem(things.ItemFinder):
+class UnheldItem(ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
         assert q
@@ -125,7 +132,7 @@ class UnheldItem(things.ItemFinder):
         return None
 
 
-class AnyHeldItem(things.ItemFinder):
+class AnyHeldItem(ItemFinder):
     async def find_item(
         self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
@@ -136,7 +143,7 @@ class AnyHeldItem(things.ItemFinder):
             return await context.get().find_item(candidates=pockets.holding, **kwargs)
 
 
-class HeldItem(things.ItemFinder):
+class HeldItem(ItemFinder):
     def __init__(
         self,
         q: str = "",
@@ -161,7 +168,7 @@ class HeldItem(things.ItemFinder):
         return None
 
 
-class FindHeldContainer(things.ItemFinder):
+class FindHeldContainer(ItemFinder):
     async def find_item(
         self, person: Optional[entity.Entity] = None, **kwargs
     ) -> Optional[entity.Entity]:
@@ -176,7 +183,7 @@ class FindHeldContainer(things.ItemFinder):
         return None
 
 
-class CurrentArea(things.ItemFinder):
+class CurrentArea(ItemFinder):
     async def find_item(
         self,
         person: Optional[entity.Entity] = None,
@@ -188,7 +195,7 @@ class CurrentArea(things.ItemFinder):
         return area
 
 
-class ContainedItem(things.ItemFinder):
+class ContainedItem(ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
         assert q
@@ -223,6 +230,90 @@ class MaybeItemOrRecipe:
         with person.make(mechanics.Memory) as brain:
             recipe = brain.find_memory(self.q)
             if recipe:
-                return things.RecipeItem(recipe).create_item(person=person, **kwargs)
+                return RecipeItem(recipe).create_item(person=person, **kwargs)
 
-        return things.MaybeItem(self.q).create_item(person=person, **kwargs)
+        return MaybeItem(self.q).create_item(person=person, **kwargs)
+
+
+class ItemFactory:
+    def create_item(self, **kwargs) -> entity.Entity:
+        raise NotImplementedError
+
+
+class MaybeItem(ItemFactory):
+    def __init__(self, name: str):
+        super().__init__()
+        self.name = name
+
+    def create_item(self, quantity: Optional[float] = None, **kwargs) -> entity.Entity:
+        log.info(
+            "%s create-item '%s' %s quantity=%s", self, self.name, kwargs, quantity
+        )
+        initialize = {}
+        if quantity:
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
+        return scopes.item(
+            props=properties.Common(self.name), initialize=initialize, **kwargs
+        )
+
+
+class RecipeItem(ItemFactory):
+    def __init__(self, recipe: entity.Entity):
+        super().__init__()
+        self.recipe = recipe
+
+    def create_item(self, **kwargs) -> entity.Entity:
+        log.info("%s create-item recipe=%s %s", self, self.recipe, kwargs)
+        return self.recipe.make(Recipe).create_item(**kwargs)
+
+
+class MaybeQuantifiedItem(ItemFactory):
+    def __init__(self, template: MaybeItem, quantity: float):
+        super().__init__()
+        self.template: MaybeItem = template
+        self.quantity: float = quantity
+
+    def create_item(self, **kwargs) -> entity.Entity:
+        log.info(
+            "%s create-item template=%s quantity=%s %s",
+            self,
+            self.template,
+            self.quantity,
+            kwargs,
+        )
+        return self.template.create_item(quantity=self.quantity, **kwargs)
+
+
+class Recipe(entity.Scope, ItemFactory):
+    def __init__(self, template=None, **kwargs):
+        super().__init__(**kwargs)
+        self.template = template if template else None
+
+    def create_item(
+        self, quantity: Optional[float] = None, initialize=None, **kwargs
+    ) -> entity.Entity:
+        assert self.template
+
+        if quantity:
+            assert not initialize
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
+
+        log.info(
+            "%s create-item %s %s initialize=%s",
+            self,
+            self.template,
+            kwargs,
+            initialize,
+        )
+        # TODO Clone
+        updated = copy.deepcopy(self.template.__dict__)
+        updated.update(
+            key=None,
+            version=None,
+            identity=None,
+            props=self.template.props.clone(),
+            initialize=initialize,
+            **kwargs
+        )
+        cloned = scopes.item(**updated)
+        return cloned

@@ -1,9 +1,11 @@
 import logging
-import test
+import pytest
 
 import model.reply as reply
-import model.scopes.carryable as carryable
-import pytest
+
+import scopes.carryable as carryable
+
+import test
 
 log = logging.getLogger("dimsum")
 

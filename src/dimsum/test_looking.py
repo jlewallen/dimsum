@@ -1,11 +1,13 @@
 import logging
-import test
-
 import freezegun
-import model.reply as reply
-import model.scopes.carryable as carryable
-import model.scopes.mechanics as mechanics
 import pytest
+
+import model.reply as reply
+
+import scopes.carryable as carryable
+import scopes.mechanics as mechanics
+
+import test
 
 log = logging.getLogger("dimsum")
 

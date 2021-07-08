@@ -1,7 +1,8 @@
 import test
 
-import model.scopes.apparel as apparel
-import model.scopes.carryable as carryable
+import scopes.apparel as apparel
+import scopes.carryable as carryable
+
 import pytest
 
 
