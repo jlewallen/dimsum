@@ -408,3 +408,35 @@ async def jingle(this, person, say):
 
     await tw.success("hold Keys")
     await tw.success("jingle")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_hook(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    door = await tw.add_behaviored_thing(
+        tw,
+        "Door",
+        """""",
+    )
+
+    keys = await tw.add_behaviored_thing(
+        tw,
+        "Keys",
+        """
+@hooks.observed.hook
+def hide_everything(resume, entity):
+    log.info("hiding %s", entity)
+    return []
+""",
+    )
+
+    r = await tw.success("look")
+    assert len(r.items) == 0
+
+    await tw.success("hold Keys")
+    await tw.success("obliterate")
+
+    r = await tw.success("look")
+    assert len(r.items) == 1

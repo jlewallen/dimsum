@@ -31,6 +31,7 @@ async def test_edit_item():
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip(reason="rethinking")
 async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged():
     tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
     await tw.initialize()

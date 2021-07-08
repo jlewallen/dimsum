@@ -4,10 +4,13 @@ from typing import Optional
 
 import model.entity as entity
 import model.world as world
+import model.reply as reply
+import model.hooks as hooks
 
 import scopes as scopes
 import scopes.behavior as behavior
 import scopes.carryable as carryable
+import scopes.mechanics as mechanics
 
 import plugins.chatting  # noqa
 import plugins.creation  # noqa
@@ -56,3 +59,10 @@ class EntityHooks(entity.Hooks):
 
 
 entity.install_hooks(EntityHooks())
+
+
+@hooks.all.observed.hook
+def hide_invisible_entities(resume, entity: entity.Entity):
+    if entity.make(mechanics.Visibility).is_invisible:
+        return []
+    return resume(entity)

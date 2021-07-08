@@ -14,6 +14,7 @@ import model.events as events
 import model.game as game
 import model.visual as visual
 import model.world as world
+import model.hooks as hook_system
 
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -28,8 +29,8 @@ import serializing
 import storage
 
 log = logging.getLogger("dimsum.model")
-scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session")
+scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
 def get() -> "Session":
@@ -141,14 +142,16 @@ class Session:
         log.info("executing: '%s'", command)
         contributing = tools.get_contributing_entities(self.world, player)
         dynamic_behavior = dynamic.Behavior(self.world, contributing)
+        log.info("dynamic-hooks: %s", dynamic_behavior.dynamic_hooks)
         evaluator = grammars.PrioritizedEvaluator(
             [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
         )
-        log.info("evaluator: '%s'", evaluator)
-        action = await evaluator.evaluate(command, world=world, player=player)
-        assert action
-        assert isinstance(action, game.Action)
-        return await self.perform(action, player)
+        with hook_system.ExtendHooks(dynamic_behavior.dynamic_hooks):
+            log.info("evaluator: '%s'", evaluator)
+            action = await evaluator.evaluate(command, world=world, player=player)
+            assert action
+            assert isinstance(action, game.Action)
+            return await self.perform(action, player)
 
     async def perform(
         self,

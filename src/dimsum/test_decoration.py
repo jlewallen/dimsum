@@ -4,7 +4,7 @@ import logging
 import pytest
 import wrapt
 
-log = logging.getLogger("decoration")
+log = logging.getLogger("dimsum.tests")
 
 
 class MethodProxy(wrapt.ObjectProxy):

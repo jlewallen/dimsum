@@ -60,9 +60,8 @@ class ObservedEntities:
         return str(self)
 
 
-def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if entity.make(mechanics.Visibility).is_invisible:
-        return []
+@hooks.all.observed.target
+def observe(entity: entity.Entity) -> Sequence[ObservedEntity]:
     return [ObservedItem(entity)]
 
 
