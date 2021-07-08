@@ -16,7 +16,7 @@ import model.scopes.carryable as carryable
 import model.scopes.movement as movement
 import model.scopes.users as users
 import model.world as world
-import plugins.default.actions as actions
+import plugins.default as actions
 import serializing
 
 log = logging.getLogger("dimsum.tests")

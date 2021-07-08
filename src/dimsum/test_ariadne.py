@@ -11,7 +11,7 @@ import model.domains as domains
 import model.properties as properties
 import model.scopes as scopes
 import model.world as world
-import plugins.default.actions as actions
+import plugins.default as actions
 import pytest
 import schema as schema_factory
 from schema import AriadneContext

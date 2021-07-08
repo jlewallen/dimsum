@@ -16,7 +16,7 @@ from plugins.actions import *
 import grammars
 import transformers
 
-import plugins.default.actions as actions
+import plugins.default as actions
 
 log = logging.getLogger("dimsum")
 

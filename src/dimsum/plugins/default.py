@@ -1,25 +1,20 @@
-import dataclasses
 import logging
-from typing import Any, List, Optional
+import dataclasses
+from typing import Type, Optional, List
 
 from context import Ctx
-import model.entity as entity
-from model.events import *
-import model.finders as finders
 from model.game import *
-import model.properties as properties
 from model.reply import *
-import model.scopes.apparel as apparel
-import model.scopes.carryable as carryable
-import model.scopes.health as health
-import model.scopes.mechanics as mechanics
-import model.scopes.movement as movement
-from model.things import *
-from model.tools import *
 from model.world import *
+from model.things import *
+from model.events import *
+from model.tools import *
+from model.finders import *
+import model.scopes.health as health
 from plugins.actions import *
+import grammars
+import transformers
 
-MemoryAreaKey = "m:area"
 log = logging.getLogger("dimsum")
 
 
@@ -185,3 +180,34 @@ class ModifyActivity(PersonAction):
         item.props.set(self.activity, self.value)
         item.touch()
         return Success("done")
+
+
+class Transformer(transformers.Base):
+    def modify_hard_to_see(self, args):
+        return ModifyHardToSee(item=AnyHeldItem(), hard_to_see=True)
+
+    def modify_easy_to_see(self, args):
+        return ModifyHardToSee(item=AnyHeldItem(), hard_to_see=False)
+
+    def modify_field(self, args):
+        field = str(args[0])
+        value = args[1]
+        return ModifyField(item=AnyHeldItem(), field=field, value=value)
+
+
+@grammars.grammar()
+class DefaultGrammar(grammars.Grammar):
+    @property
+    def transformer_factory(self) -> Type[transformers.Base]:
+        return Transformer
+
+    @property
+    def lark(self) -> str:
+        return """
+        start:             modify
+
+        modify:            "modify" TEXT_FIELD text                -> modify_field
+                         | "modify" NUMERIC_FIELD number           -> modify_field
+                         | "modify" "hard" "to" "see"              -> modify_hard_to_see
+                         | "modify" "easy" "to" "see"              -> modify_easy_to_see
+"""

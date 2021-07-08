@@ -93,7 +93,6 @@ class GrammarEvaluator(CommandEvaluator):
 
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         try:
-            log.info("%s generating: %s", self, command)
             tree = self._parser.parse(command)
             log.debug("parsed=%s", tree)
             if tree:

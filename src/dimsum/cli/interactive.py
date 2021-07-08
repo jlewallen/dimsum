@@ -34,8 +34,8 @@ class InitializeWorld:
             creator=session.world,
             props=properties.Common(key, desc="A player"),
         )
-        await session.perform(plugins.default.actions.Join(), player)
-        await session.perform(plugins.default.admin.Auth(password="asdfasdf"), player)
+        await session.perform(plugins.default.Join(), player)
+        await session.perform(plugins.admin.Auth(password="asdfasdf"), player)
 
         assert session.world
         return session.world, player
