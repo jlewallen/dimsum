@@ -1,5 +1,6 @@
 import inspect
 import logging
+import asyncio
 from typing import Any, Callable, Dict, List, Union
 
 import model.events as events
@@ -47,17 +48,18 @@ class SubscriptionManager(visual.Comms):
 
     async def somebody(self, key: str, r: visual.Renderable) -> bool:
         if key in self.by_key:
-            # TODO Parallel
-            for subscription in self.by_key[key]:
-                await subscription.write(r)
+            await asyncio.gather(
+                *[subscription.write(r) for subscription in self.by_key[key]]
+            )
             return True
         return False
 
     async def everybody(self, r: visual.Renderable) -> bool:
-        # TODO Parallel
-        for key, other in self.by_key.items():
-            for subscription in other:
-                await subscription.write(r)
+        await asyncio.gather(
+            flatten(
+                *[[sub.write(r) for sub in other] for key, other in self.by_key.items()]
+            )
+        )
         return True
 
 
@@ -99,3 +101,7 @@ class TextRendering:
 
     def install(self, bus: EventBus, comms: visual.Comms):
         pass
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]
