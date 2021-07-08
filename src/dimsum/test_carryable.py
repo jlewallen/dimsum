@@ -5,6 +5,8 @@ import model.reply as reply
 
 import scopes.carryable as carryable
 
+from plugins.looking import *
+
 import test
 
 log = logging.getLogger("dimsum")
@@ -161,7 +163,7 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
         assert len(jacob.make(carryable.Containing).holding) == 1
 
     r = await tw.execute("look in box")
-    assert isinstance(r, reply.EntitiesObservation)
+    assert isinstance(r, EntitiesObservation)
     assert "Coin" in r.items[0].props.name
 
 

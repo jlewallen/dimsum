@@ -5,7 +5,10 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
+import scopes.movement as movement
+import scopes.occupyable as occupyable
 from plugins.actions import *
+import plugins.looking as looking
 import grammars
 import transformers
 
@@ -63,7 +66,7 @@ class MovingAction(PersonAction):
                 await leaving.left(person)
                 await entering.entered(person)
 
-        return AreaObservation(world.find_person_area(person), person)
+        return looking.AreaObservation(world.find_person_area(person), person)
 
 
 class Go(MovingAction):

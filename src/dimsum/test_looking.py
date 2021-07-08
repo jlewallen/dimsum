@@ -4,6 +4,8 @@ import pytest
 
 import model.reply as reply
 
+from plugins.looking import *
+
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 
@@ -24,7 +26,7 @@ async def test_look_empty():
     tw = test.TestWorld()
     await tw.initialize()
     r = await tw.success("look")
-    assert isinstance(r, reply.AreaObservation)
+    assert isinstance(r, AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 0
     assert len(r.routes) == 0
@@ -37,7 +39,7 @@ async def test_look_items():
     await tw.success("make IPA")
     await tw.success("drop")
     r = await tw.success("look")
-    assert isinstance(r, reply.AreaObservation)
+    assert isinstance(r, AreaObservation)
     assert len(r.items) == 1
     assert len(r.living) == 0
 
@@ -48,7 +50,7 @@ async def test_look_living():
     await tw.initialize()
     await tw.add_carla()
     r = await tw.success("look")
-    assert isinstance(r, reply.AreaObservation)
+    assert isinstance(r, AreaObservation)
 
     r = await tw.success("look")
     assert len(r.items) == 0
@@ -70,7 +72,7 @@ async def test_look_people_invisible():
         await session.save()
 
     r = await tw.success("look")
-    assert isinstance(r, reply.AreaObservation)
+    assert isinstance(r, AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 1
 

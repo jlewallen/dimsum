@@ -2,9 +2,9 @@
     "data": {
         "language": {
             "reply": {
-                "py/object": "model.reply.AreaObservation",
+                "py/object": "plugins.looking.AreaObservation",
                 "who": {
-                    "py/object": "model.reply.ObservedPerson",
+                    "py/object": "plugins.looking.ObservedPerson",
                     "entity": {
                         "py/object": "model.entity.Entity",
                         "key": "jlewallen",
