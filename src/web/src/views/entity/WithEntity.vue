@@ -3,7 +3,7 @@
         <div v-if="entity">
             <slot :entity="entity"></slot>
         </div>
-        <div v-else>Loading</div>
+        <div v-else class="loading">Loading</div>
     </div>
 </template>
 
@@ -39,4 +39,10 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.loading {
+    padding: 0.1em;
+    color: #7f7f7f;
+    font-style: oblique;
+}
+</style>
