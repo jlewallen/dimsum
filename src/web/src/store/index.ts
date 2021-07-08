@@ -163,7 +163,6 @@ export default createStore<RootState>({
                 const reply = received as { nearby: string[] };
                 for (const nearby of reply.nearby) {
                     const parsed = JSON.parse(nearby);
-                    console.log("ws:received", parsed);
                     commit(MutationTypes.REPLY, { reply: parsed });
                 }
             });

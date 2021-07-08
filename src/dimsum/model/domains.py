@@ -41,9 +41,9 @@ def infinite_reach(entity: entity.Entity, depth: int):
 
 
 def default_reach(entity: entity.Entity, depth: int):
-    if depth == 3:
-        return -1
     if entity.klass == scopes.AreaClass:
+        if depth == 3:
+            return -1
         return 1
     return 0
 
@@ -90,6 +90,7 @@ class Session:
         gid: Optional[int] = None,
         json: Optional[List[entity.Serialized]] = None,
         reach=None,
+        refresh=None,
     ) -> serializing.Materialized:
         materialized = await serializing.materialize(
             registrar=self.registrar,
@@ -99,6 +100,7 @@ class Session:
             json=json,
             reach=reach if reach else default_reach,
             proxy_factory=proxying.create,
+            refresh=refresh,
         )
 
         for updated_world in [e for e in materialized.all() if e.key == world.Key]:
@@ -192,6 +194,9 @@ class Session:
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
+            # Materialize from the target entity to ensure we have
+            # enough in memory to carry out its behavior.
+            await get().materialize(key=entity.key, refresh=True)
             with entity.make(behavior.Behaviors) as behave:
                 if behave.get_default():
                     log.info("everywhere: %s", entity)

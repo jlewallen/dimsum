@@ -214,6 +214,7 @@ async def materialize(
     depth: int = 0,
     cache: Optional[Dict[str, List[entity.Serialized]]] = None,
     proxy_factory: Optional[Callable] = None,
+    refresh: bool = False,
 ) -> Materialized:
     assert registrar
     assert store
@@ -222,10 +223,11 @@ async def materialize(
     cache = cache or {}
     found = None
     if key is not None:
-        log.debug("[%d] materialize key=%s", depth, key)
-        found = registrar.find_by_key(key)
-        if found:
-            return Materialized([found])
+        if not refresh:
+            log.debug("[%d] materialize key=%s", depth, key)
+            found = registrar.find_by_key(key)
+            if found:
+                return Materialized([found])
 
         if key in cache:
             json = cache[key]
@@ -236,10 +238,11 @@ async def materialize(
                 return Materialized([])
 
     if gid is not None:
-        log.debug("[%d] materialize gid=%d", depth, gid)
-        found = registrar.find_by_gid(gid)
-        if found:
-            return Materialized([found])
+        if not refresh:
+            log.debug("[%d] materialize gid=%d", depth, gid)
+            found = registrar.find_by_gid(gid)
+            if found:
+                return Materialized([found])
 
         json = await store.load_by_gid(gid)
         if len(json) == 0:
@@ -262,20 +265,29 @@ async def materialize(
 
     cache.update(**{se.key: [se] for se in json})
 
-    deserialized = _deserialize(json[0].serialized, reference)
+    serialized = json[0].serialized
+    deserialized = _deserialize(serialized, reference)  # TODO why not all json?
     proxied = proxy_factory(deserialized) if proxy_factory else deserialized
-    registrar.register(proxied, original=json[0].serialized, depth=depth)
     loaded = proxied
 
     deeper = True
-    new_depth = depth
+    choice = 0
     if reach:
         choice = reach(loaded, depth)
         if choice < 0:
             log.debug("reach! reach! reach!")
             deeper = False
-        else:
-            new_depth += choice
+            choice = 0
+        elif choice > 0:
+            depths[loaded.key] = depths.setdefault(loaded.key, 0) + choice
+            log.debug(
+                "depth-change: %s choice=%d depth[loaded]=%d",
+                loaded.klass,
+                choice,
+                depths[loaded.key],
+            )
+
+    registrar.register(loaded, original=serialized, depth=depth + choice)
 
     if deeper:
         for referenced_key, proxy in refs.items():
@@ -285,7 +297,7 @@ async def materialize(
                 store=store,
                 key=referenced_key,
                 reach=reach,
-                depth=depths[referenced_key],
+                depth=depths[referenced_key] + choice,
                 proxy_factory=proxy_factory,
                 cache=cache,
             )
