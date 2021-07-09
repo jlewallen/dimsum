@@ -361,7 +361,9 @@ class Behavior:
         with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
             return (
-                [EntityAndBehavior(e.key, b.python)] if b and b.python else []
+                [EntityAndBehavior(e.key, b.python)]
+                if b and b.executable and b.python
+                else []
             ) + inherited
 
     @functools.cached_property

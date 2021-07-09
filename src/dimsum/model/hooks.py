@@ -31,13 +31,17 @@ class Hook:
             extended = live_hooks.get(None)
             if extended:
                 all_hooks += extended._get_extra_hooks(self.name)
-            return self._invoke(self.fn, self.hooks + all_hooks, args, kwargs)
+            return self._invoke(
+                self.name, self.fn, self.hooks + all_hooks, args, kwargs
+            )
 
         return wrap
 
     @staticmethod
-    def _invoke(call, hooks, args, kwargs):
-        log.info("hook:call %s hooks=%s args=%s kwargs=%s", call, hooks, args, kwargs)
+    def _invoke(name, call, hooks, args, kwargs):
+        log.debug(
+            "hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs
+        )
 
         for hook_fn in hooks:
             call = functools.partial(hook_fn, call)

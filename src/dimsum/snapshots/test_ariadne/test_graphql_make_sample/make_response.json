@@ -520,6 +520,7 @@
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "executable": true,
                                             "logs": []
                                         }
                                     }
@@ -738,6 +739,7 @@
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
                                             "python": "#",
+                                            "executable": true,
                                             "logs": []
                                         }
                                     }
@@ -850,6 +852,7 @@
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
                                             "python": "",
+                                            "executable": true,
                                             "logs": []
                                         }
                                     }
@@ -962,6 +965,7 @@
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=properties.Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "executable": true,
                                             "logs": []
                                         }
                                     }
@@ -2074,6 +2078,7 @@
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
                                             "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=properties.Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "executable": true,
                                             "logs": []
                                         }
                                     }

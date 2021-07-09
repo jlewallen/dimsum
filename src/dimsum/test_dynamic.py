@@ -9,6 +9,7 @@ import scopes.behavior as behavior
 import scopes as scopes
 
 import test
+from test_utils import *
 
 log = logging.getLogger("dimsum.tests")
 
@@ -281,12 +282,6 @@ evaluators = []
     await tw.failure("hold Nail")
 
 
-@pytest.fixture(scope="function")
-def silence_dynamic_errors(caplog):
-    caplog.set_level(logging.CRITICAL, "dimsum.dynamic.errors")
-    yield
-
-
 @pytest.mark.asyncio
 async def test_exception_in_parse(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
@@ -310,7 +305,7 @@ asdf;
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail.key)
         with nail.make(behavior.Behaviors) as behave:
-            assert len(behave.get_default().logs) == 2
+            assert len(behave.get_default().logs) == 1
 
 
 @pytest.mark.asyncio
@@ -415,12 +410,7 @@ async def test_dynamic_hook(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    door = await tw.add_behaviored_thing(
-        tw,
-        "Door",
-        """""",
-    )
-
+    door = await tw.add_behaviored_thing(tw, "Door", "")
     keys = await tw.add_behaviored_thing(
         tw,
         "Keys",
