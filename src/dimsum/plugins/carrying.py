@@ -11,6 +11,7 @@ from finders import *
 from tools import *
 from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
+import model.hooks as hooks
 import scopes.carryable as carryable
 import grammars
 import transformers
@@ -28,6 +29,11 @@ class ItemsDropped(StandardEvent):
 @dataclasses.dataclass(frozen=True)
 class ItemsHeld(StandardEvent):
     items: List[entity.Entity]
+
+
+@hooks.all.hold.target
+def can_hold(person: entity.Entity, entity: entity.Entity) -> bool:
+    return True
 
 
 class Drop(PersonAction):
@@ -105,6 +111,9 @@ class Hold(PersonAction):
         item = await world.apply_item_finder(person, self.item)
         if not item:
             return Failure("sorry, hold what?")
+
+        if not can_hold(person, item):
+            return Failure("sorry, you can't hold that")
 
         with person.make(carryable.Containing) as pockets:
             # This should happen after? What if there's more on the ground?
@@ -354,6 +363,9 @@ class TakeOut(PersonAction):
             item = await world.apply_item_finder(person, self.item)
             if not item:
                 return Failure("what?")
+
+            if not can_hold(person, item):
+                return Failure("sorry, you can't hold that")
 
             if containing.take_out(item):
                 with person.make(carryable.Containing) as pockets:

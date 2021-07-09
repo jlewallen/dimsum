@@ -406,7 +406,7 @@ async def jingle(this, person, say):
 
 
 @pytest.mark.asyncio
-async def test_dynamic_hook(caplog):
+async def test_dynamic_hook_observed(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -430,3 +430,21 @@ def hide_everything(resume, entity):
 
     r = await tw.success("look")
     assert len(r.items) == 1
+
+
+@pytest.mark.asyncio
+async def test_dynamic_hook_never_hold(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    keys = await tw.add_behaviored_thing(
+        tw,
+        "Keys",
+        """
+@hooks.hold.hook
+def never_hold(resume, holder, entity):
+    return False
+""",
+    )
+
+    await tw.failure("hold Keys")

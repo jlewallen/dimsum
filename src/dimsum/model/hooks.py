@@ -90,6 +90,10 @@ class All(ManagedHooks):
     def observed(self):
         return self.create_hook("observed")
 
+    @property
+    def hold(self):
+        return self.create_hook("hold")
+
 
 all = All()
 
