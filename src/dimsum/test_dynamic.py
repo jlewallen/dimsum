@@ -334,7 +334,7 @@ async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
         "Nail",
         """
 @received(TickEvent)
-def tick(this, ev, say=None):
+def tick(this, ev, say):
     og.info("hello")
 """,
     )
@@ -365,7 +365,7 @@ async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
         "Nail",
         """
 @language('start: "break"')
-def break_nail(this, person=None, say=None):
+def break_nail(this, person, say):
     og.info("hello")
 """,
     )
@@ -442,7 +442,8 @@ async def test_dynamic_hook_never_hold(caplog):
         "Keys",
         """
 @hooks.hold.hook
-def never_hold(resume, holder, entity):
+def never_hold(resume, person, entity):
+    log.info("never-hold: %s", person)
     return False
 """,
     )
@@ -467,6 +468,7 @@ async def test_dynamic_hook_never_enter(caplog):
         """
 @hooks.enter.hook
 def never_enter(resume, person, area):
+    log.info("never-enter: %s", person)
     return False
 """,
     )
@@ -491,6 +493,7 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
         """
 @hooks.enter.hook(condition=Held())
 def never_enter(resume, person, area):
+    log.info("never-enter: %s", person)
     return False
 """,
     )
