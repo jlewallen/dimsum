@@ -15,6 +15,7 @@ import model.game as game
 import model.properties as properties
 import model.world as world
 import model.hooks as hook_system
+from model.condition import Condition, AlwaysTrue
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import domains as session
@@ -27,19 +28,24 @@ log = logging.getLogger("dimsum.dynamic")
 errors_log = logging.getLogger("dimsum.dynamic.errors")
 
 
-class Condition:
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return True
-
-
+@dataclasses.dataclass
 class Held(Condition):
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return tools.is_holding(person, e)
+    entity_key: str
+
+    def applies(self) -> bool:
+        entity = session.get().registrar.find_by_key(self.entity_key)
+        assert entity
+        return tools.in_pockets(entity)
 
 
+@dataclasses.dataclass
 class Ground(Condition):
-    def applies(self, person: entity.Entity, e: entity.Entity) -> bool:
-        return not tools.is_holding(person, e)
+    entity_key: str
+
+    def applies(self) -> bool:
+        entity = session.get().registrar.find_by_key(self.entity_key)
+        assert entity
+        return tools.on_ground(entity)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -119,20 +125,22 @@ class SimplifiedTransformer(transformers.Base):
         return SimplifiedAction(self.entity, self.registered, args)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class Simplified:
     entity_key: str
     thunk_factory: Callable = dataclasses.field(repr=False)
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
-    hooks: "hook_system.All" = dataclasses.field(default_factory=hook_system.All)
+    hooks: Optional["hook_system.All"] = dataclasses.field(
+        default_factory=hook_system.All
+    )
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
             log.info("prose: '%s' %s", prose, fn)
             self.registered.append(
                 Registered(
-                    prose, self.thunk_factory(fn), condition=condition or Condition()
+                    prose, self.thunk_factory(fn), condition=condition or AlwaysTrue()
                 )
             )
             return fn
@@ -147,7 +155,7 @@ class Simplified:
                 h = hook.__name__
             log.info("hook: '%s' %s", h, fn)
             self.receives.append(
-                Receive(h, self.thunk_factory(fn), condition=condition or Condition())
+                Receive(h, self.thunk_factory(fn), condition=condition or AlwaysTrue())
             )
             return fn
 
@@ -166,9 +174,7 @@ class Simplified:
 
         log.debug("%s evaluate %s", self, entity)
 
-        for registered in [
-            r for r in self.registered if r.condition.applies(player, entity)
-        ]:
+        for registered in [r for r in self.registered if r.condition.applies()]:
 
             def transformer_factory(**kwargs):
                 assert world and player
@@ -258,8 +264,6 @@ def _get_default_globals():
         Event=events.StandardEvent,
         Scope=entity.Scope,
         Carryable=carryable.Carryable,
-        Held=Held,
-        Ground=Ground,
         fail=game.Failure,
         ok=game.Success,
         **event_classes,
@@ -325,6 +329,8 @@ async def __ex(t=thunk):
             language=simplified.language,
             received=simplified.received,
             hooks=simplified.hooks,
+            Held=functools.partial(Held, found.key),
+            Ground=functools.partial(Ground, found.key),
         )
     )
 

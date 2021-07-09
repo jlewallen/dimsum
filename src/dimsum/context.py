@@ -3,6 +3,8 @@ import contextvars
 import logging
 from typing import Any, Optional
 
+from model.condition import Condition
+
 import model.entity as entity
 import model.events as events
 
@@ -37,6 +39,10 @@ class Ctx:
 
     @abc.abstractmethod
     async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def evaluate(self, condition: Condition) -> bool:
         raise NotImplementedError
 
 

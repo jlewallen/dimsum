@@ -3,14 +3,23 @@ import logging
 import dataclasses
 import functools
 import contextvars
+import asyncio
 
-from typing import List, Optional, Callable, Dict
+from typing import List, Optional, Callable, Dict, Any
 from weakref import ref, ReferenceType
 
-from model.entity import Entity
+from model.condition import Condition
+
+import context
 
 log = logging.getLogger("dimsum.hooks")
 live_hooks: contextvars.ContextVar = contextvars.ContextVar("dimsum:hooks")
+
+
+@dataclasses.dataclass
+class RegisteredHook:
+    fn: Callable
+    condition: Optional[Condition] = None
 
 
 @dataclasses.dataclass
@@ -18,7 +27,7 @@ class Hook:
     manager: "ManagedHooks"
     name: str
     fn: Optional[Callable] = None
-    hooks: List[Callable] = dataclasses.field(default_factory=lambda: [])
+    hooks: List[RegisteredHook] = dataclasses.field(default_factory=lambda: [])
 
     def target(self, fn):
         log.info("hook:target: %s", fn)
@@ -39,29 +48,37 @@ class Hook:
 
     @staticmethod
     def _invoke(name, call, hooks, args, kwargs):
-        log.debug(
-            "hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs
-        )
+        log.info("hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs)
 
-        for hook_fn in hooks:
-            call = functools.partial(hook_fn, call)
+        for registered in hooks:
+            if registered.condition:
+                value = context.get().evaluate(registered.condition)
+                if not value:
+                    continue
+            call = functools.partial(registered.fn, call)
 
         return call(*args, **kwargs)
 
-    def hook(self, fn):
-        log.info("hook:hook: %s", fn)
-        self.hooks.append(fn)
-        return fn
+    def hook(self, wrapped=None, condition: Optional[Condition] = None):
+        if wrapped is None:
+            return functools.partial(self.hook, condition=condition)
+
+        self.hooks.append(RegisteredHook(wrapped, condition))
+
+        def wrap(fn):
+            return fn
+
+        return wrap
 
 
 @dataclasses.dataclass
 class ManagedHooks:
-    everything: Dict[str, Hook] = dataclasses.field(default_factory=dict)
+    everything: Dict[str, Hook] = dataclasses.field(default_factory=dict, init=False)
 
     def create_hook(self, name: str) -> Hook:
         return self.everything.setdefault(name, Hook(self, name))
 
-    def _get_hooks(self, name: str) -> List[Callable]:
+    def _get_hooks(self, name: str) -> List[RegisteredHook]:
         if name in self.everything:
             return self.everything[name].hooks
         return []
@@ -84,7 +101,6 @@ class ExtendHooks:
         return flatten([c._get_hooks(name) for c in self.children])
 
 
-@dataclasses.dataclass
 class All(ManagedHooks):
     @property
     def observed(self):
@@ -93,6 +109,10 @@ class All(ManagedHooks):
     @property
     def hold(self):
         return self.create_hook("hold")
+
+    @property
+    def enter(self):
+        return self.create_hook("enter")
 
 
 all = All()

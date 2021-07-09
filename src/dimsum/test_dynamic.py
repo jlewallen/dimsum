@@ -448,3 +448,54 @@ def never_hold(resume, holder, entity):
     )
 
     await tw.failure("hold Keys")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_hook_never_enter(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.success("dig north|south to Canada")
+
+    await tw.success("go north")
+
+    await tw.success("go south")
+
+    really_heavy_keys = await tw.add_behaviored_thing(
+        tw,
+        "Really Heavy Keys",
+        """
+@hooks.enter.hook
+def never_enter(resume, person, area):
+    return False
+""",
+    )
+
+    await tw.failure("go north")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.success("dig north|south to Canada")
+
+    await tw.success("go north")
+
+    await tw.success("go south")
+
+    really_heavy_keys = await tw.add_behaviored_thing(
+        tw,
+        "Really Heavy Keys",
+        """
+@hooks.enter.hook(condition=Held())
+def never_enter(resume, person, area):
+    return False
+""",
+    )
+
+    await tw.success("go north")
+    await tw.success("go south")
+    await tw.success("hold keys")
+    await tw.failure("go north")

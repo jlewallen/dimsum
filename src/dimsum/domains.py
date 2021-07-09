@@ -16,6 +16,8 @@ import model.visual as visual
 import model.world as world
 import model.hooks as hook_system
 
+from model.condition import Condition
+
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.movement as movement
@@ -418,6 +420,9 @@ class WorldCtx(context.Ctx):
                     found = e
 
         return found
+
+    def evaluate(self, condition: Condition) -> bool:
+        return condition.applies()
 
 
 def flatten(l):

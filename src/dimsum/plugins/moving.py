@@ -15,6 +15,11 @@ import transformers
 log = logging.getLogger("dimsum")
 
 
+@hooks.all.enter.target
+def can_enter(person: entity.Entity, area: entity.Entity) -> bool:
+    return True
+
+
 class Home(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -60,6 +65,9 @@ class MovingAction(PersonAction):
 
         if destination is None:
             return Failure("where?")
+
+        if not can_enter(person, destination):
+            return Failure("sorry, you can't go there")
 
         with destination.make(occupyable.Occupyable) as entering:
             with area.make(occupyable.Occupyable) as leaving:

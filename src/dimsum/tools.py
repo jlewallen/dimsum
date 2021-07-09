@@ -15,6 +15,7 @@ import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import scopes.occupyable as occupyable
 import scopes.behavior as behavior
+import scopes
 
 
 log = logging.getLogger("dimsum.tools")
@@ -67,6 +68,22 @@ def get_contributing_entities(world: Entity, player: Entity) -> EntitySet:
 def is_holding(container: Entity, e: Entity) -> bool:
     with container.make_and_discard(carryable.Containing) as contains:
         return e in contains.holding
+
+
+def in_pockets(e: Entity) -> bool:
+    with e.make_and_discard(carryable.Location) as location:
+        assert location.container
+        if location.container.klass == scopes.LivingClass:
+            return True
+    return False
+
+
+def on_ground(e: Entity) -> bool:
+    with e.make_and_discard(carryable.Location) as location:
+        assert location.container
+        if location.container.klass == scopes.AreaClass:
+            return True
+    return False
 
 
 def default_heard_for(area: Optional[Entity] = None) -> List[Entity]:

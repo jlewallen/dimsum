@@ -11,6 +11,7 @@ async def test_dig_north_no_quotes():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("dig north to Canada")
+    await tw.success("go north")
 
 
 @pytest.mark.asyncio
@@ -18,6 +19,7 @@ async def test_dig_north_single_quotes():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success("dig north to 'Canada'")
+    await tw.success("go north")
 
 
 @pytest.mark.asyncio
@@ -25,6 +27,7 @@ async def test_dig_north_double_quotes():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.success('dig north to "Canada"')
+    await tw.success("go north")
 
 
 @pytest.mark.asyncio
