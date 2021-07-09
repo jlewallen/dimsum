@@ -267,8 +267,6 @@ class Containing(Openable):
 
     def add_item(self, item: entity.Entity, **kwargs) -> entity.Entity:
         for already in self.holding:
-            # log.info("adding %s already = %s", item.kind, already.kind)
-            # log.info("adding %s already = %s", item, already)
             with already.make(Carryable) as additional:
                 with item.make(Carryable) as coming:
                     if additional.kind.same(coming.kind):
@@ -280,6 +278,11 @@ class Containing(Openable):
                         # and that has the effect of obliterating the item we
                         # picked up, merging with the one in our hands.
                         return already
+
+                # It's possible this item wasn't Carryable and we just
+                # added that scope, so discard if we ended up ignoring
+                # the item.
+                additional.discard()
 
         self.ourselves.touch()
         self.holding.append(item)

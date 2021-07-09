@@ -62,6 +62,6 @@ entity.install_hooks(EntityHooks())
 
 @hooks.all.observed.hook
 def hide_invisible_entities(resume, entity: entity.Entity):
-    if entity.make(mechanics.Visibility).is_invisible:
+    if entity.make_and_discard(mechanics.Visibility).is_invisible:
         return []
     return resume(entity)

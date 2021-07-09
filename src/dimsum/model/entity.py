@@ -312,13 +312,13 @@ class Entity:
         return False
 
     def make_and_discard(self, ctor, **kwargs):
-        return self.make(ctor, discard=True, **kwargs)
+        return self.make(ctor, discarding=True, **kwargs)
 
     def has(self, ctor, **kwargs):
         key = get_ctor_key(ctor)
         return key in self.chimeras
 
-    def make(self, ctor, discard=False, **kwargs):
+    def make(self, ctor, discarding=False, **kwargs):
         key = get_ctor_key(ctor)
 
         chargs = {}
@@ -327,14 +327,14 @@ class Entity:
         chargs.update(**kwargs)
 
         log.debug("%s splitting chimera: %s %s", self.key, key, chargs)
-        child = ctor(chimera=self, discard=discard, **chargs)
+        child = ctor(chimera=self, discarding=discarding, **chargs)
         return child
 
     def update(self, child):
         key = child.chimera_key
         data = child.__dict__
         del data["chimera"]
-        del data["discard"]
+        del data["discarding"]
         log.debug("%s updating chimera: %s %s", self.key, key, data)
         self.chimeras[key] = data
 
@@ -347,12 +347,12 @@ class Entity:
 
 class Scope:
     def __init__(
-        self, chimera: Optional[Entity] = None, discard: bool = False, **kwargs
+        self, chimera: Optional[Entity] = None, discarding: bool = False, **kwargs
     ):
         super().__init__()
         assert chimera
         self.chimera = chimera
-        self.discard = discard
+        self.discarding = discarding
 
     @property
     def chimera_key(self) -> str:
@@ -368,8 +368,11 @@ class Scope:
     def __exit__(self, type, value, traceback):
         self.save()
 
+    def discard(self):
+        self.discarding = True
+
     def save(self):
-        if self.discard:
+        if self.discarding:
             return
         self.chimera.update(self)
 

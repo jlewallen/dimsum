@@ -1866,7 +1866,7 @@
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "157",
+                                        "key": "164",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -1978,19 +1978,6 @@
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -2270,7 +2257,7 @@
                     }
                 },
                 {
-                    "key": 157,
+                    "key": 164,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2307,7 +2294,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "67",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2343,7 +2330,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "157",
+                        "key": "164",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2427,7 +2414,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "65",
+                                        "key": "66",
                                         "klass": "ExitClass",
                                         "name": "Small Crevice"
                                     }
@@ -2490,7 +2477,7 @@
                     }
                 },
                 {
-                    "key": 65,
+                    "key": 66,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2550,7 +2537,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "65",
+                        "key": "66",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2591,7 +2578,7 @@
                     }
                 },
                 {
-                    "key": 67,
+                    "key": 68,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2634,19 +2621,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "85",
+                                        "key": "86",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "87",
+                                        "key": "88",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "160",
+                                        "key": "168",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -2668,7 +2655,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "67",
+                        "key": "68",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2709,7 +2696,7 @@
                     }
                 },
                 {
-                    "key": 85,
+                    "key": 86,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2746,7 +2733,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "69",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -2754,23 +2741,10 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "67",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -2782,7 +2756,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "85",
+                        "key": "86",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2823,7 +2797,7 @@
                     }
                 },
                 {
-                    "key": 87,
+                    "key": 88,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2860,7 +2834,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "73",
+                                    "key": "74",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -2881,7 +2855,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "67",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -2896,7 +2870,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "87",
+                        "key": "88",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -2937,7 +2911,7 @@
                     }
                 },
                 {
-                    "key": 160,
+                    "key": 168,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -2995,7 +2969,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "67",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -3010,7 +2984,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "160",
+                        "key": "168",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3051,7 +3025,7 @@
                     }
                 },
                 {
-                    "key": 69,
+                    "key": 70,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3094,19 +3068,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "91",
+                                        "key": "92",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "93",
+                                        "key": "94",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "97",
+                                        "key": "98",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     }
@@ -3128,7 +3102,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "69",
+                        "key": "70",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3169,7 +3143,7 @@
                     }
                 },
                 {
-                    "key": 91,
+                    "key": 92,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3206,7 +3180,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "71",
+                                    "key": "72",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -3214,23 +3188,10 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "69",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -3242,7 +3203,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "91",
+                        "key": "92",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3283,7 +3244,7 @@
                     }
                 },
                 {
-                    "key": 93,
+                    "key": 94,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3320,7 +3281,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "67",
+                                    "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -3341,7 +3302,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "69",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3356,7 +3317,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "93",
+                        "key": "94",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3397,7 +3358,7 @@
                     }
                 },
                 {
-                    "key": 97,
+                    "key": 98,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3434,7 +3395,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "75",
+                                    "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -3455,7 +3416,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "69",
+                                    "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -3470,7 +3431,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "97",
+                        "key": "98",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3511,7 +3472,7 @@
                     }
                 },
                 {
-                    "key": 71,
+                    "key": 72,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3554,13 +3515,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "100",
+                                        "key": "102",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "102",
+                                        "key": "104",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     }
@@ -3582,7 +3543,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "71",
+                        "key": "72",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3597,120 +3558,6 @@
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 2"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 100,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "69",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 1"
-                                }
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "71",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 2"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "100",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 35
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "South Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "South Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -3774,7 +3621,108 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "77",
+                                    "key": "70",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 1"
+                                }
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "72",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 2"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "102",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 35
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 104,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -3795,7 +3743,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "71",
+                                    "key": "72",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -3810,7 +3758,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "102",
+                        "key": "104",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3851,7 +3799,7 @@
                     }
                 },
                 {
-                    "key": 77,
+                    "key": 78,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3894,19 +3842,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "127",
+                                        "key": "132",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "129",
+                                        "key": "134",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "133",
+                                        "key": "138",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -3928,7 +3876,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "77",
+                        "key": "78",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -3969,7 +3917,7 @@
                     }
                 },
                 {
-                    "key": 127,
+                    "key": 132,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4006,7 +3954,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "75",
+                                    "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -4014,23 +3962,10 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "77",
+                                    "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -4042,7 +3977,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "127",
+                        "key": "132",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4083,7 +4018,7 @@
                     }
                 },
                 {
-                    "key": 129,
+                    "key": 134,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -4120,7 +4055,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "83",
+                                    "key": "84",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -4141,7 +4076,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "77",
+                                    "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -4156,7 +4091,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "129",
+                        "key": "134",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4171,1386 +4106,6 @@
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 133,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "71",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 2"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "77",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 2"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "133",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 40
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 75,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "9",
-                            "klass": "AreaClass",
-                            "name": "generic area"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "containing": {
-                                "pattern": null,
-                                "locked": false,
-                                "openable": {
-                                    "py/object": "scopes.carryable.UnknownOpenClose"
-                                },
-                                "holding": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "115",
-                                        "klass": "ExitClass",
-                                        "name": "North Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "117",
-                                        "klass": "ExitClass",
-                                        "name": "South Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "121",
-                                        "klass": "ExitClass",
-                                        "name": "East Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "124",
-                                        "klass": "ExitClass",
-                                        "name": "West Exit"
-                                    }
-                                ],
-                                "capacity": null,
-                                "produces": {}
-                            },
-                            "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.AreaClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "75",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 41
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 1 x 1"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 1 x 1"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 115,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "77",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 2"
-                                }
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "75",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "115",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 42
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 117,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "73",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "75",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "117",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 43
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "South Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "South Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 121,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "81",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "75",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "121",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 44
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "East Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "East Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 124,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "69",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 1"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "75",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "124",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 45
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 73,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "9",
-                            "klass": "AreaClass",
-                            "name": "generic area"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "containing": {
-                                "pattern": null,
-                                "locked": false,
-                                "openable": {
-                                    "py/object": "scopes.carryable.UnknownOpenClose"
-                                },
-                                "holding": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "106",
-                                        "klass": "ExitClass",
-                                        "name": "North Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "108",
-                                        "klass": "ExitClass",
-                                        "name": "East Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "112",
-                                        "klass": "ExitClass",
-                                        "name": "West Exit"
-                                    }
-                                ],
-                                "capacity": null,
-                                "produces": {}
-                            },
-                            "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.AreaClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "73",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 46
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 1 x 0"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 1 x 0"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 106,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "75",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                }
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "73",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "106",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 47
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 108,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "79",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "73",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "108",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 48
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "East Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "East Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 112,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "67",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 0"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "73",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "112",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 49
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "West Exit"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 79,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "9",
-                            "klass": "AreaClass",
-                            "name": "generic area"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "containing": {
-                                "pattern": null,
-                                "locked": false,
-                                "openable": {
-                                    "py/object": "scopes.carryable.UnknownOpenClose"
-                                },
-                                "holding": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "136",
-                                        "klass": "ExitClass",
-                                        "name": "North Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "138",
-                                        "klass": "ExitClass",
-                                        "name": "West Exit"
-                                    }
-                                ],
-                                "capacity": null,
-                                "produces": {}
-                            },
-                            "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.AreaClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "79",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 50
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 2 x 0"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Grid Room 2 x 0"
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {}
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "key": 136,
-                    "serialized": {
-                        "py/object": "serializing.RootEntity",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 0
-                        },
-                        "creator": {
-                            "py/object": "model.world.World",
-                            "key": "world",
-                            "klass": "RootEntityClass",
-                            "name": "World"
-                        },
-                        "parent": {
-                            "py/object": "model.entity.Entity",
-                            "key": "6",
-                            "klass": "ItemClass",
-                            "name": "generic thing"
-                        },
-                        "chimeras": {
-                            "ownership": {
-                                "owner": {
-                                    "py/object": "model.world.World",
-                                    "key": "world",
-                                    "klass": "RootEntityClass",
-                                    "name": "World"
-                                }
-                            },
-                            "behaviors": {
-                                "behaviors": {
-                                    "py/object": "scopes.behavior.BehaviorMap",
-                                    "map": {}
-                                }
-                            },
-                            "exit": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "81",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
-                                }
-                            },
-                            "location": {
-                                "container": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "79",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
-                                }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
-                            }
-                        },
-                        "klass": {
-                            "py/type": "scopes.ExitClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "136",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 51
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "North Exit"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5614,9 +4169,9 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "73",
+                                    "key": "72",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
+                                    "name": "Grid Room 0 x 2"
                                 }
                             },
                             "carryable": {
@@ -5635,9 +4190,9 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "79",
+                                    "key": "78",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
+                                    "name": "Grid Room 1 x 2"
                                 }
                             }
                         },
@@ -5656,7 +4211,7 @@
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": 52
+                                    "value": 40
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
@@ -5691,7 +4246,1021 @@
                     }
                 },
                 {
-                    "key": 81,
+                    "key": 76,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "9",
+                            "klass": "AreaClass",
+                            "name": "generic area"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "containing": {
+                                "pattern": null,
+                                "locked": false,
+                                "openable": {
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
+                                },
+                                "holding": [
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "118",
+                                        "klass": "ExitClass",
+                                        "name": "North Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "120",
+                                        "klass": "ExitClass",
+                                        "name": "South Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "124",
+                                        "klass": "ExitClass",
+                                        "name": "East Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "128",
+                                        "klass": "ExitClass",
+                                        "name": "West Exit"
+                                    }
+                                ],
+                                "capacity": null,
+                                "produces": {}
+                            },
+                            "occupyable": {
+                                "occupied": [],
+                                "occupancy": 100
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.AreaClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "76",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 41
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 1"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 1"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 118,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "78",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 2"
+                                }
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "118",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 42
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 120,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "120",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 43
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 124,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "124",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 44
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "East Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "East Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 128,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "70",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 1"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "128",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 45
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "West Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "West Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 74,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "9",
+                            "klass": "AreaClass",
+                            "name": "generic area"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "containing": {
+                                "pattern": null,
+                                "locked": false,
+                                "openable": {
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
+                                },
+                                "holding": [
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "108",
+                                        "klass": "ExitClass",
+                                        "name": "North Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "110",
+                                        "klass": "ExitClass",
+                                        "name": "East Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "114",
+                                        "klass": "ExitClass",
+                                        "name": "West Exit"
+                                    }
+                                ],
+                                "capacity": null,
+                                "produces": {}
+                            },
+                            "occupyable": {
+                                "occupied": [],
+                                "occupancy": 100
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.AreaClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "74",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 46
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 0"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 0"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 108,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                }
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "108",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 47
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 110,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "80",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 0"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "110",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 48
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "East Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "East Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 114,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "68",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 0"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "114",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 49
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "West Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "West Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 80,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5742,12 +5311,6 @@
                                         "py/object": "model.entity.Entity",
                                         "key": "144",
                                         "klass": "ExitClass",
-                                        "name": "South Exit"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "148",
-                                        "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
                                 ],
@@ -5768,21 +5331,21 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "81",
+                        "key": "80",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": 53
+                                    "value": 50
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Grid Room 2 x 1"
+                                    "value": "Grid Room 2 x 0"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Grid Room 2 x 1"
+                                    "value": "Grid Room 2 x 0"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -5846,31 +5409,18 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "83",
+                                    "key": "82",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 2"
+                                    "name": "Grid Room 2 x 1"
                                 }
                             },
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "81",
+                                    "key": "80",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
+                                    "name": "Grid Room 2 x 0"
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -5888,7 +5438,7 @@
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": 54
+                                    "value": 51
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
@@ -5960,9 +5510,9 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "79",
+                                    "key": "74",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
+                                    "name": "Grid Room 1 x 0"
                                 }
                             },
                             "carryable": {
@@ -5981,9 +5531,9 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "81",
+                                    "key": "80",
                                     "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
+                                    "name": "Grid Room 2 x 0"
                                 }
                             }
                         },
@@ -6002,15 +5552,133 @@
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": 55
+                                    "value": 52
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "South Exit"
+                                    "value": "West Exit"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "South Exit"
+                                    "value": "West Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 82,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "9",
+                            "klass": "AreaClass",
+                            "name": "generic area"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "containing": {
+                                "pattern": null,
+                                "locked": false,
+                                "openable": {
+                                    "py/object": "scopes.carryable.UnknownOpenClose"
+                                },
+                                "holding": [
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "148",
+                                        "klass": "ExitClass",
+                                        "name": "North Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "150",
+                                        "klass": "ExitClass",
+                                        "name": "South Exit"
+                                    },
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "154",
+                                        "klass": "ExitClass",
+                                        "name": "West Exit"
+                                    }
+                                ],
+                                "capacity": null,
+                                "produces": {}
+                            },
+                            "occupyable": {
+                                "occupied": [],
+                                "occupancy": 100
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.AreaClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "82",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 53
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 2 x 1"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 2 x 1"
                                 },
                                 "created": {
                                     "py/object": "model.properties.Property",
@@ -6074,7 +5742,222 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "75",
+                                    "key": "84",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 2"
+                                }
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "148",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 54
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "North Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 150,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "80",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 0"
+                                }
+                            },
+                            "carryable": {
+                                "kind": {
+                                    "py/object": "model.kinds.Kind",
+                                    "identity": {
+                                        "py/object": "model.crypto.Identity",
+                                        "public": "<public>",
+                                        "signature": "<signature>",
+                                        "private": "<private>"
+                                    }
+                                },
+                                "quantity": 1,
+                                "loose": false
+                            },
+                            "location": {
+                                "container": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "scopes.ExitClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "150",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 55
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "South Exit"
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "key": 154,
+                    "serialized": {
+                        "py/object": "serializing.RootEntity",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 0
+                        },
+                        "creator": {
+                            "py/object": "model.world.World",
+                            "key": "world",
+                            "klass": "RootEntityClass",
+                            "name": "World"
+                        },
+                        "parent": {
+                            "py/object": "model.entity.Entity",
+                            "key": "6",
+                            "klass": "ItemClass",
+                            "name": "generic thing"
+                        },
+                        "chimeras": {
+                            "ownership": {
+                                "owner": {
+                                    "py/object": "model.world.World",
+                                    "key": "world",
+                                    "klass": "RootEntityClass",
+                                    "name": "World"
+                                }
+                            },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
+                            "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -6095,7 +5978,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "81",
+                                    "key": "82",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -6110,7 +5993,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "148",
+                        "key": "154",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6151,7 +6034,7 @@
                     }
                 },
                 {
-                    "key": 83,
+                    "key": 84,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6194,13 +6077,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "151",
+                                        "key": "158",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "153",
+                                        "key": "160",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -6222,7 +6105,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "83",
+                        "key": "84",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6263,7 +6146,7 @@
                     }
                 },
                 {
-                    "key": 151,
+                    "key": 158,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6300,7 +6183,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "81",
+                                    "key": "82",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -6308,23 +6191,10 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "83",
+                                    "key": "84",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
-                            },
-                            "carryable": {
-                                "kind": {
-                                    "py/object": "model.kinds.Kind",
-                                    "identity": {
-                                        "py/object": "model.crypto.Identity",
-                                        "public": "<public>",
-                                        "signature": "<signature>",
-                                        "private": "<private>"
-                                    }
-                                },
-                                "quantity": 1,
-                                "loose": false
                             }
                         },
                         "klass": {
@@ -6336,7 +6206,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "151",
+                        "key": "158",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6377,7 +6247,7 @@
                     }
                 },
                 {
-                    "key": 153,
+                    "key": 160,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6414,7 +6284,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "77",
+                                    "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -6435,7 +6305,7 @@
                             "location": {
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "83",
+                                    "key": "84",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -6450,7 +6320,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "153",
+                        "key": "160",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {

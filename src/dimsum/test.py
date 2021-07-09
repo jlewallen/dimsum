@@ -181,7 +181,7 @@ class TestWorld:
 
             await session.save()
 
-            return item
+            return item  # TODO return key
 
 
 async def make_simple_domain(
