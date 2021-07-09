@@ -36,7 +36,7 @@ src/web/node_modules:
 	cd src/web && yarn install
 
 web: src/web/node_modules src/web/src/config
-	cd src/web && yarn serve
+	cd src/web && yarn serve --port 8082
 
 graph:
 	+@for m in *.sqlite3; do                                               \
