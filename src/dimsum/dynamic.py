@@ -14,6 +14,7 @@ import model.events as events
 import model.game as game
 import model.properties as properties
 import model.world as world
+import model.hooks as hook_system
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import domains as session
@@ -23,7 +24,6 @@ import saying
 import transformers
 
 log = logging.getLogger("dimsum.dynamic")
-user_log = logging.getLogger("dimsum.dynamic.user")
 errors_log = logging.getLogger("dimsum.dynamic.errors")
 
 
@@ -57,6 +57,10 @@ class Receive:
 
 
 class EntityBehavior(grammars.CommandEvaluator):
+    @property
+    def hooks(self):
+        return hook_system.All()
+
     async def notify(self, notify: saying.Notify, **kwargs):
         raise NotImplementedError
 
@@ -121,6 +125,7 @@ class Simplified:
     thunk_factory: Callable = dataclasses.field(repr=False)
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
+    hooks: "hook_system.All" = dataclasses.field(default_factory=hook_system.All)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -221,6 +226,10 @@ class CompiledEntityBehavior(EntityBehavior):
     assigned: Optional[grammars.CommandEvaluator]
     frame: Dict[str, Any] = dataclasses.field(repr=False)
 
+    @property
+    def hooks(self):
+        return self.simplified.hooks
+
     async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
         log.debug("%s evaluate '%s'", self, command)
         action = await self.simplified.evaluate(command, **kwargs)
@@ -241,17 +250,17 @@ def _get_default_globals():
     # TODO Can we pass an exploded module here?
     event_classes = {k.__name__: k for k in events.get_all()}
     return dict(
-        log=user_log,
+        log=logging.getLogger("dimsum.dynamic.user"),
+        dataclass=dataclasses.dataclass,
+        properties=properties,
+        tools=tools,
+        Entity=entity.Entity,
+        Event=events.StandardEvent,
+        Scope=entity.Scope,
+        Carryable=carryable.Carryable,
         Held=Held,
         Ground=Ground,
-        Scope=entity.Scope,
-        properties=properties,
-        Entity=entity.Entity,
-        Carryable=carryable.Carryable,
-        dataclass=dataclasses.dataclass,
-        Event=events.StandardEvent,
         fail=game.Failure,
-        tools=tools,
         ok=game.Success,
         **event_classes,
     )
@@ -315,6 +324,7 @@ async def __ex(t=thunk):
         dict(
             language=simplified.language,
             received=simplified.received,
+            hooks=simplified.hooks,
         )
     )
 
@@ -350,7 +360,11 @@ class Behavior:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
         with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
-            return ([EntityAndBehavior(e.key, b.python)] if b else []) + inherited
+            return (
+                [EntityAndBehavior(e.key, b.python)]
+                if b and b.executable and b.python
+                else []
+            ) + inherited
 
     @functools.cached_property
     def _behaviors(self) -> Dict[entity.Entity, List[EntityAndBehavior]]:
@@ -374,6 +388,10 @@ class Behavior:
                 for entity, all_for_entity in self._behaviors.items()
             ]
         )
+
+    @property
+    def dynamic_hooks(self) -> List["hook_system.ManagedHooks"]:
+        return [c.hooks for c in self._compiled]
 
     @property
     def evaluators(self) -> Sequence[grammars.CommandEvaluator]:

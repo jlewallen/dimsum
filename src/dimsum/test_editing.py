@@ -1,9 +1,11 @@
 import logging
-import test
+import pytest
 
 import handlers
 import model.visual as visual
-import pytest
+
+import test
+from test_utils import *
 
 log = logging.getLogger("dimsum")
 
@@ -31,7 +33,9 @@ async def test_edit_item():
 
 
 @pytest.mark.asyncio
-async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged():
+async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged(
+    silence_dynamic_errors,
+):
     tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
     await tw.initialize()
 
@@ -47,4 +51,10 @@ og.info("hello")
 
     with tw.domain.session() as session:
         box = await session.materialize(key=box.key)
-        assert box.version.i == 1
+        assert box.version.i == 2
+
+    await tw.success("edit box")
+
+    with tw.domain.session() as session:
+        box = await session.materialize(key=box.key)
+        assert box.version.i == 2

@@ -3,14 +3,15 @@ import logging
 from typing import Any, Dict, List, Sequence
 
 import inflect
+import model.hooks as hooks
 import model.entity as entity
 import model.game as game
 import model.visual as visual
 
 import scopes.mechanics as mechanics
 
-p = inflect.engine()
 log = logging.getLogger("dimsum.model")
+p = inflect.engine()
 
 
 class Observation(game.Reply, visual.Renderable):
@@ -59,9 +60,8 @@ class ObservedEntities:
         return str(self)
 
 
-def observe(entity: Any) -> Sequence[ObservedEntity]:
-    if entity.make(mechanics.Visibility).is_invisible:
-        return []
+@hooks.all.observed.target
+def observe(entity: entity.Entity) -> Sequence[ObservedEntity]:
     return [ObservedItem(entity)]
 
 

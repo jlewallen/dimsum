@@ -8,13 +8,12 @@ from model.reply import *
 from model.world import *
 from model.events import *
 import scopes.apparel as apparel
-from plugins.actions import *
+from plugins.actions import PersonAction
+from plugins.editing import ModifyActivity
 from tools import *
 from finders import *
 import grammars
 import transformers
-
-import plugins.default as actions
 
 log = logging.getLogger("dimsum")
 
@@ -118,9 +117,7 @@ class Transformer(transformers.Base):
         return Remove(item=args[0])
 
     def when_worn(self, args):
-        return actions.ModifyActivity(
-            item=AnyHeldItem(), activity=properties.Worn, value=True
-        )
+        return ModifyActivity(item=AnyHeldItem(), activity=properties.Worn, value=True)
 
 
 @grammars.grammar()

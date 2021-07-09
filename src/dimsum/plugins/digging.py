@@ -11,7 +11,7 @@ from model.world import *
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes
-from plugins.actions import *
+from plugins.actions import PersonAction
 import transformers
 
 log = logging.getLogger("dimsum")

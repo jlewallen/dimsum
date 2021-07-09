@@ -6,7 +6,7 @@ from model.game import *
 from model.reply import *
 from model.world import *
 import scopes.users as users
-from plugins.actions import *
+from plugins.actions import PersonAction
 from finders import *
 import grammars
 import transformers

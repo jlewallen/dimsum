@@ -12,6 +12,7 @@ log = logging.getLogger("dimsum.scopes")
 class Behavior:
     def __init__(self, python=None, logs=None, **kwargs):
         self.python = python
+        self.executable = True
         self.logs: List[Dict[str, Any]] = logs if logs else []
 
     def check(self):

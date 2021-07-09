@@ -6,8 +6,10 @@ import model.visual as visual
 import scopes
 import domains
 import library
-import plugins.default
 import sshd
+
+from plugins.actions import Join
+from plugins.admin import Auth
 
 log = logging.getLogger("dimsum.cli")
 
@@ -34,8 +36,8 @@ class InitializeWorld:
             creator=session.world,
             props=properties.Common(key, desc="A player"),
         )
-        await session.perform(plugins.default.Join(), player)
-        await session.perform(plugins.admin.Auth(password="asdfasdf"), player)
+        await session.perform(Join(), player)
+        await session.perform(Auth(password="asdfasdf"), player)
 
         assert session.world
         return session.world, player

@@ -4,17 +4,19 @@ from typing import Optional
 
 import model.entity as entity
 import model.world as world
+import model.reply as reply
+import model.hooks as hooks
 
 import scopes as scopes
 import scopes.behavior as behavior
 import scopes.carryable as carryable
+import scopes.mechanics as mechanics
 
 import plugins.chatting  # noqa
 import plugins.creation  # noqa
 import plugins.digging  # noqa
 import plugins.editing  # noqa
 import plugins.fallback  # noqa
-import plugins.default  # noqa
 import plugins.admin  # noqa
 import plugins.looking  # noqa
 import plugins.moving  # noqa
@@ -55,4 +57,11 @@ class EntityHooks(entity.Hooks):
                     world.touch()
 
 
-entity.hooks(EntityHooks())
+entity.install_hooks(EntityHooks())
+
+
+@hooks.all.observed.hook
+def hide_invisible_entities(resume, entity: entity.Entity):
+    if entity.make(mechanics.Visibility).is_invisible:
+        return []
+    return resume(entity)

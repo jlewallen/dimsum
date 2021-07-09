@@ -91,6 +91,7 @@ export default defineComponent({
                 behavior,
                 {
                     python: this.form.behavior,
+                    executable: true,
                 }
             );
             await store.dispatch(new UpdateEntityAction(updating));

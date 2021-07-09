@@ -124,7 +124,7 @@ def generate_identity(creator=None) -> crypto.Identity:
 global_hooks = Hooks()
 
 
-def hooks(new_hooks: Hooks) -> Hooks:
+def install_hooks(new_hooks: Hooks) -> Hooks:
     global global_hooks
     previous = global_hooks
     global_hooks = new_hooks

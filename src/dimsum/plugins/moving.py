@@ -7,7 +7,7 @@ from model.reply import *
 from model.world import *
 import scopes.movement as movement
 import scopes.occupyable as occupyable
-from plugins.actions import *
+from plugins.actions import PersonAction
 import plugins.looking as looking
 import grammars
 import transformers

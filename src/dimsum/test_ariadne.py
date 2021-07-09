@@ -9,13 +9,14 @@ import config
 import freezegun
 import model.properties as properties
 import model.world as world
-import plugins.default as actions
 import scopes
 import domains
 import schema as schema_factory
 from schema import AriadneContext
 import serializing
 import test
+
+from plugins.actions import Join
 
 log = logging.getLogger("dimsum")
 
@@ -156,7 +157,7 @@ async def test_graphql_language_basic(deterministic, snapshot):
             creator=world,
         )
         session.register(jacob)
-        await session.perform(actions.Join(), jacob)
+        await session.perform(Join(), jacob)
         await session.save()
 
     data = {

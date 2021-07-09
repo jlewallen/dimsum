@@ -111,12 +111,13 @@ def area_of(entity: Entity) -> Optional[Entity]:
     return None
 
 
-def log_behavior(entity: Entity, entry: Dict[str, Any]):
+def log_behavior(entity: Entity, entry: Dict[str, Any], executable=True):
     assert entity
     log.info("logging '%s' behavior", entity)
     with entity.make(behavior.Behaviors) as behave:
         b = behave.get_default()
         assert b
+        b.executable = executable
         b.append(entry)
         entity.touch()
 
@@ -132,6 +133,7 @@ def log_behavior_exception(entity: Entity):
             value=ex_value,
             traceback=traceback.format_exc(),
         ),
+        executable=False,
     )
 
 
