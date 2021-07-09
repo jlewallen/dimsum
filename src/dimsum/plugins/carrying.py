@@ -9,12 +9,11 @@ from model.world import *
 from model.events import *
 from finders import *
 from tools import *
-from plugins.actions import *
+from plugins.actions import PersonAction
+from plugins.editing import ModifyActivity
 import scopes.carryable as carryable
 import grammars
 import transformers
-
-import plugins.default as actions
 
 log = logging.getLogger("dimsum")
 
@@ -544,7 +543,7 @@ class Transformer(transformers.Base):
         return ModifyCapacity(item=AnyHeldItem(), capacity=args[0])
 
     def when_opened(self, args):
-        return actions.ModifyActivity(
+        return ModifyActivity(
             item=AnyHeldItem(), activity=properties.Opened, value=True
         )
 

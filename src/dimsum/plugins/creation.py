@@ -14,7 +14,7 @@ from model.world import *
 import scopes as scopes
 from finders import *
 from tools import *
-from plugins.actions import *
+from plugins.actions import PersonAction
 import transformers
 
 log = logging.getLogger("dimsum")

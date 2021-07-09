@@ -9,13 +9,12 @@ from model.world import *
 from model.events import *
 import model.properties
 import scopes.health as health
-from plugins.actions import *
+from plugins.actions import PersonAction
+from plugins.editing import ModifyActivity
 from finders import *
 from tools import *
 import grammars
 import transformers
-
-import plugins.default as actions
 
 log = logging.getLogger("dimsum")
 
@@ -119,14 +118,10 @@ class Transformer(transformers.Base):
         return ModifyServings(item=AnyHeldItem(), number=args[0])
 
     def when_eaten(self, args):
-        return actions.ModifyActivity(
-            item=AnyHeldItem(), activity=properties.Eaten, value=True
-        )
+        return ModifyActivity(item=AnyHeldItem(), activity=properties.Eaten, value=True)
 
     def when_drank(self, args):
-        return actions.ModifyActivity(
-            item=AnyHeldItem(), activity=properties.Drank, value=True
-        )
+        return ModifyActivity(item=AnyHeldItem(), activity=properties.Drank, value=True)
 
 
 @grammars.grammar()

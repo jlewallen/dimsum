@@ -16,8 +16,9 @@ import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes.users as users
 import domains
-import plugins.default as actions
 import serializing
+
+from plugins.actions import Join
 
 log = logging.getLogger("dimsum.tests")
 
@@ -63,7 +64,7 @@ class TestWorld:
                 creator=world,
                 props=properties.Common("Carla", desc="Chief Salad Officer."),
             )
-            await session.perform(actions.Join(), carla)
+            await session.perform(Join(), carla)
             await session.save()
             self.carla_key = carla.key
             return carla
@@ -80,7 +81,7 @@ class TestWorld:
                 creator=world,
                 props=properties.Common("Tomi", desc="Chief Crying Officer."),
             )
-            await session.perform(actions.Join(), tomi)
+            await session.perform(Join(), tomi)
             await session.save()
             self.tomi_key = tomi.key
             return tomi
@@ -98,7 +99,7 @@ class TestWorld:
                 props=properties.Common("Jacob", desc="Curly haired bastard."),
             )
 
-            await session.perform(actions.Join(), jacob)
+            await session.perform(Join(), jacob)
             await session.save()
             self.jacob_key = jacob.key
             return jacob
@@ -206,7 +207,7 @@ async def make_simple_domain(
 
         await session.add_area(welcome)
         session.register(jacob)
-        await session.perform(actions.Join(), jacob)
+        await session.perform(Join(), jacob)
         await session.save()
 
     return domain

@@ -11,7 +11,7 @@ from model.reply import *
 from model.world import *
 from finders import *
 import scopes.occupyable as occupyable
-from plugins.actions import *
+from plugins.actions import PersonAction
 import transformers
 
 log = logging.getLogger("dimsum")

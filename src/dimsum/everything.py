@@ -17,7 +17,6 @@ import plugins.creation  # noqa
 import plugins.digging  # noqa
 import plugins.editing  # noqa
 import plugins.fallback  # noqa
-import plugins.default  # noqa
 import plugins.admin  # noqa
 import plugins.looking  # noqa
 import plugins.moving  # noqa

@@ -6,10 +6,11 @@ from context import Ctx
 from model.game import *
 from model.reply import *
 from model.world import *
+from model.entity import *
 import scopes.users as users
 import scopes.movement as movement
 from finders import *
-from plugins.actions import *
+from plugins.actions import PersonAction
 import grammars
 import transformers
 
@@ -186,12 +187,7 @@ class LookInside(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -211,12 +207,7 @@ class LookFor(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -234,12 +225,7 @@ class LookMyself(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         return PersonalObservation(person)
 
@@ -249,12 +235,7 @@ class LookDown(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         with person.make(carryable.Containing) as contain:
             return EntitiesObservation(contain.holding)
@@ -266,12 +247,7 @@ class Look(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         if self.item:
             return DetailedObservation(ObservedItem(self.item))

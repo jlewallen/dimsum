@@ -10,8 +10,8 @@ import model.visual as visual
 
 import scopes.mechanics as mechanics
 
-p = inflect.engine()
 log = logging.getLogger("dimsum.model")
+p = inflect.engine()
 
 
 class Observation(game.Reply, visual.Renderable):
