@@ -209,11 +209,9 @@ async def test_graphql_entities_people(deterministic, snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_login_good(deterministic):
     domain = await test.make_simple_domain(password="asdfasdf")
-    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
     data = {
-        "query": 'mutation { login(credentials: { username: "%s", password: "asdfasdf" }) }'
-        % (jacob_key,)
+        "query": 'mutation { login(credentials: { username: "jlewallen", password: "asdfasdf" }) }'
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
@@ -226,11 +224,9 @@ async def test_graphql_login_good(deterministic):
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_login_failed(deterministic, snapshot, caplog):
     domain = await test.make_simple_domain(password="asdfasdf")
-    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
     data = {
-        "query": 'mutation { login(credentials: { username: "%s", password: "badbadbad" }) }'
-        % (jacob_key,)
+        "query": 'mutation { login(credentials: { username: "jlewallen", password: "badbadbad" }) }'
     }
 
     with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
@@ -501,10 +497,10 @@ mutation CreateThing($entities: [EntityTemplate!]) {
 @freezegun.freeze_time("2019-09-25")
 async def test_graphql_redeem_invite(deterministic):
     domain = await test.make_simple_domain(password="asdfasdf")
-    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
 
     with domain.session() as session:
-        await session.prepare()
+        world = await session.prepare()
+        jacob_key = await users.lookup_username(world, "jlewallen")
         jacob = await session.materialize(key=jacob_key)
         invite_url, invite_token = jacob.make(users.Auth).invite("hunter42")
 

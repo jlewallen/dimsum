@@ -26,6 +26,7 @@ from model import (
     Common,
 )
 from plugins.actions import Join
+from plugins.admin import lookup_username, register_username
 import plugins.admin as admin
 import scopes.carryable as carryable
 import scopes.users as users
@@ -263,7 +264,7 @@ async def login(obj, info, credentials):
     creds = Credentials(**credentials)
     log.info("ariadne:login username=%s", creds.username)
     with domain.session() as session:
-        await session.prepare()
+        world = await session.prepare()
 
         if creds.token:
             log.info("verifying invite")
@@ -275,16 +276,16 @@ async def login(obj, info, credentials):
             creator = await session.materialize(key=decoded["creator"])
             assert creator
 
-            person = await session.try_materialize(key=creds.username)
-            if person.maybe_one():
+            maybe_key = await lookup_username(world, creds.username)
+            if maybe_key:
                 raise Exception("username taken")
 
             # everything looks good
             person = scopes.alive(
-                key=creds.username,
                 creator=session.world,
                 props=Common(creds.username, desc="A player", invited_by=creator.key),
             )
+            await register_username(world, creds.username, person.key)
             await session.perform(Join(), person)
             await session.perform(admin.Auth(password=creds.password), person)
 
@@ -295,7 +296,11 @@ async def login(obj, info, credentials):
             return dict(key=person.key, token=jwt_token)
 
         try:
-            people = await session.try_materialize(key=creds.username)
+            maybe_key = await lookup_username(world, creds.username)
+            if not maybe_key:
+                raise UsernamePasswordError()
+
+            people = await session.try_materialize(key=maybe_key)
             if person := people.maybe_one():
                 with person.make(users.Auth) as auth:
                     if auth.try_password(creds.password):

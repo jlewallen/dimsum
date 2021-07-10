@@ -8,6 +8,9 @@ from finders import *
 from plugins.actions import PersonAction
 import scopes.users as users
 
+register_username = users.register_username
+lookup_username = users.lookup_username
+
 log = logging.getLogger("dimsum")
 
 

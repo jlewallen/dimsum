@@ -20,6 +20,11 @@
                                 "name": "welcome"
                             }
                         },
+                        "usernames": {
+                            "users": {
+                                "jlewallen": "6"
+                            }
+                        },
                         "identifiers": {
                             "gid": 3
                         }
@@ -121,7 +126,7 @@
                             "occupied": [
                                 {
                                     "py/object": "model.entity.Entity",
-                                    "key": "amxld2FsbGVu",
+                                    "key": "6",
                                     "klass": "LivingClass",
                                     "name": "Jacob"
                                 }
@@ -183,7 +188,7 @@
                 }
             },
             {
-                "key": "amxld2FsbGVu",
+                "key": 6,
                 "serialized": {
                     "py/object": "serializing.RootEntity",
                     "version": {
@@ -246,7 +251,7 @@
                         "signature": "<signature>",
                         "private": "<private>"
                     },
-                    "key": "amxld2FsbGVu",
+                    "key": "6",
                     "props": {
                         "py/object": "model.properties.Common",
                         "map": {

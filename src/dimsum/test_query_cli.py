@@ -11,9 +11,10 @@ import test
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_fail_no_query(snapshot):
-    store = storage.SqliteStorage("test.sqlite3")
-    await store.purge()
-    await test.make_simple_domain(store=store)
+    with test.Deterministic():
+        store = storage.SqliteStorage("test.sqlite3")
+        await store.purge()
+        await test.make_simple_domain(store=store)
 
     router = routing.Router(
         targets=[
@@ -29,9 +30,10 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_routing_process_target_query_entity(snapshot):
-    store = storage.SqliteStorage("test.sqlite3")
-    await store.purge()
-    await test.make_simple_domain(store=store)
+    with test.Deterministic():
+        store = storage.SqliteStorage("test.sqlite3")
+        await store.purge()
+        await test.make_simple_domain(store=store)
 
     router = routing.Router(
         targets=[

@@ -7,8 +7,9 @@ import library
 import sshd
 from model import *
 
+
 from plugins.actions import Join
-from plugins.admin import Auth
+from plugins.admin import Auth, lookup_username, register_username
 
 log = logging.getLogger("dimsum.cli")
 
@@ -17,12 +18,14 @@ class InitializeWorld:
     def __init__(self, domain: domains.Domain):
         self.domain: domains.Domain = domain
 
-    async def create_player_if_necessary(self, session: domains.Session, key: str):
+    async def create_player_if_necessary(self, session: domains.Session, username: str):
         world = await session.prepare()
 
-        maybe_player = await session.try_materialize(key=key)
-        if not maybe_player.empty():
-            return world, maybe_player.one()
+        maybe_key = await lookup_username(world, username)
+        if maybe_key:
+            maybe_player = await session.try_materialize(key=maybe_key)
+            if not maybe_player.empty():
+                return world, maybe_player.one()
 
         if world.welcome_area() is None:
             log.info("creating example world")
@@ -31,10 +34,10 @@ class InitializeWorld:
             await session.add_area(area)
 
         player = scopes.alive(
-            key=key,
             creator=session.world,
-            props=Common(key, desc="A player"),
+            props=Common(name=username, desc="A player"),
         )
+        await register_username(world, username, player.key)
         await session.perform(Join(), player)
         await session.perform(Auth(password="asdfasdf"), player)
 

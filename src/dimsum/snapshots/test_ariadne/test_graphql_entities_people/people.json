@@ -2,7 +2,7 @@
     "data": {
         "people": [
             {
-                "key": "amxld2FsbGVu",
+                "key": 6,
                 "serialized": {
                     "py/object": "serializing.RootEntity",
                     "version": {
@@ -65,7 +65,7 @@
                         "signature": "<signature>",
                         "private": "<private>"
                     },
-                    "key": "amxld2FsbGVu",
+                    "key": "6",
                     "props": {
                         "py/object": "model.properties.Common",
                         "map": {

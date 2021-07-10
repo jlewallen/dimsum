@@ -3,13 +3,33 @@ import hashlib
 import logging
 import os
 import jwt
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 from model import Entity, Scope
 
 log = logging.getLogger("dimsum.scopes")
 
 invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
+
+
+class Usernames(Scope):
+    def __init__(self, users: Optional[Dict[str, str]] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.users = users if users else {}
+
+
+async def register_username(entity: Entity, username: str, key: str):
+    with entity.make(Usernames) as usernames:
+        assert key not in usernames.users
+        usernames.users[username] = key
+        entity.touch()
+
+
+async def lookup_username(entity: Entity, username: str) -> Optional[str]:
+    with entity.make_and_discard(Usernames) as usernames:
+        if username in usernames.users:
+            return usernames.users[username]
+    return None
 
 
 class Auth(Scope):

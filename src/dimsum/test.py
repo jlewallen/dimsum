@@ -189,8 +189,8 @@ async def make_simple_domain(
             props=Common(name="welcome"),
             creator=world,
         )
-        jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
-        jacob = scopes.alive(key=jacob_key, props=Common(name="Jacob"), creator=world)
+        jacob = scopes.alive(props=Common(name="Jacob"), creator=world)
+        jacob_key = jacob.key
 
         if password:
             with jacob.make(users.Auth) as auth:
@@ -198,6 +198,7 @@ async def make_simple_domain(
 
         await session.add_area(welcome)
         session.register(jacob)
+        await users.register_username(world, "jlewallen", jacob_key)
         await session.perform(Join(), jacob)
         await session.save()
 
