@@ -1,11 +1,13 @@
 import logging
 import dataclasses
+import abc
 from typing import Dict, List, Any
 
 log = logging.getLogger("dimsum.visual")
 
 
 class Renderable:
+    # @abc.abstractmethod
     def render_tree(self) -> Dict[str, Any]:
         raise NotImplementedError
 

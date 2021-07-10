@@ -2,7 +2,7 @@ import abc
 import dataclasses
 import json
 import logging
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union, Any
 
 import tools
 from model import (
@@ -27,7 +27,7 @@ class DynamicMessage(Event, Renderable):
     heard: Optional[List[Entity]]
     message: Reply
 
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return json.loads(json.dumps(self.message))  # TODO json fuckery
 
 
