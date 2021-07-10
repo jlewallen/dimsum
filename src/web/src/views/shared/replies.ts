@@ -88,6 +88,12 @@ const DynamicMessage = defineComponent({
     template: `<div class="response dynamic">{{ reply.message.message }} (from {{ reply.source.name }})</div>`,
 });
 
+const Universal = defineComponent({
+    name: "Universal",
+    props: CommonProps,
+    template: `<div class="response universal">{{ reply.f }} {{ reply.kwargs }}</div>`,
+});
+
 export default {
     AreaObservation,
     EntitiesObservation,
@@ -106,4 +112,5 @@ export default {
     ScreenCleared,
     ItemsObliterated,
     DynamicMessage,
+    Universal,
 };
