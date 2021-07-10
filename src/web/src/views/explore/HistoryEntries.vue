@@ -81,4 +81,9 @@ export default defineComponent({
     background-color: #30475e;
     display: none;
 }
+
+.response.dynamic {
+    padding: 1em;
+    background-color: #30475e;
+}
 </style>

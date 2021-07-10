@@ -82,6 +82,12 @@ const ScreenCleared = defineComponent({
     template: `<div class="response clear">Screen Cleared</div>`,
 });
 
+const DynamicMessage = defineComponent({
+    name: "DynamicMessage",
+    props: CommonProps,
+    template: `<div class="response dynamic">{{ reply.message.message }} (from {{ reply.source.name }})</div>`,
+});
+
 export default {
     AreaObservation,
     EntitiesObservation,
@@ -99,4 +105,5 @@ export default {
     EntityCreated,
     ScreenCleared,
     ItemsObliterated,
+    DynamicMessage,
 };
