@@ -20,7 +20,7 @@ const LivingEnteredArea = defineComponent({
     props: CommonProps,
     template: `
 		<div class="response living-entered-area">
-			{{ reply.living.name }} entered from {{ reply.area.name }}
+			{{ reply.source.name }} entered from {{ reply.area.name }}
 		</div>
 	`,
 });
@@ -30,38 +30,38 @@ const LivingLeftArea = defineComponent({
     props: CommonProps,
     template: `
 		<div class="response living-left-area">
-			{{ reply.living.name }} left to {{ reply.area.name }}
+			{{ reply.source.name }} left to {{ reply.area.name }}
 		</div>`,
 });
 
 const PlayerSpoke = defineComponent({
     name: "PlayerSpoke",
     props: CommonProps,
-    template: `<div class="response player-spoke">{{ reply.living.name }} said "{{ reply.message }}"</div>`,
+    template: `<div class="response player-spoke">{{ reply.source.name }} said "{{ reply.message }}"</div>`,
 });
 
 const ItemsHeld = defineComponent({
     name: "ItemsHeld",
     props: CommonProps,
-    template: `<div class="response items">{{ reply.living.name }} picked up {{ reply.items }}</div>`,
+    template: `<div class="response items">{{ reply.source.name }} picked up {{ reply.items }}</div>`,
 });
 
 const ItemsDropped = defineComponent({
     name: "ItemsDropped",
     props: CommonProps,
-    template: `<div class="response items">{{ reply.living.name }} dropped {{ reply.items }}</div>`,
+    template: `<div class="response items">{{ reply.source.name }} dropped {{ reply.items }}</div>`,
 });
 
 const ItemsObliterated = defineComponent({
     name: "ItemsObliterated",
     props: CommonProps,
-    template: `<div class="response items">{{ reply.living.name }} obliterated {{ reply.items }}</div>`,
+    template: `<div class="response items">{{ reply.source.name }} obliterated {{ reply.items }}</div>`,
 });
 
 const EntityCreated = defineComponent({
     name: "EntityCreated",
     props: CommonProps,
-    template: `<div class="response items">{{ reply.living.name }} created {{ reply.entity.name }}</div>`,
+    template: `<div class="response items">{{ reply.source.name }} created {{ reply.entity.name }}</div>`,
 });
 
 import InlineEditor from "@/views/entity/InlineEditor.vue";
