@@ -288,11 +288,13 @@ async def login(obj, info, credentials):
             await register_username(world, creds.username, person.key)
             await session.perform(Join(), person)
             await session.perform(admin.Auth(password=creds.password), person)
+            await session.save()
 
             token = dict(key=person.key)
             jwt_token = jwt.encode(
                 token, info.context.cfg.session_key, algorithm="HS256"
             )
+
             return dict(key=person.key, token=jwt_token)
 
         try:

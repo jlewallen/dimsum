@@ -32,6 +32,7 @@ class ExitClass(EntityClass):
 
 Alive = [
     ownership.Ownership,
+    behavior.Behaviors,
     carryable.Containing,
     mechanics.Memory,
     health.Health,

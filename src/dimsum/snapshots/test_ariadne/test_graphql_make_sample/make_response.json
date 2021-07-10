@@ -306,6 +306,12 @@
                                     "name": "World"
                                 }
                             },
+                            "behaviors": {
+                                "behaviors": {
+                                    "py/object": "scopes.behavior.BehaviorMap",
+                                    "map": {}
+                                }
+                            },
                             "containing": {
                                 "pattern": null,
                                 "locked": false,
