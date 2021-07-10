@@ -7,7 +7,7 @@ log = logging.getLogger("dimsum")
 
 
 class Target:
-    def __init__(self, name=None):
+    def __init__(self, name: Optional[str] = None):
         super().__init__()
         self.name: str = name if name else "unknown"
 

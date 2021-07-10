@@ -4,9 +4,17 @@ import json
 import logging
 from typing import Callable, Dict, List, Optional, Union
 
-from model import Entity, event, Event, Reply, Success, Renderable, context
-
 import tools
+from model import (
+    Entity,
+    event,
+    Event,
+    Reply,
+    Success,
+    Renderable,
+    find_entity_area,
+    context,
+)
 
 log = logging.getLogger("dimsum")
 
@@ -64,7 +72,7 @@ class Say:
         await context.get().publish(DynamicMessage(**kwargs))
 
     async def publish(self, source: Entity):
-        area = tools.area_of(source)
+        area = await find_entity_area(source)
         assert area
 
         for player, queue in self.player_queue.items():

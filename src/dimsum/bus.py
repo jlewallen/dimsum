@@ -1,33 +1,30 @@
 import inspect
 import logging
+import dataclasses
 import asyncio
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, Awaitable
 
 from model import Event, Comms, Renderable
 
 log = logging.getLogger("dimsum.bus")
 
 
+@dataclasses.dataclass
 class Subscription:
-    def __init__(
-        self, manager: "SubscriptionManager", path_key: str, handler_fn: Callable
-    ):
-        super().__init__()
-        self.manager = manager
-        self.path_key = path_key
-        self.handler_fn = handler_fn
+    manager: "SubscriptionManager"
+    path_key: str
+    handler: Callable[["Renderable"], Awaitable[None]]
 
     async def write(self, item: Renderable):
-        await self.handler_fn(item)
+        await self.handler(item)
 
     def remove(self):
-        self.manager.remove(self)
+        self.manager._remove(self)
 
 
+@dataclasses.dataclass
 class SubscriptionManager(Comms):
-    def __init__(self):
-        super().__init__()
-        self.by_key: Dict[str, List[Subscription]] = {}
+    by_key: Dict[str, List[Subscription]] = dataclasses.field(default_factory=dict)
 
     def subscribe(self, path_key: str, handler_fn: Callable) -> Subscription:
         subscription = Subscription(self, path_key, handler_fn)
@@ -35,7 +32,7 @@ class SubscriptionManager(Comms):
         log.info("subscribed: %s", path_key)
         return subscription
 
-    def remove(self, subscription: Subscription) -> bool:
+    def _remove(self, subscription: Subscription) -> bool:
         assert subscription.path_key in self.by_key
         for_key = self.by_key[subscription.path_key]
         if subscription in for_key:
@@ -68,22 +65,9 @@ class EventBus:
         self.handlers = {}
         self.modules = [f(self) for f in handlers] if handlers else []
 
-    async def publish(self, event: Event, **kwargs):
-        assert event
-        log.info("publish:%s", event)
-        await self.invoke_handlers(event)
-
-    async def invoke_handler_type(self, klass, event: Union[Any]):
-        if klass in self.handlers:
-            handlers = self.handlers[klass]
-            for fn in handlers:
-                await fn(event=event)
-
-    async def invoke_handlers(self, event: Union[Any]):
-        for t in inspect.getmro(type(event)):
-            await self.invoke_handler_type(t, event)
-
     def handler(self, klass):
+        """Decorator for marking handlers of Events"""
+
         def final_decorator(func, **kwargs):
             log.info("add handler for %s (%s)", klass, func)
             if klass not in self.handlers:
@@ -92,14 +76,20 @@ class EventBus:
 
         return final_decorator
 
+    async def publish(self, event: Event, **kwargs):
+        assert event
+        log.info("publish:%s", event)
+        await self._invoke_handlers(event)
 
-class TextRendering:
-    def __init__(self, bus: EventBus, comms: Comms):
-        super().__init__()
-        self.install(bus, comms)
+    async def _invoke_handlers(self, event: Union[Any]):
+        for t in inspect.getmro(type(event)):
+            await self._invoke_handler_type(t, event)
 
-    def install(self, bus: EventBus, comms: Comms):
-        pass
+    async def _invoke_handler_type(self, klass, event: Union[Any]):
+        if klass in self.handlers:
+            handlers = self.handlers[klass]
+            for fn in handlers:
+                await fn(event=event)
 
 
 def flatten(l):

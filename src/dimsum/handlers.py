@@ -1,4 +1,5 @@
 import logging
+import functools
 from typing import Optional
 
 import bus
@@ -8,8 +9,8 @@ from saying import DynamicMessage
 log = logging.getLogger("dimsum.handlers")
 
 
-class EventHandlers(bus.TextRendering):
-    def install(self, bus: bus.EventBus, comms: Comms):
+class EventHandlers:
+    def __init__(self, comms: Comms, bus: bus.EventBus):
         @bus.handler(DynamicMessage)
         async def handle_dynamic_message(
             event: Optional[DynamicMessage] = None, **kwargs
@@ -32,7 +33,4 @@ class EventHandlers(bus.TextRendering):
 
 
 def create(comms: Comms):
-    def factory(bus):
-        return EventHandlers(bus, comms)
-
-    return factory
+    return functools.partial(EventHandlers, comms)
