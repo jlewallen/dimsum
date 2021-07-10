@@ -1,7 +1,7 @@
 <template>
     <div class="interactables">
         <HistoryEntries :entries="interactables" @resume-repl="this.$emit('resume-repl')" />
-        <Repl @send="send" />
+        <Repl :connected="connected" @send="send" />
     </div>
 </template>
 
@@ -19,6 +19,9 @@ export default defineComponent({
     },
     props: {},
     computed: {
+        connected(): boolean {
+            return store.state.connected;
+        },
         interactables(): ReplResponse[] {
             return store.state.interactables;
         },
