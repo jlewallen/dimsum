@@ -27,7 +27,7 @@ class Hook:
     hooks: List[RegisteredHook] = dataclasses.field(default_factory=lambda: [])
 
     def target(self, fn):
-        log.info("hook:target: %s", fn)
+        log.debug("hook:target: %s", fn)
 
         assert not self.fn
         self.fn = fn
@@ -45,7 +45,9 @@ class Hook:
 
     @staticmethod
     def _invoke(name, call, hooks, args, kwargs):
-        log.info("hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs)
+        log.debug(
+            "hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs
+        )
 
         for registered in hooks:
             if registered.condition:
@@ -86,11 +88,11 @@ class ExtendHooks:
     children: List[ManagedHooks]
 
     def __enter__(self):
-        log.info("extending hooks")
+        log.debug("extending hooks")
         live_hooks.set(self)
 
     def __exit__(self, type, value, traceback):
-        log.info("done extending hooks")
+        log.debug("done extending hooks")
         live_hooks.set(None)
         return False
 
