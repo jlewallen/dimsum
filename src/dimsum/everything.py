@@ -44,8 +44,11 @@ class EntityHooks(Hooks):
         if entity.has(carryable.Carryable):
             with entity.make_and_discard(carryable.Carryable) as carry:
                 if carry.quantity > 1:
+                    q = carry.quantity
+                    if carry.quantity - int(carry.quantity) == 0:
+                        q = int(q)
                     return "{0} {1} (#{2})".format(
-                        carry.quantity,
+                        q,
                         infl.plural(entity.props.name, carry.quantity),
                         entity.props.gid,
                     )
