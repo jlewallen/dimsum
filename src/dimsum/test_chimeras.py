@@ -1,6 +1,6 @@
 import logging
 import pytest
-from typing import Optional
+from typing import Optional, List
 
 import domains
 from model import *
@@ -25,6 +25,18 @@ class SimpleHolding(Scope):
         self.holding.append(entity)
 
 
+class Remembering(Scope):
+    def __init__(self, entities: Optional[List[Entity]] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.entities = entities if entities else []
+
+
+def remember(world: World, e: Entity):
+    with world.make(Remembering) as remembering:
+        remembering.entities.append(e)
+        world.touch()
+
+
 @pytest.mark.asyncio
 async def test_chimeric_entities_serialize(caplog):
     domain = domains.Domain()
@@ -36,11 +48,11 @@ async def test_chimeric_entities_serialize(caplog):
             creator=universe, props=Common(name="Jacob"), scopes=[SimpleCore]
         )
         session.register(jacob)
-        universe.remember(jacob)
+        remember(universe, jacob)
 
         toy = Entity(creator=universe, props=Common(name="Toy"), scopes=[SimpleCore])
         session.register(toy)
-        universe.remember(toy)
+        remember(universe, toy)
 
         with jacob.make(SimpleHolding) as holding:
             with jacob.make(SimpleCore) as core:
@@ -98,11 +110,11 @@ async def test_specialization_classes(caplog):
 
         person = make_person(creator=universe, props=Common(name="Jacob"))
         session.register(person)
-        universe.remember(person)
+        remember(universe, person)
 
         toy = make_thing(creator=universe, props=Common(name="Toy"))
         session.register(toy)
-        universe.remember(toy)
+        remember(universe, toy)
 
         await session.save()
 

@@ -20,12 +20,6 @@ class Welcoming(Scope):
         self.area = area
 
 
-class Remembering(Scope):
-    def __init__(self, entities: Optional[List[Entity]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.entities = entities if entities else []
-
-
 class World(Entity):
     def __init__(self, key=None, klass=None, props=None, **kwargs):
         super().__init__(
@@ -54,11 +48,6 @@ class World(Entity):
             if welcoming.area != area:
                 welcoming.area = area
                 self.touch()
-
-    def remember(self, e: Entity):
-        with self.make(Remembering) as remembering:
-            remembering.entities.append(e)
-            self.touch()
 
     async def apply_item_finder(
         self, person: Entity, finder, **kwargs
