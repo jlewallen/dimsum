@@ -339,7 +339,7 @@ class Entity:
         self.chimeras[key] = data
 
     def __repr__(self):
-        return self.describe()
+        return "{0} (#{1})".format(self.props.name, self.props.gid)
 
     def __hash__(self):
         return hash(self.key)
