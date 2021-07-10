@@ -307,7 +307,7 @@ class Entity:
         if q:
             if q.lower() in self.props.name.lower():
                 return True
-            if q.lower() in self.describe():
+            if q.lower() in self.props.described.lower():
                 return True
         return False
 

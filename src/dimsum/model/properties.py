@@ -114,12 +114,16 @@ class Map:
 
 class Common(Map):
     def __init__(
-        self, name: Optional[str] = None, desc: Optional[str] = None, **kwargs
+        self,
+        name: Optional[str] = None,
+        desc: Optional[str] = None,
+        described: Optional[str] = None,
+        **kwargs
     ):
         super().__init__(kwargs)
         self.set(GlobalId, -1)
         self.set(Name, name)
-        self.set(Described, name)
+        self.set(Described, described or name)
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
         self.set(Touched, time.time())
@@ -147,7 +151,7 @@ class Common(Map):
     def described(self) -> str:
         return self[Described]
 
-    @name.setter
+    @described.setter
     def described(self, value: str):
         self.set(Described, value)
 
