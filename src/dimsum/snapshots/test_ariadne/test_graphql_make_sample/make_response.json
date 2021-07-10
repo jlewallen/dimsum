@@ -535,7 +535,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(\"an Oak Leaf gently floats to the ground\")\n",
                                             "executable": true,
                                             "logs": []
                                         }
@@ -996,7 +996,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=3, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(\"some Pebbles tumbled down the cliff\")\n",
                                             "executable": true,
                                             "logs": []
                                         }
@@ -2136,7 +2136,7 @@
                                     "map": {
                                         "b:default": {
                                             "py/object": "scopes.behavior.Behavior",
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(\"a Maple Leaf gently floats to the ground\")\n",
                                             "executable": true,
                                             "logs": []
                                         }

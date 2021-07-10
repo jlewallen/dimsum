@@ -83,6 +83,7 @@ async def tick(this, ev, say):
     register=False,
   )
   tools.hold(tools.area_of(this), item)
+  say.nearby("a Maple Leaf gently floats to the ground")
 """,
             )
         return item
@@ -109,6 +110,7 @@ async def tick(this, ev, say):
     register=False,
   )
   tools.hold(tools.area_of(this), item)
+  say.nearby("an Oak Leaf gently floats to the ground")
 """,
             )
         return item
@@ -167,10 +169,11 @@ async def tick(this, ev, say):
     creator=this,
     kind=this.get_kind("pebble-1"),
     props=Common("Pebble"),
-    initialize={ Carryable: dict(quantity=1, kind=this.get_kind("pebble-1")) },
+    initialize={ Carryable: dict(quantity=3, kind=this.get_kind("pebble-1")) },
     register=False,
   )
   tools.hold(tools.area_of(this), item)
+  say.nearby("some Pebbles tumbled down the cliff")
 """,
             )
         return item
