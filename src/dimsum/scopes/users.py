@@ -32,34 +32,40 @@ async def lookup_username(entity: Entity, username: str) -> Optional[str]:
     return None
 
 
+def secure_password(password: str) -> Tuple[str, str]:
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+    return (
+        base64.b64encode(salt).decode("utf-8"),
+        base64.b64encode(key).decode("utf-8"),
+    )
+
+
+def try_password(secured: Tuple[str, str], password: str) -> bool:
+    salt_encoded, key_encoded = secured
+    salt = base64.b64decode(salt_encoded)
+    key = base64.b64decode(key_encoded)
+    actual_key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+    return actual_key == key
+
+
 class Auth(Scope):
-    def __init__(self, password: Optional[List[str]] = None, **kwargs):
+    def __init__(self, password: Optional[Tuple[str, str]] = None, **kwargs):
         super().__init__(**kwargs)
         self.password = password if password else None
 
     def change(self, password: str):
-        salt = os.urandom(32)
-        key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
-        self.password = [
-            base64.b64encode(salt).decode("utf-8"),
-            base64.b64encode(key).decode("utf-8"),
-        ]
+        self.password = secure_password(password)
         self.ourselves.touch()
         log.info("%s: password changed %s", self.ourselves.key, self.ourselves)
 
     def try_password(self, password: str, **kwargs):
         if self.password:
-            salt_encoded, key_encoded = self.password
-            salt = base64.b64decode(salt_encoded)
-            key = base64.b64decode(key_encoded)
-            actual_key = hashlib.pbkdf2_hmac(
-                "sha256", password.encode("utf-8"), salt, 100000
-            )
-            return actual_key == key
+            return try_password(self.password, password)
         return None
 
     def invite(self, password: str) -> Tuple[str, str]:
-        token = {"creator": self.ourselves.key}
+        token = {"creator": self.ourselves.key, "password": secure_password(password)}
         invite_token = jwt.encode(token, invite_session_key, algorithm="HS256")
         url = "http://127.0.0.1:8082/invite?token=%s" % (invite_token,)
         log.info("invite: %s", url)

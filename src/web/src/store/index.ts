@@ -4,14 +4,9 @@ import {
     RootState,
     MutationTypes,
     ActionTypes,
-    Area,
-    Person,
     Entity,
-    Reply,
     RefreshEntityAction,
     NeedEntityAction,
-    SaveEntityDetailsAction,
-    SaveEntityBehaviorAction,
     LoginAction,
     Auth,
     AuthenticatedAction,
@@ -122,8 +117,13 @@ export default createStore<RootState>({
         [ActionTypes.LOGIN]: async ({ state, dispatch, commit }: ActionParameters, payload: LoginAction) => {
             const api = getApi(state.headers);
             let data;
-            if (payload.token) {
-                data = await api.redeemInvite({ username: payload.name, password: payload.password, token: payload.token });
+            if (payload.token && payload.secret) {
+                data = await api.redeemInvite({
+                    username: payload.name,
+                    password: payload.password,
+                    token: payload.token,
+                    secret: payload.secret,
+                });
             } else {
                 data = await api.login({ username: payload.name, password: payload.password });
             }

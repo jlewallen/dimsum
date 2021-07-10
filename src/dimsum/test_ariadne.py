@@ -505,7 +505,7 @@ async def test_graphql_redeem_invite(deterministic):
         invite_url, invite_token = jacob.make(users.Auth).invite("hunter42")
 
     data = {
-        "query": 'mutation { login(credentials: { username: "carla@carla.com", password: "asdfasdf", token: "%s" }) }'
+        "query": 'mutation { login(credentials: { username: "carla@carla.com", password: "asdfasdf", token: "%s", secret: "hunter42" }) }'
         % (invite_token,)
     }
     ok, actual = await ariadne.graphql(
@@ -513,3 +513,30 @@ async def test_graphql_redeem_invite(deterministic):
     )
     assert ok
     assert actual["data"]["login"]
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_redeem_invite_bad_secret(deterministic, caplog):
+    domain = await test.make_simple_domain(password="asdfasdf")
+
+    with domain.session() as session:
+        world = await session.prepare()
+        jacob_key = await users.lookup_username(world, "jlewallen")
+        jacob = await session.materialize(key=jacob_key)
+        invite_url, invite_token = jacob.make(users.Auth).invite("hunter42")
+
+    data = {
+        "query": 'mutation { login(credentials: { username: "carla@carla.com", password: "asdfasdf", token: "%s", secret: "hunter43" }) }'
+        % (invite_token,)
+    }
+    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+        ok, actual = await ariadne.graphql(
+            schema,
+            data,
+            debug=True,
+            context_value=get_test_context(domain),
+            logger="ariadne.errors.hidden",
+        )
+        assert ok
+        assert "schema.UsernamePasswordError" in json.dumps(actual, indent=4)

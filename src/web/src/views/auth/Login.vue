@@ -2,6 +2,12 @@
     <div class="container login">
         <div class="row justify-content-center">
             <form class="form col-4" @submit.prevent="login">
+                <div class="form-group row" v-if="token">
+                    <label class="col-sm-4 col-form-label">Invite Secret</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="secret" v-model="form.secret" />
+                    </div>
+                </div>
                 <div class="form-group row">
                     <label class="col-sm-4 col-form-label">Name</label>
                     <div class="col-sm-8">
@@ -34,12 +40,17 @@ export default defineComponent({
     name: "Login",
     data(): {
         busy: boolean;
-        form: { name: string; password: string };
+        form: {
+            secret: string;
+            name: string;
+            password: string;
+        };
         invalidCredentials: boolean;
     } {
         return {
             busy: false,
             form: {
+                secret: "",
                 name: "",
                 password: "",
             },
@@ -63,7 +74,7 @@ export default defineComponent({
             try {
                 this.invalidCredentials = false;
                 this.busy = true;
-                await store.dispatch(new LoginAction(this.form.name, this.form.password, this.token));
+                await store.dispatch(new LoginAction(this.form.name, this.form.password, this.form.secret, this.token));
                 await this.$router.push("/explore");
             } catch (error) {
                 this.invalidCredentials = true;

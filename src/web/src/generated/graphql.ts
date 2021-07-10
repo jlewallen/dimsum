@@ -24,6 +24,7 @@ export type Credentials = {
     username: Scalars["String"];
     password: Scalars["String"];
     token?: Maybe<Scalars["String"]>;
+    secret?: Maybe<Scalars["String"]>;
 };
 
 export type EntitiesUpdated = {
@@ -131,6 +132,7 @@ export type Subscription = {
 
 export type SubscriptionNearbyArgs = {
     evaluator?: Maybe<Scalars["Key"]>;
+    token?: Maybe<Scalars["String"]>;
 };
 
 export type LoginMutationVariables = Exact<{
@@ -144,6 +146,7 @@ export type RedeemInviteMutationVariables = Exact<{
     username: Scalars["String"];
     password: Scalars["String"];
     token: Scalars["String"];
+    secret: Scalars["String"];
 }>;
 
 export type RedeemInviteMutation = { __typename?: "Mutation" } & Pick<Mutation, "login">;
@@ -202,8 +205,8 @@ export const LoginDocument = gql`
     }
 `;
 export const RedeemInviteDocument = gql`
-    mutation redeemInvite($username: String!, $password: String!, $token: String!) {
-        login(credentials: { username: $username, password: $password, token: $token })
+    mutation redeemInvite($username: String!, $password: String!, $token: String!, $secret: String!) {
+        login(credentials: { username: $username, password: $password, token: $token, secret: $secret })
     }
 `;
 export const LanguageDocument = gql`

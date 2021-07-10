@@ -52,6 +52,7 @@ input Credentials {
   username: String!
   password: String!
   token: String
+  secret: String
 }
 
 input EntityDiff {

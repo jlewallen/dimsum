@@ -252,6 +252,7 @@ class Credentials:
     username: str
     password: str
     token: Optional[str] = None
+    secret: Optional[str] = None
 
 
 class UsernamePasswordError(ValueError):
@@ -266,11 +267,16 @@ async def login(obj, info, credentials):
     with domain.session() as session:
         world = await session.prepare()
 
-        if creds.token:
+        if creds.token and creds.secret:
             log.info("verifying invite")
             decoded = jwt.decode(
                 creds.token, users.invite_session_key, algorithms=["HS256"]
             )
+
+            # verify secret against stored
+            secured = decoded["password"]
+            if not users.try_password(secured, creds.secret):
+                raise UsernamePasswordError("invalid secret")
 
             log.info("decoded=%s", decoded)
             creator = await session.materialize(key=decoded["creator"])
@@ -278,7 +284,7 @@ async def login(obj, info, credentials):
 
             maybe_key = await lookup_username(world, creds.username)
             if maybe_key:
-                raise Exception("username taken")
+                raise UsernamePasswordError("username taken")
 
             # everything looks good
             person = scopes.alive(
@@ -358,7 +364,7 @@ async def resolve_language(obj, info, criteria):
     log.info("ariadne:language criteria=%s", lqc)
 
     with domain.session() as session:
-        log.debug("materialize player")
+        log.debug("materialize player=%s", evaluator)
         player = await session.materialize(key=evaluator)
         assert player
         log.debug("materialize world")
