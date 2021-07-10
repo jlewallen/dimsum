@@ -52,7 +52,7 @@ class Wear(PersonAction):
 
         await ctx.publish(
             ItemsWorn(
-                living=person,
+                source=person,
                 area=area,
                 heard=default_heard_for(area=area),
                 items=[item],
@@ -86,7 +86,7 @@ class Remove(PersonAction):
 
         await ctx.publish(
             ItemsUnworn(
-                living=person,
+                source=person,
                 area=area,
                 heard=default_heard_for(area=area),
                 items=[item],

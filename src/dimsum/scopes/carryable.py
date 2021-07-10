@@ -1,7 +1,15 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Tuple, Union, Callable
 
-from model import Entity, Scope, Common, Identity, generate_identity, Kind, context
+from model import (
+    Entity,
+    Scope,
+    Common,
+    Identity,
+    generate_entity_identity,
+    Kind,
+    context,
+)
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -34,7 +42,7 @@ class Lockable(Scope):
             if self.pattern:
                 raise Exception("already have a secret, need key")
 
-            self.pattern = generate_identity()
+            self.pattern = generate_entity_identity()
             self.locked = True
             self.ourselves.touch()
 
@@ -152,7 +160,7 @@ class Carryable(Scope):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.kind = kind if kind else Kind(identity=generate_identity())
+        self.kind = kind if kind else Kind(identity=generate_entity_identity())
         self.quantity = quantity if quantity else 1
         self.loose = loose
 

@@ -3,29 +3,29 @@ import dataclasses
 from typing import Any, Dict, List, Optional, Type
 
 from .visual import Renderable
+from .entity import Entity  # type only
 
 log = logging.getLogger("dimsum.model")
 
-
-class Event:
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
+_all_events: List[Type["Event"]] = []
 
 
-_all_events: List[Type[Event]] = []
-
-
-def event(klass):
+def event(klass: Type["Event"]):
     global _all_events
     _all_events.append(klass)
     log.debug("event: %s", klass)
     return klass
 
 
-def get_all():
+def get_all_events() -> List[Type["Event"]]:
     global _all_events
     return _all_events
+
+
+class Event:
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
 
 
 @event
@@ -37,8 +37,8 @@ class TickEvent(Event):
 @event
 @dataclasses.dataclass(frozen=True)
 class StandardEvent(Event, Renderable):
-    living: Any
-    area: Any
+    source: Entity
+    area: Entity
     heard: Optional[List[Any]]
 
     def render_string(self) -> Dict[str, str]:

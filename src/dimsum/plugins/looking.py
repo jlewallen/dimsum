@@ -84,12 +84,12 @@ class AreaObservation(Observation):
 
         occupied = area.make(occupyable.Occupyable).occupied
         self.living: List[ObservedLiving] = flatten(
-            [observe(e) for e in occupied if e != person]
+            [observe_entity(e) for e in occupied if e != person]
         )
 
         self.items: List[ObservedEntity] = flatten(
             [
-                observe(e)
+                observe_entity(e)
                 for e in area.make(carryable.Containing).holding
                 if not e.make(mechanics.Visibility).visible.hard_to_see
                 or person.make(mechanics.Visibility).can_see(e.identity)
@@ -144,9 +144,6 @@ class EntitiesObservation(Observation):
     @property
     def items(self):
         return self.entities
-
-    def accept(self, visitor):
-        return visitor.entities_observation(self)
 
     def __str__(self):
         return "observed %s" % (infl.join(self.entities),)

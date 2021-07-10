@@ -23,20 +23,27 @@ from model.entity import (
     EntityClass,
     RootEntityClass,
     Registrar,
-    generate_identity,
+    generate_entity_identity,
     Version,
     EntityRef,
-    install_hooks,
-    cleanup,
+    cleanup_entity,
     EntityFrozen,
-    keys,
-    identities,
+    set_entity_keys_provider,
+    set_entity_identities_provider,
+    set_entity_cleanup_handler,
+    set_entity_describe_handler,
 )
-from model.entity import Hooks, Keys, EntityUpdate, Serialized  # Can we move these?
+from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
 from model.world import World, Key, Welcoming
-from model.events import event, Event, StandardEvent, get_all, TickEvent
+from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
-from model.reply import Activity, ObservedEntity, HoldingActivity, Observation, observe
+from model.reply import (
+    Activity,
+    ObservedEntity,
+    HoldingActivity,
+    Observation,
+    observe_entity,
+)
 from model.hooks import ManagedHooks, All, ExtendHooks
 from model.context import Ctx, get
 
@@ -45,8 +52,6 @@ import model.hooks as hooks
 __all__: List[str] = [
     "Ctx",
     "get",
-    "Hooks",
-    "install_hooks",
     "EntityFrozen",
     "Reply",
     "Action",
@@ -56,7 +61,7 @@ __all__: List[str] = [
     "Failure",
     "Identity",
     "Kind",
-    "generate_identity",
+    "generate_entity_identity",
     "Entity",
     "Version",
     "EntityRef",
@@ -91,17 +96,19 @@ __all__: List[str] = [
     "AlwaysTrue",
     "All",
     "ManagedHooks",
-    "get_all",
-    "cleanup",
     "ExtendHooks",
     "TickEvent",
     "Welcoming",
     "ObservedEntity",
     "Observation",
     "HoldingActivity",
-    "observe",
     "hooks",
-    "keys",
-    "identities",
+    "set_entity_keys_provider",
+    "set_entity_identities_provider",
+    "set_entity_cleanup_handler",
+    "set_entity_describe_handler",
+    "cleanup_entity",
+    "observe_entity",
+    "get_all_events",
     "infl",
 ]

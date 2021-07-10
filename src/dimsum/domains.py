@@ -28,7 +28,7 @@ from model import (
     ExtendHooks,
     Welcoming,
     Condition,
-    cleanup,
+    cleanup_entity,
     Ctx,
     context,
 )
@@ -354,7 +354,7 @@ class WorldCtx(Ctx):
         return self.session.register(entity)
 
     def unregister(self, destroyed: Entity) -> Entity:
-        cleanup(destroyed, world=self.world)
+        cleanup_entity(destroyed, world=self.world)
         return self.session.unregister(destroyed)
 
     async def standard(self, klass, *args, **kwargs):

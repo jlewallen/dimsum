@@ -240,14 +240,16 @@ class Deterministic:
         self.previous_identities: Optional[Callable] = None
 
     def __enter__(self):
-        self.previous_keys = keys(self.generate_key)
-        self.previous_identities = identities(self.generate_identity)
+        self.previous_keys = set_entity_keys_provider(self.generate_key)
+        self.previous_identities = set_entity_identities_provider(
+            self.generate_identity
+        )
 
     def __exit__(self, type, value, traceback):
         assert self.previous_identities
-        identities(self.previous_identities)
+        set_entity_identities_provider(self.previous_identities)
         assert self.previous_keys
-        keys(self.previous_keys)
+        set_entity_keys_provider(self.previous_keys)
 
     def generate_key(self) -> str:
         self.i += 1

@@ -36,7 +36,7 @@ class EditEntity(PersonAction):
     ):
         item = await world.apply_item_finder(person, self.item)
         if item:
-            return EditingEntity(living=person, area=area, heard=[], entity=item)
+            return EditingEntity(source=person, area=area, heard=[], entity=item)
         return Failure("where's that?")
 
 

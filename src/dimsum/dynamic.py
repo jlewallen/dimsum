@@ -22,7 +22,7 @@ from model import (
     Action,
     Success,
     Failure,
-    get_all,
+    get_all_events,
     DynamicFailure,
     Unknown,
     ManagedHooks,
@@ -260,7 +260,7 @@ class CompiledEntityBehavior(EntityBehavior):
 
 def _get_default_globals():
     # TODO Can we pass an exploded module here?
-    event_classes = {k.__name__: k for k in get_all()}
+    event_classes = {k.__name__: k for k in get_all_events()}
     return dict(
         log=logging.getLogger("dimsum.dynamic.user"),
         dataclass=dataclasses.dataclass,

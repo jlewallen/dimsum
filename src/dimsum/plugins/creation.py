@@ -20,7 +20,7 @@ class EntityCreated(StandardEvent):
     entity: Entity
 
     def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.living.props.name} created '{self.entity.props.name}'"}
+        return {"text": f"{self.source.props.name} created '{self.entity.props.name}'"}
 
 
 @event
@@ -63,8 +63,8 @@ class Create(PersonAction):
             # this keeps us from having to unregister the item.
             ctx.register(after_hold)
             return EntityCreated(
+                source=person,
                 area=area,
-                living=person,
                 entity=after_hold,
                 heard=default_heard_for(area),
             )
@@ -110,7 +110,7 @@ class Make(PersonAction):
         area = world.find_person_area(person)
         await ctx.publish(
             ItemsMade(
-                living=person,
+                source=person,
                 area=area,
                 heard=default_heard_for(area=area),
                 items=[after_hold],
@@ -143,7 +143,7 @@ class Obliterate(PersonAction):
 
         await ctx.publish(
             ItemsObliterated(
-                living=person,
+                source=person,
                 area=area,
                 heard=default_heard_for(area=area),
                 items=items,

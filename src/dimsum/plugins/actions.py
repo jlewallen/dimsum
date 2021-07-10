@@ -45,7 +45,7 @@ class AddItemArea(PersonAction):
 
         await ctx.publish(
             ItemsAppeared(
-                living=person,
+                source=person,
                 area=self.area,
                 heard=tools.default_heard_for(area=area),
                 items=[self.item],
@@ -65,7 +65,7 @@ class Join(PersonAction):
         with world.welcome_area().make(occupyable.Occupyable) as entering:
             await ctx.publish(
                 PlayerJoined(
-                    living=person,
+                    source=person,
                     area=entering.ourselves,
                     heard=tools.default_heard_for(area=area),
                 )

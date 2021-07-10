@@ -18,13 +18,13 @@ class PlayerSpoke(StandardEvent):
     message: str
 
     def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.living.props.name} said '{self.message}'"}
+        return {"text": f"{self.source.props.name} said '{self.message}'"}
 
 
 @event
 class PlayerTold(PlayerSpoke):
     def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.living.props.name} whispered '{self.message}'"}
+        return {"text": f"{self.source.props.name} whispered '{self.message}'"}
 
 
 class Say(PersonAction):
@@ -39,7 +39,7 @@ class Say(PersonAction):
         with area.make_and_discard(occupyable.Occupyable) as here:
             await ctx.publish(
                 PlayerSpoke(
-                    living=person, area=area, heard=here.occupied, message=self.message
+                    source=person, area=area, heard=here.occupied, message=self.message
                 )
             )
         return Success()
@@ -61,7 +61,7 @@ class Tell(PersonAction):
         who = await world.apply_item_finder(person, self.who)
         if who:
             await ctx.publish(
-                PlayerTold(living=person, area=area, heard=[who], message=self.message)
+                PlayerTold(source=person, area=area, heard=[who], message=self.message)
             )
             return Success("told")
         return Failure("who?")

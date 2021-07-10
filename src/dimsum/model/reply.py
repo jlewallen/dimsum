@@ -11,14 +11,19 @@ import scopes.mechanics as mechanics
 log = logging.getLogger("dimsum.model")
 
 
-class Observation(Reply, Renderable):
-    def render_string(self) -> Dict[str, str]:
-        return {"message": "some kind of observation"}
-
-
 @dataclasses.dataclass
 class ObservedEntity:
     entity: Entity
+
+
+@all.observed.target
+def observe_entity(entity: Entity) -> Sequence[ObservedEntity]:
+    return [ObservedEntity(entity)]
+
+
+class Observation(Reply, Renderable):
+    def render_string(self) -> Dict[str, str]:
+        return {"message": "some kind of observation"}
 
 
 class Activity:
@@ -34,9 +39,4 @@ class HoldingActivity(Activity):
 class ObservedEntities:
     def __init__(self, entities: List[Entity]):
         super().__init__()
-        self.entities = entities
-
-
-@all.observed.target
-def observe(entity: Entity) -> Sequence[ObservedEntity]:
-    return [ObservedEntity(entity)]
+        self.entities = [observe_entity(e) for e in entities]

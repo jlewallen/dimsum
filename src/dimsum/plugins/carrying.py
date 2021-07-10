@@ -87,7 +87,7 @@ class Drop(PersonAction):
                 area = world.find_person_area(person)
                 await ctx.publish(
                     ItemsDropped(
-                        living=person,
+                        source=person,
                         area=area,
                         heard=default_heard_for(area=area),
                         items=dropped,
@@ -144,7 +144,7 @@ class Hold(PersonAction):
                     ctx.unregister(item)
                 await ctx.publish(
                     ItemsHeld(
-                        living=person,
+                        source=person,
                         area=area,
                         heard=default_heard_for(area=area),
                         items=[after_hold],

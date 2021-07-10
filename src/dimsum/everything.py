@@ -4,11 +4,10 @@ from typing import Optional
 from model import (
     Entity,
     World,
-    Hooks,
-    install_hooks,
-    Hooks,
     hooks,
     RootEntityClass,
+    set_entity_cleanup_handler,
+    set_entity_describe_handler,
     infl,
 )
 
@@ -33,36 +32,39 @@ import plugins.carrying  # noqa
 log = logging.getLogger("dimsum")
 
 
-class EntityHooks(Hooks):
-    def describe(self, entity: Entity) -> str:
-        if entity.klass in (RootEntityClass, scopes.LivingClass, scopes.AreaClass):
-            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
+def describe_everything(entity: Entity) -> str:
+    if entity.klass in (RootEntityClass, scopes.LivingClass, scopes.AreaClass):
+        return "{0} (#{1})".format(entity.props.name, entity.props.gid)
 
-        if entity.has(carryable.Carryable):
-            with entity.make_and_discard(carryable.Carryable) as carry:
-                if carry.quantity > 1:
-                    q = carry.quantity
-                    if carry.quantity - int(carry.quantity) == 0:
-                        q = int(q)
-                    return "{0} {1} (#{2})".format(
-                        q,
-                        infl.plural(entity.props.name, carry.quantity),
-                        entity.props.gid,
-                    )
+    if entity.has(carryable.Carryable):
+        with entity.make_and_discard(carryable.Carryable) as carry:
+            if carry.quantity > 1:
+                q = carry.quantity
+                if carry.quantity - int(carry.quantity) == 0:
+                    q = int(q)
+                return "{0} {1} (#{2})".format(
+                    q,
+                    infl.plural(entity.props.name, carry.quantity),
+                    entity.props.gid,
+                )
 
-        return "{0} (#{1})".format(infl.a(entity.props.name), entity.props.gid)
-
-    def cleanup(self, entity: Entity, world: Optional[World] = None, **kwargs):
-        assert world
-        if world.has(behavior.BehaviorCollection):
-            log.info("cleanup %s", entity)
-            with world.make(behavior.BehaviorCollection) as collection:
-                if entity in collection.entities:
-                    collection.entities.remove(entity)
-                    world.touch()
+    return "{0} (#{1})".format(infl.a(entity.props.name), entity.props.gid)
 
 
-install_hooks(EntityHooks())
+set_entity_describe_handler(describe_everything)
+
+
+def cleanup_everything(entity: Entity, world: Optional[World] = None, **kwargs):
+    assert world
+    if world.has(behavior.BehaviorCollection):
+        log.info("cleanup %s", entity)
+        with world.make(behavior.BehaviorCollection) as collection:
+            if entity in collection.entities:
+                collection.entities.remove(entity)
+                world.touch()
+
+
+set_entity_cleanup_handler(cleanup_everything)
 
 
 @hooks.all.observed.hook

@@ -35,10 +35,10 @@ class Bank(Scope):
 
 @received(ItemsDropped)
 async def dropped(this, ev, say):
-    with ev.living.make(Bank) as bank:
+    with ev.source.make(Bank) as bank:
         if bank.gold < 2:
             bank.gold += 1
-            ev.living.touch()
+            ev.source.touch()
         log.info("gold=%d", bank.gold)
 """,
             )
@@ -79,11 +79,11 @@ async def test_wear_cape(caplog):
                 python="""
 @received(ItemsWorn)
 async def worn(this, ev, say):
-    tools.hide(ev.living)
+    tools.hide(ev.source)
 
 @received(ItemsUnworn)
 async def unworn(this, ev, say):
-    tools.show(ev.living)
+    tools.show(ev.source)
 """,
             )
 

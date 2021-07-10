@@ -11,21 +11,15 @@ log = logging.getLogger("dimsum.scopes")
 @event
 @dataclasses.dataclass(frozen=True)
 class LivingEnteredArea(StandardEvent):
-    living: Entity
-    area: Entity
-
     def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.living.props.name} arrived from {self.area}"}
+        return {"text": f"{self.source.props.name} arrived from {self.area}"}
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class LivingLeftArea(StandardEvent):
-    living: Entity
-    area: Entity
-
     def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.living.props.name} went to {self.area}"}
+        return {"text": f"{self.source.props.name} went to {self.area}"}
 
 
 class Occupying(Scope):
@@ -58,7 +52,7 @@ class Occupyable(Scope):
     async def entered(self, player: Entity):
         assert player not in self.occupied
         await context.get().publish(
-            LivingEnteredArea(living=player, area=self.ourselves, heard=self.occupied)
+            LivingEnteredArea(source=player, area=self.ourselves, heard=self.occupied)
         )
         self.add_living(player)
 
@@ -67,5 +61,5 @@ class Occupyable(Scope):
         self.occupied.remove(player)
         self.ourselves.touch()
         await context.get().publish(
-            LivingLeftArea(living=player, area=self.ourselves, heard=self.occupied)
+            LivingLeftArea(source=player, area=self.ourselves, heard=self.occupied)
         )

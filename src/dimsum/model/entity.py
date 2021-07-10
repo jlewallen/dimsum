@@ -14,6 +14,74 @@ from .properties import Common
 
 log = logging.getLogger("dimsum.model.entity")
 
+_key_fn: Callable = shortuuid.uuid
+
+
+def set_entity_keys_provider(fn: Callable[[], str]) -> Callable[[], str]:
+    global _key_fn
+    previous = _key_fn
+    _key_fn = fn
+    return previous
+
+
+_identity_fn: Callable = generate
+
+
+def set_entity_identities_provider(
+    fn: Callable[[], Identity]
+) -> Callable[[], Identity]:
+    global _identity_fn
+    previous = _identity_fn
+    _identity_fn = fn
+    return previous
+
+
+def generate_entity_identity(creator=None) -> Identity:
+    return _identity_fn(creator=creator)
+
+
+def _default_describe(entity: "Entity") -> str:
+    return "{0} (#{1})".format(entity.props.name, entity.props.gid)
+
+
+_describe_fn: Callable[["Entity"], str] = _default_describe
+
+
+def set_entity_describe_handler(
+    fn: Callable[["Entity"], str]
+) -> Callable[["Entity"], str]:
+    global _describe_fn
+    previous = _describe_fn
+    _describe_fn = fn
+    return previous
+
+
+def _default_cleanup(entity: "Entity", **kwargs):
+    pass
+
+
+_cleanup_fn: Callable = _default_cleanup
+
+
+def set_entity_cleanup_handler(fn: Callable) -> Callable:
+    global _cleanup_fn
+    previous = _cleanup_fn
+    _cleanup_fn = fn
+    return previous
+
+
+def cleanup_entity(entity: "Entity", **kwargs):
+    global _cleanup_fn
+    _cleanup_fn(entity, **kwargs)
+
+
+def _get_ctor_key(ctor) -> str:
+    return stringcase.camelcase(ctor.__name__)
+
+
+def _get_instance_key(instance) -> str:
+    return _get_ctor_key(instance.__class__)
+
 
 @dataclasses.dataclass(frozen=True)
 class Serialized:
@@ -62,61 +130,6 @@ class IgnoreExtraConstructorArguments:
 
 class EntityFrozen(Exception):
     pass
-
-
-class Hooks:
-    def describe(self, entity: "Entity") -> str:
-        return "{0} (#{1})".format(entity.props.name, entity.props.gid)
-
-    def cleanup(self, entity: "Entity", **kwargs):
-        pass
-
-
-key_generator_fn: Callable = shortuuid.uuid
-
-
-def keys(fn: Callable) -> Callable:
-    global key_generator_fn
-    previous = key_generator_fn
-    key_generator_fn = fn
-    return previous
-
-
-identity_generator_fn: Callable = generate
-
-
-def identities(fn: Callable) -> Callable:
-    global identity_generator_fn
-    previous = identity_generator_fn
-    identity_generator_fn = fn
-    return previous
-
-
-def generate_identity(creator=None) -> Identity:
-    return identity_generator_fn(creator=creator)
-
-
-global_hooks = Hooks()
-
-
-def install_hooks(new_hooks: Hooks) -> Hooks:
-    global global_hooks
-    previous = global_hooks
-    global_hooks = new_hooks
-    return previous
-
-
-def cleanup(entity: "Entity", **kwargs):
-    global global_hooks
-    global_hooks.cleanup(entity, **kwargs)
-
-
-def get_ctor_key(ctor) -> str:
-    return stringcase.camelcase(ctor.__name__)
-
-
-def get_instance_key(instance) -> str:
-    return get_ctor_key(instance.__class__)
 
 
 class EntityClass:
@@ -182,11 +195,11 @@ class Entity:
         if identity:
             self.identity = identity
         else:
-            self.identity = generate_identity(
+            self.identity = generate_entity_identity(
                 creator=self.creator.identity if self.creator else None
             )
             # If we aren't given a key, the default one is our public key.
-            self.key = key_generator_fn()
+            self.key = _key_fn()
 
         if key:
             self.key = key
@@ -234,7 +247,7 @@ class Entity:
     def get_kind(self, name: str) -> Kind:
         if not name in self.props.related:
             self.props.related[name] = Kind(
-                identity=generate_identity(creator=self.identity)
+                identity=generate_entity_identity(creator=self.identity)
             )
             self.touch()
         return self.props.related[name]
@@ -276,7 +289,7 @@ class Entity:
         return True
 
     def describe(self) -> str:
-        return global_hooks.describe(self)
+        return _describe_fn(self)
 
     def describes(self, q: Optional[str] = None, **kwargs) -> bool:
         if q:
@@ -290,11 +303,11 @@ class Entity:
         return self.make(ctor, discarding=True, **kwargs)
 
     def has(self, ctor, **kwargs):
-        key = get_ctor_key(ctor)
+        key = _get_ctor_key(ctor)
         return key in self.chimeras
 
     def make(self, ctor, discarding=False, **kwargs):
-        key = get_ctor_key(ctor)
+        key = _get_ctor_key(ctor)
 
         chargs = {}
         if key in self.chimeras:
@@ -331,7 +344,7 @@ class Scope:
 
     @property
     def chimera_key(self) -> str:
-        return get_instance_key(self)
+        return _get_instance_key(self)
 
     @property
     def ourselves(self):
