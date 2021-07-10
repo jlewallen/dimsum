@@ -43,7 +43,7 @@ from model.entity import (
     set_entity_area_provider,
 )
 from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
-from model.world import World, Key, Welcoming
+from model.world import World, WorldKey, Welcoming
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
 from model.reply import (
@@ -90,7 +90,7 @@ __all__: List[str] = [
     "Scope",
     "Registrar",
     "World",
-    "Key",
+    "WorldKey",
     "event",
     "Event",
     "StandardEvent",

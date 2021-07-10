@@ -17,7 +17,7 @@ from model import (
     World,
     Registrar,
     Serialized,
-    Key,
+    WorldKey,
     Event,
     Action,
     TickEvent,
@@ -119,7 +119,7 @@ class Session:
             refresh=refresh,
         )
 
-        for updated_world in [e for e in materialized.all() if e.key == Key]:
+        for updated_world in [e for e in materialized.all() if e.key == WorldKey]:
             assert isinstance(updated_world, World)
             self.world = updated_world
 
@@ -134,7 +134,7 @@ class Session:
             return self.world
 
         maybe_world = await self.try_materialize(
-            key=Key, reach=reach if reach else None
+            key=WorldKey, reach=reach if reach else None
         )
 
         if maybe_world.maybe_one():

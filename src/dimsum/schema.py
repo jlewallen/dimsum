@@ -17,7 +17,7 @@ import library
 from model import (
     Entity,
     World,
-    Key,
+    WorldKey,
     EntityUpdate,
     Renderable,
     Reply,
@@ -355,7 +355,7 @@ async def resolve_language(obj, info, criteria):
         player = await session.materialize(key=evaluator)
         assert player
         log.debug("materialize world")
-        w = await session.materialize(key=Key)
+        w = await session.materialize(key=WorldKey)
         assert w
         reply = await session.execute(player, lqc.text.strip())
         await session.save()

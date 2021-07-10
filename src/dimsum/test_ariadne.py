@@ -107,7 +107,7 @@ async def test_graphql_world_by_key(deterministic, snapshot):
 
     data = {
         "query": '{ entitiesByKey(key: "%s", identities: false) { key serialized } }'
-        % (Key)
+        % (WorldKey)
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
@@ -255,7 +255,7 @@ async def test_graphql_update(deterministic, snapshot):
     )
 
     data = {
-        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -284,7 +284,7 @@ async def test_graphql_update_and_requery(deterministic, snapshot):
     )
 
     data = {
-        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -350,7 +350,7 @@ async def test_graphql_delete(deterministic, snapshot):
         )
 
     data = {
-        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -376,7 +376,7 @@ async def test_graphql_entities(deterministic, snapshot):
 
     data = {
         "query": '{ entities(keys: ["%s"], identities: false) { key serialized } }'
-        % (Key)
+        % (WorldKey)
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)

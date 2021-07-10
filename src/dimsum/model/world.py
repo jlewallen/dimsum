@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Sequence, Type
 from .properties import Common
 from .entity import Entity, Scope, RootEntityClass, find_entity_area
 
-Key = "world"
+WorldKey = "world"
 log = logging.getLogger("dimsum.model")
 
 
@@ -23,7 +23,7 @@ class Welcoming(Scope):
 class World(Entity):
     def __init__(self, key=None, klass=None, props=None, **kwargs):
         super().__init__(
-            key=Key,
+            key=WorldKey,
             klass=RootEntityClass,
             props=props if props else Common("World", desc="Ya know, everything"),
             **kwargs
