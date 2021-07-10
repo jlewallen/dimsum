@@ -1,6 +1,7 @@
 import logging
 import dataclasses
 import inflect
+import functools
 from typing import Type, Optional, List
 
 import grammars
@@ -33,6 +34,21 @@ def can_hold(person: Entity, entity: Entity) -> bool:
     return True
 
 
+@hooks.all.drop.target
+def can_drop(person: Entity, entity: Entity) -> bool:
+    return True
+
+
+@hooks.all.open.target
+def can_open(person: Entity, entity: Entity) -> bool:
+    return True
+
+
+@hooks.all.close.target
+def can_close(person: Entity, entity: Entity) -> bool:
+    return True
+
+
 class Drop(PersonAction):
     def __init__(
         self,
@@ -54,6 +70,9 @@ class Drop(PersonAction):
             if not item:
                 return Failure("drop what?")
 
+            if not can_drop(person, item):
+                return Failure("drop what?")
+
         area = world.find_person_area(person)
 
         with person.make(carryable.Containing) as contain:
@@ -64,6 +83,7 @@ class Drop(PersonAction):
                 creator=person,
                 owner=person,
                 ctx=ctx,
+                condition=functools.partial(can_drop, person),
             )
             if dropped:
                 area = world.find_person_area(person)
@@ -152,6 +172,9 @@ class Open(PersonAction):
             if not contain.can_hold():
                 return Failure("you can't open that")
 
+            if not can_open(person, item):
+                return Failure("huh, won't open")
+
             if not contain.open():
                 return Failure("huh, won't open")
 
@@ -174,6 +197,9 @@ class Close(PersonAction):
         with item.make(carryable.Containing) as contain:
             if not contain.can_hold():
                 return Failure("you can't open that")
+
+            if not can_close(person, item):
+                return Failure("huh, won't close")
 
             if not contain.close():
                 return Failure("it's got other plans")

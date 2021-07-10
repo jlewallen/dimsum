@@ -110,8 +110,20 @@ class All(ManagedHooks):
         return self.create_hook("hold")
 
     @property
+    def drop(self):
+        return self.create_hook("drop")
+
+    @property
     def enter(self):
         return self.create_hook("enter")
+
+    @property
+    def open(self):
+        return self.create_hook("open")
+
+    @property
+    def close(self):
+        return self.create_hook("close")
 
 
 all = All()

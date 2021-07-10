@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union, Callable
 
 from model import Entity, Scope, Common, Identity, generate_identity, Kind, context
 
@@ -286,13 +286,16 @@ class Containing(Openable):
             item.touch()
         return item
 
-    def drop_all(self) -> List[Entity]:
+    def drop_all(
+        self, condition: Optional[Callable[[Entity], bool]] = None
+    ) -> List[Entity]:
         dropped = []
-        while len(self.holding) > 0:
-            item = self.holding[0]
-            self.drop(item)
-            dropped.append(item)
-        self.ourselves.touch()
+        for item in self.holding:
+            if not condition or condition(item):
+                self.drop(item)
+                dropped.append(item)
+        if len(dropped) > 0:
+            self.ourselves.touch()
         return dropped
 
     def is_holding(self, item: Entity):
@@ -303,6 +306,7 @@ class Containing(Openable):
         area: Entity,
         item: Optional[Entity] = None,
         quantity: Optional[float] = None,
+        condition: Optional[Callable[[Entity], bool]] = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
@@ -311,7 +315,7 @@ class Containing(Openable):
         dropped: List[Entity] = []
         if quantity:
             if not item:
-                return None, "please specify what?"
+                return None, "of what, though?"
 
             with item.make(Carryable) as dropping:
                 if quantity > dropping.quantity or quantity < 1:
@@ -329,7 +333,7 @@ class Containing(Openable):
                 dropped = self.drop(item)
                 assert dropped
             else:
-                dropped = self.drop_all()
+                dropped = self.drop_all(condition=condition)
                 assert dropped
 
         for item in dropped:
