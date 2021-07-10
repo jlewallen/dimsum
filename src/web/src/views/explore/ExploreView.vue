@@ -40,6 +40,10 @@ export default defineComponent({
     async mounted(): Promise<void> {
         this.$emit("scroll-bottom");
         this.$emit("resume-repl");
+
+        if (!store.state.authenticated) {
+            this.$router.push("/login");
+        }
     },
     methods: {},
 });

@@ -77,8 +77,6 @@ export default defineComponent({
             });
         }
 
-        this.$router.push("/login");
-
         return Promise.resolve();
     },
     methods: {

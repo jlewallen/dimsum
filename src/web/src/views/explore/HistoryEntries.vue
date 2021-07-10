@@ -84,6 +84,8 @@ export default defineComponent({
 
 .response.dynamic {
     padding: 1em;
-    background-color: #30475e;
+}
+.response.universal {
+    padding: 1em;
 }
 </style>
