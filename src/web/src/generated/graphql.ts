@@ -23,6 +23,7 @@ export type Scalars = {
 export type Credentials = {
     username: Scalars["String"];
     password: Scalars["String"];
+    token?: Maybe<Scalars["String"]>;
 };
 
 export type EntitiesUpdated = {
@@ -139,6 +140,14 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: "Mutation" } & Pick<Mutation, "login">;
 
+export type RedeemInviteMutationVariables = Exact<{
+    username: Scalars["String"];
+    password: Scalars["String"];
+    token: Scalars["String"];
+}>;
+
+export type RedeemInviteMutation = { __typename?: "Mutation" } & Pick<Mutation, "login">;
+
 export type LanguageMutationVariables = Exact<{
     text: Scalars["String"];
     evaluator: Scalars["Key"];
@@ -190,6 +199,11 @@ export type NearbySubscription = { __typename?: "Subscription" } & Pick<Subscrip
 export const LoginDocument = gql`
     mutation login($username: String!, $password: String!) {
         login(credentials: { username: $username, password: $password })
+    }
+`;
+export const RedeemInviteDocument = gql`
+    mutation redeemInvite($username: String!, $password: String!, $token: String!) {
+        login(credentials: { username: $username, password: $password, token: $token })
     }
 `;
 export const LanguageDocument = gql`
@@ -255,6 +269,13 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
                 (wrappedRequestHeaders) =>
                     client.request<LoginMutation>(LoginDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
                 "login"
+            );
+        },
+        redeemInvite(variables: RedeemInviteMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RedeemInviteMutation> {
+            return withWrapper(
+                (wrappedRequestHeaders) =>
+                    client.request<RedeemInviteMutation>(RedeemInviteDocument, variables, { ...requestHeaders, ...wrappedRequestHeaders }),
+                "redeemInvite"
             );
         },
         language(variables: LanguageMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<LanguageMutation> {

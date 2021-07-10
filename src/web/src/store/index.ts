@@ -119,7 +119,12 @@ export default createStore<RootState>({
     actions: {
         [ActionTypes.LOGIN]: async ({ state, dispatch, commit }: ActionParameters, payload: LoginAction) => {
             const api = getApi(state.headers);
-            const data = await api.login({ username: payload.name, password: payload.password });
+            let data;
+            if (payload.token) {
+                data = await api.redeemInvite({ username: payload.name, password: payload.password, token: payload.token });
+            } else {
+                data = await api.login({ username: payload.name, password: payload.password });
+            }
             commit(MutationTypes.AUTH, data.login);
             return Promise.all([dispatch(new AuthenticatedAction(data.login)), dispatch(ActionTypes.LOADING)]);
         },

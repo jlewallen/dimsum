@@ -29,6 +29,9 @@ env:
 freeze:
 	pip3 freeze > requirements.txt
 
+gqlgen:
+	cd src/web && npm run gqlgen
+
 src/web/src/config:
 	cp src/web/src/config.ts.dev src/web/src/config.ts
 

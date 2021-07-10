@@ -5,7 +5,7 @@ import test
 
 
 @pytest.mark.asyncio
-async def test_auth_change():
+async def test_admin_auth_change():
     tw = test.TestWorld()
     await tw.initialize()
     with tw.domain.session() as session:
@@ -20,7 +20,7 @@ async def test_auth_change():
 
 
 @pytest.mark.asyncio
-async def test_auth_before():
+async def test_admin_auth_before():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.execute("auth asdfasdf")
@@ -37,3 +37,12 @@ async def test_auth_before():
         jacob = await session.materialize(key=tw.jacob_key)
         auth_after = jacob.make(users.Auth).password
         assert auth_before != auth_after
+
+
+@pytest.mark.asyncio
+async def test_admin_invite():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    r = await tw.execute("invite foobar")
+    assert r.kwargs

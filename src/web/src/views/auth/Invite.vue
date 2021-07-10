@@ -1,6 +1,6 @@
 <template>
     <div class="container login">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center" v-if="token">
             <form class="form col-4" @submit.prevent="login">
                 <div class="form-group row">
                     <label class="col-sm-4 col-form-label">Name</label>
@@ -26,12 +26,11 @@
 </template>
 
 <script lang="ts">
-import _ from "lodash";
 import { defineComponent } from "vue";
 import store, { LoginAction } from "@/store";
 
 export default defineComponent({
-    name: "Login",
+    name: "Invite",
     data(): {
         busy: boolean;
         form: { name: string; password: string };
@@ -48,14 +47,7 @@ export default defineComponent({
     },
     computed: {
         token(): string | null {
-            const maybe = this.$route.query?.token;
-            if (!maybe) {
-                return null;
-            }
-            if (_.isArray(maybe)) {
-                return maybe[0];
-            }
-            return maybe || null;
+            return this.$route.query?.token || null;
         },
     },
     methods: {

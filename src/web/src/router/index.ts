@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
         component: Login,
     },
     {
+        path: "/invite",
+        name: "Invite",
+        component: Login,
+    },
+    {
         path: "/logout",
         name: "logout",
         component: Logout,

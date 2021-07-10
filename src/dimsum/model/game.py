@@ -8,14 +8,17 @@ class Reply:
 
 
 class Universal(Reply):
-    def __init__(self, *args, ok: Optional[bool] = True, **kwargs):
+    def __init__(self, f: str, ok: Optional[bool] = True, **kwargs):
         super().__init__()
-        self.args = args
+        self.f = f
         self.kwargs = kwargs
         self.ok = ok
 
     def failed(self) -> "Universal":
         return self
+
+    def __str__(self) -> str:
+        return self.f % self.kwargs
 
 
 class Action:

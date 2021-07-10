@@ -83,7 +83,7 @@ export class SaveEntityBehaviorAction {
 export class LoginAction {
     type = ActionTypes.LOGIN;
 
-    constructor(public readonly name: string, public readonly password: string) {}
+    constructor(public readonly name: string, public readonly password: string, public readonly token: string | null) {}
 }
 
 export class LogoutAction {

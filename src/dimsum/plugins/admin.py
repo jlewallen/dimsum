@@ -14,15 +14,31 @@ log = logging.getLogger("dimsum")
 class Auth(PersonAction):
     def __init__(self, password=None, **kwargs):
         super().__init__(**kwargs)
-        self.password = password
+        assert password
+        self.password: str = password
 
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         with person.make(users.Auth) as auth:
             auth.change(self.password)
-            log.info(auth.password)
         return Success("done, https://mud.espial.me")
+
+
+class Invite(PersonAction):
+    def __init__(self, password=None, **kwargs):
+        super().__init__(**kwargs)
+        assert password
+        self.password: str = password
+
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        with person.make(users.Auth) as auth:
+            url, token = auth.invite(self.password)
+            return Universal(
+                "All good to go! The new URL is %(url)s", url=url, token=token
+            )
 
 
 class Freeze(PersonAction):
@@ -73,6 +89,9 @@ class Transformer(transformers.Base):
     def auth(self, args):
         return Auth(password=str(args[0]))
 
+    def invite(self, args):
+        return Invite(password=str(args[0]))
+
     def freeze(self, args):
         return Freeze(item=args[0])
 
@@ -89,9 +108,10 @@ class AdminGrammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:             auth | freeze | unfreeze
+        start:             auth | invite | freeze | unfreeze
 
         auth:              "auth" TEXT
+        invite:            "invite" TEXT
         freeze:            "freeze" held                           -> freeze
         unfreeze:          "unfreeze" held                         -> unfreeze
 """

@@ -25,8 +25,11 @@ from model import (
     Keys,
     Common,
 )
+from plugins.actions import Join
+import plugins.admin as admin
 import scopes.carryable as carryable
 import scopes.users as users
+
 
 # Create
 
@@ -212,6 +215,7 @@ mutation = ariadne.MutationType()
 class Credentials:
     username: str
     password: str
+    token: Optional[str] = None
 
 
 class UsernamePasswordError(ValueError):
@@ -226,13 +230,42 @@ async def login(obj, info, credentials):
     with domain.session() as session:
         await session.prepare()
 
-        try:
-            person = await session.materialize(key=creds.username)
-            if person:
-                with person.make(users.Auth) as auth:
-                    token = auth.try_password(creds.password)
+        if creds.token:
+            log.info("verifying invite")
+            decoded = jwt.decode(
+                creds.token, users.invite_session_key, algorithms=["HS256"]
+            )
 
-                    if token:
+            log.info("decoded=%s", decoded)
+            creator = await session.materialize(key=decoded["creator"])
+            assert creator
+
+            person = await session.try_materialize(key=creds.username)
+            if person.maybe_one():
+                raise Exception("username taken")
+
+            # everything looks good
+            person = scopes.alive(
+                key=creds.username,
+                creator=session.world,
+                props=Common(creds.username, desc="A player", invited_by=creator.key),
+            )
+            log.info("PERSON = %s", person)
+            await session.perform(Join(), person)
+            await session.perform(admin.Auth(password=creds.password), person)
+
+            token = dict(key=person.key)
+            jwt_token = jwt.encode(
+                token, info.context.cfg.session_key, algorithm="HS256"
+            )
+            return dict(key=person.key, token=jwt_token)
+
+        try:
+            people = await session.try_materialize(key=creds.username)
+            if person := people.maybe_one():
+                with person.make(users.Auth) as auth:
+                    if auth.try_password(creds.password):
+                        token = dict(key=person.key)
                         log.info("successful login %s", token)
                         jwt_token = jwt.encode(
                             token, info.context.cfg.session_key, algorithm="HS256"
@@ -265,7 +298,7 @@ def make_language_query_criteria(
     return LanguageQueryCriteria(
         persistence=PersistenceCriteria(**persistence) if persistence else None,
         reach=reach if reach else 0,
-        **kwargs
+        **kwargs,
     )
 
 

@@ -51,6 +51,7 @@ type Subscription {
 input Credentials {
   username: String!
   password: String!
+  token: String
 }
 
 input EntityDiff {

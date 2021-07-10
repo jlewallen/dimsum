@@ -13,6 +13,7 @@ import serializing
 from model import *
 from schema import AriadneContext
 from plugins.actions import Join
+import scopes.users as users
 import schema as schema_factory
 import test
 
@@ -494,3 +495,25 @@ mutation CreateThing($entities: [EntityTemplate!]) {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_redeem_invite(deterministic):
+    domain = await test.make_simple_domain(password="asdfasdf")
+    jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
+
+    with domain.session() as session:
+        await session.prepare()
+        jacob = await session.materialize(key=jacob_key)
+        invite_url, invite_token = jacob.make(users.Auth).invite("hunter42")
+
+    data = {
+        "query": 'mutation { login(credentials: { username: "carla@carla.com", password: "asdfasdf", token: "%s" }) }'
+        % (invite_token,)
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    assert actual["data"]["login"]

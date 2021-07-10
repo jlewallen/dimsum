@@ -2,11 +2,14 @@ import base64
 import hashlib
 import logging
 import os
-from typing import List, Optional
+import jwt
+from typing import List, Optional, Tuple
 
 from model import Entity, Scope
 
 log = logging.getLogger("dimsum.scopes")
+
+invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
 
 
 class Auth(Scope):
@@ -32,8 +35,12 @@ class Auth(Scope):
             actual_key = hashlib.pbkdf2_hmac(
                 "sha256", password.encode("utf-8"), salt, 100000
             )
-            if actual_key == key:
-                return {
-                    "key": self.ourselves.key,
-                }
+            return actual_key == key
         return None
+
+    def invite(self, password: str) -> Tuple[str, str]:
+        token = {"creator": self.ourselves.key}
+        invite_token = jwt.encode(token, invite_session_key, algorithm="HS256")
+        url = "http://127.0.0.1:8082/invite?token=%s" % (invite_token,)
+        log.info("invite: %s", url)
+        return url, invite_token

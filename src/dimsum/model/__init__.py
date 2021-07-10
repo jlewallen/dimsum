@@ -1,7 +1,15 @@
 from typing import List
 
 from model.inflection import infl
-from model.game import Reply, Action, Unknown, DynamicFailure, Success, Failure
+from model.game import (
+    Reply,
+    Action,
+    Unknown,
+    DynamicFailure,
+    Success,
+    Failure,
+    Universal,
+)
 from model.crypto import Identity
 from model.kinds import Kind
 from model.properties import (
@@ -68,6 +76,7 @@ __all__: List[str] = [
     "DynamicFailure",
     "Success",
     "Failure",
+    "Universal",
     "Identity",
     "Kind",
     "Entity",
