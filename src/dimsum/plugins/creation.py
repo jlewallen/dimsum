@@ -1,7 +1,6 @@
 import copy
 import dataclasses
 import logging
-import inflect
 from typing import Dict, List, Optional, Type
 
 import grammars
@@ -13,7 +12,6 @@ import scopes
 from plugins.actions import PersonAction
 
 log = logging.getLogger("dimsum")
-p = inflect.engine()
 
 
 @event
@@ -152,7 +150,7 @@ class Obliterate(PersonAction):
             )
         )
 
-        return Success("you obliterated %s" % (p.join(list(map(str, items))),))
+        return Success("you obliterated %s" % (infl.join(list(map(str, items))),))
 
 
 class CallThis(PersonAction):

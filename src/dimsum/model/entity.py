@@ -3,7 +3,6 @@ import dataclasses
 import json
 import logging
 import time
-import inflect
 import jsondiff
 import shortuuid
 import stringcase
@@ -15,7 +14,6 @@ from .kinds import Kind
 from .properties import Common
 
 log = logging.getLogger("dimsum.model.entity")
-p = inflect.engine()
 
 
 @dataclasses.dataclass(frozen=True)

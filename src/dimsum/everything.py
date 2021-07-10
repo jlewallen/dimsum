@@ -1,8 +1,16 @@
 import logging
-import inflect
 from typing import Optional
 
-from model import Entity, World, Hooks, install_hooks, Hooks, hooks, RootEntityClass
+from model import (
+    Entity,
+    World,
+    Hooks,
+    install_hooks,
+    Hooks,
+    hooks,
+    RootEntityClass,
+    infl,
+)
 
 import scopes as scopes
 import scopes.behavior as behavior
@@ -21,7 +29,6 @@ import plugins.clothing  # noqa
 import plugins.dining  # noqa
 import plugins.carrying  # noqa
 
-p = inflect.engine()
 
 log = logging.getLogger("dimsum")
 
@@ -39,10 +46,10 @@ class EntityHooks(Hooks):
                 if carry.quantity > 1:
                     return "{0} {1} (#{2})".format(
                         carry.quantity,
-                        p.plural(entity.props.name, carry.quantity),
+                        infl.plural(entity.props.name, carry.quantity),
                         entity.props.gid,
                     )
-        return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
+        return "{0} (#{1})".format(infl.a(entity.props.name), entity.props.gid)
 
     def cleanup(self, entity: Entity, world: Optional[World] = None, **kwargs):
         assert world

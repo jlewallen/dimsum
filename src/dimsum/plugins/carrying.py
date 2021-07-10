@@ -1,6 +1,5 @@
 import logging
 import dataclasses
-import inflect
 import functools
 from typing import Type, Optional, List
 
@@ -14,7 +13,6 @@ from plugins.editing import ModifyActivity
 import scopes.carryable as carryable
 
 log = logging.getLogger("dimsum")
-p = inflect.engine()
 
 
 @event
@@ -95,7 +93,7 @@ class Drop(PersonAction):
                         items=dropped,
                     )
                 )
-                return Success("you dropped %s" % (p.join(dropped),))
+                return Success("you dropped %s" % (infl.join(dropped),))
 
             return Failure(failure)
 

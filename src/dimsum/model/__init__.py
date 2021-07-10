@@ -1,5 +1,6 @@
 from typing import List
 
+from model.inflection import infl
 from model.game import Reply, Action, Unknown, DynamicFailure, Success, Failure
 from model.crypto import Identity
 from model.kinds import Kind
@@ -104,4 +105,5 @@ __all__: List[str] = [
     "hooks",
     "keys",
     "identities",
+    "infl",
 ]

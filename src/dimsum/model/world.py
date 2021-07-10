@@ -1,5 +1,4 @@
 import logging
-import inflect
 from typing import Dict, List, Optional, Sequence, Type
 
 from .properties import Common

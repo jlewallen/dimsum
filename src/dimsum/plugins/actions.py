@@ -1,13 +1,10 @@
 import dataclasses
-import inflect
 from typing import List, Dict, Optional
 
 import tools
-from model import Entity, World, Action, Ctx, Reply, event, StandardEvent, Success
+from model import Entity, World, Action, Ctx, Reply, event, StandardEvent, Success, infl
 import scopes.carryable as carryable
 import scopes.occupyable as occupyable
-
-p = inflect.engine()
 
 
 class PersonAction(Action):
@@ -54,7 +51,7 @@ class AddItemArea(PersonAction):
                 items=[self.item],
             )
         )
-        return Success("%s appeared" % (p.join([self.item]),))
+        return Success("%s appeared" % (infl.join([self.item]),))
 
 
 class Join(PersonAction):

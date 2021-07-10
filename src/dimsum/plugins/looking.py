@@ -1,6 +1,5 @@
 import logging
 import dataclasses
-import inflect
 from typing import Type, Optional, List, Sequence, Dict
 
 import grammars
@@ -12,7 +11,6 @@ import scopes.users as users
 import scopes.movement as movement
 
 log = logging.getLogger("dimsum")
-p = inflect.engine()
 
 
 class ObservedLiving(ObservedEntity):
@@ -33,7 +31,10 @@ class ObservedLiving(ObservedEntity):
     def __str__(self):
         if len(self.activities) == 0:
             return "%s" % (self.entity,)
-        return "%s who is %s" % (self.entity, p.join(list(map(str, self.activities))))
+        return "%s who is %s" % (
+            self.entity,
+            infl.join(list(map(str, self.activities))),
+        )
 
     def __repr__(self):
         return str(self)
@@ -117,20 +118,20 @@ class AreaObservation(Observation):
         emd = self.props.desc
         emd += "\n\n"
         if len(self.living) > 0:
-            emd += "Also here: " + p.join([str(x) for x in self.living])
+            emd += "Also here: " + infl.join([str(x) for x in self.living])
             emd += "\n"
         if len(self.items) > 0:
-            emd += "You can see " + p.join([str(x) for x in self.items])
+            emd += "You can see " + infl.join([str(x) for x in self.items])
             emd += "\n"
         if len(self.who.holding) > 0:
-            emd += "You're holding " + p.join([str(x) for x in self.who.holding])
+            emd += "You're holding " + infl.join([str(x) for x in self.who.holding])
             emd += "\n"
         directional = [
             e for e in self.routes if isinstance(e, movement.DirectionalRoute)
         ]
         if len(directional) > 0:
             directions = [d.direction for d in directional]
-            emd += "You can go " + p.join([str(d) for d in directions])
+            emd += "You can go " + infl.join([str(d) for d in directions])
             emd += "\n"
         return {"title": self.props.name, "description": emd}
 
@@ -148,7 +149,7 @@ class EntitiesObservation(Observation):
         return visitor.entities_observation(self)
 
     def __str__(self):
-        return "observed %s" % (p.join(self.entities),)
+        return "observed %s" % (infl.join(self.entities),)
 
 
 class PersonalObservation(Observation):
