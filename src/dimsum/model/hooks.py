@@ -50,7 +50,7 @@ class Hook:
 
         for registered in hooks:
             if registered.condition:
-                value = get().evaluate(registered.condition)
+                value = registered.condition.applies()
                 if not value:
                     continue
             call = functools.partial(registered.fn, call)

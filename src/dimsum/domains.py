@@ -431,9 +431,6 @@ class WorldCtx(Ctx):
 
         return found
 
-    def evaluate(self, condition: Condition) -> bool:
-        return condition.applies()
-
 
 def flatten(l):
     return [item for sl in l for item in sl]
