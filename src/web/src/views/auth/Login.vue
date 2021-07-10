@@ -1,21 +1,24 @@
 <template>
     <div class="container login">
         <div class="row justify-content-center">
-            <form class="form col-8" @submit.prevent="login">
+            <form class="form col-4" @submit.prevent="login">
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-4">
+                    <label class="col-sm-4 col-form-label">Name</label>
+                    <div class="col-sm-8">
                         <input class="form-control" type="text" v-model="form.name" />
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Password</label>
-                    <div class="col-sm-4">
+                    <label class="col-sm-4 col-form-label">Password</label>
+                    <div class="col-sm-8">
                         <input class="form-control" type="password" v-model="form.password" />
                     </div>
                 </div>
+                <div class="alert alert-danger" v-if="invalidCredentials">Sorry, those don't seem to be valid.</div>
                 <div class="form-group row">
-                    <input class="btn btn-primary" type="submit" value="Login" />
+                    <div class="col-sm-6">
+                        <input class="btn btn-primary" type="submit" value="Login" :disabled="busy" />
+                    </div>
                 </div>
             </form>
         </div>
@@ -28,23 +31,33 @@ import store, { LoginAction } from "@/store";
 
 export default defineComponent({
     name: "Login",
-    components: {},
-    data(): { busy: boolean; form: { name: string; password: string } } {
+    data(): {
+        busy: boolean;
+        form: { name: string; password: string };
+        invalidCredentials: boolean;
+    } {
         return {
             busy: false,
             form: {
                 name: "",
                 password: "",
             },
+            invalidCredentials: false,
         };
     },
     computed: {},
     methods: {
-        login(): Promise<any> {
-            return store.dispatch(new LoginAction(this.form.name, this.form.password)).then(() => {
-                // TODO Take them to where they are.
-                this.$router.push("/");
-            });
+        async login(): Promise<void> {
+            try {
+                this.invalidCredentials = false;
+                this.busy = true;
+                await store.dispatch(new LoginAction(this.form.name, this.form.password));
+                await this.$router.push("/explore");
+            } catch (error) {
+                this.invalidCredentials = true;
+            } finally {
+                this.busy = false;
+            }
         },
     },
 });
