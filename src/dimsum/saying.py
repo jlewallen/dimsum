@@ -4,7 +4,7 @@ import json
 import logging
 from typing import Callable, Dict, List, Optional, Union
 
-from model import Entity, event, Event, Reply, Success, context
+from model import Entity, event, Event, Reply, Success, Renderable, context
 
 import tools
 
@@ -13,7 +13,7 @@ log = logging.getLogger("dimsum")
 
 @event
 @dataclasses.dataclass(frozen=True)
-class DynamicMessage(Event):
+class DynamicMessage(Event, Renderable):
     living: Optional[Entity]
     area: Entity
     heard: Optional[List[Entity]]
@@ -47,14 +47,8 @@ class NotifyAll(Notify):
 
 @dataclasses.dataclass
 class Say:
-    everyone_queue: List[Reply] = dataclasses.field(default_factory=list)
     nearby_queue: List[Reply] = dataclasses.field(default_factory=list)
     player_queue: Dict[Entity, List[Reply]] = dataclasses.field(default_factory=dict)
-
-    def everyone(self, message: Union[Reply, str]):
-        if isinstance(message, str):
-            r = Success(message)
-        self.everyone_queue.append(r)
 
     def nearby(self, message: Union[Reply, str]):
         if isinstance(message, str):
@@ -69,7 +63,10 @@ class Say:
     async def _pub(self, **kwargs):
         await context.get().publish(DynamicMessage(**kwargs))
 
-    async def publish(self, area: Entity, person: Optional[Entity] = None):
+    async def publish(self, entity: Entity, person: Optional[Entity] = None):
+        area = tools.area_of(entity)
+        assert area
+
         for player, queue in self.player_queue.items():
             for e in queue:
                 await self._pub(
@@ -79,6 +76,8 @@ class Say:
                     message=e,
                 )
 
+        self.player_queue = {}
+
         heard = tools.default_heard_for(area)
         for e in self.nearby_queue:
             await self._pub(
@@ -87,3 +86,5 @@ class Say:
                 heard=heard,
                 message=e,
             )
+
+        self.nearby_queue = []

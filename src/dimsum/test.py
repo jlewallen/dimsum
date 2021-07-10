@@ -25,9 +25,9 @@ def create_empty_world():
 class TestWorld:
     def __init__(self, handlers=None):
         self.domain = domains.Domain(handlers=handlers)
-        self.carla_key = None
-        self.jacob_key = None
-        self.tomi_key = None
+        self.carla_key: Optional[str] = None
+        self.jacob_key: Optional[str] = None
+        self.tomi_key: Optional[str] = None
 
     async def to_json(self):
         capture = io.StringIO()

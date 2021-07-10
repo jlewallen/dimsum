@@ -116,8 +116,6 @@ class SimplifiedAction(Action):
                 *args, this=self.entity, person=person, say=say, **kwargs
             )
             if reply:
-                log.debug("say: %s", say)
-                await say.publish(area, person=person)
                 return self._transform_reply(reply)
             return Failure("no reply from handler?")
         except Exception as e:
@@ -363,10 +361,10 @@ async def __ex(t=thunk):
     return CompiledEntityBehavior(simplified, evaluator, declarations)
 
 
+@dataclasses.dataclass
 class Behavior:
-    def __init__(self, world: World, entities: tools.EntitySet):
-        self.world = world
-        self.entities = entities
+    world: World
+    entities: tools.EntitySet
 
     def _get_behaviors(self, e: Entity, c: Entity) -> List[EntityAndBehavior]:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []

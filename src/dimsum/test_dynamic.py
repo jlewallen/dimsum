@@ -61,7 +61,7 @@ async def wiggle(this, person, say):
 
 
 @pytest.mark.asyncio
-async def test_dynamic_say_nearby(caplog):
+async def test_dynamic_language_say_nearby(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
@@ -78,7 +78,18 @@ async def jingle(this, person, say):
     )
 
     await tw.success("hold Keys")
+
+    received: List[Renderable] = []
+
+    async def handle_message(item: Renderable):
+        received.append(item)
+
+    assert tw.jacob_key
+    subscription = tw.domain.subscriptions.subscribe(tw.jacob_key, handle_message)
+    assert len(received) == 0
+
     await tw.success("jingle")
+    assert len(received) == 1
 
 
 @pytest.mark.asyncio
@@ -497,3 +508,36 @@ def never_enter(resume, person, area):
     await tw.success("go south")
     await tw.success("hold keys")
     await tw.failure("go north")
+
+
+@pytest.mark.asyncio
+async def test_dynamic_received_say_nearby(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    hammer = await tw.add_behaviored_thing(
+        tw,
+        "Keys",
+        """
+@received(TickEvent)
+async def make_noise(this, say):
+    say.nearby("you hear an annoying buzzing sound")
+    return ok()
+""",
+    )
+
+    received: List[Renderable] = []
+
+    async def handle_message(item: Renderable):
+        received.append(item)
+
+    assert tw.jacob_key
+    subscription = tw.domain.subscriptions.subscribe(tw.jacob_key, handle_message)
+    assert len(received) == 0
+
+    with tw.domain.session() as session:
+        await session.prepare()
+        await session.tick(10)
+        await session.save()
+
+    assert len(received) == 1

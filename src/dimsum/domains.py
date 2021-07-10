@@ -73,7 +73,6 @@ class Session:
         self.world: Optional[World] = None
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = Registrar()
-        self.saying = saying.Say()
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
@@ -181,13 +180,15 @@ class Session:
 
         with WorldCtx(session=self, person=person, **kwargs) as ctx:
             try:
-                return await action.perform(
+                reply = await action.perform(
                     world=world,
                     area=area,
                     person=person,
                     ctx=ctx,
-                    say=self.saying,
+                    say=ctx.say,
                 )
+                await ctx.complete()
+                return reply
             except EntityFrozen:
                 return Failure("whoa, that's frozen")
 
@@ -217,6 +218,7 @@ class Session:
                     log.info("everywhere: %s", entity)
                     with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
                         await ctx.notify(ev)
+                        await ctx.complete()
 
     async def add_area(
         self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -312,8 +314,10 @@ class WorldCtx(Ctx):
         self.session = session
         self.world: World = session.world
         self.person = person
+        self.reference = person or entity
         self.bus = session.bus
         self.entities: tools.EntitySet = self._get_default_entity_set(entity)
+        self.say = saying.Say()
 
     def _get_default_entity_set(self, entity: Optional[Entity]) -> tools.EntitySet:
         assert self.world
@@ -359,13 +363,15 @@ class WorldCtx(Ctx):
             a = (self.person, area, []) + args
             await self.publish(klass(*a, **kwargs))
 
-    async def notify(self, ev: Event):
+    async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify=%s entities=%s", ev, self.entities)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        await dynamic_behavior.notify(
-            saying.NotifyAll(ev.name, ev), say=self.session.saying
-        )
+        await dynamic_behavior.notify(saying.NotifyAll(ev.name, ev), say=self.say)
+
+    async def complete(self):
+        assert self.reference
+        await self.say.publish(self.reference)
 
     async def publish(self, ev: Event):
         assert self.world
