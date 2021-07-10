@@ -6,7 +6,6 @@ import time
 import jsondiff
 import shortuuid
 import stringcase
-import wrapt
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 from .crypto import Identity, generate
@@ -47,28 +46,6 @@ class EntityRef:
         assert name
         assert pyObject
         return EntityRef(key, klass, name, pyObject)
-
-
-class EntityProxy(wrapt.ObjectProxy):
-    def __init__(self, ref: EntityRef):
-        super().__init__(ref)
-        self._self_ref = ref
-
-    def __getattr__(self, *arg):
-        if self.__wrapped__ is None:
-            log.info("self.None __getattr__: %s %s", arg, self._self_ref)
-        return super().__getattr__(*arg)
-
-    def __deepcopy__(self, memo):
-        return copy.deepcopy(self.__wrapped__, memo)
-
-    def __repr__(self) -> str:
-        assert self.__wrapped__
-        return str(self.__wrapped__)
-
-    def __str__(self) -> str:
-        assert self.__wrapped__
-        return str(self.__wrapped__)
 
 
 class IgnoreExtraConstructorArguments:

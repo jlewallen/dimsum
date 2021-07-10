@@ -3,6 +3,7 @@ import dataclasses
 import copy
 import enum
 import jsonpickle
+import wrapt
 from typing import Callable, Dict, List, Optional
 
 import storage
@@ -16,7 +17,6 @@ from model import (
     EntityUpdate,
     Keys,
     EntityRef,
-    EntityProxy,
 )
 import scopes.movement as movement
 
@@ -46,6 +46,28 @@ class Identities(enum.Enum):
     PRIVATE = 1
     PUBLIC = 2
     HIDDEN = 3
+
+
+class EntityProxy(wrapt.ObjectProxy):
+    def __init__(self, ref: EntityRef):
+        super().__init__(ref)
+        self._self_ref = ref
+
+    def __getattr__(self, *arg):
+        if self.__wrapped__ is None:
+            log.info("self.None __getattr__: %s %s", arg, self._self_ref)
+        return super().__getattr__(*arg)
+
+    def __deepcopy__(self, memo):
+        return copy.deepcopy(self.__wrapped__, memo)
+
+    def __repr__(self) -> str:
+        assert self.__wrapped__
+        return str(self.__wrapped__)
+
+    def __str__(self) -> str:
+        assert self.__wrapped__
+        return str(self.__wrapped__)
 
 
 @jsonpickle.handlers.register(Version, base=True)
