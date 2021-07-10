@@ -14,7 +14,7 @@ log = logging.getLogger("dimsum")
 @event
 @dataclasses.dataclass(frozen=True)
 class DynamicMessage(Event, Renderable):
-    living: Optional[Entity]
+    source: Entity
     area: Entity
     heard: Optional[List[Entity]]
     message: Reply
@@ -63,14 +63,14 @@ class Say:
     async def _pub(self, **kwargs):
         await context.get().publish(DynamicMessage(**kwargs))
 
-    async def publish(self, entity: Entity, person: Optional[Entity] = None):
-        area = tools.area_of(entity)
+    async def publish(self, source: Entity):
+        area = tools.area_of(source)
         assert area
 
         for player, queue in self.player_queue.items():
             for e in queue:
                 await self._pub(
-                    living=person,
+                    source=source,
                     area=area,
                     heard=[player],
                     message=e,
@@ -81,7 +81,7 @@ class Say:
         heard = tools.default_heard_for(area)
         for e in self.nearby_queue:
             await self._pub(
-                living=person,
+                source=source,
                 area=area,
                 heard=heard,
                 message=e,
