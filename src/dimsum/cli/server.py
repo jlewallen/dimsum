@@ -3,7 +3,7 @@ import asyncio
 import uvicorn
 import asyncclick as click
 import ariadne.asgi
-from typing import List
+from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
@@ -46,6 +46,11 @@ def commands():
     type=click.Path(),
 )
 @click.option(
+    "--session-key",
+    default=None,
+    help="Session key.",
+)
+@click.option(
     "--conf",
     help="Configuration file.",
     type=click.Path(exists=True),
@@ -77,6 +82,7 @@ def commands():
 )
 async def server(
     database: str,
+    session_key: Optional[str],
     conf: str,
     read: List[str],
     write: List[str],
@@ -94,8 +100,10 @@ async def server(
     if read or write:
         cfg = config.Configuration(
             persistence=config.Persistence(read=read, write=write),
-            session_key=config.generate_session_key(),
+            session_key=session_key or config.generate_session_key(),
         )
+    else:
+        cfg.session_key = session_key or config.generate_session_key()
 
     domain = cfg.make_domain()
     schema = schema_factory.create()

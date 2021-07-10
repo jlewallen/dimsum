@@ -25,11 +25,29 @@ function getWebsocketsUrl() {
 }
 
 type OnReceivedFunc = (item: unknown) => Promise<void>;
+type OnConnectedFunc = () => Promise<void>;
+type OnDisconnectedFunc = () => Promise<void>;
 
-export async function subscribe(headers: { [index: string]: string }, onReceived: OnReceivedFunc) {
+export async function subscribe(
+    headers: { [index: string]: string },
+    token: string,
+    onReceived: OnReceivedFunc,
+    onConnected: OnConnectedFunc,
+    onDisconnected: OnDisconnectedFunc
+) {
     const wsUrl = getWebsocketsUrl();
     const subscriptionClient = new SubscriptionClient(wsUrl, {
         reconnect: true,
+        connectionParams: {
+            authToken: token,
+        },
+        connectionCallback: () => {
+            onConnected();
+        },
+    });
+
+    subscriptionClient.on("disconnected", () => {
+        onDisconnected();
     });
 
     const link = new WebSocketLink(subscriptionClient);
@@ -39,13 +57,16 @@ export async function subscribe(headers: { [index: string]: string }, onReceived
     });
 
     const asGql = gql`
-        subscription {
-            nearby(evaluator: "jlewallen")
+        subscription nearby($token: String) {
+            nearby(token: $token)
         }
     `;
 
     const s = cc.subscribe({
         query: asGql,
+        variables: {
+            token: token,
+        },
     });
 
     s.subscribe({

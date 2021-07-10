@@ -45,7 +45,7 @@ type Query {
 }
 
 type Subscription {
-  nearby(evaluator: Key): [Reply!]
+  nearby(evaluator: Key, token: String): [Reply!]
 }
 
 input Credentials {

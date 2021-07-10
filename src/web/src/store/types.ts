@@ -13,7 +13,9 @@ export function getObjectType(something: Record<string, unknown>) {
 
 export class RootState {
     authenticated = false;
+    connected = false;
     key = "";
+    token = "";
     headers: { [index: string]: string } = {};
     entities: { [index: string]: Entity } = {};
     areas: { [index: string]: Area } = {};
@@ -44,6 +46,8 @@ export enum MutationTypes {
     ENTITIES = "ENTITIES",
     REPLY = "REPLY",
     REMOVE_HISTORY_ENTRY = "REMOVE_HISTORY_ENTRY",
+    CONNECTED = "CONNECTED",
+    DISCONNECTED = "DISCONNECTED",
 }
 
 export class LoadingAction {

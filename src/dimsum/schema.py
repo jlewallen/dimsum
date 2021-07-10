@@ -100,8 +100,21 @@ class EntityResolver:
         )
 
 
+def verify_token(info) -> Optional[str]:
+    if info.context.request is None:
+        return None
+    headers = info.context.request.headers
+    if "Authorization" not in headers:
+        # raise Exception("unauthorized (header)")
+        return None
+    token = headers["Authorization"].split(" ")[1]
+    decoded = jwt.decode(token, info.context.cfg.session_key, algorithms=["HS256"])
+    return decoded["key"]
+
+
 @query.field("world")
 async def resolve_world(obj, info):
+    verify_token(info)
     domain = info.context.domain
     log.info("ariadne:world")
     with domain.session() as session:
@@ -128,6 +141,7 @@ def flatten(l):
 
 @query.field("entities")
 async def resolve_entities(obj, info, keys, reach: int = 0, identities=True):
+    verify_token(info)
     domain = info.context.domain
     info.context.identities = (
         serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
@@ -143,6 +157,7 @@ async def resolve_entities(obj, info, keys, reach: int = 0, identities=True):
 
 @query.field("entitiesByKey")
 async def resolve_entities_by_key(obj, info, key, reach: int = 0, identities=True):
+    verify_token(info)
     domain = info.context.domain
     info.context.identities = (
         serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
@@ -154,6 +169,7 @@ async def resolve_entities_by_key(obj, info, key, reach: int = 0, identities=Tru
 
 @query.field("entitiesByGid")
 async def resolve_entities_by_gid(obj, info, gid, reach: int = 0, identities=True):
+    verify_token(info)
     domain = info.context.domain
     info.context.identities = (
         serializing.Identities.PRIVATE if identities else serializing.Identities.HIDDEN
@@ -165,6 +181,7 @@ async def resolve_entities_by_gid(obj, info, gid, reach: int = 0, identities=Tru
 
 @query.field("areas")
 async def resolve_areas(obj, info):
+    verify_token(info)
     domain = info.context.domain
     log.info("ariadne:areas")
     with domain.session() as session:
@@ -176,6 +193,7 @@ async def resolve_areas(obj, info):
 
 @query.field("people")
 async def resolve_people(obj, info):
+    verify_token(info)
     domain = info.context.domain
     log.info("ariadne:people")
     with domain.session() as session:
@@ -189,7 +207,19 @@ subscription = ariadne.SubscriptionType()
 
 
 @subscription.source("nearby")
-async def nearby_generator(obj, info, evaluator: str):
+async def nearby_generator(
+    obj, info, evaluator: Optional[str] = None, token: Optional[str] = None
+):
+    assert token
+
+    decoded = jwt.decode(token, info.context.cfg.session_key, algorithms=["HS256"])
+
+    log.info("decoded=%s", decoded)
+
+    evaluator = decoded["key"]
+
+    log.info("evaluator=%s", evaluator)
+
     q: asyncio.Queue = asyncio.Queue()
     subscriptions = info.context.domain.subscriptions
 
@@ -206,7 +236,9 @@ async def nearby_generator(obj, info, evaluator: str):
 
 
 @subscription.field("nearby")
-def nearby_resolver(item, info, evaluator: str):
+def nearby_resolver(
+    item, info, evaluator: Optional[str] = None, token: Optional[str] = None
+):
     log.debug("resolver %s", item)
     return [serialize_reply(item)]
 
@@ -312,13 +344,15 @@ class Evaluation:
 
 @mutation.field("language")
 async def resolve_language(obj, info, criteria):
+    auth_key = verify_token(info)
     domain = info.context.domain
     lqc = make_language_query_criteria(**criteria)
+    evaluator = auth_key or lqc.evaluator
     log.info("ariadne:language criteria=%s", lqc)
 
     with domain.session() as session:
         log.debug("materialize player")
-        player = await session.materialize(key=lqc.evaluator)
+        player = await session.materialize(key=evaluator)
         assert player
         log.debug("materialize world")
         w = await session.materialize(key=Key)
@@ -329,7 +363,7 @@ async def resolve_language(obj, info, criteria):
         async def send_entities(entities: List[EntityResolver]):
             subscriptions = info.context.domain.subscriptions
             await subscriptions.somebody(
-                lqc.evaluator,
+                evaluator,
                 Updated(
                     entities=[
                         dict(key=row.key(info), serialized=row.serialized(info))
@@ -337,6 +371,10 @@ async def resolve_language(obj, info, criteria):
                     ]
                 ),
             )
+
+        log.info(
+            "ariadne:language materialized=%d", len(session.registrar.entities.values())
+        )
 
         entities = [
             EntityResolver(session, e)
@@ -377,6 +415,7 @@ class Template:
 
 @mutation.field("create")
 async def resolve_create(obj, info, entities):
+    auth_key = verify_token(info)
     domain = info.context.domain
     templates = [Template(**e) for e in entities]
     key_space = "key-space"
@@ -420,6 +459,7 @@ async def resolve_evaluation_entities(obj, info):
 
 @mutation.field("makeSample")
 async def makeSample(obj, info):
+    auth_key = verify_token(info)
     domain = info.context.domain
     log.info("ariadne:make-sample")
 
@@ -443,6 +483,7 @@ async def makeSample(obj, info):
 
 @mutation.field("update")
 async def update(obj, info, entities):
+    verify_token(info)
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
 

@@ -50,18 +50,31 @@ export default createStore<RootState>({
                 const auth = JSON.parse(raw);
                 state.authenticated = true;
                 state.headers = auth.headers;
+                state.token = auth.token;
                 state.key = auth.key;
             }
         },
+        [MutationTypes.CONNECTED]: (state: RootState) => {
+            state.connected = true;
+        },
+        [MutationTypes.DISCONNECTED]: (state: RootState) => {
+            state.connected = false;
+        },
         [MutationTypes.AUTH]: (state: RootState, auth: Auth | null) => {
             if (auth) {
-                state.headers["Authorization"] = `Bearer ${auth.token}`;
                 state.key = auth.key;
+                state.headers["Authorization"] = `Bearer ${auth.token}`;
+                state.token = auth.token;
                 state.authenticated = true;
-                window.localStorage["dimsum:auth"] = JSON.stringify({ key: auth.key, headers: state.headers });
+                window.localStorage["dimsum:auth"] = JSON.stringify({
+                    key: auth.key,
+                    headers: state.headers,
+                    token: auth.token,
+                });
             } else {
-                state.headers = {};
                 state.key = "";
+                state.headers = {};
+                state.token = "";
                 state.authenticated = false;
                 delete window.localStorage["dimsum:auth"];
             }
@@ -142,13 +155,23 @@ export default createStore<RootState>({
         [ActionTypes.LOADING]: async ({ state, commit }: ActionParameters) => {
             const api = getApi(state.headers);
 
-            await subscribe(state.headers, async (received) => {
-                const reply = received as { nearby: { rendered: string; model: string }[] };
-                for (const nearby of reply.nearby) {
-                    const parsed = JSON.parse(nearby.model);
-                    commit(MutationTypes.REPLY, { reply: parsed });
+            await subscribe(
+                state.headers,
+                state.token,
+                async (received) => {
+                    const reply = received as { nearby: { rendered: string; model: string }[] };
+                    for (const nearby of reply.nearby) {
+                        const parsed = JSON.parse(nearby.model);
+                        commit(MutationTypes.REPLY, { reply: parsed });
+                    }
+                },
+                async () => {
+                    commit(MutationTypes.CONNECTED);
+                },
+                async () => {
+                    commit(MutationTypes.DISCONNECTED);
                 }
-            });
+            );
         },
         [ActionTypes.REFRESH_ENTITY]: async ({ state, commit }: ActionParameters, payload: RefreshEntityAction) => {
             if (state.entities[payload.key]) {

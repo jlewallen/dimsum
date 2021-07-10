@@ -13,6 +13,9 @@ export default defineComponent({
         HistoryEntries,
     },
     computed: {
+        connected(): boolean {
+            return store.state.connected;
+        },
         entries(): ReplResponse[] {
             return store.state.responses;
         },
@@ -24,13 +27,16 @@ export default defineComponent({
         length(after: number, before: number): void {
             this.$emit("scroll-bottom");
         },
+        connected(after: boolean, before: boolean): void {
+            if (after) {
+                if (this.length == 0) {
+                    void store.dispatch(new ReplAction("look"));
+                }
+            }
+        },
     },
     async mounted(): Promise<void> {
-        if (this.length == 0) {
-            await store.dispatch(new ReplAction("look"));
-        } else {
-            this.$emit("scroll-bottom");
-        }
+        this.$emit("scroll-bottom");
         this.$emit("resume-repl");
     },
     methods: {},
