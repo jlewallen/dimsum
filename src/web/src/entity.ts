@@ -37,6 +37,13 @@ export interface InteractiveReply {
     information: false;
 }
 
+export interface Universal {
+    interactive: false;
+    information: false;
+    f: string;
+    kwargs: Record<string, any>;
+}
+
 export interface ReplResponse {
     reply:
         | { interactive: false; information: boolean; entities?: { key: string; serialized: string }[] }
@@ -46,7 +53,8 @@ export interface ReplResponse {
         | PersonalObservation
         | Success
         | Failure
-        | InteractiveReply;
+        | InteractiveReply
+        | Universal;
 }
 
 export type PropertyMap = { [index: string]: any };

@@ -27,7 +27,7 @@
                             </span>
                         </li>
                     </ul>
-                    <form class="form-inline my-2 my-lg-0">
+                    <form class="form-inline my-2 my-lg-0" v-show="false">
                         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
                         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                     </form>
@@ -65,6 +65,14 @@ export default defineComponent({
         isObscured(): boolean {
             return store.state.interactables.length > 0;
         },
+    },
+    created() {
+        window.addEventListener("keyup", (data) => {
+            if (data.key == " ") {
+                console.log("keyup.space");
+                this.resumeRepl();
+            }
+        });
     },
     mounted(): Promise<void> {
         this.busy = true;

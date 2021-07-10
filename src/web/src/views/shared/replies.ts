@@ -7,6 +7,7 @@ import EntitiesObservation from "./EntitiesObservation.vue";
 import Success from "./Success.vue";
 import Failure from "./Failure.vue";
 import DefaultReply from "./DefaultReply.vue";
+import { Universal } from "@/entity";
 import { CommonComponents } from "./index";
 
 const CommonProps = {
@@ -88,10 +89,64 @@ const DynamicMessage = defineComponent({
     template: `<div class="response dynamic">{{ reply.message.message }} (from {{ reply.source.name }})</div>`,
 });
 
+const UniversalString = defineComponent({
+    name: "UniversalString",
+    props: { value: { type: String, required: true } },
+    template: `<span>{{ value }}</span>`,
+});
+
+const UniversalLink = defineComponent({
+    name: "UniversalLink",
+    props: { value: { type: String, required: true } },
+    template: `<a :href="value">{{ simple }}</a>`,
+    computed: {
+        simple(): string {
+            const i = this.value.indexOf("?");
+            if (i < 0) {
+                return this.value;
+            }
+            return this.value.substring(0, i);
+        },
+    },
+});
+
+function render(value: string): { view: unknown; value: string } {
+    if (value.indexOf("http") == 0) {
+        return { view: UniversalLink, value: value.toString() };
+    }
+    return { view: UniversalString, value: value.toString() };
+}
 const Universal = defineComponent({
     name: "Universal",
-    props: CommonProps,
-    template: `<div class="response universal">{{ reply.f }} {{ reply.kwargs }}</div>`,
+    props: {
+        reply: {
+            type: Object as () => Universal,
+            required: true,
+        },
+    },
+    template: `<div class="response universal">
+	<template v-for="(p, i) in parsed" v-bind:key="i">
+		<component :is="p.view" :value="p.value" />
+	</template>
+</div>`,
+    computed: {
+        parsed(): { view: unknown; value: string }[] {
+            if (this.reply && this.reply.f && this.reply.kwargs) {
+                const re = /(%\([^{}]*\)s)/g;
+                const broken = this.reply.f.split(re).map((part) => {
+                    const m = part.match(/%\(([^{}]*)\)s/);
+                    if (m) {
+                        return render(this.reply.kwargs[m[1]]);
+                    } else {
+                        return { view: UniversalString, value: part };
+                    }
+                });
+                console.log("parsed", broken);
+                return broken;
+            }
+            return [];
+        },
+    },
 });
 
 export default {
