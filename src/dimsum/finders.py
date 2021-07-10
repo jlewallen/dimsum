@@ -2,7 +2,7 @@ import logging
 import copy
 from typing import List, Optional
 
-from model import Entity, Scope, Common, context
+from model import Entity, Scope, Common, ItemFinder, ItemFactory, context
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -10,34 +10,6 @@ import scopes.occupyable as occupyable
 import scopes
 
 log = logging.getLogger("dimsum.model")
-
-
-class ItemFinder:
-    async def find_item(self, **kwargs) -> Optional[Entity]:
-        raise NotImplementedError
-
-
-class FindNone(ItemFinder):
-    async def find_item(self, **kwargs) -> Optional[Entity]:
-        return None
-
-
-class StaticItem(ItemFinder):
-    def __init__(self, item: Optional[Entity] = None, **kwargs):
-        super().__init__()
-        self.item = item
-
-    async def find_item(self, **kwargs) -> Optional[Entity]:
-        return self.item
-
-
-class ObjectNumber(ItemFinder):
-    def __init__(self, number: int, **kwargs):
-        super().__init__()
-        self.number = number
-
-    async def find_item(self, **kwargs) -> Optional[Entity]:
-        return await context.get().find_item(number=self.number, **kwargs)
 
 
 class AnyItem(ItemFinder):
@@ -175,15 +147,6 @@ class FindHeldContainer(ItemFinder):
         return None
 
 
-class CurrentArea(ItemFinder):
-    async def find_item(
-        self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
-    ) -> Optional[Entity]:
-        assert person
-        assert area
-        return area
-
-
 class ContainedItem(ItemFinder):
     def __init__(self, q: str = ""):
         super().__init__()
@@ -220,11 +183,6 @@ class MaybeItemOrRecipe:
                 return RecipeItem(recipe).create_item(person=person, **kwargs)
 
         return MaybeItem(self.q).create_item(person=person, **kwargs)
-
-
-class ItemFactory:
-    def create_item(self, **kwargs) -> Entity:
-        raise NotImplementedError
 
 
 class MaybeItem(ItemFactory):

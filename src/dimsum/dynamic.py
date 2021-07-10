@@ -31,6 +31,7 @@ from model import (
     Condition,
     AlwaysTrue,
     All,
+    ItemFinder,
 )
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -94,9 +95,9 @@ class SimplifiedAction(Action):
         return r
 
     async def _transform_arg(
-        self, arg: finders.ItemFinder, world: World, person: Entity, ctx: Ctx
+        self, arg: ItemFinder, world: World, person: Entity, ctx: Ctx
     ) -> Optional[Entity]:
-        assert isinstance(arg, finders.ItemFinder)
+        assert isinstance(arg, ItemFinder)
         return await ctx.apply_item_finder(person, arg)
 
     async def _args(self, world: World, person: Entity, ctx: Ctx) -> List[Any]:

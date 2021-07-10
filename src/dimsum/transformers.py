@@ -1,7 +1,7 @@
 import dataclasses
 import lark
 
-from model import Entity, World
+from model import Entity, World, FindObjectByGid
 import finders as finders
 import scopes.movement as movement
 
@@ -53,7 +53,7 @@ class Base(lark.Transformer):
         return finders.AnyItem(str(args[0]))
 
     def object_by_gid(self, args):
-        return finders.ObjectNumber(int(args[0]))
+        return FindObjectByGid(int(args[0]))
 
     def consumable_noun(self, args):
         return finders.AnyConsumableItem(q=str(args[0]))

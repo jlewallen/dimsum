@@ -154,7 +154,7 @@ class Grammar(grammars.Grammar):
 
 class Transformer(transformers.Base):
     def here(self, args):
-        return CurrentArea()
+        return FindCurrentArea()
 
     def edit_entity(self, args):
         return EditEntity(args[0])

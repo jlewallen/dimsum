@@ -3,8 +3,7 @@ import logging
 import asyncio
 from typing import Any, Callable, Dict, List, Union
 
-from model import Event
-from model import Comms, Renderable
+from model import Event, Comms, Renderable
 
 log = logging.getLogger("dimsum.bus")
 

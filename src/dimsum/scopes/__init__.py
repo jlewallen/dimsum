@@ -10,7 +10,6 @@ import scopes.mechanics as mechanics
 import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes.ownership as ownership
-import scopes
 
 log = logging.getLogger("dimsum.scopes")
 
