@@ -7,8 +7,6 @@ from model.kinds import Kind
 from model.properties import (
     Common,
     Map,
-    SumFields,
-    merge_dictionaries,
 )
 from model.conditions import Condition, AlwaysTrue
 from model.properties import (
@@ -61,7 +59,6 @@ __all__: List[str] = [
     "Failure",
     "Identity",
     "Kind",
-    "generate_entity_identity",
     "Entity",
     "Version",
     "EntityRef",
@@ -80,8 +77,6 @@ __all__: List[str] = [
     "Kind",
     "Common",
     "Map",
-    "SumFields",
-    "merge_dictionaries",
     "Worn",
     "Eaten",
     "Drank",
@@ -103,6 +98,7 @@ __all__: List[str] = [
     "Observation",
     "HoldingActivity",
     "hooks",
+    "generate_entity_identity",
     "set_entity_keys_provider",
     "set_entity_identities_provider",
     "set_entity_cleanup_handler",

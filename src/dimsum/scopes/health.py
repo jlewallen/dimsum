@@ -2,10 +2,36 @@ import dataclasses
 import logging
 from typing import Optional
 
-from model import Entity, Scope, Event, SumFields, merge_dictionaries
+from model import Entity, Scope, Event
 import scopes.carryable as carryable
 
 log = logging.getLogger("dimsum.scopes")
+
+
+class FieldMergeStrategy:
+    def __init__(self, name: str):
+        self.name = name
+
+    def merge(self, old_value, new_value):
+        return old_value
+
+
+class SumFields(FieldMergeStrategy):
+    def merge(self, old_value, new_value):
+        if not old_value:
+            return new_value
+        if not new_value:
+            return old_value
+        return float(old_value) + float(new_value)
+
+
+def merge_dictionaries(left, right, fields):
+    merged = {}
+    for field in fields:
+        old_value = left[field.name] if field.name in left else None
+        new_value = right[field.name] if field.name in right else None
+        merged[field.name] = field.merge(old_value, new_value)
+    return merged
 
 
 NutritionFields = [
