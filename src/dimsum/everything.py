@@ -35,12 +35,9 @@ log = logging.getLogger("dimsum")
 
 class EntityHooks(Hooks):
     def describe(self, entity: Entity) -> str:
-        if entity.klass == RootEntityClass:
+        if entity.klass in (RootEntityClass, scopes.LivingClass, scopes.AreaClass):
             return "{0} (#{1})".format(entity.props.name, entity.props.gid)
-        if entity.klass == scopes.LivingClass:
-            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
-        if entity.klass == scopes.AreaClass:
-            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
+
         if entity.has(carryable.Carryable):
             with entity.make_and_discard(carryable.Carryable) as carry:
                 if carry.quantity > 1:
@@ -52,6 +49,7 @@ class EntityHooks(Hooks):
                         infl.plural(entity.props.name, carry.quantity),
                         entity.props.gid,
                     )
+
         return "{0} (#{1})".format(infl.a(entity.props.name), entity.props.gid)
 
     def cleanup(self, entity: Entity, world: Optional[World] = None, **kwargs):
