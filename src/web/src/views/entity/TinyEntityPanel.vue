@@ -1,9 +1,6 @@
 <template>
     <div class="entity" v-on:click="() => onSelected(entity)" v-bind:class="entityToClass(entity)">
-        <template v-if="entity.quantity == 1">
-            {{ entity.props.map.name.value }}
-        </template>
-        <template v-else>{{ entity.quantity }} {{ entity.props.map.name.value }}</template>
+        {{ entity.props.map.described.value }}
     </div>
 </template>
 

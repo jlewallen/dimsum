@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Login from "../views/auth/Login.vue";
 import Logout from "../views/auth/Logout.vue";
-import GeneralView from "../views/entity/GeneralView.vue";
+import EntityView from "../views/entity/EntityView.vue";
 import ExploreView from "../views/explore/ExploreView.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: "/entities/:key",
         name: "entity",
-        component: GeneralView,
+        component: EntityView,
     },
     {
         path: "/explore",
