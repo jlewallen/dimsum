@@ -168,9 +168,9 @@ export default createStore<RootState>({
             }
 
             await subscribe(state.headers, async (received) => {
-                const reply = received as { nearby: string[] };
+                const reply = received as { nearby: { rendered: string; model: string }[] };
                 for (const nearby of reply.nearby) {
-                    const parsed = JSON.parse(nearby);
+                    const parsed = JSON.parse(nearby.model);
                     commit(MutationTypes.REPLY, { reply: parsed });
                 }
             });

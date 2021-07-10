@@ -27,9 +27,6 @@ class DynamicMessage(Event, Renderable):
     heard: Optional[List[Entity]]
     message: Reply
 
-    def render_tree(self) -> Dict[str, Any]:
-        return json.loads(json.dumps(self.message))  # TODO json fuckery
-
 
 class Notify:
     @abc.abstractmethod

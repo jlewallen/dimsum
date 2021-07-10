@@ -7,9 +7,8 @@ log = logging.getLogger("dimsum.visual")
 
 
 class Renderable:
-    # @abc.abstractmethod
     def render_tree(self) -> Dict[str, Any]:
-        raise NotImplementedError
+        return {"unimplemented": True}
 
 
 @dataclasses.dataclass
