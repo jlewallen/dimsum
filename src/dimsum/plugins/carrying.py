@@ -64,7 +64,7 @@ class Drop(PersonAction):
         item = None
 
         if self.item:
-            item = await world.apply_item_finder(person, self.item)
+            item = await ctx.apply_item_finder(person, self.item)
             if not item:
                 return Failure("drop what?")
 
@@ -113,7 +113,7 @@ class Hold(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("sorry, hold what?")
 
@@ -162,7 +162,7 @@ class Open(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("open what?")
 
@@ -188,7 +188,7 @@ class Close(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("close what?")
 
@@ -223,11 +223,11 @@ class Lock(PersonAction):
     ):
         area = await find_entity_area(person)
 
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("what?")
 
-        maybe_key = await world.apply_item_finder(person, self.key, exclude=[item])
+        maybe_key = await ctx.apply_item_finder(person, self.key, exclude=[item])
 
         with person.make(carryable.Containing) as hands:
             with item.make(carryable.Containing) as locking:
@@ -262,12 +262,12 @@ class Unlock(PersonAction):
     ):
         area = await find_entity_area(person)
 
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("unlock what?")
 
         log.info("finding key %s", self.key)
-        maybe_key = await world.apply_item_finder(person, self.key, exclude=[item])
+        maybe_key = await ctx.apply_item_finder(person, self.key, exclude=[item])
         log.info("maybe key: %s", maybe_key)
 
         with item.make(carryable.Containing) as unlocking:
@@ -295,7 +295,7 @@ class PutInside(PersonAction):
     ):
         area = await find_entity_area(person)
 
-        container = await world.apply_item_finder(person, self.container)
+        container = await ctx.apply_item_finder(person, self.container)
         if not container:
             return Failure("what?")
 
@@ -303,7 +303,7 @@ class PutInside(PersonAction):
             if not containing.can_hold():
                 return Failure("inside... that?")
 
-            item = await world.apply_item_finder(person, self.item)
+            item = await ctx.apply_item_finder(person, self.item)
             if not item:
                 return Failure("what?")
 
@@ -333,7 +333,7 @@ class TakeOut(PersonAction):
     ):
         area = await find_entity_area(person)
 
-        container = await world.apply_item_finder(person, self.container)
+        container = await ctx.apply_item_finder(person, self.container)
         if not container:
             return Failure("what?")
 
@@ -341,7 +341,7 @@ class TakeOut(PersonAction):
             if not containing.can_hold():
                 return Failure("outside of... that?")
 
-            item = await world.apply_item_finder(person, self.item)
+            item = await ctx.apply_item_finder(person, self.item)
             if not item:
                 return Failure("what?")
 
@@ -377,11 +377,11 @@ class Pour(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        source = await world.apply_item_finder(person, self.source)
+        source = await ctx.apply_item_finder(person, self.source)
         if not source:
             return Failure("from what?")
 
-        destination = await world.apply_item_finder(
+        destination = await ctx.apply_item_finder(
             person, self.destination, exclude=[source]
         )
         if not destination:
@@ -431,7 +431,7 @@ class ModifyPours(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("nothing to modify")
 
@@ -458,7 +458,7 @@ class ModifyCapacity(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("nothing to modify")
         item.try_modify()

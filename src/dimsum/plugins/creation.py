@@ -91,7 +91,7 @@ class Make(PersonAction):
     ):
         item: Optional[Entity] = None
         if self.item:
-            item = await world.apply_item_finder(person, self.item)
+            item = await ctx.apply_item_finder(person, self.item)
 
         if self.template:
             item = self.template.create_item(
@@ -174,7 +174,7 @@ class CallThis(PersonAction):
         ctx: Ctx,
         **kwargs,
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("you don't have anything")
 

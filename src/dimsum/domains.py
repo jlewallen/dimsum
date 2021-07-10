@@ -435,6 +435,20 @@ class WorldCtx(Ctx):
 
         return found
 
+    async def apply_item_finder(
+        self, person: Entity, finder, **kwargs
+    ) -> Optional[Entity]:
+        assert person
+        assert finder
+        area = await find_entity_area(person)
+        log.info("applying finder:%s %s", finder, kwargs)
+        found = await finder.find_item(area=area, person=person, world=self, **kwargs)
+        if found:
+            log.info("found: {0}".format(found))
+        else:
+            log.info("found: nada")
+        return found
+
 
 def flatten(l):
     return [item for sl in l for item in sl]

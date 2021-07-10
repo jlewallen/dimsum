@@ -16,6 +16,7 @@ from model import (
     Entity,
     Scope,
     World,
+    Ctx,
     Common,
     StandardEvent,
     Reply,
@@ -93,25 +94,26 @@ class SimplifiedAction(Action):
         return r
 
     async def _transform_arg(
-        self, arg: finders.ItemFinder, world: World, person: Entity
+        self, arg: finders.ItemFinder, world: World, person: Entity, ctx: Ctx
     ) -> Optional[Entity]:
         assert isinstance(arg, finders.ItemFinder)
-        return await world.apply_item_finder(person, arg)
+        return await ctx.apply_item_finder(person, arg)
 
-    async def _args(self, world: World, person: Entity) -> List[Any]:
-        return [await self._transform_arg(a, world, person) for a in self.args]
+    async def _args(self, world: World, person: Entity, ctx: Ctx) -> List[Any]:
+        return [await self._transform_arg(a, world, person, ctx) for a in self.args]
 
     async def perform(
         self,
         world: World,
         area: Entity,
         person: Entity,
+        ctx: Ctx,
         say: Optional[saying.Say] = None,
         **kwargs,
     ):
         assert say
         try:
-            args = await self._args(world, person)
+            args = await self._args(world, person, ctx)
             reply = await self.registered.handler(
                 *args, this=self.entity, person=person, say=say, **kwargs
             )

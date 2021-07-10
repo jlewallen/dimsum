@@ -35,7 +35,7 @@ class Wear(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("wear what?")
 
@@ -70,7 +70,7 @@ class Remove(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("remove what?")
 

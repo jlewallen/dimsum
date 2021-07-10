@@ -40,6 +40,12 @@ class Ctx:
     async def find_item(self, **kwargs) -> Optional[Entity]:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def apply_item_finder(
+        self, person: Entity, finder, **kwargs
+    ) -> Optional[Entity]:
+        raise NotImplementedError
+
 
 def get() -> Ctx:
     ctx = world_ctx.get()

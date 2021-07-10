@@ -58,7 +58,7 @@ class Tell(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        who = await world.apply_item_finder(person, self.who)
+        who = await ctx.apply_item_finder(person, self.who)
         if who:
             await ctx.publish(
                 PlayerTold(source=person, area=area, heard=[who], message=self.message)

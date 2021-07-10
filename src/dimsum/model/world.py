@@ -49,20 +49,6 @@ class World(Entity):
                 welcoming.area = area
                 self.touch()
 
-    async def apply_item_finder(
-        self, person: Entity, finder, **kwargs
-    ) -> Optional[Entity]:
-        assert person
-        assert finder
-        area = await find_entity_area(person)
-        log.info("applying finder:%s %s", finder, kwargs)
-        found = await finder.find_item(area=area, person=person, world=self, **kwargs)
-        if found:
-            log.info("found: {0}".format(found))
-        else:
-            log.info("found: nada")
-        return found
-
     # TODO Removing these causes a very strange modified during
     # iteration dict error. Would be worth seeing why!
     def __str__(self):

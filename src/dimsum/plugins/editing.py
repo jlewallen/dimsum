@@ -34,7 +34,7 @@ class EditEntity(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if item:
             return EditingEntity(source=person, area=area, heard=[], entity=item)
         return Failure("where's that?")
@@ -57,7 +57,7 @@ class ModifyHardToSee(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("of what?")
 
@@ -82,7 +82,7 @@ class ModifyField(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("of what?")
 
@@ -114,7 +114,7 @@ class ModifyActivity(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("of what?")
 

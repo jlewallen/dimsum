@@ -185,7 +185,7 @@ class LookInside(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("inside what?")
 
@@ -205,7 +205,7 @@ class LookFor(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        item = await world.apply_item_finder(person, self.item)
+        item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("i can't seem to find that")
 
