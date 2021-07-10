@@ -1,11 +1,11 @@
 import dataclasses
 import logging
 import os.path
+import ariadne
+import starlette.requests
 from typing import Optional
 
-import ariadne
 import routing
-import starlette.requests
 
 log = logging.getLogger("dimsum")
 

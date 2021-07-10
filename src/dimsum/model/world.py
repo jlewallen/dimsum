@@ -1,41 +1,38 @@
 import logging
+import inflect
 from typing import Dict, List, Optional, Sequence, Type
 
-import inflect
-import model.entity as entity
-import model.properties as properties
-import tools as tools
+from .properties import Common
+from .entity import Entity, Scope, RootEntityClass
 
 Key = "world"
 log = logging.getLogger("dimsum.model")
 
 
-class Identifiers(entity.Scope):
+class Identifiers(Scope):
     def __init__(self, gid: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.gid = gid
 
 
-class Welcoming(entity.Scope):
-    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
+class Welcoming(Scope):
+    def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
 
 
-class Remembering(entity.Scope):
-    def __init__(self, entities: Optional[List[entity.Entity]] = None, **kwargs):
+class Remembering(Scope):
+    def __init__(self, entities: Optional[List[Entity]] = None, **kwargs):
         super().__init__(**kwargs)
         self.entities = entities if entities else []
 
 
-class World(entity.Entity):
+class World(Entity):
     def __init__(self, key=None, klass=None, props=None, **kwargs):
         super().__init__(
             key=Key,
-            klass=entity.RootEntityClass,
-            props=props
-            if props
-            else properties.Common("World", desc="Ya know, everything"),
+            klass=RootEntityClass,
+            props=props if props else Common("World", desc="Ya know, everything"),
             **kwargs
         )
 
@@ -49,32 +46,34 @@ class World(entity.Entity):
                 ids.gid = gid
                 self.touch()
 
-    def welcome_area(self) -> entity.Entity:
+    def welcome_area(self) -> Entity:
         with self.make(Welcoming) as welcoming:
             return welcoming.area
 
-    def change_welcome_area(self, area: entity.Entity):
+    def change_welcome_area(self, area: Entity):
         with self.make(Welcoming) as welcoming:
             if welcoming.area != area:
                 welcoming.area = area
                 self.touch()
 
-    def remember(self, e: entity.Entity):
+    def remember(self, e: Entity):
         with self.make(Remembering) as remembering:
             remembering.entities.append(e)
             self.touch()
 
-    def find_entity_area(self, entity: entity.Entity) -> Optional[entity.Entity]:
+    def find_entity_area(self, entity: Entity) -> Optional[Entity]:
+        import tools as tools
+
         return tools.area_of(entity)
 
-    def find_person_area(self, person: entity.Entity) -> entity.Entity:
+    def find_person_area(self, person: Entity) -> Entity:
         area = self.find_entity_area(person)
         assert area
         return area
 
     async def apply_item_finder(
-        self, person: entity.Entity, finder, **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Entity, finder, **kwargs
+    ) -> Optional[Entity]:
         assert person
         assert finder
         area = self.find_person_area(person)

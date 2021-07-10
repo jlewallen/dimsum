@@ -2,21 +2,19 @@ import base64
 import json
 import logging
 import pytest
+import ariadne
+import freezegun
 from typing import List
 
-import ariadne
 import config
-import freezegun
-import model.properties as properties
-import model.world as world
-import scopes
 import domains
-import schema as schema_factory
-from schema import AriadneContext
+import scopes
 import serializing
-import test
-
+from model import *
+from schema import AriadneContext
 from plugins.actions import Join
+import schema as schema_factory
+import test
 
 log = logging.getLogger("dimsum")
 
@@ -108,7 +106,7 @@ async def test_graphql_world_by_key(deterministic, snapshot):
 
     data = {
         "query": '{ entitiesByKey(key: "%s", identities: false) { key serialized } }'
-        % (world.Key)
+        % (Key)
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
@@ -147,13 +145,13 @@ async def test_graphql_language_basic(deterministic, snapshot):
 
         welcome = scopes.area(
             key="welcome",
-            props=properties.Common(name="welcome"),
+            props=Common(name="welcome"),
             creator=world,
         )
         await session.add_area(welcome)
         jacob = scopes.alive(
             key="jlewallen",
-            props=properties.Common(name="Jacob"),
+            props=Common(name="Jacob"),
             creator=world,
         )
         session.register(jacob)
@@ -250,11 +248,11 @@ async def test_graphql_update(deterministic, snapshot):
     domain = domains.Domain()
 
     serialized = serializing.serialize(
-        world.World(), identities=serializing.Identities.PRIVATE
+        World(), identities=serializing.Identities.PRIVATE
     )
 
     data = {
-        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -279,11 +277,11 @@ async def test_graphql_update_and_requery(deterministic, snapshot):
     domain = domains.Domain()
 
     serialized = serializing.serialize(
-        world.World(), identities=serializing.Identities.PRIVATE
+        World(), identities=serializing.Identities.PRIVATE
     )
 
     data = {
-        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -312,7 +310,7 @@ async def test_graphql_make_sample(deterministic, snapshot):
     domain = domains.Domain(empty=True)
 
     serialized = serializing.serialize(
-        world.World(), identities=serializing.Identities.PRIVATE
+        World(), identities=serializing.Identities.PRIVATE
     )
 
     data = {
@@ -349,7 +347,7 @@ async def test_graphql_delete(deterministic, snapshot):
         )
 
     data = {
-        "variables": {"entities": [{"key": world.Key, "serialized": serialized}]},
+        "variables": {"entities": [{"key": Key, "serialized": serialized}]},
         "query": """
 mutation UpdateEntities($entities: [EntityDiff!]) {
     update(entities: $entities) {
@@ -375,7 +373,7 @@ async def test_graphql_entities(deterministic, snapshot):
 
     data = {
         "query": '{ entities(keys: ["%s"], identities: false) { key serialized } }'
-        % (world.Key)
+        % (Key)
     }
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)

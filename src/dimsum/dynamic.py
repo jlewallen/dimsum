@@ -4,25 +4,35 @@ import functools
 import inspect
 import logging
 import time
-
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
-import context
 import grammars
-import model.entity as entity
-import model.events as events
-import model.game as game
-import model.properties as properties
-import model.world as world
-import model.hooks as hook_system
-from model.condition import Condition, AlwaysTrue
+import transformers
+import saying
+import domains as session
+import finders
+import tools
+from model import (
+    Entity,
+    Scope,
+    World,
+    Common,
+    StandardEvent,
+    Reply,
+    Action,
+    Success,
+    Failure,
+    get_all,
+    DynamicFailure,
+    Unknown,
+    ManagedHooks,
+    context,
+    Condition,
+    AlwaysTrue,
+    All,
+)
 import scopes.behavior as behavior
 import scopes.carryable as carryable
-import domains as session
-import tools
-import finders
-import saying
-import transformers
 
 log = logging.getLogger("dimsum.dynamic")
 errors_log = logging.getLogger("dimsum.dynamic.errors")
@@ -65,37 +75,37 @@ class Receive:
 class EntityBehavior(grammars.CommandEvaluator):
     @property
     def hooks(self):
-        return hook_system.All()
+        return All()
 
     async def notify(self, notify: saying.Notify, **kwargs):
         raise NotImplementedError
 
 
 @dataclasses.dataclass(frozen=True)
-class SimplifiedAction(game.Action):
-    entity: entity.Entity
+class SimplifiedAction(Action):
+    entity: Entity
     registered: Registered
     args: List[Any]
 
-    def _transform_reply(self, r: Union[game.Reply, str]) -> game.Reply:
+    def _transform_reply(self, r: Union[Reply, str]) -> Reply:
         if isinstance(r, str):
-            return game.Success(r)
+            return Success(r)
         return r
 
     async def _transform_arg(
-        self, arg: finders.ItemFinder, world: world.World, person: entity.Entity
-    ) -> Optional[entity.Entity]:
+        self, arg: finders.ItemFinder, world: World, person: Entity
+    ) -> Optional[Entity]:
         assert isinstance(arg, finders.ItemFinder)
         return await world.apply_item_finder(person, arg)
 
-    async def _args(self, world: world.World, person: entity.Entity) -> List[Any]:
+    async def _args(self, world: World, person: Entity) -> List[Any]:
         return [await self._transform_arg(a, world, person) for a in self.args]
 
     async def perform(
         self,
-        world: world.World,
-        area: entity.Entity,
-        person: entity.Entity,
+        world: World,
+        area: Entity,
+        person: Entity,
         say: Optional[saying.Say] = None,
         **kwargs,
     ):
@@ -109,17 +119,17 @@ class SimplifiedAction(game.Action):
                 log.debug("say: %s", say)
                 await say.publish(area, person=person)
                 return self._transform_reply(reply)
-            return game.Failure("no reply from handler?")
+            return Failure("no reply from handler?")
         except Exception as e:
             errors_log.exception("handler:error", exc_info=True)
             tools.log_behavior_exception(self.entity)
-            return game.DynamicFailure(str(e), str(self.registered.handler))
+            return DynamicFailure(str(e), str(self.registered.handler))
 
 
 @dataclasses.dataclass
 class SimplifiedTransformer(transformers.Base):
     registered: Registered
-    entity: entity.Entity
+    entity: Entity
 
     def start(self, args):
         return SimplifiedAction(self.entity, self.registered, args)
@@ -131,9 +141,7 @@ class Simplified:
     thunk_factory: Callable = dataclasses.field(repr=False)
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
-    hooks: Optional["hook_system.All"] = dataclasses.field(
-        default_factory=hook_system.All
-    )
+    hooks: Optional["All"] = dataclasses.field(default_factory=All)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -164,9 +172,9 @@ class Simplified:
     async def evaluate(
         self,
         command: str,
-        world: Optional[world.World] = None,
-        player: Optional[entity.Entity] = None,
-    ) -> Optional[game.Action]:
+        world: Optional[World] = None,
+        player: Optional[Entity] = None,
+    ) -> Optional[Action]:
         assert player
 
         entity = await session.get().materialize(key=self.entity_key)
@@ -219,7 +227,7 @@ class EntityAndBehavior:
 
 
 class NoopEntityBehavior(EntityBehavior):
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         return None
 
     async def notify(self, notify: saying.Notify, **kwargs):
@@ -236,7 +244,7 @@ class CompiledEntityBehavior(EntityBehavior):
     def hooks(self):
         return self.simplified.hooks
 
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         log.debug("%s evaluate '%s'", self, command)
         action = await self.simplified.evaluate(command, **kwargs)
         if action:
@@ -245,7 +253,7 @@ class CompiledEntityBehavior(EntityBehavior):
             action = await self.assigned.evaluate(command, **kwargs)
             if action:
                 return action
-            return game.Unknown()
+            return Unknown()
         return None
 
     async def notify(self, notify: saying.Notify, **kwargs):
@@ -254,18 +262,18 @@ class CompiledEntityBehavior(EntityBehavior):
 
 def _get_default_globals():
     # TODO Can we pass an exploded module here?
-    event_classes = {k.__name__: k for k in events.get_all()}
+    event_classes = {k.__name__: k for k in get_all()}
     return dict(
         log=logging.getLogger("dimsum.dynamic.user"),
         dataclass=dataclasses.dataclass,
-        properties=properties,
+        Common=Common,
         tools=tools,
-        Entity=entity.Entity,
-        Event=events.StandardEvent,
-        Scope=entity.Scope,
+        Entity=Entity,
+        Event=StandardEvent,
+        Scope=Scope,
         Carryable=carryable.Carryable,
-        fail=game.Failure,
-        ok=game.Success,
+        fail=Failure,
+        ok=Success,
         **event_classes,
     )
 
@@ -356,13 +364,11 @@ async def __ex(t=thunk):
 
 
 class Behavior:
-    def __init__(self, world: world.World, entities: tools.EntitySet):
+    def __init__(self, world: World, entities: tools.EntitySet):
         self.world = world
         self.entities = entities
 
-    def _get_behaviors(
-        self, e: entity.Entity, c: entity.Entity
-    ) -> List[EntityAndBehavior]:
+    def _get_behaviors(self, e: Entity, c: Entity) -> List[EntityAndBehavior]:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
         with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
@@ -373,11 +379,11 @@ class Behavior:
             ) + inherited
 
     @functools.cached_property
-    def _behaviors(self) -> Dict[entity.Entity, List[EntityAndBehavior]]:
+    def _behaviors(self) -> Dict[Entity, List[EntityAndBehavior]]:
         return {e: self._get_behaviors(e, e) for e in self.entities.all()}
 
     def _compile_behavior(
-        self, entity: entity.Entity, found: EntityAndBehavior
+        self, entity: Entity, found: EntityAndBehavior
     ) -> EntityBehavior:
         try:
             return _compile(found)
@@ -396,7 +402,7 @@ class Behavior:
         )
 
     @property
-    def dynamic_hooks(self) -> List["hook_system.ManagedHooks"]:
+    def dynamic_hooks(self) -> List["ManagedHooks"]:
         return [c.hooks for c in self._compiled]
 
     @property

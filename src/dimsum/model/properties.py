@@ -4,8 +4,8 @@ import re
 import time
 from typing import Dict, Optional, Optional
 
-import model.crypto as crypto
-import model.kinds as kinds
+from .crypto import Identity
+from .kinds import Kind
 
 log = logging.getLogger("dimsum.model")
 
@@ -150,27 +150,27 @@ class Common(Map):
         self.set(Desc, value)
 
     @property
-    def destroyed(self) -> Optional[crypto.Identity]:
+    def destroyed(self) -> Optional[Identity]:
         return self[Destroyed]
 
     @destroyed.setter
-    def destroyed(self, value: Optional[crypto.Identity]):
+    def destroyed(self, value: Optional[Identity]):
         self.set(Destroyed, value)
 
     @property
-    def frozen(self) -> Optional[crypto.Identity]:
+    def frozen(self) -> Optional[Identity]:
         return self[Frozen]
 
     @frozen.setter
-    def frozen(self, value: Optional[crypto.Identity]):
+    def frozen(self, value: Optional[Identity]):
         self.set(Frozen, value)
 
     @property
-    def related(self) -> Dict[str, kinds.Kind]:
+    def related(self) -> Dict[str, Kind]:
         return self[Related]
 
     @related.setter
-    def related(self, value: Dict[str, kinds.Kind]):
+    def related(self, value: Dict[str, Kind]):
         self.set(Related, value)
 
     def clone(self) -> "Common":
@@ -179,4 +179,4 @@ class Common(Map):
         return cloned
 
     def touch(self):
-        self.touched = time.time()
+        self[Touched] = time.time()

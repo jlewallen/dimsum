@@ -1,38 +1,35 @@
 import logging
 import dataclasses
+import inflect
 from typing import Type, Optional, List
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-from model.events import *
+import grammars
+import transformers
+from model import *
 from finders import *
 from tools import *
 from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
-import model.hooks as hooks
 import scopes.carryable as carryable
-import grammars
-import transformers
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsDropped(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsHeld(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 @hooks.all.hold.target
-def can_hold(person: entity.Entity, entity: entity.Entity) -> bool:
+def can_hold(person: Entity, entity: Entity) -> bool:
     return True
 
 
@@ -48,12 +45,7 @@ class Drop(PersonAction):
         self.item = item if item else None
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = None
 
@@ -101,12 +93,7 @@ class Hold(PersonAction):
         self.quantity = quantity
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -155,12 +142,7 @@ class Open(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -183,12 +165,7 @@ class Close(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -218,12 +195,7 @@ class Lock(PersonAction):
         self.key = key
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         area = world.find_person_area(person)
 
@@ -262,12 +234,7 @@ class Unlock(PersonAction):
         self.key = key
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         area = world.find_person_area(person)
 
@@ -300,12 +267,7 @@ class PutInside(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         area = world.find_person_area(person)
 
@@ -343,12 +305,7 @@ class TakeOut(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         area = world.find_person_area(person)
 
@@ -394,12 +351,7 @@ class Pour(PersonAction):
         self.destination = destination
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         source = await world.apply_item_finder(person, self.source)
         if not source:
@@ -430,10 +382,10 @@ class PourProducer(carryable.Producer):
         assert template
         self.template: MaybeItemOrRecipe = template
 
-    def produce_item(self, **kwargs) -> entity.Entity:
+    def produce_item(self, **kwargs) -> Entity:
         item = self.template.create_item(verb=PourVerb, **kwargs)
         with item.make(mechanics.Interactable) as inaction:
-            inaction.link_activity(properties.Drank)
+            inaction.link_activity(Drank)
         with item.make(carryable.Carryable) as carry:
             carry.loose = True
         return item
@@ -453,12 +405,7 @@ class ModifyPours(PersonAction):
         self.produces = produces
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -485,12 +432,7 @@ class ModifyCapacity(PersonAction):
         self.capacity = capacity
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -555,9 +497,7 @@ class Transformer(transformers.Base):
         return ModifyCapacity(item=AnyHeldItem(), capacity=args[0])
 
     def when_opened(self, args):
-        return ModifyActivity(
-            item=AnyHeldItem(), activity=properties.Opened, value=True
-        )
+        return ModifyActivity(item=AnyHeldItem(), activity=Opened, value=True)
 
 
 @grammars.grammar()

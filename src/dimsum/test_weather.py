@@ -1,8 +1,8 @@
 import logging
-import test
+import pytest
 
 import library
-import pytest
+import test
 
 log = logging.getLogger("dimsum")
 

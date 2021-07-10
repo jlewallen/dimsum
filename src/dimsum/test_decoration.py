@@ -1,8 +1,7 @@
-import inspect
 import logging
-
-import pytest
+import inspect
 import wrapt
+import pytest
 
 log = logging.getLogger("dimsum.tests")
 

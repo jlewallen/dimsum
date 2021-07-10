@@ -3,10 +3,9 @@ import contextvars
 import logging
 from typing import Any, Optional
 
-from model.condition import Condition
-
-import model.entity as entity
-import model.events as events
+from .entity import Entity
+from .events import Event
+from .conditions import Condition
 
 world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
@@ -14,15 +13,15 @@ log = logging.getLogger("dimsum")
 
 class Ctx:
     @abc.abstractmethod
-    def register(self, entity: entity.Entity) -> entity.Entity:
+    def register(self, entity: Entity) -> Entity:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def unregister(self, entity: entity.Entity) -> entity.Entity:
+    def unregister(self, entity: Entity) -> Entity:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def publish(self, ev: events.Event):
+    async def publish(self, ev: Event):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -30,7 +29,7 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def create_item(self, **kwargs) -> entity.Entity:
+    def create_item(self, **kwargs) -> Entity:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -38,7 +37,7 @@ class Ctx:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[Entity]:
         raise NotImplementedError
 
     @abc.abstractmethod

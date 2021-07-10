@@ -9,4 +9,3 @@ async def main():
 
 if __name__ == "__main__":
     cProfile.run("test.TestWorld()")
-    # cProfile.run("asyncio.run(main())")

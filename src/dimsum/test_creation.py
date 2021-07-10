@@ -1,16 +1,12 @@
 import logging
 import pytest
-
 import freezegun
+
 import handlers
-
-import model.properties as properties
-import model.visual as visual
-
+from model import *
 import scopes.behavior as behavior
 import scopes.carryable as carryable
-import scopes as scopes
-
+import scopes
 import test
 
 log = logging.getLogger("dimsum")
@@ -20,7 +16,7 @@ log = logging.getLogger("dimsum")
 @freezegun.freeze_time("2019-09-25")
 async def test_create_thing(snapshot):
     with test.Deterministic():
-        tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
+        tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.success("create thing Box")
         snapshot.assert_match(await tw.to_json(), "world.json")
@@ -30,7 +26,7 @@ async def test_create_thing(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_create_area(snapshot):
     with test.Deterministic():
-        tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
+        tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.success("create area Treehouse")
         snapshot.assert_match(await tw.to_json(), "world.json")
@@ -40,7 +36,7 @@ async def test_create_area(snapshot):
 @freezegun.freeze_time("2019-09-25")
 async def test_create_exit(snapshot):
     with test.Deterministic():
-        tw = test.TestWorld(handlers=[handlers.create(visual.NoopComms())])
+        tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.success("create exit Window")
         snapshot.assert_match(await tw.to_json(), "world.json")
@@ -76,7 +72,7 @@ async def test_obliterate_thing_with_behavior():
         world = await session.prepare()
 
         hammer = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("Hammer")),
+            scopes.item(creator=world, props=Common("Hammer")),
             session=session,
         )
 

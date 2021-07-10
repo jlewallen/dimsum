@@ -1,13 +1,13 @@
+import sys
 import json
 import logging
-import sys
-
 import ariadne
 import asyncclick as click
+
+import serializing
 import config as configuration
 import schema as schema_factory
 from schema import AriadneContext
-import serializing
 
 log = logging.getLogger("dimsum.cli")
 

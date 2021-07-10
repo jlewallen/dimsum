@@ -1,13 +1,12 @@
 import json
+import time
 import logging
 import logging.config
 import multiprocessing as mp
-import time
-from typing import List, Optional, TextIO, TYPE_CHECKING
-
 import asyncclick as click
 import brokers.brokers as brokers
 import uvicorn
+from typing import List, Optional, TextIO, TYPE_CHECKING
 
 log = logging.getLogger("dimsum.cli")
 

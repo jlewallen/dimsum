@@ -2,12 +2,9 @@ import logging
 import pytest
 from typing import Dict, List, Optional
 
-import model.game as game
-import model.properties as properties
-
+from model import *
 import scopes.behavior as behavior
 import scopes as scopes
-
 import test
 from test_utils import *
 
@@ -371,7 +368,7 @@ def break_nail(this, person, say):
     )
 
     reply = await tw.success("break")
-    assert isinstance(reply, game.DynamicFailure)
+    assert isinstance(reply, DynamicFailure)
 
 
 @pytest.mark.asyncio
@@ -394,9 +391,7 @@ async def jingle(this, person, say):
     with tw.domain.session() as session:
         world = await session.prepare()
         keys = tw.add_item_to_welcome_area(
-            scopes.item(
-                creator=world, parent=jingles_base, props=properties.Common("Keys")
-            ),
+            scopes.item(creator=world, parent=jingles_base, props=Common("Keys")),
             session=session,
         )
         await session.save()

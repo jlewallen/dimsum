@@ -4,12 +4,9 @@ import enum
 import logging
 import traceback
 import time
-
 from typing import Any, Dict, List, Optional, Sequence
 
-import context
-
-from model.entity import Entity
+from model import Entity, context
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics

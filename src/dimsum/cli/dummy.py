@@ -1,7 +1,6 @@
+import sys
 import json
 import logging
-import sys
-
 import asyncclick as click
 
 log = logging.getLogger("dimsum.cli")

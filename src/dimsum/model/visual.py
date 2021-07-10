@@ -1,5 +1,5 @@
-import dataclasses
 import logging
+import dataclasses
 from typing import Dict, List, Any
 
 log = logging.getLogger("dimsum.visual")

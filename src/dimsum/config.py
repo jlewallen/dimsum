@@ -3,12 +3,11 @@ import json
 import logging
 import os
 import os.path
+import shortuuid
 from typing import Dict, List, Optional
 
-import shortuuid
-
-import domains
-import storage
+from domains import Domain
+from storage import *
 
 log = logging.getLogger("dimsum.config")
 
@@ -18,27 +17,25 @@ class Persistence:
     read: List[str]
     write: List[str]
 
-    def get_store_from_url(self, url: str, cache: Dict[str, storage.EntityStorage]):
+    def get_store_from_url(self, url: str, cache: Dict[str, EntityStorage]):
         if url not in cache:
             log.info("storage-url: %s", url)
             if url.startswith("http"):
-                cache[url] = storage.HttpStorage(url)
+                cache[url] = HttpStorage(url)
             else:
-                cache[url] = storage.SqliteStorage(url)
+                cache[url] = SqliteStorage(url)
         return cache[url]
 
-    def get_stores_from_url(
-        self, urls: List[str], cache: Dict[str, storage.EntityStorage]
-    ):
+    def get_stores_from_url(self, urls: List[str], cache: Dict[str, EntityStorage]):
         return [self.get_store_from_url(url, cache) for url in urls]
 
     def make_store(self):
         if not self.read or not self.write:
             raise ConfigurationException("at least one read and write url is required")
-        cache: Dict[str, storage.EntityStorage] = {}
-        read = storage.Prioritized(self.get_stores_from_url(self.read, cache))
-        write = storage.All(self.get_stores_from_url(self.write, cache))
-        return storage.Separated(read, write)
+        cache: Dict[str, EntityStorage] = {}
+        read = Prioritized(self.get_stores_from_url(self.read, cache))
+        write = All(self.get_stores_from_url(self.write, cache))
+        return Separated(read, write)
 
 
 @dataclasses.dataclass
@@ -49,7 +46,7 @@ class Configuration:
     def make_domain(self, handlers=None):
         store = self.persistence.make_store()
         log.info("store = %s", store)
-        return domains.Domain(store=store, handlers=handlers)
+        return Domain(store=store, handlers=handlers)
 
 
 class ConfigurationException(Exception):

@@ -4,7 +4,6 @@ import pytest
 import scopes
 import domains
 import library
-
 import test
 
 log = logging.getLogger("dimsum")

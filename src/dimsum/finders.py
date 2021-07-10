@@ -2,9 +2,7 @@ import logging
 import copy
 from typing import List, Optional
 
-import context
-import model.properties as properties
-import model.entity as entity
+from model import Entity, Scope, Common, context
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -15,21 +13,21 @@ log = logging.getLogger("dimsum.model")
 
 
 class ItemFinder:
-    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[Entity]:
         raise NotImplementedError
 
 
 class FindNone(ItemFinder):
-    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[Entity]:
         return None
 
 
 class StaticItem(ItemFinder):
-    def __init__(self, item: Optional[entity.Entity] = None, **kwargs):
+    def __init__(self, item: Optional[Entity] = None, **kwargs):
         super().__init__()
         self.item = item
 
-    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[Entity]:
         return self.item
 
 
@@ -38,7 +36,7 @@ class ObjectNumber(ItemFinder):
         super().__init__()
         self.number = number
 
-    async def find_item(self, **kwargs) -> Optional[entity.Entity]:
+    async def find_item(self, **kwargs) -> Optional[Entity]:
         return await context.get().find_item(number=self.number, **kwargs)
 
 
@@ -49,11 +47,8 @@ class AnyItem(ItemFinder):
         self.q = q
 
     async def find_item(
-        self,
-        person: Optional[entity.Entity] = None,
-        area: Optional[entity.Entity] = None,
-        **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
         assert area
 
@@ -109,11 +104,8 @@ class UnheldItem(ItemFinder):
         self.q = q
 
     async def find_item(
-        self,
-        person: Optional[entity.Entity] = None,
-        area: Optional[entity.Entity] = None,
-        **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
         assert area
 
@@ -134,8 +126,8 @@ class UnheldItem(ItemFinder):
 
 class AnyHeldItem(ItemFinder):
     async def find_item(
-        self, person: Optional[entity.Entity] = None, **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
 
         log.info("%s finding pockets", self)
@@ -153,8 +145,8 @@ class HeldItem(ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: Optional[entity.Entity] = None, **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
 
         log.info("%s finding pockets", self)
@@ -170,8 +162,8 @@ class HeldItem(ItemFinder):
 
 class FindHeldContainer(ItemFinder):
     async def find_item(
-        self, person: Optional[entity.Entity] = None, **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
 
         log.info("%s finding pockets", self)
@@ -185,11 +177,8 @@ class FindHeldContainer(ItemFinder):
 
 class CurrentArea(ItemFinder):
     async def find_item(
-        self,
-        person: Optional[entity.Entity] = None,
-        area: Optional[entity.Entity] = None,
-        **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
         assert area
         return area
@@ -202,8 +191,8 @@ class ContainedItem(ItemFinder):
         self.q = q
 
     async def find_item(
-        self, person: Optional[entity.Entity] = None, **kwargs
-    ) -> Optional[entity.Entity]:
+        self, person: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
         assert person
 
         log.info("%s finding pockets (contained)", self)
@@ -221,9 +210,7 @@ class MaybeItemOrRecipe:
         assert q
         self.q = q
 
-    def create_item(
-        self, person: Optional[entity.Entity] = None, **kwargs
-    ) -> entity.Entity:
+    def create_item(self, person: Optional[Entity] = None, **kwargs) -> Entity:
         assert person
 
         log.info("%s finding brain", self)
@@ -236,7 +223,7 @@ class MaybeItemOrRecipe:
 
 
 class ItemFactory:
-    def create_item(self, **kwargs) -> entity.Entity:
+    def create_item(self, **kwargs) -> Entity:
         raise NotImplementedError
 
 
@@ -245,24 +232,22 @@ class MaybeItem(ItemFactory):
         super().__init__()
         self.name = name
 
-    def create_item(self, quantity: Optional[float] = None, **kwargs) -> entity.Entity:
+    def create_item(self, quantity: Optional[float] = None, **kwargs) -> Entity:
         log.info(
             "%s create-item '%s' %s quantity=%s", self, self.name, kwargs, quantity
         )
         initialize = {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
-        return scopes.item(
-            props=properties.Common(self.name), initialize=initialize, **kwargs
-        )
+        return scopes.item(props=Common(self.name), initialize=initialize, **kwargs)
 
 
 class RecipeItem(ItemFactory):
-    def __init__(self, recipe: entity.Entity):
+    def __init__(self, recipe: Entity):
         super().__init__()
         self.recipe = recipe
 
-    def create_item(self, **kwargs) -> entity.Entity:
+    def create_item(self, **kwargs) -> Entity:
         log.info("%s create-item recipe=%s %s", self, self.recipe, kwargs)
         return self.recipe.make(Recipe).create_item(**kwargs)
 
@@ -273,7 +258,7 @@ class MaybeQuantifiedItem(ItemFactory):
         self.template: MaybeItem = template
         self.quantity: float = quantity
 
-    def create_item(self, **kwargs) -> entity.Entity:
+    def create_item(self, **kwargs) -> Entity:
         log.info(
             "%s create-item template=%s quantity=%s %s",
             self,
@@ -284,14 +269,14 @@ class MaybeQuantifiedItem(ItemFactory):
         return self.template.create_item(quantity=self.quantity, **kwargs)
 
 
-class Recipe(entity.Scope, ItemFactory):
+class Recipe(Scope, ItemFactory):
     def __init__(self, template=None, **kwargs):
         super().__init__(**kwargs)
         self.template = template if template else None
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs
-    ) -> entity.Entity:
+    ) -> Entity:
         assert self.template
 
         if quantity:

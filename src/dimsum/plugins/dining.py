@@ -2,19 +2,14 @@ import logging
 import dataclasses
 from typing import Type, Optional, List
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-from model.events import *
-import model.properties
-import scopes.health as health
-from plugins.actions import PersonAction
-from plugins.editing import ModifyActivity
-from finders import *
-from tools import *
 import grammars
 import transformers
+from model import *
+from finders import *
+from tools import *
+from plugins.actions import PersonAction
+from plugins.editing import ModifyActivity
+import scopes.health as health
 
 log = logging.getLogger("dimsum")
 
@@ -28,12 +23,7 @@ class ModifyServings(PersonAction):
         self.number = number
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -56,12 +46,7 @@ class Eat(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -85,12 +70,7 @@ class Drink(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -118,10 +98,10 @@ class Transformer(transformers.Base):
         return ModifyServings(item=AnyHeldItem(), number=args[0])
 
     def when_eaten(self, args):
-        return ModifyActivity(item=AnyHeldItem(), activity=properties.Eaten, value=True)
+        return ModifyActivity(item=AnyHeldItem(), activity=Eaten, value=True)
 
     def when_drank(self, args):
-        return ModifyActivity(item=AnyHeldItem(), activity=properties.Drank, value=True)
+        return ModifyActivity(item=AnyHeldItem(), activity=Drank, value=True)
 
 
 @grammars.grammar()

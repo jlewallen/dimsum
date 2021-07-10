@@ -1,9 +1,8 @@
-import test
+import pytest
 
 import scopes.apparel as apparel
 import scopes.carryable as carryable
-
-import pytest
+import test
 
 
 @pytest.mark.asyncio

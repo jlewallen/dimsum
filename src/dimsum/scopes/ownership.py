@@ -1,10 +1,10 @@
 from typing import Optional
 
-import model.entity as entity
+from model import Entity, Scope
 
 
-class Ownership(entity.Scope):
-    def __init__(self, owner: Optional[entity.Entity] = None, **kwargs):
+class Ownership(Scope):
+    def __init__(self, owner: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         default_creator = (
             self.ourselves.creator if self.ourselves.creator else self.ourselves

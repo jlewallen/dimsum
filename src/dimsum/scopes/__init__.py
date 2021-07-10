@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Optional, Type
 
-import model.entity as entity
+from model import Entity, EntityClass
 
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -15,19 +15,19 @@ import scopes
 log = logging.getLogger("dimsum.scopes")
 
 
-class LivingClass(entity.EntityClass):
+class LivingClass(EntityClass):
     pass
 
 
-class ItemClass(entity.EntityClass):
+class ItemClass(EntityClass):
     pass
 
 
-class AreaClass(entity.EntityClass):
+class AreaClass(EntityClass):
     pass
 
 
-class ExitClass(entity.EntityClass):
+class ExitClass(EntityClass):
     pass
 
 
@@ -69,29 +69,27 @@ def set_proxy_factory(factory: Callable):
 
 
 def create_klass(
-    desired: Type[entity.EntityClass],
-    klass: Optional[Type[entity.EntityClass]] = None,
-    **kwargs
-) -> entity.Entity:
+    desired: Type[EntityClass], klass: Optional[Type[EntityClass]] = None, **kwargs
+) -> Entity:
     assert klass is None or klass is desired
     return proxy_factory(
-        entity.Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
+        Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
     )  # TODO create
 
 
-def alive(**kwargs) -> entity.Entity:
+def alive(**kwargs) -> Entity:
     return create_klass(LivingClass, **kwargs)
 
 
-def item(**kwargs) -> entity.Entity:
+def item(**kwargs) -> Entity:
     return create_klass(ItemClass, **kwargs)
 
 
-def area(**kwargs) -> entity.Entity:
+def area(**kwargs) -> Entity:
     return create_klass(AreaClass, **kwargs)
 
 
-def exit(**kwargs) -> entity.Entity:
+def exit(**kwargs) -> Entity:
     return create_klass(ExitClass, **kwargs)
 
 
@@ -103,6 +101,6 @@ classes = {
 }
 
 
-def get_entity_class(name: str) -> Type[entity.EntityClass]:
+def get_entity_class(name: str) -> Type[EntityClass]:
     assert name in classes
     return classes[name]

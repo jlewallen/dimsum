@@ -2,28 +2,30 @@ import asyncio
 import dataclasses
 import logging
 import os.path
-from typing import List, Optional
-
-import ariadne
-import config
-import jwt
-import model.entity as entity
-import model.entity as entities
-import model.game as game
-import model.properties as properties
-import model.visual as visual
-import model.world as world
-
-import library
-import scopes as scopes
-import scopes.carryable as carryable
-import scopes.users as users
-
-import domains
-
-import serializing
 import shortuuid
 import starlette.requests
+import ariadne
+import jwt
+from typing import List, Optional
+
+import config
+import domains
+import serializing
+import scopes
+import library
+from model import (
+    Entity,
+    World,
+    Key,
+    EntityUpdate,
+    Renderable,
+    Reply,
+    Updated,
+    Keys,
+    Common,
+)
+import scopes.carryable as carryable
+import scopes.users as users
 
 # Create
 
@@ -69,7 +71,7 @@ async def resolve_size(_, info):
 @dataclasses.dataclass
 class EntityResolver:
     session: domains.Session
-    entity: entities.Entity
+    entity: Entity
     cached: Optional[str] = None
 
     def key(self, info, **data):
@@ -181,7 +183,7 @@ async def nearby_generator(obj, info, evaluator: str):
     q: asyncio.Queue = asyncio.Queue()
     subscriptions = info.context.domain.subscriptions
 
-    async def publish(item: visual.Renderable, **kwargs):
+    async def publish(item: Renderable, **kwargs):
         await q.put(item)
 
     subscription = subscriptions.subscribe(evaluator, publish)
@@ -265,7 +267,7 @@ def make_language_query_criteria(
 
 @dataclasses.dataclass
 class Evaluation:
-    reply: game.Reply
+    reply: Reply
     entities: List[EntityResolver]
 
 
@@ -280,7 +282,7 @@ async def resolve_language(obj, info, criteria):
         player = await session.materialize(key=lqc.evaluator)
         assert player
         log.debug("materialize world")
-        w = await session.materialize(key=world.Key)
+        w = await session.materialize(key=Key)
         assert w
         reply = await session.execute(player, lqc.text.strip())
         await session.save()
@@ -289,7 +291,7 @@ async def resolve_language(obj, info, criteria):
             subscriptions = info.context.domain.subscriptions
             await subscriptions.somebody(
                 lqc.evaluator,
-                visual.Updated(
+                Updated(
                     entities=[
                         dict(key=row.key(info), serialized=row.serialized(info))
                         for row in entities
@@ -328,7 +330,7 @@ class Template:
         return scopes.create_klass(
             scopes.get_entity_class(self.klass),
             key=key,
-            props=properties.Common(name=self.name, desc=self.desc),
+            props=Common(name=self.name, desc=self.desc),
         )
 
 
@@ -355,7 +357,7 @@ async def resolve_create(obj, info, entities):
 
         await session.save()
         return Evaluation(
-            game.Reply(),
+            Reply(),
             [EntityResolver(session, r[1]) for r in created],
         )
 
@@ -403,10 +405,7 @@ async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
 
-    diffs = {
-        entity.Keys(row["key"]): entity.EntityUpdate(row["serialized"])
-        for row in entities
-    }
+    diffs = {Keys(row["key"]): EntityUpdate(row["serialized"]) for row in entities}
 
     updated = await domain.store.update(diffs)
 

@@ -3,9 +3,9 @@ import dataclasses
 import functools
 import logging
 from typing import Callable, List, Optional, Sequence, Type
-
 from lark import exceptions, Lark, Transformer
-import model.game as game
+
+from model import Action
 
 log = logging.getLogger("dimsum.grammars")
 
@@ -21,13 +21,13 @@ class CommandEvaluator:
         return DYNAMIC + 1
 
     @abc.abstractmethod
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         raise NotImplementedError
 
 
 class AlwaysUnknown(CommandEvaluator):
     @abc.abstractmethod
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         raise NotImplementedError
 
 
@@ -38,7 +38,7 @@ class PrioritizedEvaluator(CommandEvaluator):
     def __post_init__(self):
         self.evaluators = sorted(self.evaluators, key=lambda e: e.order)
 
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         for evaluator in self.evaluators:
             action = await evaluator.evaluate(command, **kwargs)
             if action:
@@ -55,7 +55,7 @@ class LazyCommandEvaluator(CommandEvaluator):
     def evaluator(self) -> CommandEvaluator:
         return PrioritizedEvaluator(self.factory())
 
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         return await self.evaluator.evaluate(command, **kwargs)
 
 
@@ -91,7 +91,7 @@ class GrammarEvaluator(CommandEvaluator):
     def _parser(self) -> Lark:
         return _wrap_parser(self.grammar)
 
-    async def evaluate(self, command: str, **kwargs) -> Optional[game.Action]:
+    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         try:
             tree = self._parser.parse(command)
             log.debug("parsed=%s", tree)

@@ -3,8 +3,8 @@ import logging
 import asyncio
 from typing import Any, Callable, Dict, List, Union
 
-import model.events as events
-import model.visual as visual
+from model import Event
+from model import Comms, Renderable
 
 log = logging.getLogger("dimsum.bus")
 
@@ -18,14 +18,14 @@ class Subscription:
         self.path_key = path_key
         self.handler_fn = handler_fn
 
-    async def write(self, item: visual.Renderable):
+    async def write(self, item: Renderable):
         await self.handler_fn(item)
 
     def remove(self):
         self.manager.remove(self)
 
 
-class SubscriptionManager(visual.Comms):
+class SubscriptionManager(Comms):
     def __init__(self):
         super().__init__()
         self.by_key: Dict[str, List[Subscription]] = {}
@@ -46,7 +46,7 @@ class SubscriptionManager(visual.Comms):
         else:
             return False
 
-    async def somebody(self, key: str, r: visual.Renderable) -> bool:
+    async def somebody(self, key: str, r: Renderable) -> bool:
         if key in self.by_key:
             await asyncio.gather(
                 *[subscription.write(r) for subscription in self.by_key[key]]
@@ -54,7 +54,7 @@ class SubscriptionManager(visual.Comms):
             return True
         return False
 
-    async def everybody(self, r: visual.Renderable) -> bool:
+    async def everybody(self, r: Renderable) -> bool:
         await asyncio.gather(
             flatten(
                 *[[sub.write(r) for sub in other] for key, other in self.by_key.items()]
@@ -69,7 +69,7 @@ class EventBus:
         self.handlers = {}
         self.modules = [f(self) for f in handlers] if handlers else []
 
-    async def publish(self, event: events.Event, **kwargs):
+    async def publish(self, event: Event, **kwargs):
         assert event
         log.info("publish:%s", event)
         await self.invoke_handlers(event)
@@ -95,11 +95,11 @@ class EventBus:
 
 
 class TextRendering:
-    def __init__(self, bus: EventBus, comms: visual.Comms):
+    def __init__(self, bus: EventBus, comms: Comms):
         super().__init__()
         self.install(bus, comms)
 
-    def install(self, bus: EventBus, comms: visual.Comms):
+    def install(self, bus: EventBus, comms: Comms):
         pass
 
 

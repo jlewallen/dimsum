@@ -2,8 +2,7 @@ import ast
 import logging
 from typing import Dict, List, Optional, Any
 
-import model.entity as entity
-import model.properties as properties
+from model import Entity, Scope, Map
 
 DefaultKey = "b:default"
 log = logging.getLogger("dimsum.scopes")
@@ -30,7 +29,7 @@ class Behavior:
         return hash(self.python)
 
 
-class BehaviorMap(properties.Map):
+class BehaviorMap(Map):
     def get_all(self, behavior: str):
         pattern = "b:(.+):%s" % (behavior,)
         return [self.map[key] for key in self.keys_matching(pattern)]
@@ -53,13 +52,13 @@ class BehaviorMap(properties.Map):
         return super().replace(**typed)
 
 
-class BehaviorCollection(entity.Scope):
+class BehaviorCollection(Scope):
     def __init__(self, entities=None, **kwargs):
         super().__init__(**kwargs)
-        self.entities: List[entity.Entity] = entities if entities else []
+        self.entities: List[Entity] = entities if entities else []
 
 
-class Behaviors(entity.Scope):
+class Behaviors(Scope):
     def __init__(self, behaviors: Optional[BehaviorMap] = None, **kwargs):
         super().__init__(**kwargs)
         self.behaviors = behaviors if behaviors else BehaviorMap()
@@ -67,7 +66,7 @@ class Behaviors(entity.Scope):
     def get_default(self) -> Optional[Behavior]:
         return self.behaviors.get(DefaultKey)
 
-    def add_behavior(self, world: entity.Entity, **kwargs):
+    def add_behavior(self, world: Entity, **kwargs):
         # TODO This should be smarter. Only necessary for tick
         # receivers currently. Maye we just make tick special and run
         # over everything? This has elegance.

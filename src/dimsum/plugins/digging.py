@@ -1,18 +1,13 @@
 import logging
 from typing import List, Optional, Type
 
-from context import *
 import grammars
-from model.events import *
-from model.game import *
-import model.properties as properties
-from model.reply import *
-from model.world import *
+import transformers
+from model import *
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes
 from plugins.actions import PersonAction
-import transformers
 
 log = logging.getLogger("dimsum")
 
@@ -75,12 +70,7 @@ class Dig(PersonAction):
         self.area_name = area_name
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         log.info(
             "digging {0} via {1} from {2}".format(self.area_name, self.linkage, area)
@@ -88,13 +78,13 @@ class Dig(PersonAction):
 
         digging = scopes.area(
             creator=person,
-            props=properties.Common(name=self.area_name),
+            props=Common(name=self.area_name),
         )
 
         if self.linkage.there:
             goes_there = scopes.exit(
                 creator=person,
-                props=properties.Common(name=self.linkage.there.name),
+                props=Common(name=self.linkage.there.name),
                 initialize={movement.Exit: dict(area=digging)},
             )
             with area.make(carryable.Containing) as ground:
@@ -104,7 +94,7 @@ class Dig(PersonAction):
         if self.linkage.back:
             comes_back = scopes.exit(
                 creator=person,
-                props=properties.Common(name=self.linkage.back.name),
+                props=Common(name=self.linkage.back.name),
                 initialize={movement.Exit: dict(area=area)},
             )
             with digging.make(carryable.Containing) as ground:

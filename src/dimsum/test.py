@@ -4,27 +4,22 @@ import json
 import logging
 from typing import Any, Callable, Dict, Optional, Union
 
+import domains
+import serializing
 import everything  # noqa
-import model.crypto as crypto
-import model.entity as entity
-import model.game as game
-import model.properties as properties
-import model.world as world
+from model import *
+from plugins.actions import Join
 import scopes as scopes
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes.users as users
-import domains
-import serializing
-
-from plugins.actions import Join
 
 log = logging.getLogger("dimsum.tests")
 
 
 def create_empty_world():
-    return world.World()
+    return World()
 
 
 class TestWorld:
@@ -42,8 +37,8 @@ class TestWorld:
     async def add_simple_area_here(self, door, name):
         with self.domain.session() as session:
             world = await session.prepare()
-            door = scopes.item(creator=world, props=properties.Common(door))
-            area = scopes.area(creator=world, props=properties.Common(name))
+            door = scopes.item(creator=world, props=Common(door))
+            area = scopes.area(creator=world, props=Common(name))
             with door.make(movement.Movement) as nav:
                 nav.link_area(area)
             with area.make(carryable.Containing) as ground:
@@ -62,7 +57,7 @@ class TestWorld:
 
             carla = scopes.alive(
                 creator=world,
-                props=properties.Common("Carla", desc="Chief Salad Officer."),
+                props=Common("Carla", desc="Chief Salad Officer."),
             )
             await session.perform(Join(), carla)
             await session.save()
@@ -79,7 +74,7 @@ class TestWorld:
 
             tomi = scopes.alive(
                 creator=world,
-                props=properties.Common("Tomi", desc="Chief Crying Officer."),
+                props=Common("Tomi", desc="Chief Crying Officer."),
             )
             await session.perform(Join(), tomi)
             await session.save()
@@ -96,7 +91,7 @@ class TestWorld:
 
             jacob = scopes.alive(
                 creator=world,
-                props=properties.Common("Jacob", desc="Curly haired bastard."),
+                props=Common("Jacob", desc="Curly haired bastard."),
             )
 
             await session.perform(Join(), jacob)
@@ -113,9 +108,7 @@ class TestWorld:
                 world = await session.prepare()
 
             if not area:
-                area = scopes.area(
-                    creator=world, props=properties.Common("Living room")
-                )
+                area = scopes.area(creator=world, props=Common("Living room"))
 
             await session.add_area(area)
             await session.save()
@@ -125,7 +118,7 @@ class TestWorld:
     def add_item_to_welcome_area(self, item, session=None):
         assert session
         session.register(item)
-        with session.world.make(world.Welcoming) as welcoming:
+        with session.world.make(Welcoming) as welcoming:
             with welcoming.area.make(carryable.Containing) as ground:
                 ground.add_item(item)
         return item
@@ -147,7 +140,7 @@ class TestWorld:
             response = await session.execute(person, command)
 
             log.info("response: %s" % (response,))
-            if isinstance(response, game.Failure):
+            if isinstance(response, Failure):
                 log.info("unsaved!")
             else:
                 await session.save()
@@ -157,14 +150,14 @@ class TestWorld:
     async def success(self, *commands: str, **kwargs):
         for command in commands:
             r = await self.execute(command, **kwargs)
-            if not isinstance(r, game.Failure):
+            if not isinstance(r, Failure):
                 return r
             log.error("reply: %s", r)
-            assert not isinstance(r, game.Failure)
+            assert not isinstance(r, Failure)
 
     async def failure(self, command: str, **kwargs):
         r = await self.execute(command, **kwargs)
-        assert isinstance(r, game.Failure)
+        assert isinstance(r, Failure)
         return r
 
     async def add_behaviored_thing(self, tw: "TestWorld", name: str, python: str):
@@ -172,7 +165,7 @@ class TestWorld:
             world = await session.prepare()
 
             item = tw.add_item_to_welcome_area(
-                scopes.item(creator=world, props=properties.Common(name)),
+                scopes.item(creator=world, props=Common(name)),
                 session=session,
             )
 
@@ -193,13 +186,11 @@ async def make_simple_domain(
 
         welcome = scopes.area(
             key="welcome",
-            props=properties.Common(name="welcome"),
+            props=Common(name="welcome"),
             creator=world,
         )
         jacob_key = base64.b64encode("jlewallen".encode("utf-8")).decode("utf-8")
-        jacob = scopes.alive(
-            key=jacob_key, props=properties.Common(name="Jacob"), creator=world
-        )
+        jacob = scopes.alive(key=jacob_key, props=Common(name="Jacob"), creator=world)
 
         if password:
             with jacob.make(users.Auth) as auth:
@@ -249,19 +240,19 @@ class Deterministic:
         self.previous_identities: Optional[Callable] = None
 
     def __enter__(self):
-        self.previous_keys = entity.keys(self.generate_key)
-        self.previous_identities = entity.identities(self.generate_identity)
+        self.previous_keys = keys(self.generate_key)
+        self.previous_identities = identities(self.generate_identity)
 
     def __exit__(self, type, value, traceback):
         assert self.previous_identities
-        entity.identities(self.previous_identities)
+        identities(self.previous_identities)
         assert self.previous_keys
-        entity.keys(self.previous_keys)
+        keys(self.previous_keys)
 
     def generate_key(self) -> str:
         self.i += 1
         return str(self.i)
 
-    def generate_identity(self, creator=None) -> crypto.Identity:
+    def generate_identity(self, creator=None) -> Identity:
         self.i += 1
-        return crypto.Identity(str(self.i), str(self.i), str(self.i))
+        return Identity(str(self.i), str(self.i), str(self.i))

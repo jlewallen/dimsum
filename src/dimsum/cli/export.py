@@ -1,7 +1,6 @@
-import logging
-import os
 import sys
-
+import os
+import logging
 import asyncclick as click
 import cli.utils as utils
 

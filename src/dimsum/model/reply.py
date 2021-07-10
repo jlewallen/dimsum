@@ -1,32 +1,26 @@
-import dataclasses
 import logging
+import dataclasses
+import inflect
 from typing import Any, Dict, List, Sequence
 
-import inflect
-import model.hooks as hooks
-import model.entity as entity
-import model.game as game
-import model.visual as visual
-
+from .hooks import *
+from .entity import *
+from .game import *
+from .visual import *
 import scopes.mechanics as mechanics
 
 log = logging.getLogger("dimsum.model")
 p = inflect.engine()
 
 
-class Observation(game.Reply, visual.Renderable):
+class Observation(Reply, Renderable):
     def render_string(self) -> Dict[str, str]:
         return {"message": "some kind of observation"}
 
 
 @dataclasses.dataclass
 class ObservedEntity:
-    entity: entity.Entity
-
-
-class ObservedItem(ObservedEntity):
-    def accept(self, visitor):
-        return visitor.observed_entity(self)
+    entity: Entity
 
     def __str__(self):
         return str(self.entity)
@@ -40,7 +34,7 @@ class Activity:
 
 
 class HoldingActivity(Activity):
-    def __init__(self, item: entity.Entity):
+    def __init__(self, item: Entity):
         super().__init__()
         self.item = item
 
@@ -49,7 +43,7 @@ class HoldingActivity(Activity):
 
 
 class ObservedEntities:
-    def __init__(self, entities: List[entity.Entity]):
+    def __init__(self, entities: List[Entity]):
         super().__init__()
         self.entities = entities
 
@@ -60,10 +54,6 @@ class ObservedEntities:
         return str(self)
 
 
-@hooks.all.observed.target
-def observe(entity: entity.Entity) -> Sequence[ObservedEntity]:
-    return [ObservedItem(entity)]
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]
+@all.observed.target
+def observe(entity: Entity) -> Sequence[ObservedEntity]:
+    return [ObservedEntity(entity)]

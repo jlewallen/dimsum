@@ -3,16 +3,16 @@ import dataclasses
 import json
 import logging
 import time
-from typing import Any, Callable, Dict, List, Optional, Type, Union
-
 import inflect
 import jsondiff
-import model.crypto as crypto
-import model.kinds as kinds
-import model.properties as properties
 import shortuuid
 import stringcase
 import wrapt
+from typing import Any, Callable, Dict, List, Optional, Type, Union
+
+from .crypto import Identity, generate
+from .kinds import Kind
+from .properties import Common
 
 log = logging.getLogger("dimsum.model.entity")
 p = inflect.engine()
@@ -107,7 +107,7 @@ def keys(fn: Callable) -> Callable:
     return previous
 
 
-identity_generator_fn: Callable = crypto.generate
+identity_generator_fn: Callable = generate
 
 
 def identities(fn: Callable) -> Callable:
@@ -117,7 +117,7 @@ def identities(fn: Callable) -> Callable:
     return previous
 
 
-def generate_identity(creator=None) -> crypto.Identity:
+def generate_identity(creator=None) -> Identity:
     return identity_generator_fn(creator=creator)
 
 
@@ -186,8 +186,8 @@ class Entity:
         creator: Optional["Entity"] = None,
         parent: Optional["Entity"] = None,
         klass: Optional[Type[EntityClass]] = None,
-        identity: Optional[crypto.Identity] = None,
-        props: Optional[properties.Common] = None,
+        identity: Optional[Identity] = None,
+        props: Optional[Common] = None,
         chimeras=None,
         scopes=None,
         initialize=None,
@@ -218,7 +218,7 @@ class Entity:
 
         assert props
 
-        self.props: properties.Common = props
+        self.props: Common = props
 
         if scopes:
             for scope in scopes:
@@ -256,16 +256,16 @@ class Entity:
             self.props.gid = gid
             return gid
 
-    def get_kind(self, name: str) -> kinds.Kind:
+    def get_kind(self, name: str) -> Kind:
         if not name in self.props.related:
-            self.props.related[name] = kinds.Kind(
+            self.props.related[name] = Kind(
                 identity=generate_identity(creator=self.identity)
             )
             self.touch()
         return self.props.related[name]
 
     def touch(self) -> None:
-        self.props[properties.Touched] = time.time()
+        self.props.touch()
         self.version.touch()
 
     @property
@@ -284,14 +284,14 @@ class Entity:
         self.props.destroyed = self.identity
         self.touch()
 
-    def freeze(self, identity: crypto.Identity) -> bool:
+    def freeze(self, identity: Identity) -> bool:
         if self.props.frozen:
             raise EntityFrozen()
         self.props.frozen = identity
         self.touch()
         return True
 
-    def unfreeze(self, identity: crypto.Identity) -> bool:
+    def unfreeze(self, identity: Identity) -> bool:
         if not self.props.frozen:
             raise Exception("unfrozen")
         if self.props.frozen.public != identity.public:

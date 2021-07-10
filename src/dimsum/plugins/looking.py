@@ -1,20 +1,18 @@
 import logging
 import dataclasses
+import inflect
 from typing import Type, Optional, List, Sequence, Dict
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-from model.entity import *
-import scopes.users as users
-import scopes.movement as movement
-from finders import *
-from plugins.actions import PersonAction
 import grammars
 import transformers
+from model import *
+from finders import *
+from plugins.actions import PersonAction
+import scopes.users as users
+import scopes.movement as movement
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 class ObservedLiving(ObservedEntity):
@@ -76,12 +74,12 @@ class DetailedObservation(Observation):
 
 
 class AreaObservation(Observation):
-    def __init__(self, area: entity.Entity, person: entity.Entity):
+    def __init__(self, area: Entity, person: Entity):
         super().__init__()
         assert area
         assert person
         self.who: ObservedPerson = ObservedPerson(person)
-        self.where: entity.Entity = area
+        self.where: Entity = area
 
         occupied = area.make(occupyable.Occupyable).occupied
         self.living: List[ObservedLiving] = flatten(
@@ -138,7 +136,7 @@ class AreaObservation(Observation):
 
 
 class EntitiesObservation(Observation):
-    def __init__(self, entities: Sequence[entity.Entity]):
+    def __init__(self, entities: Sequence[Entity]):
         super().__init__()
         self.entities = entities
 
@@ -154,7 +152,7 @@ class EntitiesObservation(Observation):
 
 
 class PersonalObservation(Observation):
-    def __init__(self, who: entity.Entity):
+    def __init__(self, who: Entity):
         super().__init__()
         self.who = ObservedPerson(who)
 
@@ -250,7 +248,7 @@ class Look(PersonAction):
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         if self.item:
-            return DetailedObservation(ObservedItem(self.item))
+            return DetailedObservation(ObservedEntity(self.item))
 
         assert area
         return AreaObservation(area, person)
@@ -294,3 +292,7 @@ class LookingGrammar(grammars.Grammar):
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
 """
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]

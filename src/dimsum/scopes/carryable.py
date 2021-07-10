@@ -1,28 +1,22 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
-import model.crypto as crypto
-import model.entity as entity
-import model.kinds as kinds
-import model.properties as properties
-import context
+from model import Entity, Scope, Common, Identity, generate_identity, Kind, context
 
 log = logging.getLogger("dimsum.scopes")
 
 
-class Key(entity.Scope):
-    def __init__(self, patterns: Optional[Dict[str, crypto.Identity]] = None, **kwargs):
+class Key(Scope):
+    def __init__(self, patterns: Optional[Dict[str, Identity]] = None, **kwargs):
         super().__init__(**kwargs)
         self.patterns = patterns if patterns else {}
 
-    def has_pattern(self, pattern: crypto.Identity):
+    def has_pattern(self, pattern: Identity):
         return pattern.public in self.patterns
 
 
-class Lockable(entity.Scope):
-    def __init__(
-        self, pattern: Optional[crypto.Identity] = None, locked=None, **kwargs
-    ):
+class Lockable(Scope):
+    def __init__(self, pattern: Optional[Identity] = None, locked=None, **kwargs):
         super().__init__(**kwargs)
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
@@ -30,7 +24,7 @@ class Lockable(entity.Scope):
     def is_locked(self) -> bool:
         return self.locked
 
-    def lock(self, key: Optional[entity.Entity] = None, identity=None, **kwargs):
+    def lock(self, key: Optional[Entity] = None, identity=None, **kwargs):
         assert not self.locked
 
         identity = identity if identity else self.ourselves.identity
@@ -40,13 +34,13 @@ class Lockable(entity.Scope):
             if self.pattern:
                 raise Exception("already have a secret, need key")
 
-            self.pattern = crypto.generate_identity()
+            self.pattern = generate_identity()
             self.locked = True
             self.ourselves.touch()
 
             patterns = {}
             patterns[self.pattern.public] = self.pattern
-            key = context.get().create_item(props=properties.Common("Key"), **kwargs)
+            key = context.get().create_item(props=Common("Key"), **kwargs)
             assert key
             with key.make(Key) as keying:
                 keying.patterns = patterns
@@ -66,7 +60,7 @@ class Lockable(entity.Scope):
 
         return key
 
-    def unlock(self, key: Optional[entity.Entity] = None, **kwargs):
+    def unlock(self, key: Optional[Entity] = None, **kwargs):
         assert key
         assert self.locked
 
@@ -149,16 +143,16 @@ class Openable(Lockable):
         return False
 
 
-class Carryable(entity.Scope):
+class Carryable(Scope):
     def __init__(
         self,
-        kind: Optional[kinds.Kind] = None,
+        kind: Optional[Kind] = None,
         quantity: Optional[float] = None,
         loose: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.kind = kind if kind else kinds.Kind(identity=entity.generate_identity())
+        self.kind = kind if kind else Kind(identity=generate_identity())
         self.quantity = quantity if quantity else 1
         self.loose = loose
 
@@ -176,7 +170,7 @@ class Carryable(entity.Scope):
         self.quantity -= q
         return self
 
-    def separate(self, quantity: float, **kwargs) -> List[entity.Entity]:
+    def separate(self, quantity: float, **kwargs) -> List[Entity]:
         self.decrease_quantity(quantity)
         self.ourselves.touch()
 
@@ -192,12 +186,12 @@ class Carryable(entity.Scope):
 
 
 class Producer:
-    def produce_item(self, **kwargs) -> entity.Entity:
+    def produce_item(self, **kwargs) -> Entity:
         raise NotImplementedError
 
 
-class Location(entity.Scope):
-    def __init__(self, container: Optional[entity.Entity] = None, **kwargs):
+class Location(Scope):
+    def __init__(self, container: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.container = container
 
@@ -205,14 +199,14 @@ class Location(entity.Scope):
 class Containing(Openable):
     def __init__(self, holding=None, capacity=None, produces=None, **kwargs):
         super().__init__(**kwargs)
-        self.holding: List[entity.Entity] = holding if holding else []
+        self.holding: List[Entity] = holding if holding else []
         self.capacity = capacity if capacity else None
         self.produces: Dict[str, Producer] = produces if produces else {}
 
     def produces_when(self, verb: str, item: Producer):
         self.produces[verb] = item
 
-    def produce_into(self, verb: str, container: "entity.Entity", **kwargs):
+    def produce_into(self, verb: str, container: Entity, **kwargs):
         with container.make(Containing) as into:
             if not into.is_open():
                 log.info("produce_into: unopened")
@@ -240,32 +234,32 @@ class Containing(Openable):
             return False
         return True
 
-    def contains(self, e: entity.Entity) -> bool:
+    def contains(self, e: Entity) -> bool:
         return e in self.holding
 
-    def unhold(self, e: entity.Entity, **kwargs) -> entity.Entity:
+    def unhold(self, e: Entity, **kwargs) -> Entity:
         self.holding.remove(e)
         self.ourselves.touch()
         with e.make(Location) as location:
             location.container = None
         return e
 
-    def place_inside(self, item: entity.Entity, **kwargs):
+    def place_inside(self, item: Entity, **kwargs):
         if self.is_open():
             return self.hold(item, **kwargs)
         return False
 
-    def take_out(self, item: entity.Entity, **kwargs):
+    def take_out(self, item: Entity, **kwargs):
         if self.is_open():
             if item in self.holding:
                 return self.unhold(item, **kwargs)
         return False
 
-    def hold(self, item: entity.Entity, quantity: Optional[float] = None, **kwargs):
+    def hold(self, item: Entity, quantity: Optional[float] = None, **kwargs):
         log.info("holding %s", item)
         return self.add_item(item, **kwargs)
 
-    def add_item(self, item: entity.Entity, **kwargs) -> entity.Entity:
+    def add_item(self, item: Entity, **kwargs) -> Entity:
         for already in self.holding:
             with already.make(Carryable) as additional:
                 with item.make(Carryable) as coming:
@@ -292,7 +286,7 @@ class Containing(Openable):
             item.touch()
         return item
 
-    def drop_all(self) -> List[entity.Entity]:
+    def drop_all(self) -> List[Entity]:
         dropped = []
         while len(self.holding) > 0:
             item = self.holding[0]
@@ -301,20 +295,20 @@ class Containing(Openable):
         self.ourselves.touch()
         return dropped
 
-    def is_holding(self, item: entity.Entity):
+    def is_holding(self, item: Entity):
         return item in self.holding
 
     def drop_here(
         self,
-        area: entity.Entity,
-        item: Optional[entity.Entity] = None,
+        area: Entity,
+        item: Optional[Entity] = None,
         quantity: Optional[float] = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
             return None, "nothing to drop"
 
-        dropped: List[entity.Entity] = []
+        dropped: List[Entity] = []
         if quantity:
             if not item:
                 return None, "please specify what?"
@@ -346,7 +340,7 @@ class Containing(Openable):
 
         return dropped, None
 
-    def drop(self, e: entity.Entity) -> List[entity.Entity]:
+    def drop(self, e: Entity) -> List[Entity]:
         if e in self.holding:
             self.holding.remove(e)
             self.ourselves.touch()
@@ -356,13 +350,13 @@ class Containing(Openable):
             return [e]
         return []
 
-    def entities(self) -> List[entity.Entity]:
+    def entities(self) -> List[Entity]:
         return self.holding
 
     def entities_named(self, of: str):
         return [e for e in self.entities() if e.describes(q=of)]
 
-    def entities_of_kind(self, kind: kinds.Kind):
+    def entities_of_kind(self, kind: Kind):
         return [
             e
             for e in self.entities()
@@ -372,5 +366,5 @@ class Containing(Openable):
     def number_of_named(self, of: str) -> float:
         return sum([e.quantity for e in self.entities_named(of)])
 
-    def number_of_kind(self, kind: kinds.Kind) -> float:
+    def number_of_kind(self, kind: Kind) -> float:
         return sum([e.make(Carryable).quantity for e in self.entities_of_kind(kind)])

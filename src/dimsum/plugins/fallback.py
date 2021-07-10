@@ -2,8 +2,8 @@ import logging
 from typing import Type
 
 import grammars
-import model.game as game
 import transformers
+from model import *
 
 log = logging.getLogger("dimsum")
 
@@ -28,4 +28,4 @@ class Grammar(grammars.Grammar):
 
 class Transformer(transformers.Base):
     def verb(self, args):
-        return game.Unknown()
+        return Unknown()

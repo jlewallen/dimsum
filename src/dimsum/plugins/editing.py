@@ -2,18 +2,13 @@ import dataclasses
 import logging
 from typing import Optional, Type
 
-from context import *
 import grammars
-from model.entity import *
-from model.events import *
-from model.game import *
-from model.reply import *
-from model.world import *
+import transformers
+from model import *
 from finders import *
 from plugins.actions import PersonAction
 import scopes.mechanics as mechanics
 import scopes.health as health
-import transformers
 
 log = logging.getLogger("dimsum")
 
@@ -60,12 +55,7 @@ class ModifyHardToSee(PersonAction):
         self.hard_to_see = hard_to_see
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -106,7 +96,7 @@ class ModifyField(PersonAction):
 
         item.touch()
 
-        return game.Success("done")
+        return Success("done")
 
 
 class ModifyActivity(PersonAction):
@@ -133,7 +123,7 @@ class ModifyActivity(PersonAction):
             inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
         item.touch()
-        return game.Success("done")
+        return Success("done")
 
 
 @grammars.grammar()

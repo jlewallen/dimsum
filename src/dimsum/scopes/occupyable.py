@@ -2,79 +2,67 @@ import dataclasses
 import logging
 from typing import Dict, List, Optional
 
-import context
-import model.entity as entity
-import model.events as events
+from model import Entity, Scope, event, StandardEvent, context
 
-"""
-One thing I've considered is to use this as a place for a way to
-intercept existing scopes/operations.
-
-So, being able to decorate with something like
-
-@entity.before(carryable.Containing)
-
-And then using that to maintain our state.
-"""
 
 log = logging.getLogger("dimsum.scopes")
 
 
-@events.event
+@event
 @dataclasses.dataclass(frozen=True)
-class LivingEnteredArea(events.StandardEvent):
-    living: entity.Entity
-    area: entity.Entity
+class LivingEnteredArea(StandardEvent):
+    living: Entity
+    area: Entity
 
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} arrived from {self.area}"}
 
 
-@events.event
+@event
 @dataclasses.dataclass(frozen=True)
-class LivingLeftArea(events.StandardEvent):
-    living: entity.Entity
-    area: entity.Entity
+class LivingLeftArea(StandardEvent):
+    living: Entity
+    area: Entity
 
     def render_string(self) -> Dict[str, str]:
         return {"text": f"{self.living.props.name} went to {self.area}"}
 
 
-class Occupying(entity.Scope):
-    def __init__(self, area: Optional[entity.Entity] = None, **kwargs):
+class Occupying(Scope):
+    def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
 
-    def update(self, area: entity.Entity):
+    def update(self, area: Entity):
         self.area = area
         self.ourselves.touch()
 
 
-class Occupyable(entity.Scope):
+class Occupyable(Scope):
     def __init__(self, occupied=None, **kwargs):
         super().__init__(**kwargs)
-        self.occupied: List[entity.Entity] = occupied if occupied else []
+        self.occupied: List[Entity] = occupied if occupied else []
         self.occupancy: int = 100
 
-    def add_living(self, living: entity.Entity) -> entity.Entity:
-        assert isinstance(living, entity.Entity)
+    def add_living(self, living: Entity) -> Entity:
+        assert isinstance(living, Entity)
         self.occupied.append(living)
         with living.make(Occupying) as occupying:
             occupying.update(self.ourselves)
             self.ourselves.touch()
         return living
 
-    def occupying(self, living: entity.Entity) -> bool:
+    def occupying(self, living: Entity) -> bool:
         return living in self.occupied
 
-    async def entered(self, player: entity.Entity):
+    async def entered(self, player: Entity):
         assert player not in self.occupied
         await context.get().publish(
             LivingEnteredArea(living=player, area=self.ourselves, heard=self.occupied)
         )
         self.add_living(player)
 
-    async def left(self, player: entity.Entity):
+    async def left(self, player: Entity):
         assert player in self.occupied
         self.occupied.remove(player)
         self.ourselves.touch()

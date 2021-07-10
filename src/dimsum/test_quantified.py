@@ -1,10 +1,9 @@
 import logging
 import pytest
 
+import finders
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
-import finders
-
 import test
 
 log = logging.getLogger("dimsum")

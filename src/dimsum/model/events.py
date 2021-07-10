@@ -1,8 +1,8 @@
-import dataclasses
 import logging
+import dataclasses
 from typing import Any, Dict, List, Optional, Type
 
-import model.visual as visual
+from .visual import Renderable
 
 log = logging.getLogger("dimsum.model")
 
@@ -36,7 +36,7 @@ class TickEvent(Event):
 
 @event
 @dataclasses.dataclass(frozen=True)
-class StandardEvent(Event, visual.Renderable):
+class StandardEvent(Event, Renderable):
     living: Any
     area: Any
     heard: Optional[List[Any]]

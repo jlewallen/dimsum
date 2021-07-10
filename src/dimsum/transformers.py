@@ -1,18 +1,15 @@
 import dataclasses
-
 import lark
-import model.entity as entity
-import model.world as world
 
-import scopes.movement as movement
-
+from model import Entity, World
 import finders as finders
+import scopes.movement as movement
 
 
 @dataclasses.dataclass
 class Base(lark.Transformer):
-    world: world.World
-    player: entity.Entity
+    world: World
+    player: Entity
 
     def start(self, args):
         return args[0]

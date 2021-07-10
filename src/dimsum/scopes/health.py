@@ -2,10 +2,7 @@ import dataclasses
 import logging
 from typing import Optional
 
-import model.entity as entity
-import model.events as events
-import model.properties as properties
-
+from model import Entity, Scope, Event, SumFields, merge_dictionaries
 import scopes.carryable as carryable
 
 log = logging.getLogger("dimsum.scopes")
@@ -22,7 +19,7 @@ NutritionFields = [
     "vitamins",
 ]
 
-Fields = [properties.SumFields(name) for name in NutritionFields]
+Fields = [SumFields(name) for name in NutritionFields]
 
 
 class Nutrition:
@@ -31,9 +28,7 @@ class Nutrition:
         self.properties = properties if properties else {}
 
     def include(self, other: "Nutrition"):
-        changes = properties.merge_dictionaries(
-            self.properties, other.properties, Fields
-        )
+        changes = merge_dictionaries(self.properties, other.properties, Fields)
         log.info("merged %s" % (changes,))
         self.properties.update(changes)
 
@@ -44,7 +39,7 @@ class Medical:
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
-class Edible(entity.Scope):
+class Edible(Scope):
     def __init__(
         self, nutrition: Optional[Nutrition] = None, servings: int = 1, **kwargs
     ):
@@ -56,14 +51,12 @@ class Edible(entity.Scope):
         self.servings = s
 
 
-class Health(entity.Scope):
+class Health(Scope):
     def __init__(self, medical=None, **kwargs):
         super().__init__(**kwargs)
         self.medical = medical if medical else Medical()
 
-    async def consume(
-        self, edible: entity.Entity, drink=True, area=None, ctx=None, **kwargs
-    ):
+    async def consume(self, edible: Entity, drink=True, area=None, ctx=None, **kwargs):
         with edible.make(Edible) as eating:
             self.medical.nutrition.include(eating.nutrition)
             eating.servings -= 1
@@ -82,14 +75,14 @@ class Health(entity.Scope):
 
 
 @dataclasses.dataclass
-class ItemEaten(events.Event):
-    living: entity.Entity
-    area: entity.Entity
-    item: entity.Entity
+class ItemEaten(Event):
+    living: Entity
+    area: Entity
+    item: Entity
 
 
 @dataclasses.dataclass
-class ItemDrank(events.Event):
-    living: entity.Entity
-    area: entity.Entity
-    item: entity.Entity
+class ItemDrank(Event):
+    living: Entity
+    area: Entity
+    item: Entity

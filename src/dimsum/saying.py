@@ -4,22 +4,20 @@ import json
 import logging
 from typing import Callable, Dict, List, Optional, Union
 
-import context
-import model.entity as entity
-import model.events as events
-import model.game as game
+from model import Entity, event, Event, Reply, Success, context
+
 import tools
 
 log = logging.getLogger("dimsum")
 
 
-@events.event
+@event
 @dataclasses.dataclass(frozen=True)
-class DynamicMessage(events.Event):
-    living: Optional[entity.Entity]
-    area: entity.Entity
-    heard: Optional[List[entity.Entity]]
-    message: game.Reply
+class DynamicMessage(Event):
+    living: Optional[Entity]
+    area: Entity
+    heard: Optional[List[Entity]]
+    message: Reply
 
     def render_string(self) -> Dict[str, str]:
         return json.loads(json.dumps(self.message))  # TODO json fuckery
@@ -38,7 +36,7 @@ class Notify:
 @dataclasses.dataclass(frozen=True)
 class NotifyAll(Notify):
     hook: str
-    event: events.Event
+    event: Event
 
     def applies(self, hook: str) -> bool:
         return self.hook == hook
@@ -49,33 +47,29 @@ class NotifyAll(Notify):
 
 @dataclasses.dataclass
 class Say:
-    everyone_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-    nearby_queue: List[game.Reply] = dataclasses.field(default_factory=list)
-    player_queue: Dict[entity.Entity, List[game.Reply]] = dataclasses.field(
-        default_factory=dict
-    )
+    everyone_queue: List[Reply] = dataclasses.field(default_factory=list)
+    nearby_queue: List[Reply] = dataclasses.field(default_factory=list)
+    player_queue: Dict[Entity, List[Reply]] = dataclasses.field(default_factory=dict)
 
-    def everyone(self, message: Union[game.Reply, str]):
+    def everyone(self, message: Union[Reply, str]):
         if isinstance(message, str):
-            r = game.Success(message)
+            r = Success(message)
         self.everyone_queue.append(r)
 
-    def nearby(self, message: Union[game.Reply, str]):
+    def nearby(self, message: Union[Reply, str]):
         if isinstance(message, str):
-            r = game.Success(message)
+            r = Success(message)
         self.nearby_queue.append(r)
 
-    def player(self, person: entity.Entity, message: Union[game.Reply, str]):
+    def player(self, person: Entity, message: Union[Reply, str]):
         if isinstance(message, str):
-            r = game.Success(message)
+            r = Success(message)
         self.player_queue.setdefault(person, []).append(r)
 
     async def _pub(self, **kwargs):
         await context.get().publish(DynamicMessage(**kwargs))
 
-    async def publish(
-        self, area: entity.Entity, person: Optional[entity.Entity] = None
-    ):
+    async def publish(self, area: Entity, person: Optional[Entity] = None):
         for player, queue in self.player_queue.items():
             for e in queue:
                 await self._pub(

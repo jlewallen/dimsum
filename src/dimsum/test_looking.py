@@ -2,13 +2,10 @@ import logging
 import freezegun
 import pytest
 
-import model.reply as reply
-
+from model import *
 from plugins.looking import *
-
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
-
 import test
 
 log = logging.getLogger("dimsum")
@@ -135,7 +132,3 @@ async def test_making_item_hard_to_see():
         log.info(tw.dumps(orb))
 
         assert len(r.items) == 1
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]

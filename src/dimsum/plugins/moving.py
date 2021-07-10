@@ -1,22 +1,19 @@
 import logging
 from typing import Type, Optional, Any
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-import scopes.movement as movement
-import scopes.occupyable as occupyable
-from plugins.actions import PersonAction
-import plugins.looking as looking
 import grammars
 import transformers
+from model import *
+from plugins.actions import PersonAction
+import scopes.movement as movement
+import scopes.occupyable as occupyable
+import plugins.looking as looking
 
 log = logging.getLogger("dimsum")
 
 
 @hooks.all.enter.target
-def can_enter(person: entity.Entity, area: entity.Entity) -> bool:
+def can_enter(person: Entity, area: Entity) -> bool:
     return True
 
 
@@ -25,12 +22,7 @@ class Home(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         return await Go(area=world.welcome_area()).perform(
             world=world, area=area, person=person, ctx=ctx, **kwargs
@@ -40,7 +32,7 @@ class Home(PersonAction):
 class MovingAction(PersonAction):
     def __init__(
         self,
-        area: Optional[entity.Entity] = None,
+        area: Optional[Entity] = None,
         finder: Optional[movement.FindsRoute] = None,
         **kwargs
     ):
@@ -48,7 +40,7 @@ class MovingAction(PersonAction):
         self.area = area
         self.finder = finder
 
-    async def move(self, ctx: Ctx, world: World, person: entity.Entity):
+    async def move(self, ctx: Ctx, world: World, person: Entity):
         area = world.find_person_area(person)
 
         destination = self.area
@@ -79,12 +71,7 @@ class MovingAction(PersonAction):
 
 class Go(MovingAction):
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         return await self.move(ctx, world, person)
 

@@ -2,18 +2,14 @@ import logging
 import dataclasses
 from typing import Type, Optional, List
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-from model.events import *
-import scopes.apparel as apparel
-from plugins.actions import PersonAction
-from plugins.editing import ModifyActivity
-from tools import *
-from finders import *
 import grammars
 import transformers
+from model import *
+from tools import *
+from finders import *
+from plugins.actions import PersonAction
+from plugins.editing import ModifyActivity
+import scopes.apparel as apparel
 
 log = logging.getLogger("dimsum")
 
@@ -21,13 +17,13 @@ log = logging.getLogger("dimsum")
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsWorn(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsUnworn(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 class Wear(PersonAction):
@@ -37,12 +33,7 @@ class Wear(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -77,12 +68,7 @@ class Remove(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -117,7 +103,7 @@ class Transformer(transformers.Base):
         return Remove(item=args[0])
 
     def when_worn(self, args):
-        return ModifyActivity(item=AnyHeldItem(), activity=properties.Worn, value=True)
+        return ModifyActivity(item=AnyHeldItem(), activity=Worn, value=True)
 
 
 @grammars.grammar()

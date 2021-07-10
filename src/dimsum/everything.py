@@ -2,10 +2,7 @@ import logging
 import inflect
 from typing import Optional
 
-import model.entity as entity
-import model.world as world
-import model.reply as reply
-import model.hooks as hooks
+from model import Entity, World, Hooks, install_hooks, Hooks, hooks
 
 import scopes as scopes
 import scopes.behavior as behavior
@@ -29,8 +26,8 @@ p = inflect.engine()
 log = logging.getLogger("dimsum")
 
 
-class EntityHooks(entity.Hooks):
-    def describe(self, entity: entity.Entity) -> str:
+class EntityHooks(Hooks):
+    def describe(self, entity: Entity) -> str:
         if entity.klass == scopes.LivingClass:
             return "{0} (#{1})".format(entity.props.name, entity.props.gid)
         if entity.klass == scopes.AreaClass:
@@ -45,9 +42,7 @@ class EntityHooks(entity.Hooks):
                     )
         return "{0} (#{1})".format(p.a(entity.props.name), entity.props.gid)
 
-    def cleanup(
-        self, entity: entity.Entity, world: Optional[world.World] = None, **kwargs
-    ):
+    def cleanup(self, entity: Entity, world: Optional[World] = None, **kwargs):
         assert world
         if world.has(behavior.BehaviorCollection):
             log.info("cleanup %s", entity)
@@ -57,11 +52,11 @@ class EntityHooks(entity.Hooks):
                     world.touch()
 
 
-entity.install_hooks(EntityHooks())
+install_hooks(EntityHooks())
 
 
 @hooks.all.observed.hook
-def hide_invisible_entities(resume, entity: entity.Entity):
+def hide_invisible_entities(resume, entity: Entity):
     if entity.make_and_discard(mechanics.Visibility).is_invisible:
         return []
     return resume(entity)

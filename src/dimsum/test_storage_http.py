@@ -1,22 +1,21 @@
 import asyncio
 import json
 import logging
-from multiprocessing import Process
-import test
 import time
-from typing import Optional
-
-import dimsum
+import shortuuid
+import uvicorn
+import pytest
 import freezegun
+from typing import Optional
+from multiprocessing import Process
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
-import model.entity as entity
-import model.properties as properties
-import pytest
+
 import serializing
-import shortuuid
 import storage
-import uvicorn
+from model import *
+import dimsum
+import test
 
 log = logging.getLogger("dimsum")
 
@@ -101,21 +100,21 @@ def deterministic():
 async def test_storage_update_one_entity(
     snapshot, server, silence_aihttp, deterministic
 ):
-    w = entity.Entity(props=properties.Common(name="Fake Entity"))
+    w = Entity(props=Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
     assert serialized
 
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid(name="example-1")
 
-    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    updated = await store.update({Keys(key): EntityUpdate(serialized)})
     snapshot.assert_match(test.pretty_json(updated), "before.json")
 
     w.version.increase()
     serialized = serializing.serialize(w)
     assert serialized
 
-    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    updated = await store.update({Keys(key): EntityUpdate(serialized)})
     snapshot.assert_match(test.pretty_json(updated), "after.json")
 
 
@@ -124,13 +123,13 @@ async def test_storage_update_one_entity(
 async def test_storage_delete_one_entity(
     snapshot, server, silence_aihttp, deterministic
 ):
-    w = entity.Entity(props=properties.Common(name="Fake Entity"))
+    w = Entity(props=Common(name="Fake Entity"))
     serialized = serializing.serialize(w)
     assert serialized
 
     store = storage.HttpStorage("http://127.0.0.1:45600")
     key = shortuuid.uuid(name="example-2")
-    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    updated = await store.update({Keys(key): EntityUpdate(serialized)})
     snapshot.assert_match(test.pretty_json(updated), "before.json")
 
     w.version.increase()
@@ -138,5 +137,5 @@ async def test_storage_delete_one_entity(
     serialized = serializing.serialize(w)
     assert serialized
 
-    updated = await store.update({entity.Keys(key): entity.EntityUpdate(serialized)})
+    updated = await store.update({Keys(key): EntityUpdate(serialized)})
     snapshot.assert_match(test.pretty_json(updated), "after.json")

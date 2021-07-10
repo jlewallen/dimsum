@@ -1,11 +1,9 @@
 import logging
-import pytest
-
 import freezegun
+import pytest
 
 import domains
 import library
-
 import test
 
 log = logging.getLogger("dimsum")

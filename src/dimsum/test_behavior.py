@@ -1,13 +1,11 @@
 import logging
 import pytest
 
-import model.properties as properties
-
+from model import *
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import scopes as scopes
-
 import test
 
 log = logging.getLogger("dimsum.tests")
@@ -22,7 +20,7 @@ async def test_drop_hammer_funny_gold(caplog):
         world = await session.prepare()
 
         hammer = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("Hammer")),
+            scopes.item(creator=world, props=Common("Hammer")),
             session=session,
         )
 
@@ -70,7 +68,7 @@ async def test_wear_cape(caplog):
         world = await session.prepare()
 
         cape = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("Cape")), session=session
+            scopes.item(creator=world, props=Common("Cape")), session=session
         )
         with cape.make(mechanics.Interactable) as inaction:
             inaction.link_activity("worn")
@@ -119,7 +117,7 @@ async def test_behavior_create_item(caplog):
         w = await session.prepare()
 
         box = tw.add_item_to_welcome_area(
-            scopes.item(creator=w, props=properties.Common("A Colorful Box")),
+            scopes.item(creator=w, props=Common("A Colorful Box")),
             session=session,
         )
         with box.make(behavior.Behaviors) as behave:
@@ -130,7 +128,7 @@ async def test_behavior_create_item(caplog):
 async def shake(this, person, say):
     item = ctx.create_item(
         creator=person,
-        props=properties.Common("Flower Petal")
+        props=Common("Flower Petal")
     )
     tools.hold(person, item)
     return "oh wow look at that!"
@@ -175,7 +173,7 @@ async def test_behavior_create_item_same_kind(caplog):
         w = await session.prepare()
 
         box = tw.add_item_to_welcome_area(
-            scopes.item(creator=w, props=properties.Common("A Colorful Box")),
+            scopes.item(creator=w, props=Common("A Colorful Box")),
             session=session,
         )
         with box.make(behavior.Behaviors) as behave:
@@ -187,7 +185,7 @@ async def shake(this, person, say):
     item = ctx.create_item(
         creator=person,
         kind=this.get_kind("petal-1"),
-        props=properties.Common("Flower Petal"),
+        props=Common("Flower Petal"),
         initialize={ Carryable: dict(kind=this.get_kind("petal-1")) },
     )
     tools.hold(person, item)
@@ -232,7 +230,7 @@ async def test_behavior_create_quantified_item(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         box = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("A Colorful Box")),
+            scopes.item(creator=world, props=Common("A Colorful Box")),
             session=session,
         )
         with box.make(behavior.Behaviors) as behave:
@@ -243,7 +241,7 @@ async def test_behavior_create_quantified_item(caplog):
 async def shake(this, person, say):
     item = ctx.create_item(
         creator=person,
-        props=properties.Common("Flower Petal"),
+        props=Common("Flower Petal"),
         initialize={ Carryable: dict(quantity=10) }
     )
     tools.hold(tools.area_of(person), item)
@@ -293,7 +291,7 @@ async def test_behavior_time_passing(caplog):
         world = await session.prepare()
 
         tree = tw.add_item_to_welcome_area(
-            scopes.item(creator=world, props=properties.Common("A Lovely Tree")),
+            scopes.item(creator=world, props=Common("A Lovely Tree")),
             session=session,
         )
         with tree.make(behavior.Behaviors) as behave:
@@ -304,7 +302,7 @@ async def test_behavior_time_passing(caplog):
 async def tick(this, ev, say):
     item = ctx.create_item(
         creator=this,
-        props=properties.Common("Flower Petal"),
+        props=Common("Flower Petal"),
         initialize={ Carryable: dict(quantity=10) }
     )
     tools.hold(tools.area_of(this), item)

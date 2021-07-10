@@ -2,29 +2,26 @@ import logging
 import pytest
 from typing import Optional
 
-import model.entity as entity
-import model.properties as properties
-
 import domains
-
+from model import *
 import scopes.ownership as ownership
 
 
 log = logging.getLogger("dimsum")
 
 
-class SimpleCore(entity.Scope):
+class SimpleCore(Scope):
     def __init__(self, name: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
         self.name = name
 
 
-class SimpleHolding(entity.Scope):
+class SimpleHolding(Scope):
     def __init__(self, holding=None, **kwargs):
         super().__init__(**kwargs)
         self.holding = holding if holding else []
 
-    def add_item(self, entity: entity.Entity):
+    def add_item(self, entity: Entity):
         self.holding.append(entity)
 
 
@@ -35,15 +32,13 @@ async def test_chimeric_entities_serialize(caplog):
     with domain.session() as session:
         universe = await session.prepare()
 
-        jacob = entity.Entity(
-            creator=universe, props=properties.Common(name="Jacob"), scopes=[SimpleCore]
+        jacob = Entity(
+            creator=universe, props=Common(name="Jacob"), scopes=[SimpleCore]
         )
         session.register(jacob)
         universe.remember(jacob)
 
-        toy = entity.Entity(
-            creator=universe, props=properties.Common(name="Toy"), scopes=[SimpleCore]
-        )
+        toy = Entity(creator=universe, props=Common(name="Toy"), scopes=[SimpleCore])
         session.register(toy)
         universe.remember(toy)
 
@@ -60,11 +55,9 @@ async def test_chimeric_entities_serialize(caplog):
 
 
 def make_person(
-    props: Optional[properties.Common] = None,
-    creator: Optional[entity.Entity] = None,
-    **kwargs
+    props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
 ):
-    person = entity.Entity(props=props, creator=creator, scopes=[SimpleCore], **kwargs)
+    person = Entity(props=props, creator=creator, scopes=[SimpleCore], **kwargs)
 
     assert props
 
@@ -78,13 +71,9 @@ def make_person(
 
 
 def make_thing(
-    props: Optional[properties.Common] = None,
-    creator: Optional[entity.Entity] = None,
-    **kwargs
+    props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
 ):
-    thing = entity.Entity(
-        props=props, creator=creator, scopes=[ownership.Ownership], **kwargs
-    )
+    thing = Entity(props=props, creator=creator, scopes=[ownership.Ownership], **kwargs)
 
     assert props
 
@@ -107,11 +96,11 @@ async def test_specialization_classes(caplog):
     with domain.session() as session:
         universe = await session.prepare()
 
-        person = make_person(creator=universe, props=properties.Common(name="Jacob"))
+        person = make_person(creator=universe, props=Common(name="Jacob"))
         session.register(person)
         universe.remember(person)
 
-        toy = make_thing(creator=universe, props=properties.Common(name="Toy"))
+        toy = make_thing(creator=universe, props=Common(name="Toy"))
         session.register(toy)
         universe.remember(toy)
 

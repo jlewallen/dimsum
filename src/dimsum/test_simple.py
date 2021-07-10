@@ -1,14 +1,12 @@
 import logging
-import test
+import pytest
 
-import model.world as world
-
+from model import *
 import scopes.carryable as carryable
 import scopes.health as health
 import scopes.mechanics as mechanics
 import scopes.ownership as ownership
-
-import pytest
+import test
 
 log = logging.getLogger("dimsum")
 
@@ -17,7 +15,7 @@ log = logging.getLogger("dimsum")
 async def test_world_owns_itself(caplog):
     whatever = test.create_empty_world()
     with whatever.make(ownership.Ownership) as props:
-        assert isinstance(props.owner, world.World)
+        assert isinstance(props.owner, World)
 
 
 @pytest.mark.asyncio

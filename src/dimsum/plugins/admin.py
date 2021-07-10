@@ -1,15 +1,12 @@
 import logging
 from typing import Type, Optional
 
-from context import Ctx
-from model.game import *
-from model.reply import *
-from model.world import *
-import scopes.users as users
-from plugins.actions import PersonAction
-from finders import *
 import grammars
 import transformers
+from model import *
+from finders import *
+from plugins.actions import PersonAction
+import scopes.users as users
 
 log = logging.getLogger("dimsum")
 
@@ -20,12 +17,7 @@ class Auth(PersonAction):
         self.password = password
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         with person.make(users.Auth) as auth:
             auth.change(self.password)
@@ -40,12 +32,7 @@ class Freeze(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -67,12 +54,7 @@ class Unfreeze(PersonAction):
         self.item = item
 
     async def perform(
-        self,
-        world: World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         item = await world.apply_item_finder(person, self.item)
         if not item:

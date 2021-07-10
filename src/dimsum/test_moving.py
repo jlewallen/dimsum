@@ -1,13 +1,10 @@
 from typing import Optional
 import pytest
 
-import model.entity as entity
-import model.properties as properties
-
+from model import *
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes as scopes
-
 import test
 
 
@@ -16,7 +13,7 @@ async def test_go_unknown():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before: Optional[entity.Entity] = None
+    area_before: Optional[Entity] = None
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
@@ -39,13 +36,11 @@ async def test_go_adjacent():
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        another_room = scopes.area(
-            creator=session.world, props=properties.Common("Another Room")
-        )
+        another_room = scopes.area(creator=session.world, props=Common("Another Room"))
 
         exit = scopes.exit(
             creator=session.world,
-            props=properties.Common("Door"),
+            props=Common("Door"),
             initialize={movement.Exit: dict(area=another_room)},
         )
         add_item(world.welcome_area(), exit)
@@ -102,13 +97,13 @@ async def test_directional_moving():
         jacob = await session.materialize(key=tw.jacob_key)
         area = world.find_entity_area(jacob)
 
-        park = scopes.area(props=properties.Common("North Park"), creator=world)
+        park = scopes.area(props=Common("North Park"), creator=world)
 
         await session.add_area(park)
 
         exit = scopes.exit(
             creator=world,
-            props=properties.Common(name=movement.Direction.NORTH.exiting),
+            props=Common(name=movement.Direction.NORTH.exiting),
             initialize={movement.Exit: dict(area=park)},
         )
         add_item(world.welcome_area(), exit)
@@ -129,20 +124,17 @@ async def test_directional_moving():
 
 class Bidirectional:
     def __init__(
-        self,
-        there: Optional[entity.Entity] = None,
-        back: Optional[entity.Entity] = None,
-        **kwargs
+        self, there: Optional[Entity] = None, back: Optional[Entity] = None, **kwargs
     ):
         assert there
         assert back
         goes_there = scopes.exit(
-            props=properties.Common(name="Exit to {0}".format(there.props.name)),
+            props=Common(name="Exit to {0}".format(there.props.name)),
             initialize={movement.Exit: dict(area=there)},
             **kwargs
         )
         comes_back = scopes.exit(
-            props=properties.Common(name="Exit to {0}".format(back.props.name)),
+            props=Common(name="Exit to {0}".format(back.props.name)),
             initialize={movement.Exit: dict(area=back)},
             **kwargs
         )
@@ -161,8 +153,8 @@ async def test_programmatic_basic_entrances_and_exits():
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        earth = scopes.area(creator=world, props=properties.Common(name="Earth"))
-        asteroid = scopes.area(creator=world, props=properties.Common(name="Asteroid"))
+        earth = scopes.area(creator=world, props=Common(name="Earth"))
+        asteroid = scopes.area(creator=world, props=Common(name="Asteroid"))
         Bidirectional(there=asteroid, back=earth, creator=world)
 
         await session.add_area(asteroid)
@@ -193,6 +185,6 @@ async def test_digging_with_return():
     await tw.success("go south")
 
 
-def add_item(container: entity.Entity, item: entity.Entity):
+def add_item(container: Entity, item: Entity):
     with container.make(carryable.Containing) as contain:
         contain.add_item(item)

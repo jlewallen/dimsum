@@ -2,17 +2,12 @@ import dataclasses
 import logging
 from typing import Dict, Optional, Type
 
-from context import *
 import grammars
-from model.entity import *
-from model.events import *
-from model.game import *
-from model.reply import *
-from model.world import *
-from finders import *
-import scopes.occupyable as occupyable
-from plugins.actions import PersonAction
 import transformers
+from model import *
+from finders import *
+from plugins.actions import PersonAction
+import scopes.occupyable as occupyable
 
 log = logging.getLogger("dimsum")
 

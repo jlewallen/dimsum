@@ -2,10 +2,7 @@ import logging
 import stringcase
 from typing import Tuple
 
-import model.entity as entity
-import model.properties as properties
-import model.world as world
-
+from model import Entity, World, Common
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -16,24 +13,24 @@ import scopes as scopes
 log = logging.getLogger("dimsum.model")
 
 
-def add_item(container: entity.Entity, item: entity.Entity):
+def add_item(container: Entity, item: Entity):
     with container.make(carryable.Containing) as contain:
         contain.add_item(item)
 
 
 class Generics:
-    def __init__(self, world: world.World):
+    def __init__(self, world: World):
         self.thing = scopes.item(
             creator=world,
-            props=properties.Common("generic thing"),
+            props=Common("generic thing"),
         )
         self.area = scopes.area(
             creator=world,
-            props=properties.Common("generic area"),
+            props=Common("generic area"),
         )
         self.player = scopes.alive(
             creator=world,
-            props=properties.Common("generic player"),
+            props=Common("generic player"),
         )
 
     @property
@@ -42,35 +39,35 @@ class Generics:
 
 
 class Factory:
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         raise NotImplementedError
 
 
 class Hammer(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         return scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Hammer", desc="It's heavy."),
+            props=Common("Hammer", desc="It's heavy."),
         )
 
 
 class BeerKeg(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Beer Keg", desc="It's heavy."),
+            props=Common("Beer Keg", desc="It's heavy."),
         )
         return item
 
 
 class LargeMapleTree(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Large Maple Tree", desc="It's heavy."),
+            props=Common("Large Maple Tree", desc="It's heavy."),
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -81,7 +78,7 @@ async def tick(this, ev, say):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("leaf-1"),
-    props=properties.Common("Maple Leaf"),
+    props=Common("Maple Leaf"),
     initialize={ Carryable: dict(quantity=1, kind=this.get_kind("leaf-1")) },
     register=False,
   )
@@ -92,11 +89,11 @@ async def tick(this, ev, say):
 
 
 class LargeOakTree(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Large Oak Tree", desc="It's heavy."),
+            props=Common("Large Oak Tree", desc="It's heavy."),
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -107,7 +104,7 @@ async def tick(this, ev, say):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("leaf-1"),
-    props=properties.Common("Oak Leaf"),
+    props=Common("Oak Leaf"),
     initialize={ Carryable: dict(quantity=1, kind=this.get_kind("leaf-1")) },
     register=False,
   )
@@ -118,13 +115,13 @@ async def tick(this, ev, say):
 
 
 class SmallCrevice:
-    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+    def create(self, world: World, generics: Generics, area: Entity):
         item = scopes.exit(
             creator=world,
             parent=generics.thing,
             visible=mechanics.Visible(hard_to_see=True),
             initialize={movement.Exit: dict(area=area)},
-            props=properties.Common(
+            props=Common(
                 "Small Crevice",
                 desc="Whoa, how'd you even find this!?",
             ),
@@ -133,11 +130,11 @@ class SmallCrevice:
 
 
 class MysteriousBox(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common(
+            props=Common(
                 "Mysterious Box",
                 desc="It looks like some weird antique your grandmother would have. Why would anyone carry this thing around?",
             ),
@@ -151,11 +148,11 @@ class MysteriousBox(Factory):
 
 
 class LargeSteepCliff(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common(
+            props=Common(
                 "Large Steep Cliff",
                 desc="It's immense, with rocky outcroppings. It looks very climbable.",
             ),
@@ -169,7 +166,7 @@ async def tick(this, ev, say):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("pebble-1"),
-    props=properties.Common("Pebble"),
+    props=Common("Pebble"),
     initialize={ Carryable: dict(quantity=1, kind=this.get_kind("pebble-1")) },
     register=False,
   )
@@ -180,13 +177,11 @@ async def tick(this, ev, say):
 
 
 class Guitar(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         item = scopes.item(
             creator=world,
             parent=generics.thing,
-            props=properties.Common(
-                "Acoustic Guitar", desc="Seems to be well travelled."
-            ),
+            props=Common("Acoustic Guitar", desc="Seems to be well travelled."),
         )
         with item.make(behavior.Behaviors) as behave:
             behave.add_behavior(
@@ -197,22 +192,22 @@ class Guitar(Factory):
 
 
 class WoodenLadder:
-    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+    def create(self, world: World, generics: Generics, area: Entity):
         item = scopes.exit(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Wooden Ladder", desc="Seems sturdy enough."),
+            props=Common("Wooden Ladder", desc="Seems sturdy enough."),
             initialize={movement.Exit: dict(area=area)},
         )
         return item
 
 
 class TomorrowCat(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         animal = scopes.alive(
             creator=world,
             parent=generics.thing,
-            props=properties.Common(
+            props=Common(
                 "Tomorrow", desc="She's a Maine Coon, and very elegant and pretty."
             ),
         )
@@ -220,11 +215,11 @@ class TomorrowCat(Factory):
 
 
 class CavernEntrance:
-    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+    def create(self, world: World, generics: Generics, area: Entity):
         area = scopes.exit(
             creator=world,
             parent=generics.area,
-            props=properties.Common(
+            props=Common(
                 "Entrance to a Dark Cavern",
                 desc="It's dark, the cavern that is.",
             ),
@@ -234,11 +229,11 @@ class CavernEntrance:
 
 
 class DarkCavern(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         area = scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common(
+            props=Common(
                 "Dark Cavern",
                 desc="It's dark",
             ),
@@ -248,11 +243,11 @@ class DarkCavern(Factory):
 
 
 class ArtistsLoft(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         area = scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common(
+            props=Common(
                 "Artist's Loft",
                 desc="Everything is very colorful, because everything has got paint on it.",
             ),
@@ -266,15 +261,15 @@ class RoomGrid(Factory):
         self.w = w
         self.h = h
 
-    def make_cell(self, world: world.World, generics: Generics, x, y):
+    def make_cell(self, world: World, generics: Generics, x, y):
         name = "Grid Room %d x %x" % (x, y)
         return scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common(name, desc=name),
+            props=Common(name, desc=name),
         )
 
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         grid = [
             [self.make_cell(world, generics, y, x) for x in range(self.w)]
             for y in range(self.h)
@@ -286,9 +281,7 @@ class RoomGrid(Factory):
                 scopes.exit(
                     creator=world,
                     parent=generics.thing,
-                    props=properties.Common(
-                        name="%s Exit" % (direction.exiting.title(),)
-                    ),
+                    props=Common(name="%s Exit" % (direction.exiting.title(),)),
                     initialize={movement.Exit: dict(area=to_cell)},
                 ),
             )
@@ -317,27 +310,27 @@ class RoomGrid(Factory):
 
 
 class Museum(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         return RoomGrid(w=3, h=3).create(world, generics)
 
 
 class MarbleSteps:
-    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+    def create(self, world: World, generics: Generics, area: Entity):
         item = scopes.exit(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Marble Steps", desc="Marble"),
+            props=Common("Marble Steps", desc="Marble"),
             initialize={movement.Exit: dict(area=area)},
         )
         return item
 
 
 class NarrowCanyon:
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         area = scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common(
+            props=Common(
                 "Narrow Canyon",
                 desc="It's barely wide enough to walk two by two down. The narrow walls really funnel the wind, creating powerful gusts.",
             ),
@@ -348,24 +341,22 @@ class NarrowCanyon:
 
 
 class RockyPath:
-    def create(self, world: world.World, generics: Generics, area: entity.Entity):
+    def create(self, world: World, generics: Generics, area: Entity):
         item = scopes.exit(
             creator=world,
             parent=generics.thing,
-            props=properties.Common("Rocky Path", desc="Looks easy enough"),
+            props=Common("Rocky Path", desc="Looks easy enough"),
             initialize={movement.Exit: dict(area=area)},
         )
         return item
 
 
 class WelcomeArea(Factory):
-    def create(self, world: world.World, generics: Generics):
+    def create(self, world: World, generics: Generics):
         area = scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common(
-                "Town Courtyard.", desc="There's a ton going on here."
-            ),
+            props=Common("Town Courtyard.", desc="There's a ton going on here."),
         )
         add_item(area, BeerKeg().create(world, generics))
         add_item(area, LargeOakTree().create(world, generics))
@@ -387,14 +378,14 @@ class WelcomeArea(Factory):
         clearing = scopes.area(
             creator=world,
             parent=generics.area,
-            props=properties.Common("A small clearing."),
+            props=Common("A small clearing."),
         )
         add_item(
             area,
             scopes.exit(
                 creator=world,
                 parent=generics.thing,
-                props=properties.Common("Worn Path"),
+                props=Common("Worn Path"),
                 initialize={movement.Exit: dict(area=clearing)},
             ),
         )
@@ -403,7 +394,7 @@ class WelcomeArea(Factory):
             scopes.exit(
                 creator=world,
                 parent=generics.thing,
-                props=properties.Common("Worn Path"),
+                props=Common("Worn Path"),
                 initialize={movement.Exit: dict(area=area)},
             ),
         )
@@ -421,7 +412,7 @@ class WelcomeArea(Factory):
         return area
 
 
-def create_example_world(world: world.World) -> Tuple[Generics, entity.Entity]:
+def create_example_world(world: World) -> Tuple[Generics, Entity]:
     generics = Generics(world)
     area = WelcomeArea().create(world, generics)
     return generics, area

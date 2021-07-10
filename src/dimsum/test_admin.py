@@ -1,7 +1,6 @@
 import pytest
 
 import scopes.users as users
-
 import test
 
 

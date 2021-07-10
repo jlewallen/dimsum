@@ -2,14 +2,13 @@ import logging
 from typing import Optional
 
 import bus
-from model.events import *
-import model.visual as visual
+from model import Comms, Renderable, StandardEvent
 
 log = logging.getLogger("dimsum.handlers")
 
 
 class EventHandlers(bus.TextRendering):
-    def install(self, bus: bus.EventBus, comms: visual.Comms):
+    def install(self, bus: bus.EventBus, comms: Comms):
         @bus.handler(StandardEvent)
         async def handle_standard_event(
             event: Optional[StandardEvent] = None, **kwargs
@@ -21,7 +20,7 @@ class EventHandlers(bus.TextRendering):
                     await comms.somebody(nearby.key, event)
 
 
-def create(comms: visual.Comms):
+def create(comms: Comms):
     def factory(bus):
         return EventHandlers(bus, comms)
 

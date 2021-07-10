@@ -1,19 +1,28 @@
-import copy
-import dataclasses
-import enum
 import logging
+import dataclasses
+import copy
+import enum
+import jsonpickle
 from typing import Callable, Dict, List, Optional
 
-import jsonpickle
-import model.crypto as crypto
-import model.entity as entity
-import model.world as world
-import scopes.movement as movement
 import storage
+from model import (
+    Entity,
+    World,
+    Version,
+    Registrar,
+    Serialized,
+    Identity,
+    EntityUpdate,
+    Keys,
+    EntityRef,
+    EntityProxy,
+)
+import scopes.movement as movement
 
 log = logging.getLogger("dimsum")
 
-entity_types = {"model.entity.Entity": entity.Entity, "model.world.World": world.World}
+entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 
 
 # From stackoverflow
@@ -39,20 +48,20 @@ class Identities(enum.Enum):
     HIDDEN = 3
 
 
-@jsonpickle.handlers.register(entity.Version, base=True)
+@jsonpickle.handlers.register(Version, base=True)
 class VersionHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        return entity.Version(i=obj["i"])
+        return Version(i=obj["i"])
 
     def flatten(self, obj, data):
         data["i"] = obj.i
         return data
 
 
-@jsonpickle.handlers.register(crypto.Identity, base=True)
+@jsonpickle.handlers.register(Identity, base=True)
 class IdentityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        return crypto.Identity(
+        return Identity(
             public=obj["public"], private=obj["private"], signature=obj["signature"]
         )
 
@@ -85,7 +94,7 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(entity.EntityRef)
+@jsonpickle.handlers.register(EntityRef)
 class EntityRefHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         raise NotImplementedError
@@ -99,12 +108,12 @@ class EntityRefHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-@jsonpickle.handlers.register(entity.Entity)
-@jsonpickle.handlers.register(world.World)
+@jsonpickle.handlers.register(Entity)
+@jsonpickle.handlers.register(World)
 class EntityHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         pyObject = entity_types[obj["py/object"]]
-        ref = entity.EntityRef.new(pyObject=pyObject, **obj)
+        ref = EntityRef.new(pyObject=pyObject, **obj)
         log.debug("entity-handler: %s", ref)
         return self.context.lookup(ref)
 
@@ -185,34 +194,34 @@ def _deserialize(encoded, lookup):
 
 @dataclasses.dataclass()
 class Materialized:
-    entities: List[entity.Entity]
+    entities: List[Entity]
 
     def empty(self) -> bool:
         return len(self.entities) == 0
 
-    def maybe_one(self) -> Optional[entity.Entity]:
+    def maybe_one(self) -> Optional[Entity]:
         if len(self.entities) == 1:
             return self.entities[0]
         return None
 
-    def one(self) -> entity.Entity:
+    def one(self) -> Entity:
         if len(self.entities) == 1:
             return self.entities[0]
         raise Exception()
 
-    def all(self) -> List[entity.Entity]:
+    def all(self) -> List[Entity]:
         return self.entities
 
 
 async def materialize(
-    registrar: Optional[entity.Registrar] = None,
+    registrar: Optional[Registrar] = None,
     store: Optional[storage.EntityStorage] = None,
     key: Optional[str] = None,
     gid: Optional[int] = None,
-    json: Optional[List[entity.Serialized]] = None,
+    json: Optional[List[Serialized]] = None,
     reach=None,
     depth: int = 0,
-    cache: Optional[Dict[str, List[entity.Serialized]]] = None,
+    cache: Optional[Dict[str, List[Serialized]]] = None,
     proxy_factory: Optional[Callable] = None,
     refresh: bool = False,
 ) -> Materialized:
@@ -251,12 +260,12 @@ async def materialize(
 
     log.debug("json: %s", json)
 
-    refs: Dict[str, entity.EntityProxy] = {}
+    refs: Dict[str, EntityProxy] = {}
     depths: Dict[str, int] = {}
 
-    def reference(ref: entity.EntityRef):
+    def reference(ref: EntityRef):
         if ref.key not in refs:
-            refs[ref.key] = entity.EntityProxy(ref)
+            refs[ref.key] = EntityProxy(ref)
             depths[ref.key] = depth
         return refs[ref.key]
 
@@ -313,19 +322,17 @@ async def materialize(
     )
 
 
-def _entity_update(
-    instance: entity.Entity, serialized: Optional[str]
-) -> entity.EntityUpdate:
+def _entity_update(instance: Entity, serialized: Optional[str]) -> EntityUpdate:
     assert serialized
     assert instance
-    return entity.EntityUpdate(serialized, instance)
+    return EntityUpdate(serialized, instance)
 
 
 def for_update(
-    entities: List[entity.Entity], everything: bool = True, **kwargs
-) -> Dict[entity.Keys, entity.EntityUpdate]:
+    entities: List[Entity], everything: bool = True, **kwargs
+) -> Dict[Keys, EntityUpdate]:
     return {
-        entity.Keys(key=e.key): _entity_update(
+        Keys(key=e.key): _entity_update(
             e, serialize(e, identities=Identities.PRIVATE, **kwargs)
         )
         for e in entities
@@ -333,9 +340,7 @@ def for_update(
     }
 
 
-def modified(
-    registrar: entity.Registrar, **kwargs
-) -> Dict[entity.Keys, entity.EntityUpdate]:
+def modified(registrar: Registrar, **kwargs) -> Dict[Keys, EntityUpdate]:
     return {
         key: serialized
         for key, serialized in for_update(

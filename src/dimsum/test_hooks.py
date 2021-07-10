@@ -1,12 +1,9 @@
 import inspect
 import logging
-
-import pytest
 import wrapt
+import pytest
 
-import model.entity as entity
-import model.properties as properties
-import model.hooks as hooks
+from model import *
 import scopes
 
 log = logging.getLogger("dimsum.tests")
@@ -17,15 +14,15 @@ async def test_simple_hook_one_arg():
     h = hooks.All()
 
     @h.observed.target
-    def observe(entity: entity.Entity):
+    def observe(entity: Entity):
         log.info("observe")
         return [entity]
 
     @h.observed.hook
-    def hide_invisible_entities(fn, entity: entity.Entity):
+    def hide_invisible_entities(fn, entity: Entity):
         log.info("hiding invisible")
         return fn(entity)
 
-    jacob = scopes.alive(props=properties.Common("Jacob"))
+    jacob = scopes.alive(props=Common("Jacob"))
 
     observe(jacob)

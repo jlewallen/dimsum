@@ -1,11 +1,9 @@
-import logging
 import os
-
+import logging
 import asyncclick as click
 import jinja2
 
-import model.entity as entity
-
+from model import *
 import scopes
 
 import cli.utils as utils
@@ -18,9 +16,9 @@ def commands():
     pass
 
 
-def get_color(e: entity.Entity) -> str:
+def get_color(e: Entity) -> str:
     map = {
-        entity.RootEntityClass: "white",
+        RootEntityClass: "white",
         scopes.LivingClass: "darkseagreen",
         scopes.ItemClass: "khaki",
         scopes.ExitClass: "salmon",

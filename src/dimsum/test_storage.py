@@ -1,14 +1,12 @@
 import logging
-
-import model.properties as properties
-import model.world as world
+import pytest
 
 import domains
 import scopes
-
-import pytest
 import serializing
 import storage
+from model import *
+
 
 log = logging.getLogger("dimsum")
 
@@ -18,12 +16,12 @@ async def test_storage_materialize_world():
     store = storage.SqliteStorage(":memory:")
     domain = domains.Domain(storage=store)
     with domain.session() as session:
-        before = await serializing.materialize(session.registrar, store, key=world.Key)
+        before = await serializing.materialize(session.registrar, store, key=Key)
         assert before.empty()
 
-        await store.update(serializing.for_update([world.World()]))
+        await store.update(serializing.for_update([World()]))
         after = await serializing.materialize(
-            registrar=session.registrar, store=store, key=world.Key
+            registrar=session.registrar, store=store, key=Key
         )
         assert after.one()
 
@@ -35,14 +33,14 @@ async def test_storage_materialize_reference():
 
     with domain.session() as session:
         w = await session.prepare()
-        await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
+        await session.add_area(scopes.area(creator=w, props=Common("Area")))
         await session.save()
 
     with domain.session() as session:
         assert session.registrar.number_of_entities() == 0
         await session.prepare()
         assert await serializing.materialize(
-            registrar=session.registrar, store=store, key=world.Key
+            registrar=session.registrar, store=store, key=Key
         )
         assert session.registrar.number_of_entities() == 2
 
@@ -54,14 +52,14 @@ async def test_storage_only_save_modified_super_simple():
 
     with domain.session() as session:
         w = await session.prepare()
-        await session.add_area(scopes.area(creator=w, props=properties.Common("Area")))
+        await session.add_area(scopes.area(creator=w, props=Common("Area")))
         await session.save()
 
     with domain.session() as session:
         assert session.registrar.number_of_entities() == 0
         await session.prepare()
         assert await serializing.materialize(
-            registrar=session.registrar, store=store, key=world.Key
+            registrar=session.registrar, store=store, key=Key
         )
         assert session.registrar.number_of_entities() == 2
 

@@ -1,12 +1,11 @@
 import logging
 from typing import List, Optional, TextIO
 
-import model.properties as properties
-import model.visual as visual
 import scopes
 import domains
 import library
 import sshd
+from model import *
 
 from plugins.actions import Join
 from plugins.admin import Auth
@@ -34,7 +33,7 @@ class InitializeWorld:
         player = scopes.alive(
             key=key,
             creator=session.world,
-            props=properties.Common(key, desc="A player"),
+            props=Common(key, desc="A player"),
         )
         await session.perform(Join(), player)
         await session.perform(Auth(password="asdfasdf"), player)
@@ -68,7 +67,7 @@ class Interactive(sshd.CommandHandler):
         )
         self.initialize = InitializeWorld(self.domain)
 
-    async def write(self, item: visual.Renderable, **kwargs):
+    async def write(self, item: Renderable, **kwargs):
         self.channel.write("\n" + str(item.render_string()) + "\n\n")
 
     async def handle(self, line: str):
@@ -82,10 +81,10 @@ class Interactive(sshd.CommandHandler):
 
             log.debug("reply: %s", reply)
 
-            if isinstance(reply, visual.Renderable):
+            if isinstance(reply, Renderable):
                 await self.write(reply)
             else:
-                await self.write(visual.String(str(reply)))
+                await self.write(String(str(reply)))
 
             await session.save()
 

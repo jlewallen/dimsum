@@ -1,34 +1,42 @@
 import logging
 import time
+import contextvars
 from typing import Any, cast, Dict, List, Literal, Optional, Union
 
-import bus
-import contextvars
-from bus import EventBus
-import context
 import dynamic
 import grammars
 import handlers
-import model.entity as entity
-import model.events as events
-import model.game as game
-import model.visual as visual
-import model.world as world
-import model.hooks as hook_system
-
-from model.condition import Condition
-
-import scopes.behavior as behavior
-import scopes.carryable as carryable
-import scopes.movement as movement
-import scopes.occupyable as occupyable
-import scopes as scopes
-
 import tools
 import proxying
 import saying
 import serializing
 import storage
+from bus import EventBus, SubscriptionManager
+from model import (
+    Entity,
+    World,
+    Registrar,
+    Serialized,
+    Key,
+    Event,
+    Action,
+    TickEvent,
+    EntityFrozen,
+    Failure,
+    Comms,
+    Reply,
+    ExtendHooks,
+    Welcoming,
+    Condition,
+    cleanup,
+    Ctx,
+    context,
+)
+import scopes.behavior as behavior
+import scopes.carryable as carryable
+import scopes.movement as movement
+import scopes.occupyable as occupyable
+import scopes as scopes
 
 log = logging.getLogger("dimsum.model")
 active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session")
@@ -41,11 +49,11 @@ def get() -> "Session":
     return session
 
 
-def infinite_reach(entity: entity.Entity, depth: int):
+def infinite_reach(entity: Entity, depth: int):
     return 0
 
 
-def default_reach(entity: entity.Entity, depth: int):
+def default_reach(entity: Entity, depth: int):
     if entity.klass == scopes.AreaClass:
         if depth == 3:
             return -1
@@ -62,14 +70,14 @@ class Session:
         super().__init__()
         assert store
         self.store: storage.EntityStorage = store
-        self.world: Optional[world.World] = None
+        self.world: Optional[World] = None
         self.bus = EventBus(handlers=handlers or [])
-        self.registrar = entity.Registrar()
+        self.registrar = Registrar()
         self.saying = saying.Say()
 
     async def save(self) -> None:
         log.info("saving %s", self.store)
-        assert isinstance(self.world, world.World)
+        assert isinstance(self.world, World)
         self.world.update_gid(self.registrar.number)
         modified = serializing.modified(self.registrar)
         await self.store.update(modified)
@@ -83,17 +91,17 @@ class Session:
         # TODO Warn on unsaved changes?
         return False
 
-    def register(self, entity: entity.Entity) -> entity.Entity:
+    def register(self, entity: Entity) -> Entity:
         return self.registrar.register(entity)
 
-    def unregister(self, entity: entity.Entity) -> entity.Entity:
+    def unregister(self, entity: Entity) -> Entity:
         return self.registrar.unregister(entity)
 
     async def try_materialize(
         self,
         key: Optional[str] = None,
         gid: Optional[int] = None,
-        json: Optional[List[entity.Serialized]] = None,
+        json: Optional[List[Serialized]] = None,
         reach=None,
         refresh=None,
     ) -> serializing.Materialized:
@@ -108,13 +116,13 @@ class Session:
             refresh=refresh,
         )
 
-        for updated_world in [e for e in materialized.all() if e.key == world.Key]:
-            assert isinstance(updated_world, world.World)
+        for updated_world in [e for e in materialized.all() if e.key == Key]:
+            assert isinstance(updated_world, World)
             self.world = updated_world
 
         return materialized
 
-    async def materialize(self, **kwargs) -> entity.Entity:
+    async def materialize(self, **kwargs) -> Entity:
         materialized = await self.try_materialize(**kwargs)
         return materialized.one()
 
@@ -123,23 +131,23 @@ class Session:
             return self.world
 
         maybe_world = await self.try_materialize(
-            key=world.Key, reach=reach if reach else None
+            key=Key, reach=reach if reach else None
         )
 
         if maybe_world.maybe_one():
-            self.world = cast(world.World, maybe_world.one())
-            assert isinstance(self.world, world.World)
+            self.world = cast(World, maybe_world.one())
+            assert isinstance(self.world, World)
 
         if self.world:
             self.registrar.number = self.world.gid()
             return self.world
 
         log.info("creating new world")
-        self.world = world.World()
+        self.world = World()
         self.register(self.world)
         return self.world
 
-    async def execute(self, player: entity.Entity, command: str):
+    async def execute(self, player: Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
         contributing = tools.get_contributing_entities(self.world, player)
@@ -148,20 +156,20 @@ class Session:
         evaluator = grammars.PrioritizedEvaluator(
             [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
         )
-        with hook_system.ExtendHooks(dynamic_behavior.dynamic_hooks):
+        with ExtendHooks(dynamic_behavior.dynamic_hooks):
             log.info("evaluator: '%s'", evaluator)
-            action = await evaluator.evaluate(command, world=world, player=player)
+            action = await evaluator.evaluate(command, world=self.world, player=player)
             assert action
-            assert isinstance(action, game.Action)
+            assert isinstance(action, Action)
             return await self.perform(action, player)
 
     async def perform(
         self,
         action,
-        person: Optional[entity.Entity] = None,
+        person: Optional[Entity] = None,
         dynamic_behavior: Optional["dynamic.Behavior"] = None,
         **kwargs
-    ) -> game.Reply:
+    ) -> Reply:
 
         log.info("-" * 100)
         log.info("%s", action)
@@ -180,8 +188,8 @@ class Session:
                     ctx=ctx,
                     say=self.saying,
                 )
-            except entity.EntityFrozen:
-                return game.Failure("whoa, that's frozen")
+            except EntityFrozen:
+                return Failure("whoa, that's frozen")
 
     async def tick(self, now: Optional[float] = None):
         await self.prepare()
@@ -189,15 +197,15 @@ class Session:
         if now is None:
             now = time.time()
 
-        await self.everywhere(events.TickEvent(now))
+        await self.everywhere(TickEvent(now))
 
         return now
 
-    async def everywhere(self, ev: events.Event, **kwargs):
+    async def everywhere(self, ev: Event, **kwargs):
         assert self.world
 
         log.info("everywhere:%s %s", ev, kwargs)
-        everything: List[entity.Entity] = []
+        everything: List[Entity] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities
         for entity in everything:
@@ -211,7 +219,7 @@ class Session:
                         await ctx.notify(ev)
 
     async def add_area(
-        self, area: entity.Entity, depth=0, seen: Optional[Dict[str, str]] = None
+        self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
     ):
         await self.prepare()
 
@@ -226,7 +234,7 @@ class Session:
 
         occupied = area.make(occupyable.Occupyable).occupied
 
-        with self.world.make(world.Welcoming) as welcoming:
+        with self.world.make(Welcoming) as welcoming:
             if welcoming.area:
                 existing_occupied = welcoming.area.make(occupyable.Occupyable).occupied
                 if len(existing_occupied) < len(occupied):
@@ -271,15 +279,13 @@ class Domain:
     def __init__(
         self,
         store: Optional[storage.EntityStorage] = None,
-        subscriptions: Optional[bus.SubscriptionManager] = None,
+        subscriptions: Optional[SubscriptionManager] = None,
         **kwargs
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
-        self.subscriptions = (
-            subscriptions if subscriptions else bus.SubscriptionManager()
-        )
-        self.comms: visual.Comms = self.subscriptions
+        self.subscriptions = subscriptions if subscriptions else SubscriptionManager()
+        self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]
 
     def session(self) -> "Session":
@@ -293,25 +299,23 @@ class Domain:
         return Domain(empty=True, store=self.store)
 
 
-class WorldCtx(context.Ctx):
+class WorldCtx(Ctx):
     def __init__(
         self,
         session: Optional[Session] = None,
-        person: Optional[entity.Entity] = None,
-        entity: Optional[entity.Entity] = None,
+        person: Optional[Entity] = None,
+        entity: Optional[Entity] = None,
         **kwargs
     ):
         super().__init__()
         assert session and session.world
         self.session = session
-        self.world: world.World = session.world
+        self.world: World = session.world
         self.person = person
         self.bus = session.bus
         self.entities: tools.EntitySet = self._get_default_entity_set(entity)
 
-    def _get_default_entity_set(
-        self, entity: Optional[entity.Entity]
-    ) -> tools.EntitySet:
+    def _get_default_entity_set(self, entity: Optional[Entity]) -> tools.EntitySet:
         assert self.world
         entitySet = tools.EntitySet()
         if self.person:
@@ -340,11 +344,11 @@ class WorldCtx(context.Ctx):
                 self.entities.add(tools.Relation.OTHER, l)
         return self
 
-    def register(self, entity: entity.Entity) -> entity.Entity:
+    def register(self, entity: Entity) -> Entity:
         return self.session.register(entity)
 
-    def unregister(self, destroyed: entity.Entity) -> entity.Entity:
-        entity.cleanup(destroyed, world=self.world)
+    def unregister(self, destroyed: Entity) -> Entity:
+        cleanup(destroyed, world=self.world)
         return self.session.unregister(destroyed)
 
     async def standard(self, klass, *args, **kwargs):
@@ -355,7 +359,7 @@ class WorldCtx(context.Ctx):
             a = (self.person, area, []) + args
             await self.publish(klass(*a, **kwargs))
 
-    async def notify(self, ev: events.Event):
+    async def notify(self, ev: Event):
         assert self.world
         log.info("notify=%s entities=%s", ev, self.entities)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
@@ -363,14 +367,14 @@ class WorldCtx(context.Ctx):
             saying.NotifyAll(ev.name, ev), say=self.session.saying
         )
 
-    async def publish(self, ev: events.Event):
+    async def publish(self, ev: Event):
         assert self.world
         await self.bus.publish(ev)
         await self.notify(ev)
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, register=True, **kwargs
-    ) -> entity.Entity:
+    ) -> Entity:
         initialize = initialize if initialize else {}
         if quantity:
             initialize = {carryable.Carryable: dict(quantity=quantity)}
@@ -381,7 +385,7 @@ class WorldCtx(context.Ctx):
 
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
-    ) -> Optional[entity.Entity]:
+    ) -> Optional[Entity]:
         log.info(
             "find-item: gid=%s candidates=%s exclude=%s scopes=%s kw=%s",
             number,
@@ -400,7 +404,7 @@ class WorldCtx(context.Ctx):
         if len(candidates) == 0:
             return None
 
-        found: Optional[entity.Entity] = None
+        found: Optional[Entity] = None
 
         for e in candidates:
             if exclude and e in exclude:

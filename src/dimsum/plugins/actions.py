@@ -1,44 +1,31 @@
 import dataclasses
+import inflect
 from typing import List, Dict, Optional
 
-import inflect
-
-import context
-
-import model.entity as entity
-import model.game as game
-import model.world as world
-import model.events as events
-import model.reply as reply
 import tools
-
+from model import Entity, World, Action, Ctx, Reply, event, StandardEvent, Success
 import scopes.carryable as carryable
 import scopes.occupyable as occupyable
 
 p = inflect.engine()
 
 
-class PersonAction(game.Action):
+class PersonAction(Action):
     async def perform(
-        self,
-        world: world.World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: context.Ctx,
-        **kwargs
-    ) -> game.Reply:
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ) -> Reply:
         raise NotImplementedError
 
 
-@events.event
+@event
 @dataclasses.dataclass(frozen=True)
-class ItemsAppeared(events.StandardEvent):
-    items: List[entity.Entity]
+class ItemsAppeared(StandardEvent):
+    items: List[Entity]
 
 
-@events.event
+@event
 @dataclasses.dataclass(frozen=True)
-class PlayerJoined(events.StandardEvent):
+class PlayerJoined(StandardEvent):
     pass
 
 
@@ -49,12 +36,7 @@ class AddItemArea(PersonAction):
         self.area = area
 
     async def perform(
-        self,
-        world: world.World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: context.Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         with self.area.make(carryable.Containing) as ground:
             after_add = ground.add_item(self.item)
@@ -72,7 +54,7 @@ class AddItemArea(PersonAction):
                 items=[self.item],
             )
         )
-        return game.Success("%s appeared" % (p.join([self.item]),))
+        return Success("%s appeared" % (p.join([self.item]),))
 
 
 class Join(PersonAction):
@@ -80,12 +62,7 @@ class Join(PersonAction):
         super().__init__(**kwargs)
 
     async def perform(
-        self,
-        world: world.World,
-        area: entity.Entity,
-        person: entity.Entity,
-        ctx: context.Ctx,
-        **kwargs
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         ctx.register(person)
         with world.welcome_area().make(occupyable.Occupyable) as entering:
@@ -97,4 +74,4 @@ class Join(PersonAction):
                 )
             )
             await entering.entered(person)
-        return game.Success("welcome!")
+        return Success("welcome!")

@@ -3,10 +3,10 @@ import json
 import logging
 import sqlite3
 from typing import Any, Dict, List, Optional, TextIO
-
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
-import model.entity as entity
+
+from model import Entity, Keys, EntityUpdate, Serialized
 
 log = logging.getLogger("dimsum.storage")
 
@@ -43,15 +43,13 @@ class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def update(
-        self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[str, str]:
+    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
         raise NotImplementedError
 
-    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+    async def load_by_gid(self, gid: int) -> List[Serialized]:
         raise NotImplementedError
 
-    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+    async def load_by_key(self, key: str) -> List[Serialized]:
         raise NotImplementedError
 
 
@@ -63,19 +61,19 @@ class All(EntityStorage):
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
 
-    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         for child in self.children:
             returning = await child.update(diffs)
         return returning
 
-    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+    async def load_by_gid(self, gid: int) -> List[Serialized]:
         for child in self.children:
             maybe = await child.load_by_gid(gid)
             if maybe:
                 return maybe
         return []
 
-    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+    async def load_by_key(self, key: str) -> List[Serialized]:
         for child in self.children:
             maybe = await child.load_by_key(key)
             if maybe:
@@ -96,18 +94,18 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         for child in self.children:
             return await child.update(diffs)
 
-    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+    async def load_by_gid(self, gid: int) -> List[Serialized]:
         for child in self.children:
             maybe = await child.load_by_gid(gid)
             if maybe:
                 return maybe
         return []
 
-    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+    async def load_by_key(self, key: str) -> List[Serialized]:
         for child in self.children:
             maybe = await child.load_by_key(key)
             if maybe:
@@ -127,13 +125,13 @@ class Separated(EntityStorage):
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
 
-    async def update(self, diffs: Dict[entity.Keys, entity.EntityUpdate]):
+    async def update(self, diffs: Dict[Keys, EntityUpdate]):
         return await self.write.update(diffs)
 
-    async def load_by_gid(self, gid: int) -> List[entity.Serialized]:
+    async def load_by_gid(self, gid: int) -> List[Serialized]:
         return await self.read.load_by_gid(gid)
 
-    async def load_by_key(self, key: str) -> List[entity.Serialized]:
+    async def load_by_key(self, key: str) -> List[Serialized]:
         return await self.read.load_by_key(key)
 
     def __str__(self):
@@ -173,7 +171,7 @@ class SqliteStorage(EntityStorage):
 
         self.db.rollback()
 
-        return [entity.Serialized(key, serialized) for key, serialized in rows.items()]
+        return [Serialized(key, serialized) for key, serialized in rows.items()]
 
     async def write(self, stream: TextIO):
         await self.open_if_necessary()
@@ -255,9 +253,7 @@ class SqliteStorage(EntityStorage):
             ],
         )
 
-    async def update(
-        self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[str, str]:
+    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
         await self.open_if_necessary()
         assert self.db
 
@@ -325,9 +321,7 @@ class HttpStorage(EntityStorage):
             response = await session.execute(query)
             return response["size"]
 
-    async def update(
-        self, updates: Dict[entity.Keys, entity.EntityUpdate]
-    ) -> Dict[str, str]:
+    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
         async with self.session() as session:
             query = gql(
                 """
@@ -358,7 +352,7 @@ class HttpStorage(EntityStorage):
             serialized_entities = response["entitiesByGid"]
             if len(serialized_entities) == 0:
                 return []
-            return [entity.Serialized(**row) for row in serialized_entities]
+            return [Serialized(**row) for row in serialized_entities]
 
     async def load_by_key(self, key: str):
         async with self.session() as session:
@@ -369,7 +363,7 @@ class HttpStorage(EntityStorage):
             serialized_entities = response["entitiesByKey"]
             if len(serialized_entities) == 0:
                 return []
-            return [entity.Serialized(**row) for row in serialized_entities]
+            return [Serialized(**row) for row in serialized_entities]
 
     def __repr__(self):
         return "Http<%s>" % (self.url,)

@@ -4,13 +4,11 @@ import dataclasses
 import functools
 import contextvars
 import asyncio
-
 from typing import List, Optional, Callable, Dict, Any
 from weakref import ref, ReferenceType
 
-from model.condition import Condition
-
-import context
+from .conditions import Condition
+from .context import get
 
 log = logging.getLogger("dimsum.hooks")
 live_hooks: contextvars.ContextVar = contextvars.ContextVar("dimsum:hooks")
@@ -52,7 +50,7 @@ class Hook:
 
         for registered in hooks:
             if registered.condition:
-                value = context.get().evaluate(registered.condition)
+                value = get().evaluate(registered.condition)
                 if not value:
                     continue
             call = functools.partial(registered.fn, call)

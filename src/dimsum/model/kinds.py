@@ -1,13 +1,13 @@
 from typing import Optional
 
-import model.crypto as crypto
+from .crypto import Identity
 
 
 class Kind:
-    def __init__(self, identity: Optional[crypto.Identity] = None, **kwargs):
+    def __init__(self, identity: Optional[Identity] = None, **kwargs):
         super().__init__()
         assert identity
-        self.identity: crypto.Identity = identity
+        self.identity: Identity = identity
 
     def same(self, other: "Kind") -> bool:
         assert other

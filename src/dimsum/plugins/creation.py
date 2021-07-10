@@ -1,23 +1,19 @@
 import copy
 import dataclasses
 import logging
+import inflect
 from typing import Dict, List, Optional, Type
 
-from context import *
 import grammars
-from model.entity import *
-from model.events import *
-from model.game import *
-import model.properties as properties
-from model.reply import *
-from model.world import *
-import scopes as scopes
+import transformers
+from model import *
 from finders import *
 from tools import *
+import scopes
 from plugins.actions import PersonAction
-import transformers
 
 log = logging.getLogger("dimsum")
+p = inflect.engine()
 
 
 @event
@@ -32,13 +28,13 @@ class EntityCreated(StandardEvent):
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsMade(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsObliterated(StandardEvent):
-    items: List[entity.Entity]
+    items: List[Entity]
 
 
 class Create(PersonAction):
@@ -61,7 +57,7 @@ class Create(PersonAction):
         created = scopes.create_klass(
             self.klass,
             creator=person,
-            props=properties.Common(name=self.name, desc=self.name),
+            props=Common(name=self.name, desc=self.name),
         )
         with person.make(carryable.Containing) as contain:
             after_hold = contain.hold(created)
@@ -90,12 +86,12 @@ class Make(PersonAction):
     async def perform(
         self,
         world: World,
-        area: entity.Entity,
-        person: entity.Entity,
+        area: Entity,
+        person: Entity,
         ctx: Ctx,
         **kwargs,
     ):
-        item: Optional[entity.Entity] = None
+        item: Optional[Entity] = None
         if self.item:
             item = await world.apply_item_finder(person, self.item)
 
@@ -132,8 +128,8 @@ class Obliterate(PersonAction):
     async def perform(
         self,
         world: World,
-        area: entity.Entity,
-        person: entity.Entity,
+        area: Entity,
+        person: Entity,
         ctx: Ctx,
         **kwargs,
     ):
@@ -175,8 +171,8 @@ class CallThis(PersonAction):
     async def perform(
         self,
         world: World,
-        area: entity.Entity,
-        person: entity.Entity,
+        area: Entity,
+        person: Entity,
         ctx: Ctx,
         **kwargs,
     ):

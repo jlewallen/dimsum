@@ -3,14 +3,12 @@ import datetime
 import logging
 from typing import Dict, List, Optional
 
-import model.crypto as crypto
-import model.entity as entity
-import model.properties as properties
+from model import Entity, Scope, Identity, Worn, Eaten, Drank
 
 log = logging.getLogger("dimsum.scopes")
 
 
-class Interactable(entity.Scope):
+class Interactable(Scope):
     def __init__(self, interactions: Optional[Dict[str, bool]] = None, **kwargs):
         super().__init__(**kwargs)
         self.interactions = interactions if interactions else {}
@@ -22,13 +20,13 @@ class Interactable(entity.Scope):
         return self.interactions[name] if name in self.interactions else False
 
     def when_worn(self) -> bool:
-        return self.when_activity(properties.Worn)
+        return self.when_activity(Worn)
 
     def when_eaten(self) -> bool:
-        return self.when_activity(properties.Eaten)
+        return self.when_activity(Eaten)
 
     def when_drank(self) -> bool:
-        return self.when_activity(properties.Drank)
+        return self.when_activity(Drank)
 
 
 def get_now() -> datetime.datetime:
@@ -47,7 +45,7 @@ class Observation:
 
 class Observer:
     @abc.abstractmethod
-    def observe(self, identity: crypto.Identity):
+    def observe(self, identity: Identity):
         raise NotImplementedError
 
 
@@ -64,12 +62,12 @@ class Visible:
         self.hard_to_see = hard_to_see
         self.observations = observations if observations else {}
 
-    def add_observation(self, identity: crypto.Identity):
+    def add_observation(self, identity: Identity):
         if identity.public not in self.observations:
             self.observations[identity.public] = []
         self.observations[identity.public].append(Observation())
 
-    def can_see(self, identity: crypto.Identity) -> bool:
+    def can_see(self, identity: Identity) -> bool:
         if not identity.public in self.observations:
             return False
 
@@ -80,7 +78,7 @@ class Visible:
         return obs[-1].memorable()
 
 
-class Visibility(entity.Scope):
+class Visibility(Scope):
     def __init__(self, visible: Optional[Visible] = None, **kwargs):
         super().__init__(**kwargs)
         self.visible: Visible = visible if visible else Visible()
@@ -95,7 +93,7 @@ class Visibility(entity.Scope):
             self.ourselves.touch()
         self.visible.hidden = True
 
-    def can_see(self, identity: crypto.Identity) -> bool:
+    def can_see(self, identity: Identity) -> bool:
         return self.visible.can_see(identity)
 
     def make_easy_to_see(self):
@@ -108,7 +106,7 @@ class Visibility(entity.Scope):
             self.ourselves.touch()
         self.visible.hard_to_see = True
 
-    def add_observation(self, identity: crypto.Identity):
+    def add_observation(self, identity: Identity):
         self.ourselves.touch()
         return self.visible.add_observation(identity)
 
@@ -129,7 +127,7 @@ class Physics:
         self.mass = mass
 
 
-class Memory(entity.Scope):
+class Memory(Scope):
     def __init__(self, memory: Optional[Dict[str, Memorable]] = None, **kwargs):
         super().__init__(**kwargs)
         self.memory = memory if memory else {}
@@ -156,7 +154,7 @@ class Wind:
         self.magnitude = magnitude
 
 
-class Weather(entity.Scope):
+class Weather(Scope):
     def __init__(self, wind: Optional[Wind] = None, **kwargs):
         super().__init__(**kwargs)
         self.wind = wind

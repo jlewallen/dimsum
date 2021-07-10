@@ -4,12 +4,12 @@ import logging
 import os
 from typing import List, Optional
 
-import model.entity as entity
+from model import Entity, Scope
 
 log = logging.getLogger("dimsum.scopes")
 
 
-class Auth(entity.Scope):
+class Auth(Scope):
     def __init__(self, password: Optional[List[str]] = None, **kwargs):
         super().__init__(**kwargs)
         self.password = password if password else None
