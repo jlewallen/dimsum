@@ -56,7 +56,7 @@ class Eat(PersonAction):
             if not inaction.when_eaten():
                 return Failure("you can't eat that")
 
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
 
@@ -80,7 +80,7 @@ class Drink(PersonAction):
             if not inaction.when_drank():
                 return Failure("you can't drink that")
 
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
 

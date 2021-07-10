@@ -8,8 +8,11 @@ from model import (
     RootEntityClass,
     set_entity_cleanup_handler,
     set_entity_describe_handler,
+    set_entity_area_provider,
     infl,
 )
+
+import tools
 
 import scopes as scopes
 import scopes.behavior as behavior
@@ -27,7 +30,6 @@ import plugins.moving  # noqa
 import plugins.clothing  # noqa
 import plugins.dining  # noqa
 import plugins.carrying  # noqa
-
 
 log = logging.getLogger("dimsum")
 
@@ -72,3 +74,10 @@ def hide_invisible_entities(resume, entity: Entity):
     if entity.make_and_discard(mechanics.Visibility).is_invisible:
         return []
     return resume(entity)
+
+
+async def _area_of(entity: Entity) -> Optional[Entity]:
+    return tools.area_of(entity)
+
+
+set_entity_area_provider(_area_of)

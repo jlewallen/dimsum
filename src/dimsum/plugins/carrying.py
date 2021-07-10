@@ -71,7 +71,7 @@ class Drop(PersonAction):
             if not can_drop(person, item):
                 return Failure("drop what?")
 
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         with person.make(carryable.Containing) as contain:
             dropped, failure = contain.drop_here(
@@ -84,7 +84,7 @@ class Drop(PersonAction):
                 condition=functools.partial(can_drop, person),
             )
             if dropped:
-                area = world.find_person_area(person)
+                area = await find_entity_area(person)
                 await ctx.publish(
                     ItemsDropped(
                         source=person,
@@ -125,7 +125,7 @@ class Hold(PersonAction):
             if pockets.is_holding(item):
                 return Failure("you're already holding that")
 
-            area = world.find_person_area(person)
+            area = await find_entity_area(person)
             with area.make(carryable.Containing) as ground:
                 if self.quantity:
                     with item.make(carryable.Carryable) as hands:
@@ -221,7 +221,7 @@ class Lock(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -260,7 +260,7 @@ class Unlock(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         item = await world.apply_item_finder(person, self.item)
         if not item:
@@ -293,7 +293,7 @@ class PutInside(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         container = await world.apply_item_finder(person, self.container)
         if not container:
@@ -331,7 +331,7 @@ class TakeOut(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         container = await world.apply_item_finder(person, self.container)
         if not container:

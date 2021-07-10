@@ -17,14 +17,14 @@ async def test_go_unknown():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_before = world.find_person_area(jacob).key
+        area_before = (await find_entity_area(jacob)).key
 
     await tw.failure("go door")
 
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_person_area(jacob).key
+        area_after = (await find_entity_area(jacob)).key
         assert area_before == area_after
 
 
@@ -52,14 +52,14 @@ async def test_go_adjacent():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_before = world.find_person_area(jacob).key
+        area_before = (await find_entity_area(jacob)).key
 
     await tw.success("go door")
 
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_person_area(jacob).key
+        area_after = (await find_entity_area(jacob)).key
         assert area_after != area_before
         assert area_after == another_room.key
 
@@ -73,14 +73,14 @@ async def test_directional_moving_nowhere():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_before = world.find_person_area(jacob).key
+        area_before = (await find_entity_area(jacob)).key
 
     await tw.failure("go north")
 
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_person_area(jacob).key
+        area_after = (await find_entity_area(jacob)).key
         assert area_before == area_after
 
 
@@ -95,7 +95,7 @@ async def test_directional_moving():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
 
         park = scopes.area(props=Common("North Park"), creator=world)
 
@@ -109,7 +109,7 @@ async def test_directional_moving():
         add_item(world.welcome_area(), exit)
         session.register(exit)
 
-        area_before = world.find_person_area(jacob).key
+        area_before = (await find_entity_area(jacob)).key
         await session.save()
 
     await tw.success("go north")
@@ -117,7 +117,7 @@ async def test_directional_moving():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area_after = world.find_person_area(jacob).key
+        area_after = (await find_entity_area(jacob)).key
         assert area_after != area_before
         assert area_after == park.key
 

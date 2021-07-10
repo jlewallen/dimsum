@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, Optional, Sequence, Type
 
 from .properties import Common
-from .entity import Entity, Scope, RootEntityClass
+from .entity import Entity, Scope, RootEntityClass, find_entity_area
 
 Key = "world"
 log = logging.getLogger("dimsum.model")
@@ -60,22 +60,12 @@ class World(Entity):
             remembering.entities.append(e)
             self.touch()
 
-    def find_entity_area(self, entity: Entity) -> Optional[Entity]:
-        import tools as tools
-
-        return tools.area_of(entity)
-
-    def find_person_area(self, person: Entity) -> Entity:
-        area = self.find_entity_area(person)
-        assert area
-        return area
-
     async def apply_item_finder(
         self, person: Entity, finder, **kwargs
     ) -> Optional[Entity]:
         assert person
         assert finder
-        area = self.find_person_area(person)
+        area = await find_entity_area(person)
         log.info("applying finder:%s %s", finder, kwargs)
         found = await finder.find_item(area=area, person=person, world=self, **kwargs)
         if found:

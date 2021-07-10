@@ -257,7 +257,7 @@ async def shake(this, person, say):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
 
@@ -266,7 +266,7 @@ async def shake(this, person, say):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
 
@@ -313,7 +313,7 @@ async def tick(this, ev, say):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
 
         await session.tick(0)
         assert len(area.make(carryable.Containing).holding) == 2

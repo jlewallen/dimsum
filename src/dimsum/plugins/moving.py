@@ -41,13 +41,13 @@ class MovingAction(PersonAction):
         self.finder = finder
 
     async def move(self, ctx: Ctx, world: World, person: Entity):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
 
         destination = self.area
 
         if self.finder:
             log.info("finder: {0}".format(self.finder))
-            area = world.find_person_area(person)
+            area = await find_entity_area(person)
             route = await self.finder.find_route(
                 area, person, world=world, builder=world
             )
@@ -66,7 +66,7 @@ class MovingAction(PersonAction):
                 await leaving.left(person)
                 await entering.entered(person)
 
-        return looking.AreaObservation(world.find_person_area(person), person)
+        return looking.AreaObservation(await find_entity_area(person), person)
 
 
 class Go(MovingAction):

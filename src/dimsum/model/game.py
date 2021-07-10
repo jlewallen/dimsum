@@ -7,6 +7,17 @@ class Reply:
     pass
 
 
+class Universal(Reply):
+    def __init__(self, *args, ok: Optional[bool] = True, **kwargs):
+        super().__init__()
+        self.args = args
+        self.kwargs = kwargs
+        self.ok = ok
+
+    def failed(self) -> "Universal":
+        return self
+
+
 class Action:
     def __init__(self, **kwargs):
         super().__init__()
@@ -29,14 +40,8 @@ class SimpleReply(Reply):
 
 
 class Success(SimpleReply):
-    def __str__(self):
-        if self.message:
-            return "Success<%s>" % (self.message,)
-        return "Success"
+    pass
 
 
 class Failure(SimpleReply):
-    def __str__(self):
-        if self.message:
-            return "Failure<%s>" % (self.message,)
-        return "Failure"
+    pass

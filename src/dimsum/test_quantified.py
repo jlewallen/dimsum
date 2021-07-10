@@ -2,6 +2,7 @@ import logging
 import pytest
 
 import finders
+from model import *
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import test
@@ -19,7 +20,7 @@ async def test_quantified_drop_partial_and_hold():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
         assert len(session.registrar.entities) == 4
@@ -29,7 +30,7 @@ async def test_quantified_drop_partial_and_hold():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
         assert (
@@ -57,7 +58,7 @@ async def test_quantified_drop_partial_and_hold():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
         assert len(session.registrar.undestroyed) == 4
@@ -67,7 +68,7 @@ async def test_quantified_drop_partial_and_hold():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
         assert len(session.registrar.undestroyed) == 5
@@ -77,7 +78,7 @@ async def test_quantified_drop_partial_and_hold():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
         assert (
@@ -108,7 +109,7 @@ async def test_quantified_hold_number():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 0
         assert len(area.make(carryable.Containing).holding) == 1
 
@@ -117,7 +118,7 @@ async def test_quantified_hold_number():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
 
@@ -135,7 +136,7 @@ async def test_quantified_drop_all():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
         assert len(session.registrar.entities) == 4
@@ -145,7 +146,7 @@ async def test_quantified_drop_all():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 0
         assert len(area.make(carryable.Containing).holding) == 1
         assert (
@@ -177,7 +178,7 @@ async def test_quantified_drop_inflected():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(area.make(carryable.Containing).holding) == 0
 
     await tw.success("drop 10 coin")
@@ -185,7 +186,7 @@ async def test_quantified_drop_inflected():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
 
@@ -202,7 +203,7 @@ async def test_quantified_from_recipe_holding_template(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert (
             jacob.make(carryable.Containing)
@@ -218,7 +219,7 @@ async def test_quantified_from_recipe_holding_template(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert (
             jacob.make(carryable.Containing)
             .holding[0]
@@ -257,7 +258,7 @@ async def test_quantified_from_recipe(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
         coins = jacob.make(carryable.Containing).holding[0]
@@ -268,7 +269,7 @@ async def test_quantified_from_recipe(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 0
         assert (

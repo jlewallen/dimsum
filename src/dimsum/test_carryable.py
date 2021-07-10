@@ -104,7 +104,7 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert (
             len(
                 session.registrar.find_entity_by_name("Box")

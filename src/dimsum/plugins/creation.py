@@ -107,7 +107,7 @@ class Make(PersonAction):
             # this keeps us from having to unregister the item.
             ctx.register(after_hold)
 
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
         await ctx.publish(
             ItemsMade(
                 source=person,
@@ -131,7 +131,7 @@ class Obliterate(PersonAction):
         ctx: Ctx,
         **kwargs,
     ):
-        area = world.find_person_area(person)
+        area = await find_entity_area(person)
         items = None
         with person.make(carryable.Containing) as pockets:
             items = pockets.drop_all()

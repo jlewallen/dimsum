@@ -31,6 +31,8 @@ from model import (
     cleanup_entity,
     Ctx,
     context,
+    find_entity_area,
+    find_entity_area_maybe,
 )
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -178,7 +180,7 @@ class Session:
 
         world = await self.prepare()
 
-        area = world.find_entity_area(person) if person else None
+        area = await find_entity_area_maybe(person) if person else None
 
         with WorldCtx(session=self, person=person, **kwargs) as ctx:
             try:
@@ -361,7 +363,7 @@ class WorldCtx(Ctx):
         assert self.world
         if self.person:
             assert self.person
-            area = self.world.find_person_area(self.person)
+            area = await find_entity_area(self.person)
             a = (self.person, area, []) + args
             await self.publish(klass(*a, **kwargs))
 

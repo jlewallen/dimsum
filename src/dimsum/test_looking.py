@@ -85,7 +85,7 @@ async def test_making_item_hard_to_see():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(area.make(carryable.Containing).holding) == 1
 
     r = await tw.success("look")
@@ -97,7 +97,7 @@ async def test_making_item_hard_to_see():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
 
     await tw.success("modify hard to see")
@@ -106,7 +106,7 @@ async def test_making_item_hard_to_see():
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        area = world.find_entity_area(jacob)
+        area = await find_entity_area(jacob)
         assert len(area.make(carryable.Containing).holding) == 2
 
     r = await tw.success("look")

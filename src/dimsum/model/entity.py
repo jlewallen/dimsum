@@ -6,7 +6,7 @@ import time
 import jsondiff
 import shortuuid
 import stringcase
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union
 
 from .crypto import Identity, generate
 from .kinds import Kind
@@ -73,6 +73,34 @@ def set_entity_cleanup_handler(fn: Callable) -> Callable:
 def cleanup_entity(entity: "Entity", **kwargs):
     global _cleanup_fn
     _cleanup_fn(entity, **kwargs)
+
+
+async def _default_area(entity: "Entity") -> "Entity":
+    raise NotImplementedError
+
+
+_area_fn: Callable[["Entity"], Awaitable[Optional["Entity"]]] = _default_area
+
+
+def set_entity_area_provider(
+    fn: Callable[["Entity"], Awaitable[Optional["Entity"]]]
+) -> Callable[["Entity"], Awaitable[Optional["Entity"]]]:
+    global _area_fn
+    previous = _area_fn
+    _area_fn = fn
+    return previous
+
+
+async def find_entity_area_maybe(entity: "Entity") -> Optional["Entity"]:
+    global _area_fn
+    return await _area_fn(entity)
+
+
+async def find_entity_area(entity: "Entity") -> "Entity":
+    global _area_fn
+    area = await _area_fn(entity)
+    assert area
+    return area
 
 
 def _get_ctor_key(ctor) -> str:

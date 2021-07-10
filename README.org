@@ -1,9 +1,17 @@
 * DimSum
+
+** TODO Permissions
+
+   Behavior (read/write)
+   Location (read/write)
+   Clone (execute)
+   Action (execute)
+
 ** TODO Allow 'Scopes' to be @dataclasses
-** TODO SSB Storage Backend
+** TODO Web tool for 'drawing' connected areas.
 ** TODO Distance Effects.
 
-   N-Hops aways, etc...
+   N-Hops aways, etc... This is mostly a tools related thing.
 
 ** TODO Weather esp Wind
 
@@ -30,5 +38,3 @@
    capture a flag or do something? See who can gather the most X in
    whatever time? People can also create their own scenarios, in a
    DnD-esque way and see if their friends can find their way out.
-
-** TODO Web tool for drawing connected areas.
