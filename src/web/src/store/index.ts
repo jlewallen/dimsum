@@ -38,6 +38,7 @@ function base64ToHex(key: string): string {
 }
 
 const urlKey = base64ToHex;
+const disabledRefresh = true;
 
 export default createStore<RootState>({
     plugins: [createLogger()],
@@ -63,18 +64,6 @@ export default createStore<RootState>({
                 state.key = "";
                 state.authenticated = false;
                 delete window.localStorage["dimsum:auth"];
-            }
-        },
-        [MutationTypes.PEOPLE]: (state: RootState, people: Person[]) => {
-            state.people = _.keyBy(people, (p: Person) => p.key);
-            for (const e of people) {
-                state.entities[e.key] = e;
-            }
-        },
-        [MutationTypes.AREAS]: (state: RootState, areas: Area[]) => {
-            state.areas = _.keyBy(areas, (p: Area) => p.key);
-            for (const e of areas) {
-                state.entities[e.key] = e;
             }
         },
         [MutationTypes.ENTITY]: (state: RootState, entity: Entity) => {
@@ -152,20 +141,6 @@ export default createStore<RootState>({
         },
         [ActionTypes.LOADING]: async ({ state, commit }: ActionParameters) => {
             const api = getApi(state.headers);
-            const areas = await api.areas();
-            if (areas && areas.areas) {
-                commit(
-                    MutationTypes.AREAS,
-                    areas.areas.map((row) => JSON.parse(row.serialized))
-                );
-            }
-            const people = await api.people();
-            if (people && people.people) {
-                commit(
-                    MutationTypes.PEOPLE,
-                    people.people.map((row) => JSON.parse(row.serialized))
-                );
-            }
 
             await subscribe(state.headers, async (received) => {
                 const reply = received as { nearby: { rendered: string; model: string }[] };
@@ -179,19 +154,22 @@ export default createStore<RootState>({
             if (state.entities[payload.key]) {
                 return Promise.resolve();
             }
-            const api = getApi(state.headers);
-            const data = await api.entity({ key: payload.key });
-            if (data.entitiesByKey) {
-                commit(MutationTypes.ENTITY, JSON.parse(data.entitiesByKey[0].serialized));
+            if (!disabledRefresh) {
+                const api = getApi(state.headers);
+                const data = await api.entity({ key: payload.key });
+                if (data.entitiesByKey) {
+                    commit(MutationTypes.ENTITY, JSON.parse(data.entitiesByKey[0].serialized));
+                }
             }
         },
         [ActionTypes.NEED_ENTITY]: async ({ state, commit }: ActionParameters, payload: NeedEntityAction) => {
-            const api = getApi(state.headers);
-            const data = await api.entity({ key: payload.key });
-            if (data.entitiesByKey) {
-                for (const row of data.entitiesByKey) {
-                    commit(MutationTypes.ENTITY, JSON.parse(row.serialized));
-                    break; // TODO FIX
+            if (!disabledRefresh) {
+                const api = getApi(state.headers);
+                const data = await api.entity({ key: payload.key });
+                if (data && data.entitiesByKey) {
+                    for (const row of data.entitiesByKey) {
+                        commit(MutationTypes.ENTITY, JSON.parse(row.serialized));
+                    }
                 }
             }
         },
