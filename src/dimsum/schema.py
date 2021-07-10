@@ -134,8 +134,11 @@ async def resolve_entities(obj, info, keys, reach: int = 0, identities=True):
     )
     log.info("ariadne:entities keys=%s", keys)
     with domain.session() as session:
-        entities = [await materialize(session, key=key, reach=reach) for key in keys]
-        return flatten(entities)
+        entities = flatten(
+            [await materialize(session, key=key, reach=reach) for key in keys]
+        )
+        log.info("ariadne:entities nentities=%d", len(entities))
+        return entities
 
 
 @query.field("entitiesByKey")
@@ -167,7 +170,7 @@ async def resolve_areas(obj, info):
     with domain.session() as session:
         await session.prepare()
         entities = session.registrar.entities_of_klass(scopes.AreaClass)
-        log.info("ariadne:areas entities=%s", entities)
+        log.info("ariadne:areas nentities=%d", len(entities))
         return [EntityResolver(session, e) for e in entities]
 
 
@@ -178,7 +181,7 @@ async def resolve_people(obj, info):
     with domain.session() as session:
         await session.prepare()
         entities = session.registrar.entities_of_klass(scopes.LivingClass)
-        log.info("ariadne:people entities=%s", entities)
+        log.info("ariadne:people nentities=%d", len(entities))
         return [EntityResolver(session, e) for e in entities]
 
 
@@ -250,7 +253,6 @@ async def login(obj, info, credentials):
                 creator=session.world,
                 props=Common(creds.username, desc="A player", invited_by=creator.key),
             )
-            log.info("PERSON = %s", person)
             await session.perform(Join(), person)
             await session.perform(admin.Auth(password=creds.password), person)
 
@@ -341,6 +343,8 @@ async def resolve_language(obj, info, criteria):
             for e in session.registrar.entities.values()
             if e.modified or lqc.reach > 0
         ]
+
+        log.info("ariadne:language nentities=%d", len(entities))
 
         if lqc.subscription:
             asyncio.create_task(send_entities(entities))
