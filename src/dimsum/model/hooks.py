@@ -5,7 +5,6 @@ import functools
 import contextvars
 import asyncio
 from typing import List, Optional, Callable, Dict, Any
-from weakref import ref, ReferenceType
 
 from .conditions import Condition
 from .context import get
