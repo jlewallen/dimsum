@@ -74,6 +74,10 @@
                                 "py/object": "model.properties.Property",
                                 "value": "welcome"
                             },
+                            "described": {
+                                "py/object": "model.properties.Property",
+                                "value": "welcome (#1)"
+                            },
                             "desc": {
                                 "py/object": "model.properties.Property",
                                 "value": "welcome"

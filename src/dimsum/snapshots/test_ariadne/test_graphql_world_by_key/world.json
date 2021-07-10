@@ -37,6 +37,10 @@
                                 "py/object": "model.properties.Property",
                                 "value": "World"
                             },
+                            "described": {
+                                "py/object": "model.properties.Property",
+                                "value": "World (#0)"
+                            },
                             "desc": {
                                 "py/object": "model.properties.Property",
                                 "value": "Ya know, everything"

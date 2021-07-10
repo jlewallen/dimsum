@@ -11,6 +11,7 @@ log = logging.getLogger("dimsum.model")
 
 GlobalId = "gid"
 Name = "name"
+Described = "described"
 Desc = "desc"
 Created = "created"
 Touched = "touched"
@@ -118,6 +119,7 @@ class Common(Map):
         super().__init__(kwargs)
         self.set(GlobalId, -1)
         self.set(Name, name)
+        self.set(Described, name)
         self.set(Desc, desc if desc else name)
         self.set(Created, time.time())
         self.set(Touched, time.time())
@@ -140,6 +142,14 @@ class Common(Map):
     @name.setter
     def name(self, value: str):
         self.set(Name, value)
+
+    @property
+    def described(self) -> str:
+        return self[Described]
+
+    @name.setter
+    def described(self, value: str):
+        self.set(Described, value)
 
     @property
     def desc(self) -> str:

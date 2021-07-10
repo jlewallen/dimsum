@@ -2,7 +2,7 @@ import logging
 import inflect
 from typing import Optional
 
-from model import Entity, World, Hooks, install_hooks, Hooks, hooks
+from model import Entity, World, Hooks, install_hooks, Hooks, hooks, RootEntityClass
 
 import scopes as scopes
 import scopes.behavior as behavior
@@ -28,6 +28,8 @@ log = logging.getLogger("dimsum")
 
 class EntityHooks(Hooks):
     def describe(self, entity: Entity) -> str:
+        if entity.klass == RootEntityClass:
+            return "{0} (#{1})".format(entity.props.name, entity.props.gid)
         if entity.klass == scopes.LivingClass:
             return "{0} (#{1})".format(entity.props.name, entity.props.gid)
         if entity.klass == scopes.AreaClass:

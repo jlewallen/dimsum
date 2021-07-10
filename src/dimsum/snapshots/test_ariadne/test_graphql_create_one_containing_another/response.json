@@ -79,6 +79,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Thing A"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Thing A (#1)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Thing"
@@ -174,6 +178,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Thing B"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Thing B (#2)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",

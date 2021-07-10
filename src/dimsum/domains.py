@@ -78,6 +78,8 @@ class Session:
         log.info("saving %s", self.store)
         assert isinstance(self.world, World)
         self.world.update_gid(self.registrar.number)
+        for key, mod in self.registrar.modified().items():
+            mod.props.described = mod.describe()
         modified = serializing.modified(self.registrar)
         await self.store.update(modified)
 

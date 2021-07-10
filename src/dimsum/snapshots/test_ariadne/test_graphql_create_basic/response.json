@@ -62,6 +62,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Flute"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Flute"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Flute"

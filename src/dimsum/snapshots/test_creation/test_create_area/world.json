@@ -41,6 +41,10 @@
                     "py/object": "model.properties.Property",
                     "value": "World"
                 },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "World (#0)"
+                },
                 "desc": {
                     "py/object": "model.properties.Property",
                     "value": "Ya know, everything"
@@ -138,6 +142,10 @@
                 "name": {
                     "py/object": "model.properties.Property",
                     "value": "Living room"
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Living room (#1)"
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
@@ -247,6 +255,10 @@
                     "py/object": "model.properties.Property",
                     "value": "Jacob"
                 },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Jacob (#2)"
+                },
                 "desc": {
                     "py/object": "model.properties.Property",
                     "value": "Curly haired bastard."
@@ -345,6 +357,10 @@
                 "name": {
                     "py/object": "model.properties.Property",
                     "value": "Treehouse"
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Treehouse (#3)"
                 },
                 "desc": {
                     "py/object": "model.properties.Property",

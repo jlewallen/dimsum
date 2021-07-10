@@ -80,6 +80,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "World"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "World (#0)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Ya know, everything"
@@ -241,6 +245,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Town Courtyard."
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Town Courtyard. (#4)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "There's a ton going on here."
@@ -350,6 +358,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Tomorrow"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Tomorrow (#5)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "She's a Maine Coon, and very elegant and pretty."
@@ -455,6 +467,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Beer Keg"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Beer Keg (#6)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -569,6 +585,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Large Oak Tree"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Large Oak Tree (#7)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "It's heavy."
@@ -674,6 +694,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Hammer"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Hammer (#8)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -788,6 +812,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Mysterious Box"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Mysterious Box (#9)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "It looks like some weird antique your grandmother would have. Why would anyone carry this thing around?"
@@ -901,6 +929,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Acoustic Guitar"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an Acoustic Guitar (#10)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Seems to be well travelled."
@@ -1013,6 +1045,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Large Steep Cliff"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Large Steep Cliff (#11)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -1128,6 +1164,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Wooden Ladder"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Wooden Ladder (#12)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Seems sturdy enough."
@@ -1241,6 +1281,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Rocky Path"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Rocky Path (#13)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -1356,6 +1400,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Worn Path"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Worn Path (#14)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Worn Path"
@@ -1462,6 +1510,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Artist's Loft"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Artist's Loft (#15)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Everything is very colorful, because everything has got paint on it."
@@ -1562,6 +1614,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Wooden Ladder"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Wooden Ladder (#16)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -1675,6 +1731,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Narrow Canyon"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Narrow Canyon (#17)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "It's barely wide enough to walk two by two down. The narrow walls really funnel the wind, creating powerful gusts."
@@ -1775,6 +1835,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Rocky Path"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Rocky Path (#18)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -1900,6 +1964,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "A small clearing."
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "A small clearing. (#19)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "A small clearing."
@@ -2000,6 +2068,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Worn Path"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Worn Path (#20)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -2113,6 +2185,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Large Maple Tree"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Large Maple Tree (#21)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -2228,6 +2304,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Entrance to a Dark Cavern"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an Entrance to a Dark Cavern (#22)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "It's dark, the cavern that is."
@@ -2342,6 +2422,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Marble Steps"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Marble Steps (#23)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Marble"
@@ -2448,6 +2532,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Dark Cavern"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Dark Cavern (#24)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "It's dark"
@@ -2548,6 +2636,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Small Crevice"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Small Crevice (#25)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -2667,6 +2759,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 0"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 0 x 0 (#26)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 0"
@@ -2767,6 +2863,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#27)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -2882,6 +2982,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#28)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
@@ -2995,6 +3099,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "Marble Steps"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a Marble Steps (#29)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -3114,6 +3222,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 1"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 0 x 1 (#30)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 1"
@@ -3214,6 +3326,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#31)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -3329,6 +3445,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#32)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
@@ -3443,6 +3563,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#33)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
@@ -3555,6 +3679,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 2"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 0 x 2 (#34)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 0 x 2"
@@ -3655,6 +3783,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#35)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -3769,6 +3901,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#36)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -3888,6 +4024,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 2"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 2 (#37)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 2"
@@ -3988,6 +4128,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#38)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -4103,6 +4247,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#39)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
@@ -4216,6 +4364,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#40)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -4341,6 +4493,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 1"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 1 (#41)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 1"
@@ -4441,6 +4597,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#42)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -4556,6 +4716,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#43)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
@@ -4670,6 +4834,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#44)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
@@ -4783,6 +4951,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#45)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -4902,6 +5074,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 0"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 1 x 0 (#46)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 1 x 0"
@@ -5002,6 +5178,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#47)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -5117,6 +5297,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "an East Exit (#48)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "East Exit"
@@ -5231,6 +5415,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#49)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
@@ -5343,6 +5531,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 0"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 2 x 0 (#50)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 0"
@@ -5443,6 +5635,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#51)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -5557,6 +5753,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#52)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -5676,6 +5876,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 1"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 2 x 1 (#53)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 1"
@@ -5776,6 +5980,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "North Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a North Exit (#54)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -5891,6 +6099,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#55)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
@@ -6005,6 +6217,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#56)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
@@ -6117,6 +6333,10 @@
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 2"
                                 },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Grid Room 2 x 2 (#57)"
+                                },
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Grid Room 2 x 2"
@@ -6217,6 +6437,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "South Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a South Exit (#58)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -6331,6 +6555,10 @@
                                 "name": {
                                     "py/object": "model.properties.Property",
                                     "value": "West Exit"
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "a West Exit (#59)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",

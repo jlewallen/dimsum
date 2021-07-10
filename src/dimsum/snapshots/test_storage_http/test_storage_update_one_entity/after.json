@@ -28,6 +28,10 @@
                     "py/object": "model.properties.Property",
                     "value": "Fake Entity"
                 },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Fake Entity"
+                },
                 "desc": {
                     "py/object": "model.properties.Property",
                     "value": "Fake Entity"
