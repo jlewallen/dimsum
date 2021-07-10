@@ -6,6 +6,7 @@ import shortuuid
 import starlette.requests
 import ariadne
 import jwt
+import json
 from typing import List, Optional
 
 import config
@@ -50,7 +51,10 @@ reply = ariadne.ScalarType("Reply")
 @reply.serializer
 def serialize_reply(value):
     log.debug("ariadne:reply")
-    return serializing.serialize(value)
+    serialized = serializing.serialize(value)
+    if isinstance(value, Renderable):
+        return dict(rendered=json.dumps(value.render_tree()), model=serialized)
+    return dict(model=serialized)
 
 
 query = ariadne.QueryType()

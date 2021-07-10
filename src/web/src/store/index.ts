@@ -133,7 +133,10 @@ export default createStore<RootState>({
             const api = getApi(state.headers);
             const data = await api.language({ text: payload.command, evaluator: state.key });
             if (data.language) {
-                commit(MutationTypes.REPLY, { reply: JSON.parse(data.language.reply) });
+                commit(MutationTypes.REPLY, {
+                    rendered: data.language.reply.rendered ? JSON.parse(data.language.reply.rendered) : undefined,
+                    reply: JSON.parse(data.language.reply.model),
+                });
                 if (data.language.entities) {
                     commit(
                         MutationTypes.ENTITIES,

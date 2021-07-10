@@ -145,7 +145,9 @@ async def test_graphql_language_basic(deterministic, snapshot):
 
         welcome = scopes.area(
             key="welcome",
-            props=Common(name="welcome"),
+            props=Common(
+                name="Welcome Area", desc="A two lane street in a small town."
+            ),
             creator=world,
         )
         await session.add_area(welcome)

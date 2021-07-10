@@ -116,8 +116,8 @@ async def test_making_item_hard_to_see():
 
     with freezegun.freeze_time("2000-01-01 00:00:00"):
         r = await tw.success("look for orb")
-        assert len(r.items) == 1
-        orb = r.items[0]
+        assert len(r.entities) == 1
+        orb = r.entities[0]
 
         r = await tw.success("look")
         assert len(r.items) == 2

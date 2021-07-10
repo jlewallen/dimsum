@@ -68,7 +68,7 @@ class Interactive(sshd.CommandHandler):
         self.initialize = InitializeWorld(self.domain)
 
     async def write(self, item: Renderable, **kwargs):
-        self.channel.write("\n" + str(item.render_string()) + "\n\n")
+        self.channel.write("\n" + str(item.render_tree()) + "\n\n")
 
     async def handle(self, line: str):
         log.info("handle: %s '%s'", self.username, line)

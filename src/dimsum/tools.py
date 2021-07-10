@@ -62,6 +62,11 @@ def get_contributing_entities(world: Entity, player: Entity) -> EntitySet:
     return entities
 
 
+def get_holding(entity: Entity) -> List[Entity]:
+    with entity.make_and_discard(carryable.Containing) as container:
+        return container.holding
+
+
 def is_holding(container: Entity, e: Entity) -> bool:
     with container.make_and_discard(carryable.Containing) as contains:
         return e in contains.holding

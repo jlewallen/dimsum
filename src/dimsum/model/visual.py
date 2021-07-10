@@ -6,7 +6,7 @@ log = logging.getLogger("dimsum.visual")
 
 
 class Renderable:
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         raise NotImplementedError
 
 
@@ -14,7 +14,7 @@ class Renderable:
 class String(Renderable):
     message: str
 
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return {"message": self.message}
 
 

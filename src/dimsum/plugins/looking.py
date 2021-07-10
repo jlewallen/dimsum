@@ -1,9 +1,10 @@
 import logging
 import dataclasses
-from typing import Type, Optional, List, Sequence, Dict
+from typing import Type, Optional, List, Sequence, Dict, Any
 
 import grammars
 import transformers
+import tools
 from model import *
 from finders import *
 from plugins.actions import PersonAction
@@ -24,98 +25,37 @@ class ObservedLiving(ObservedEntity):
     def holding(self):
         return self.entity.make(carryable.Containing).holding
 
-    @property
-    def memory(self):
-        return self.entity.make(mechanics.Memory).memory
-
-    def __str__(self):
-        if len(self.activities) == 0:
-            return "%s" % (self.entity,)
-        return "%s who is %s" % (
-            self.entity,
-            infl.join(list(map(str, self.activities))),
-        )
-
-    def __repr__(self):
-        return str(self)
-
-
-class ObservedAnimal(ObservedLiving):
-    @property
-    def animal(self):
-        return self.entity
-
-
-class ObservedPerson(ObservedLiving):
-    @property
-    def person(self):
-        return self.entity
-
 
 @dataclasses.dataclass
 class DetailedObservation(Observation):
     item: ObservedEntity
 
-    @property
-    def props(self):
-        return self.item.entity.props
 
-    @property
-    def properties(self):
-        return self.props.map
-
-    def accept(self, visitor):
-        return visitor.detailed_observation(self)
-
-    def __str__(self):
-        return "observed %s %s" % (
-            self.item,
-            self.properties,
-        )
-
-
+@dataclasses.dataclass
 class AreaObservation(Observation):
-    def __init__(self, area: Entity, person: Entity):
-        super().__init__()
-        assert area
-        assert person
-        self.who: ObservedPerson = ObservedPerson(person)
-        self.where: Entity = area
+    area: Entity
+    person: Entity
 
-        occupied = area.make(occupyable.Occupyable).occupied
+    def __post_init__(self):
+        occupied = self.area.make(occupyable.Occupyable).occupied
         self.living: List[ObservedLiving] = flatten(
-            [observe_entity(e) for e in occupied if e != person]
+            [observe_entity(e) for e in occupied if e != self.person]
         )
 
         self.items: List[ObservedEntity] = flatten(
             [
                 observe_entity(e)
-                for e in area.make(carryable.Containing).holding
+                for e in self.area.make(carryable.Containing).holding
                 if not e.make(mechanics.Visibility).visible.hard_to_see
-                or person.make(mechanics.Visibility).can_see(e.identity)
+                or self.person.make(mechanics.Visibility).can_see(e.identity)
             ]
         )
-        self.routes: List[movement.AreaRoute] = area.make(
+        self.routes: List[movement.AreaRoute] = self.area.make(
             movement.Movement
         ).available_routes
 
-    @property
-    def props(self):
-        return self.where.props
-
-    def accept(self, visitor):
-        return visitor.area_observation(self)
-
-    def __str__(self):
-        return "%s observes %s, also here %s and visible is %s" % (
-            self.who,
-            self.props,
-            self.living,
-            self.items,
-        )
-
-    def render_string(self) -> Dict[str, str]:
-        emd = self.props.desc
+    def render_tree(self) -> Dict[str, Any]:
+        emd = self.area.props.desc
         emd += "\n\n"
         if len(self.living) > 0:
             emd += "Also here: " + infl.join([str(x) for x in self.living])
@@ -123,8 +63,9 @@ class AreaObservation(Observation):
         if len(self.items) > 0:
             emd += "You can see " + infl.join([str(x) for x in self.items])
             emd += "\n"
-        if len(self.who.holding) > 0:
-            emd += "You're holding " + infl.join([str(x) for x in self.who.holding])
+        holding = tools.get_holding(self.person)
+        if len(holding) > 0:
+            emd += "You're holding " + infl.join([str(x) for x in holding])
             emd += "\n"
         directional = [
             e for e in self.routes if isinstance(e, movement.DirectionalRoute)
@@ -133,47 +74,17 @@ class AreaObservation(Observation):
             directions = [d.direction for d in directional]
             emd += "You can go " + infl.join([str(d) for d in directions])
             emd += "\n"
-        return {"title": self.props.name, "description": emd}
+        return {"title": self.area.props.name, "description": emd}
 
 
+@dataclasses.dataclass
 class EntitiesObservation(Observation):
-    def __init__(self, entities: Sequence[Entity]):
-        super().__init__()
-        self.entities = entities
-
-    @property
-    def items(self):
-        return self.entities
-
-    def __str__(self):
-        return "observed %s" % (infl.join(self.entities),)
+    entities: Sequence[Entity]
 
 
+@dataclasses.dataclass
 class PersonalObservation(Observation):
-    def __init__(self, who: Entity):
-        super().__init__()
-        self.who = ObservedPerson(who)
-
-    @property
-    def props(self):
-        return self.who.person.props
-
-    @property
-    def properties(self):
-        return self.props.map
-
-    @property
-    def memory(self):
-        return self.who.person.make(mechanics.Memory).memory
-
-    def accept(self, visitor):
-        return visitor.personal_observation(self)
-
-    def __str__(self):
-        return "%s considers themselves %s" % (
-            self.who,
-            self.properties,
-        )
+    who: Entity
 
 
 class LookInside(PersonAction):

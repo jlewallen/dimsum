@@ -1,6 +1,6 @@
 <template>
     <div class="response area-observation card">
-        <WithEntity :entityKey="reply.where.key" v-slot="where">
+        <WithEntity :entityKey="reply.area.key" v-slot="where">
             <div class="card-body">
                 <h4 class="card-title">{{ where.entity.props.map.name.value }}</h4>
                 <h6 class="card-subtitle">{{ where.entity.props.map.desc.value }}</h6>

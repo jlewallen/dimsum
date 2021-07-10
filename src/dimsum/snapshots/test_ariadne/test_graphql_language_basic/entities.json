@@ -2,25 +2,28 @@
     "data": {
         "language": {
             "reply": {
-                "py/object": "plugins.looking.AreaObservation",
-                "who": {
-                    "py/object": "plugins.looking.ObservedPerson",
-                    "entity": {
+                "rendered": {
+                    "title": "Welcome Area",
+                    "description": "A two lane street in a small town.\n\n"
+                },
+                "model": {
+                    "py/object": "plugins.looking.AreaObservation",
+                    "area": {
+                        "py/object": "model.entity.Entity",
+                        "key": "welcome",
+                        "klass": "AreaClass",
+                        "name": "Welcome Area"
+                    },
+                    "person": {
                         "py/object": "model.entity.Entity",
                         "key": "jlewallen",
                         "klass": "LivingClass",
                         "name": "Jacob"
-                    }
-                },
-                "where": {
-                    "py/object": "model.entity.Entity",
-                    "key": "welcome",
-                    "klass": "AreaClass",
-                    "name": "welcome"
-                },
-                "living": [],
-                "items": [],
-                "routes": []
+                    },
+                    "living": [],
+                    "items": [],
+                    "routes": []
+                }
             },
             "entities": []
         }

@@ -161,7 +161,7 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
 
     r = await tw.execute("look in box")
     assert isinstance(r, EntitiesObservation)
-    assert "Coin" in r.items[0].props.name
+    assert "Coin" in r.entities[0].props.name
 
 
 @pytest.mark.asyncio

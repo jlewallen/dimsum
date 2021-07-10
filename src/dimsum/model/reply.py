@@ -12,8 +12,11 @@ log = logging.getLogger("dimsum.model")
 
 
 @dataclasses.dataclass
-class ObservedEntity:
+class ObservedEntity(Renderable):
     entity: Entity
+
+    def render_tree(self) -> Dict[str, Any]:
+        return {"entity": self.entity}
 
 
 @all.observed.target
@@ -22,21 +25,17 @@ def observe_entity(entity: Entity) -> Sequence[ObservedEntity]:
 
 
 class Observation(Reply, Renderable):
-    def render_string(self) -> Dict[str, str]:
-        return {"message": "some kind of observation"}
+    pass
 
 
 class Activity:
     pass
 
 
-class HoldingActivity(Activity):
-    def __init__(self, item: Entity):
+class HoldingActivity(Activity, Renderable):
+    def __init__(self, entity: Entity):
         super().__init__()
-        self.item = item
+        self.entity = entity
 
-
-class ObservedEntities:
-    def __init__(self, entities: List[Entity]):
-        super().__init__()
-        self.entities = [observe_entity(e) for e in entities]
+    def render_tree(self) -> Dict[str, Any]:
+        return {"holding": self.entity}
