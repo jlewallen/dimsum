@@ -246,8 +246,9 @@ class Containing(Openable):
         return e in self.holding
 
     def unhold(self, e: Entity, **kwargs) -> Entity:
-        self.holding.remove(e)
-        self.ourselves.touch()
+        if e in self.holding:
+            self.holding.remove(e)
+            self.ourselves.touch()
         with e.make(Location) as location:
             location.container = None
         return e
