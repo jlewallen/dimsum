@@ -41,6 +41,11 @@
                                 "loose": false
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -195,6 +200,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "a",

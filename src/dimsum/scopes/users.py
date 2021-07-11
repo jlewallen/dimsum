@@ -5,7 +5,7 @@ import os
 import jwt
 from typing import List, Optional, Tuple, Dict
 
-from model import Entity, Scope
+from model import Entity, Scope, Acls
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -15,6 +15,7 @@ invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
 class Usernames(Scope):
     def __init__(self, users: Optional[Dict[str, str]] = None, **kwargs):
         super().__init__(**kwargs)
+        self.acls = Acls("usernames")
         self.users = users if users else {}
 
 
@@ -52,6 +53,7 @@ def try_password(secured: Tuple[str, str], password: str) -> bool:
 class Auth(Scope):
     def __init__(self, password: Optional[Tuple[str, str]] = None, **kwargs):
         super().__init__(**kwargs)
+        self.acls = Acls("auth")
         self.password = password if password else None
 
     def change(self, password: str):

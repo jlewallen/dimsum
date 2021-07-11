@@ -3,7 +3,7 @@ import datetime
 import logging
 from typing import Dict, List, Optional
 
-from model import Entity, Scope, Identity, Worn, Eaten, Drank
+from model import Entity, Scope, Identity, Worn, Eaten, Drank, Acls
 
 log = logging.getLogger("dimsum.scopes")
 
@@ -81,6 +81,7 @@ class Visible:
 class Visibility(Scope):
     def __init__(self, visible: Optional[Visible] = None, **kwargs):
         super().__init__(**kwargs)
+        self.acls = Acls("visibility")
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):

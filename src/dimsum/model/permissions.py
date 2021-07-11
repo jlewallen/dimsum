@@ -46,10 +46,11 @@ AclsKey = "acls"
 
 
 def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
-    log.info("walking diff: %s", diff)
+    log.debug("walking diff: %s", diff)
 
     def prepare_acl(d):
-        del d["py/object"]
+        if "py/object" in d:
+            del d["py/object"]
         return d
 
     def walk(frame, value):
@@ -70,15 +71,35 @@ def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
         return value
 
     def walk_into(frame, key, value):
-        acls = []
-        if AclsKey in frame:
-            acls.append(prepare_acl(frame[AclsKey]))
-        walked = walk(frame[key], value)
-        if isinstance(walked, list):
-            return acls + walked
-        if isinstance(walked, dict):
-            return acls + flatten([v for _, v in walked.items()])
-        return acls
+        if frame is None:
+            # No more acls to dicsover if the frame is gone.
+            return []
+        try:
+            if isinstance(frame, list) and isinstance(key, str):
+                # We need to be indexed to get past one of these.
+                return []
+
+            acls = []
+            if isinstance(frame, dict) and AclsKey in frame:
+                acls.append(prepare_acl(frame[AclsKey]))
+
+            # If we can't find any more frame using this key then we
+            # end. Notice this may contain a just now added acl.
+            if isinstance(frame, dict) and key not in frame:
+                return acls
+
+            walked = walk(frame[key], value)
+            if isinstance(walked, list):
+                return acls + walked
+            if isinstance(walked, dict):
+                return acls + flatten([v for _, v in walked.items()])
+            return acls
+        except:
+            logging.exception("security-check error", exc_info=True)
+            logging.error("frame=%s (%s)", frame, type(frame))
+            logging.error("key=%s (%s)", key, type(key))
+            logging.error("value=%s", value)
+            raise
 
     walked = walk(original, diff)
     acl_maps = flatten([v for _, v in walked.items()])

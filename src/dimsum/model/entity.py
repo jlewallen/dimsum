@@ -11,7 +11,12 @@ from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union
 from .crypto import Identity, generate
 from .kinds import Kind
 from .properties import Common
-from .permissions import Acls, Permission, EverybodyIdentity
+from .permissions import (
+    Acls,
+    Permission,
+    EverybodyIdentity,
+    generate_security_check_from_json_diff,
+)
 
 log = logging.getLogger("dimsum.model.entity")
 
@@ -444,20 +449,24 @@ class Registrar:
         self, key: str, e: Optional[Entity], update: EntityUpdate
     ) -> bool:
         if key in self.originals:
-            if self.originals[key] == update.serialized:
-                return False
             original = self.originals[key]
             assert original
+
+            if original == update.serialized:
+                return False
+
+            # TODO Parsing/diffing entity JSON
+            parsed_original = json.loads(original)
+            d = jsondiff.diff(
+                parsed_original,
+                json.loads(update.serialized),
+                marshal=True,
+            )
+            sc = generate_security_check_from_json_diff(parsed_original, d)
+            log.info("acls=%s", sc)
+
             if e and not e.modified and update.serialized:
-                log.warning(
-                    "%s: untouched save %s",
-                    key,
-                    jsondiff.diff(  # TODO Parsing/diffing entity JSON
-                        json.loads(original),
-                        json.loads(update.serialized),
-                        marshal=True,
-                    ),
-                )
+                log.warning("%s: untouched save %s", key, d)
         return True
 
     def was_modified(self, e: Entity) -> bool:

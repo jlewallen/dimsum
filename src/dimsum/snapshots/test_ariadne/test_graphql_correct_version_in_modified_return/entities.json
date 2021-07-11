@@ -61,6 +61,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -209,6 +214,11 @@
                                 }
                             },
                             "usernames": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "usernames",
+                                    "rules": []
+                                },
                                 "users": {
                                     "jlewallen": "6"
                                 }
@@ -351,6 +361,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {

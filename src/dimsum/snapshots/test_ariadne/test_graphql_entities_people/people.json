@@ -32,6 +32,11 @@
                             }
                         },
                         "containing": {
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "name": "containing",
+                                "rules": []
+                            },
                             "pattern": null,
                             "locked": false,
                             "openable": {

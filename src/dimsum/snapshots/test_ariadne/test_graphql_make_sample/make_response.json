@@ -193,6 +193,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -403,6 +408,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -580,6 +590,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -747,6 +762,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -902,6 +922,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1069,6 +1094,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1236,6 +1266,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1403,6 +1438,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1566,6 +1606,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1729,6 +1774,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -1892,6 +1942,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
@@ -2034,6 +2089,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -2197,6 +2257,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "35",
@@ -2339,6 +2404,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -2508,6 +2578,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "42",
@@ -2650,6 +2725,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -2831,6 +2911,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "49",
@@ -2998,6 +3083,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "49",
@@ -3161,6 +3251,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "49",
@@ -3324,6 +3419,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "49",
@@ -3466,6 +3566,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -3629,6 +3734,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "60",
@@ -3771,6 +3881,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -3946,6 +4061,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "68",
@@ -4109,6 +4229,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "68",
@@ -4272,6 +4397,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "68",
@@ -4414,6 +4544,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -4589,6 +4724,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "70",
@@ -4752,6 +4892,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "70",
@@ -4915,6 +5060,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "70",
@@ -5057,6 +5207,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -5226,6 +5381,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "72",
@@ -5389,6 +5549,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "72",
@@ -5531,6 +5696,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -5706,6 +5876,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "78",
@@ -5869,6 +6044,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "78",
@@ -6032,6 +6212,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "78",
@@ -6174,6 +6359,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -6355,6 +6545,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "76",
@@ -6518,6 +6713,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "76",
@@ -6681,6 +6881,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "76",
@@ -6844,6 +7049,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "76",
@@ -6986,6 +7196,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -7161,6 +7376,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "74",
@@ -7324,6 +7544,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "74",
@@ -7487,6 +7712,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "74",
@@ -7629,6 +7859,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -7798,6 +8033,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "80",
@@ -7961,6 +8201,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "80",
@@ -8103,6 +8348,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -8278,6 +8528,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "82",
@@ -8441,6 +8696,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "82",
@@ -8604,6 +8864,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "82",
@@ -8746,6 +9011,11 @@
                                 }
                             },
                             "containing": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "containing",
+                                    "rules": []
+                                },
                                 "pattern": null,
                                 "locked": false,
                                 "openable": {
@@ -8915,6 +9185,11 @@
                                 }
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "84",
@@ -9078,6 +9353,11 @@
                                 "loose": false
                             },
                             "location": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "location",
+                                    "rules": []
+                                },
                                 "container": {
                                     "py/object": "model.entity.Entity",
                                     "key": "84",
