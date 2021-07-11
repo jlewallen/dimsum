@@ -93,23 +93,21 @@ export default defineComponent({
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            if (this.help) {
-                updating.chimeras.encyclopedia = _.extend(updating.chimeras.encyclopedia || {}, {
-                    body: this.form.pedia,
-                });
-            } else {
-                const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
-                updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
-                    {
-                        "py/object": "model.scopes.behavior.Behavior",
-                    },
-                    behavior,
-                    {
-                        python: this.form.behavior,
-                        executable: true,
-                    }
-                );
-            }
+            updating.chimeras.encyclopedia = _.extend(updating.chimeras.encyclopedia || {}, {
+                body: this.form.pedia,
+            });
+            const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
+            updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
+                {
+                    "py/object": "model.scopes.behavior.Behavior",
+                },
+                behavior,
+                {
+                    python: this.form.behavior,
+                    executable: true,
+                }
+            );
+            console.log("updating entity", updating);
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },
