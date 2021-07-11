@@ -110,7 +110,7 @@ export default defineComponent({
             const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
             updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
                 {
-                    "py/object": "model.scopes.behavior.Behavior",
+                    "py/object": "scopes.behavior.Behavior",
                 },
                 behavior,
                 {
