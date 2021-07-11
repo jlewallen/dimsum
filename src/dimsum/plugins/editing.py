@@ -15,14 +15,9 @@ log = logging.getLogger("dimsum")
 
 @event
 @dataclasses.dataclass(frozen=True)
-class EditingEntity(StandardEvent):
+class EditingEntityBehavior(StandardEvent):
     entity: Entity
     interactive: bool = True
-
-
-@dataclasses.dataclass(frozen=True)
-class ScreenCleared(Reply):
-    pass
 
 
 class EditEntity(PersonAction):
@@ -36,8 +31,15 @@ class EditEntity(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if item:
-            return EditingEntity(source=person, area=area, heard=[], entity=item)
+            return EditingEntityBehavior(
+                source=person, area=area, heard=[], entity=item
+            )
         return Failure("where's that?")
+
+
+@dataclasses.dataclass(frozen=True)
+class ScreenCleared(Reply):
+    pass
 
 
 class ClearScreen(PersonAction):

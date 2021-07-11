@@ -43,7 +43,7 @@ from model.entity import (
     set_entity_area_provider,
 )
 from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
-from model.world import World, WorldKey, Welcoming
+from model.world import World, WorldKey, Welcoming, materialize_well_known_entity
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
 from model.reply import (
@@ -126,6 +126,7 @@ __all__: List[str] = [
     "set_entity_cleanup_handler",
     "set_entity_describe_handler",
     "set_entity_area_provider",
+    "materialize_well_known_entity",
     "cleanup_entity",
     "observe_entity",
     "get_all_events",

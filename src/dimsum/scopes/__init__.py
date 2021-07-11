@@ -71,9 +71,12 @@ def set_proxy_factory(factory: Callable):
 def create_klass(
     desired: Type[EntityClass], klass: Optional[Type[EntityClass]] = None, **kwargs
 ) -> Entity:
-    assert klass is None or klass is desired
+    assert klass is None  # or klass is desired
+    entity_scopes = Item
+    if desired in scopes_by_class:
+        entity_scopes = scopes_by_class[desired]
     return proxy_factory(
-        Entity(scopes=scopes_by_class[desired], klass=desired, **kwargs)
+        Entity(scopes=entity_scopes, klass=desired, **kwargs)
     )  # TODO create
 
 
@@ -81,8 +84,8 @@ def alive(**kwargs) -> Entity:
     return create_klass(LivingClass, **kwargs)
 
 
-def item(**kwargs) -> Entity:
-    return create_klass(ItemClass, **kwargs)
+def item(klass=None, **kwargs) -> Entity:
+    return create_klass(klass if klass else ItemClass, **kwargs)
 
 
 def area(**kwargs) -> Entity:

@@ -19,6 +19,7 @@ import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 
+import plugins.helping  # noqa
 import plugins.chatting  # noqa
 import plugins.creation  # noqa
 import plugins.digging  # noqa

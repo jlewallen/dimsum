@@ -63,6 +63,8 @@ export class VCodeMirror extends VueComponentBase {
             this.$emit("save", this.editor.getValue());
         };
 
+        console.log("editor:mode", this.mode);
+
         const editor = (this.editor = markRaw(
             CodeMirror(this.$el, {
                 value: this.modelValue,

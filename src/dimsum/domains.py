@@ -449,6 +449,10 @@ class WorldCtx(Ctx):
             log.info("found: nada")
         return found
 
+    async def try_materialize(self, key: str) -> Optional[Entity]:
+        maybe = await self.session.try_materialize(key=key)
+        return maybe.maybe_one()
+
 
 def flatten(l):
     return [item for sl in l for item in sl]

@@ -69,8 +69,14 @@ export default defineComponent({
     created() {
         window.addEventListener("keyup", (data) => {
             if (data.key == " ") {
-                console.log("keyup.space");
-                this.resumeRepl();
+                const focused = window.document.activeElement;
+                if (focused) {
+                    if (focused.localName == "body") {
+                        this.resumeRepl();
+                    } else {
+                        console.log("keyup.space", focused.localName);
+                    }
+                }
             }
         });
     },

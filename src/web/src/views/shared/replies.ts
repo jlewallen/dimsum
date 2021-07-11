@@ -9,6 +9,7 @@ import Failure from "./Failure.vue";
 import DefaultReply from "./DefaultReply.vue";
 import { Universal } from "@/entity";
 import { CommonComponents } from "./index";
+import Markdown from "vue3-markdown-it";
 
 const CommonProps = {
     reply: {
@@ -16,6 +17,16 @@ const CommonProps = {
         required: true,
     },
 };
+
+const Help = defineComponent({
+    name: "Help",
+    props: CommonProps,
+    components: {
+        Markdown,
+    },
+    template: `<div class="response help"><Markdown :source="reply.body" /></div>`,
+});
+
 const LivingEnteredArea = defineComponent({
     name: "LivingEnteredArea",
     props: CommonProps,
@@ -67,14 +78,24 @@ const EntityCreated = defineComponent({
 
 import InlineEditor from "@/views/entity/InlineEditor.vue";
 
-const EditingEntity = defineComponent({
-    name: "EditingEntity",
+const EditingEntityBehavior = defineComponent({
+    name: "EditingEntityBehavior",
     props: CommonProps,
     components: {
         ...CommonComponents,
         InlineEditor,
     },
-    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
+    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :help="false" :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
+});
+
+const EditingEntityHelp = defineComponent({
+    name: "EditingEntityHelp",
+    props: CommonProps,
+    components: {
+        ...CommonComponents,
+        InlineEditor,
+    },
+    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :help="true" :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
 });
 
 const ScreenCleared = defineComponent({
@@ -162,10 +183,12 @@ export default {
     DefaultReply,
     ItemsHeld,
     ItemsDropped,
-    EditingEntity,
+    EditingEntityBehavior,
+    EditingEntityHelp,
     EntityCreated,
     ScreenCleared,
     ItemsObliterated,
     DynamicMessage,
     Universal,
+    Help,
 };

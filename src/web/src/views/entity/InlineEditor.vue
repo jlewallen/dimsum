@@ -5,7 +5,8 @@
             <span v-on:click="showLogs" :class="{ btn: true, 'btn-primary': !editor }">Logs</span>
         </div>
         <div class="inline-editor-row" v-if="editor">
-            <VCodeMirror v-model="form.behavior" :autoFocus="true" />
+            <VCodeMirror v-model="form.behavior" :autoFocus="true" v-if="!help" />
+            <VCodeMirror v-model="form.pedia" :autoFocus="true" :mode="{ name: 'markdown' }" v-if="help" />
         </div>
         <div class="inline-editor-row" v-else>
             <div class="logs">
@@ -54,21 +55,35 @@ export default defineComponent({
             type: Object as () => Entity,
             required: true,
         },
+        help: {
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
+        const pedia = (() => {
+            if (this.entity.chimeras.encyclopedia) {
+                return this.entity.chimeras.encyclopedia.body;
+            }
+            return null;
+        })();
+
+        console.log("pedia", pedia);
+
         return {
             editor: true,
             logs: _.reverse(behavior?.logs || []),
             form: {
                 behavior: behavior?.python || "",
+                pedia: pedia || "",
                 name: this.entity.props.map.name.value,
                 desc: this.entity.props.map.desc.value,
             },
         };
     },
     mounted() {
-        if (this.form.behavior == "") {
+        if (this.form.behavior == "" && this.form.pedia == "") {
             (this.$refs.name as HTMLInputElement).focus();
         }
     },
@@ -83,17 +98,23 @@ export default defineComponent({
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
-            updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
-                {
-                    "py/object": "model.scopes.behavior.Behavior",
-                },
-                behavior,
-                {
-                    python: this.form.behavior,
-                    executable: true,
-                }
-            );
+            if (this.help) {
+                updating.chimeras.encyclopedia = _.extend(updating.chimeras.encyclopedia || {}, {
+                    body: this.form.pedia,
+                });
+            } else {
+                const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
+                updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
+                    {
+                        "py/object": "model.scopes.behavior.Behavior",
+                    },
+                    behavior,
+                    {
+                        python: this.form.behavior,
+                        executable: true,
+                    }
+                );
+            }
             await store.dispatch(new UpdateEntityAction(updating));
             this.$emit("dismiss");
         },

@@ -118,6 +118,10 @@ export interface Carryable {
     kind: Kind;
 }
 
+export interface Encyclopedia {
+    body: string;
+}
+
 export interface Entity {
     key: string;
     url: string;
@@ -127,6 +131,7 @@ export interface Entity {
     chimeras: {
         behaviors: { behaviors: { map: Behaviors } };
         containing?: Containing;
+        encyclopedia?: Encyclopedia;
         occupyable?: Occupyable;
         visibility?: Visibility;
         carryable?: Carryable;

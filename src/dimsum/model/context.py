@@ -1,7 +1,7 @@
 import abc
 import contextvars
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from .entity import Entity
 from .events import Event
@@ -44,6 +44,10 @@ class Ctx:
     async def apply_item_finder(
         self, person: Entity, finder, **kwargs
     ) -> Optional[Entity]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def try_materialize(self, key: str) -> Optional[Entity]:
         raise NotImplementedError
 
 
