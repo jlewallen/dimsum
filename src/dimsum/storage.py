@@ -20,6 +20,7 @@ class StorageFields:
     original: int
     destroyed: bool
     serialized: str
+    provided: str
 
     @staticmethod
     def parse(serialized: str):
@@ -33,7 +34,7 @@ class StorageFields:
             parsed["version"]["i"] = version
             reserialized = json.dumps(parsed)
             return StorageFields(
-                parsed, key, gid, version, original, destroyed, reserialized
+                parsed, key, gid, version, original, destroyed, reserialized, serialized
             )
         except KeyError:
             raise Exception("malformed entity: {0}".format(serialized))
@@ -222,18 +223,30 @@ class SqliteStorage(EntityStorage):
             fields.version,
             fields.original,
         )
-        rv = self.dbc.execute(
-            "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
-            [
-                fields.version,
-                fields.gid,
-                fields.serialized,
+        try:
+            rv = self.dbc.execute(
+                "UPDATE entities SET version = ?, gid = ?, serialized = ? WHERE key = ? AND version = ?",
+                [
+                    fields.version,
+                    fields.gid,
+                    fields.serialized,
+                    fields.key,
+                    fields.original,
+                ],
+            )
+            if rv.rowcount != 1:
+                raise Exception("update failed")
+        except:
+            log.exception("UPDATE error", exc_info=True)
+            log.error(
+                "serialized key=%s original=%d version=%d",
                 fields.key,
                 fields.original,
-            ],
-        )
-        if rv.rowcount != 1:
-            raise Exception("update failed")
+                fields.version,
+            )
+            log.error("provided=%s", fields.provided)
+            log.error("serialized=%s", fields.serialized)
+            raise
 
     def _insert_row(self, fields: StorageFields):
         assert self.dbc
@@ -243,15 +256,27 @@ class SqliteStorage(EntityStorage):
             fields.version,
             fields.original,
         )
-        self.dbc.execute(
-            "INSERT INTO entities (key, gid, version, serialized) VALUES (?, ?, ?, ?) ",
-            [
+        try:
+            self.dbc.execute(
+                "INSERT INTO entities (key, gid, version, serialized) VALUES (?, ?, ?, ?) ",
+                [
+                    fields.key,
+                    fields.gid,
+                    fields.version,
+                    fields.serialized,
+                ],
+            )
+        except:
+            log.exception("INSERT error", exc_info=True)
+            log.error(
+                "serialized key=%s original=%d version=%d",
                 fields.key,
-                fields.gid,
+                fields.original,
                 fields.version,
-                fields.serialized,
-            ],
-        )
+            )
+            log.error("provided=%s", fields.provided)
+            log.error("serialized=%s", fields.serialized)
+            raise
 
     async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
         await self.open_if_necessary()
