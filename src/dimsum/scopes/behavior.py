@@ -1,25 +1,30 @@
 import ast
 import logging
+import dataclasses
+import functools
 from typing import Dict, List, Optional, Any
 
-from model import Entity, Scope, Map
+from model import Entity, Scope, Map, Acls
 
 DefaultKey = "b:default"
 log = logging.getLogger("dimsum.scopes")
 
 
+@dataclasses.dataclass
 class Behavior:
-    def __init__(self, python=None, logs=None, **kwargs):
-        self.python = python
-        self.executable = True
-        self.logs: List[Dict[str, Any]] = logs if logs else []
+    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls, "behavior"))
+    python: Optional[str] = None
+    executable: bool = True
+    logs: List[Dict[str, Any]] = dataclasses.field(default_factory=list)
 
     def check(self):
         try:
-            ast.parse(self.python)
-            return True
+            if self.python:
+                ast.parse(self.python)
+                return True
         except:
-            return False
+            pass
+        return False
 
     def append(self, entry: Dict[str, Any]):
         self.logs.append(entry)

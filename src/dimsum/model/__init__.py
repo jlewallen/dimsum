@@ -12,6 +12,7 @@ from model.game import (
 )
 from model.crypto import Identity
 from model.kinds import Kind
+from model.permissions import Acls
 from model.properties import (
     Common,
     Map,
@@ -138,4 +139,5 @@ __all__: List[str] = [
     "FindObjectByGid",
     "ItemFactory",
     "FindCurrentArea",
+    "Acls",
 ]
