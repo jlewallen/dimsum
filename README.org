@@ -7,6 +7,8 @@
    Clone (execute)
    Action (execute)
 
+** TODO Secure JSON
+
 ** TODO Add --public/anonymous flag for insecure installations.
 ** TODO Allow 'Scopes' to be @dataclasses
 ** TODO Web tool for 'drawing' connected areas.

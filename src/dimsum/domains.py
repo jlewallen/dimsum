@@ -83,8 +83,8 @@ class Session:
         for key, mod in self.registrar.modified().items():
             mod.props.described = mod.describe()
         modified = serializing.modified(self.registrar)
-        await self.store.update(modified)
-        return [keys.key for keys, _ in modified.items()]
+        updated = await self.store.update(modified)
+        return [key for key, _ in updated.items()]
 
     def __enter__(self) -> "Session":
         active_session.set(self)
@@ -92,7 +92,6 @@ class Session:
 
     def __exit__(self, type, value, traceback) -> Literal[False]:
         active_session.set(None)
-        # TODO Warn on unsaved changes?
         return False
 
     def register(self, entity: Entity) -> Entity:

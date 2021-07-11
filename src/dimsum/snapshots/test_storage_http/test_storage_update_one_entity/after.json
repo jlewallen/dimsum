@@ -1,11 +1,123 @@
 {
-    "UTJ8yaFqCgirYAGrQwrHpN": {
+    "world": {
+        "py/object": "serializing.RootWorld",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 3
+        },
+        "creator": null,
+        "parent": null,
+        "chimeras": {
+            "behaviorCollection": {
+                "entities": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": "<deterministic>",
+                        "klass": "ItemClass",
+                        "name": "Large Oak Tree"
+                    },
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": "<deterministic>",
+                        "klass": "ItemClass",
+                        "name": "Mysterious Box"
+                    },
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": "<deterministic>",
+                        "klass": "ItemClass",
+                        "name": "Acoustic Guitar"
+                    },
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": "<deterministic>",
+                        "klass": "ItemClass",
+                        "name": "Large Steep Cliff"
+                    },
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": "<deterministic>",
+                        "klass": "ItemClass",
+                        "name": "Large Maple Tree"
+                    }
+                ]
+            },
+            "welcoming": {
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": "<deterministic>",
+                    "klass": "AreaClass",
+                    "name": "Town Courtyard"
+                }
+            },
+            "identifiers": {
+                "gid": 62
+            }
+        },
+        "klass": {
+            "py/type": "model.entity.RootEntityClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": "<deterministic>",
+            "signature": null,
+            "private": "<deterministic>"
+        },
+        "key": "<deterministic>",
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 0
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "World"
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "World (#0)"
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Ya know, everything"
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": "0"
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": "0"
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {}
+                }
+            }
+        }
+    },
+    "4": {
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 2
         },
-        "creator": null,
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "<deterministic>",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
         "parent": null,
         "chimeras": {},
         "klass": {
@@ -13,16 +125,17 @@
         },
         "identity": {
             "py/object": "model.crypto.Identity",
-            "public": "1",
-            "signature": "1"
+            "public": "<deterministic>",
+            "signature": "3",
+            "private": "<deterministic>"
         },
-        "key": "2",
+        "key": "<deterministic>",
         "props": {
             "py/object": "model.properties.Common",
             "map": {
                 "gid": {
                     "py/object": "model.properties.Property",
-                    "value": -1
+                    "value": 61
                 },
                 "name": {
                     "py/object": "model.properties.Property",
@@ -38,11 +151,11 @@
                 },
                 "created": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0
+                    "value": "0"
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0
+                    "value": "0"
                 },
                 "frozen": {
                     "py/object": "model.properties.Property",

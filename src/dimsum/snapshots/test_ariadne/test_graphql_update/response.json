@@ -12,15 +12,19 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {},
+                        "chimeras": {
+                            "identifiers": {
+                                "gid": 2
+                            }
+                        },
                         "klass": {
                             "py/type": "model.entity.RootEntityClass"
                         },
                         "identity": {
                             "py/object": "model.crypto.Identity",
-                            "public": "1",
-                            "signature": "1",
-                            "private": "1"
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
                         },
                         "key": "world",
                         "props": {
@@ -28,7 +32,7 @@
                             "map": {
                                 "gid": {
                                     "py/object": "model.properties.Property",
-                                    "value": -1
+                                    "value": 1
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
@@ -36,7 +40,7 @@
                                 },
                                 "described": {
                                     "py/object": "model.properties.Property",
-                                    "value": "World"
+                                    "value": "World (#1)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",

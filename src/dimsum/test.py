@@ -206,22 +206,54 @@ async def make_simple_domain(
 
 
 def expand_json(obj: Dict[str, Any]) -> Dict[str, Any]:
-    def expand_value(value):
+    def expand(value):
         if isinstance(value, str):
             try:
                 return json.loads(value)
             except:
                 return value
         if isinstance(value, dict):
-            return {key: expand_value(value) for key, value in value.items()}
+            return {key: expand(value) for key, value in value.items()}
         if isinstance(value, list):
-            return [expand_json(v) for v in value]
+            return [expand(v) for v in value]
         return value
 
-    return expand_value(obj)
+    return expand(obj)
 
 
-def pretty_json(obj: Union[Dict[str, Any], Optional[str]]) -> str:
+def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
+    # "key": "XCCf383KvgvJ7erVa2gxd8",
+    # "public": "qigxTieZXLSVokwOYHqlXO1QUKrUaaiSEFR1nREDcWs=",
+    # "value": 1626034498.0281904
+
+    def fix(value, key=None, keys=None):
+        if isinstance(value, str):
+            if keys:
+                if keys[-1] == "key":
+                    return "<deterministic>"
+                if keys[-1] == "public" or keys[-1] == "private":
+                    return "<deterministic>"
+            return value
+        if isinstance(value, float):
+            if keys:
+                if keys[-2] == "created":
+                    return "0"
+                if keys[-2] == "touched":
+                    return "0"
+            return value
+        if isinstance(value, dict):
+            return {
+                key: fix(value, key=key, keys=(keys or []) + [key])
+                for key, value in value.items()
+            }
+        if isinstance(value, list):
+            return [fix(v) for v in value]
+        return value
+
+    return fix(obj)
+
+
+def pretty_json(obj: Union[Dict[str, Any], Optional[str]], deterministic=False) -> str:
     if obj is None:
         return json.dumps(None)
 
@@ -229,6 +261,8 @@ def pretty_json(obj: Union[Dict[str, Any], Optional[str]]) -> str:
         return pretty_json(json.loads(obj))
 
     expanded = expand_json(obj)
+    if deterministic:
+        expanded = make_deterministic(expanded)
 
     return json.dumps(expanded, indent=4)
 

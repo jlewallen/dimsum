@@ -12,7 +12,7 @@
                 "parent": null,
                 "chimeras": {
                     "identifiers": {
-                        "gid": 0
+                        "gid": 2
                     }
                 },
                 "klass": {
@@ -30,7 +30,7 @@
                     "map": {
                         "gid": {
                             "py/object": "model.properties.Property",
-                            "value": 0
+                            "value": 1
                         },
                         "name": {
                             "py/object": "model.properties.Property",
@@ -38,7 +38,7 @@
                         },
                         "described": {
                             "py/object": "model.properties.Property",
-                            "value": "World"
+                            "value": "World (#1)"
                         },
                         "desc": {
                             "py/object": "model.properties.Property",

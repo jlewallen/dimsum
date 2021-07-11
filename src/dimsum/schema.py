@@ -7,7 +7,7 @@ import starlette.requests
 import ariadne
 import jwt
 import json
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import config
 import domains
@@ -18,6 +18,7 @@ from model import (
     Entity,
     World,
     WorldKey,
+    Serialized,
     EntityUpdate,
     Renderable,
     Reply,
@@ -31,8 +32,6 @@ import plugins.admin as admin
 import scopes.carryable as carryable
 import scopes.users as users
 
-
-# Create
 
 log = logging.getLogger("dimsum")
 
@@ -507,15 +506,27 @@ async def update(obj, info, entities):
     domain = info.context.domain
     log.info("ariadne:update entities=%d", len(entities))
 
-    diffs = {Keys(row["key"]): EntityUpdate(row["serialized"]) for row in entities}
+    serialized = [Serialized(row["key"], row["serialized"]) for row in entities]
+    if len(serialized) == 0:
+        return {"affected": []}
 
-    updated = await domain.store.update(diffs)
+    with domain.session() as session:
+        world = await session.prepare()
 
-    affected = [
-        dict(key=key, serialized=serialized) for key, serialized in updated.items()
-    ]
+        incoming = await session.try_materialize(json=serialized, refresh=True)
+        for e in incoming.entities:
+            e.touch()
+        log.info("incoming=%s", incoming)
 
-    return {"affected": affected}
+        modified_keys = await session.save()
+        for key in modified_keys:
+            log.warning("hacked reload: %s", key)
+        affected = [
+            EntityResolver(session, await session.materialize(key=key, refresh=True))
+            for key in modified_keys
+        ]
+
+        return {"affected": affected}
 
 
 def create():

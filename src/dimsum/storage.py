@@ -302,7 +302,9 @@ class SqliteStorage(EntityStorage):
 
         self.db.commit()
 
-        return {keys.key: f.serialized for keys, f in updating.items()}
+        return {
+            keys.key: f.serialized for keys, f in updating.items() if not f.destroyed
+        }
 
     async def load_by_gid(self, gid: int):
         loaded = await self.load_query(
