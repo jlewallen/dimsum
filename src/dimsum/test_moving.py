@@ -43,9 +43,8 @@ async def test_go_adjacent():
             props=Common("Door"),
             initialize={movement.Exit: dict(area=another_room)},
         )
-        add_item(world.welcome_area(), exit)
+        await tw.add_item_to_welcome_area(exit, session=session)
         await session.add_area(another_room)
-        session.register(exit)
         await session.save()
 
     area_before = None
@@ -106,8 +105,8 @@ async def test_directional_moving():
             props=Common(name=movement.Direction.NORTH.exiting),
             initialize={movement.Exit: dict(area=park)},
         )
-        add_item(world.welcome_area(), exit)
-        session.register(exit)
+
+        await tw.add_item_to_welcome_area(exit, session=session)
 
         area_before = (await find_entity_area(jacob)).key
         await session.save()
@@ -170,7 +169,10 @@ async def test_digging_basic():
     gid = None
     with tw.domain.session() as session:
         world = await session.prepare()
-        gid = world.welcome_area().props.gid
+        wa_key = get_well_known_key(world, WelcomeAreaKey)
+        assert wa_key
+        area = await session.materialize(key=wa_key)
+        gid = area.props.gid
 
     await tw.success("go #{0}".format(gid))
 

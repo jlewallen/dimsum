@@ -42,7 +42,7 @@ async def test_storage_materialize_reference():
         assert await serializing.materialize(
             registrar=session.registrar, store=store, key=WorldKey
         )
-        assert session.registrar.number_of_entities() == 2
+        assert session.registrar.number_of_entities() == 1
 
 
 @pytest.mark.asyncio
@@ -61,7 +61,7 @@ async def test_storage_only_save_modified_super_simple():
         assert await serializing.materialize(
             registrar=session.registrar, store=store, key=WorldKey
         )
-        assert session.registrar.number_of_entities() == 2
+        assert session.registrar.number_of_entities() == 1
 
         store.freeze()
 

@@ -47,12 +47,9 @@
                                     }
                                 ]
                             },
-                            "welcoming": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "13",
-                                    "klass": "AreaClass",
-                                    "name": "Town Courtyard"
+                            "wellKnown": {
+                                "entities": {
+                                    "welcomeArea": "13"
                                 }
                             },
                             "identifiers": {

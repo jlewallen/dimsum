@@ -205,12 +205,10 @@
                         "creator": null,
                         "parent": null,
                         "chimeras": {
-                            "welcoming": {
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "welcome",
-                                    "klass": "AreaClass",
-                                    "name": "welcome"
+                            "wellKnown": {
+                                "entities": {
+                                    "welcomeArea": "welcome",
+                                    "encyclopedia": "8"
                                 }
                             },
                             "usernames": {
@@ -225,11 +223,6 @@
                             },
                             "identifiers": {
                                 "gid": 4
-                            },
-                            "wellKnown": {
-                                "entities": {
-                                    "encyclopedia": "8"
-                                }
                             }
                         },
                         "klass": {

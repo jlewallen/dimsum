@@ -20,12 +20,12 @@ class WellKnown(Scope):
         return True
 
 
-def _get_well_known(entity: Entity, local_key: str) -> Optional[str]:
+def get_well_known_key(entity: Entity, local_key: str) -> Optional[str]:
     with entity.make_and_discard(WellKnown) as wk:
         return wk.get(local_key)
 
 
-def _set_well_known(entity: Entity, local_key: str, key: str):
+def set_well_known_key(entity: Entity, local_key: str, key: str):
     with entity.make(WellKnown) as wk:
         if wk.set(local_key, key):
             entity.touch()
@@ -39,13 +39,14 @@ async def materialize_well_known_entity(
     local_key: str,
     create_args: Optional[Dict[str, Any]] = None,
 ) -> Entity:
-    entity_key = _get_well_known(origin, local_key)
+    entity_key = get_well_known_key(origin, local_key)
     if entity_key:
         loaded = await ctx.try_materialize(key=entity_key)
         if loaded:
             return loaded
-    create_args = create_args or {}
+    if not create_args:
+        raise Exception()
     entity = ctx.create_item(creator=origin, **create_args)
     ctx.register(entity)
-    _set_well_known(origin, local_key, entity.key)
+    set_well_known_key(origin, local_key, entity.key)
     return entity

@@ -27,7 +27,7 @@ class InitializeWorld:
             if not maybe_player.empty():
                 return world, maybe_player.one()
 
-        if world.welcome_area() is None:
+        if get_well_known_key(world, WelcomeAreaKey) is None:
             log.info("creating example world")
             generics, area = library.create_example_world(world)
             session.register(generics.all)

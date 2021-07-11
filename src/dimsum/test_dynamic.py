@@ -402,7 +402,7 @@ async def jingle(this, person, say):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        keys = tw.add_item_to_welcome_area(
+        keys = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, parent=jingles_base, props=Common("Keys")),
             session=session,
         )

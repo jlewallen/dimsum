@@ -44,7 +44,7 @@ from model.entity import (
     set_entity_area_provider,
 )
 from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
-from model.world import World, WorldKey, Welcoming
+from model.world import World, WorldKey, WelcomeAreaKey
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
 from model.reply import (
@@ -55,7 +55,7 @@ from model.reply import (
     observe_entity,
 )
 from model.hooks import ManagedHooks, All, ExtendHooks
-from model.context import Ctx, get
+from model.context import Ctx, get, TryMaterialize
 from model.finders import (
     ItemFinder,
     FindNone,
@@ -64,12 +64,17 @@ from model.finders import (
     FindCurrentArea,
     ItemFactory,
 )
-from model.well_known import materialize_well_known_entity
+from model.well_known import (
+    materialize_well_known_entity,
+    get_well_known_key,
+    set_well_known_key,
+)
 
 import model.hooks as hooks
 
 __all__: List[str] = [
     "Ctx",
+    "TryMaterialize",
     "get",
     "EntityFrozen",
     "Reply",
@@ -93,6 +98,7 @@ __all__: List[str] = [
     "Registrar",
     "World",
     "WorldKey",
+    "WelcomeAreaKey",
     "event",
     "Event",
     "StandardEvent",
@@ -115,7 +121,6 @@ __all__: List[str] = [
     "ManagedHooks",
     "ExtendHooks",
     "TickEvent",
-    "Welcoming",
     "ObservedEntity",
     "Observation",
     "HoldingActivity",
@@ -129,6 +134,8 @@ __all__: List[str] = [
     "set_entity_describe_handler",
     "set_entity_area_provider",
     "materialize_well_known_entity",
+    "get_well_known_key",
+    "set_well_known_key",
     "cleanup_entity",
     "observe_entity",
     "get_all_events",

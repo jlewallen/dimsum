@@ -19,7 +19,7 @@ async def test_drop_hammer_funny_gold(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        hammer = tw.add_item_to_welcome_area(
+        hammer = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, props=Common("Hammer")),
             session=session,
         )
@@ -67,7 +67,7 @@ async def test_wear_cape(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        cape = tw.add_item_to_welcome_area(
+        cape = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, props=Common("Cape")), session=session
         )
         with cape.make(mechanics.Interactable) as inaction:
@@ -116,7 +116,7 @@ async def test_behavior_create_item(caplog):
     with tw.domain.session() as session:
         w = await session.prepare()
 
-        box = tw.add_item_to_welcome_area(
+        box = await tw.add_item_to_welcome_area(
             scopes.item(creator=w, props=Common("A Colorful Box")),
             session=session,
         )
@@ -172,7 +172,7 @@ async def test_behavior_create_item_same_kind(caplog):
     with tw.domain.session() as session:
         w = await session.prepare()
 
-        box = tw.add_item_to_welcome_area(
+        box = await tw.add_item_to_welcome_area(
             scopes.item(creator=w, props=Common("A Colorful Box")),
             session=session,
         )
@@ -229,7 +229,7 @@ async def test_behavior_create_quantified_item(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        box = tw.add_item_to_welcome_area(
+        box = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, props=Common("A Colorful Box")),
             session=session,
         )
@@ -290,7 +290,7 @@ async def test_behavior_time_passing(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        tree = tw.add_item_to_welcome_area(
+        tree = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, props=Common("A Lovely Tree")),
             session=session,
         )

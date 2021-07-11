@@ -71,7 +71,7 @@ async def test_obliterate_thing_with_behavior():
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        hammer = tw.add_item_to_welcome_area(
+        hammer = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, props=Common("Hammer")),
             session=session,
         )

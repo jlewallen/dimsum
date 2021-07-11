@@ -42,12 +42,9 @@
                     }
                 ]
             },
-            "welcoming": {
-                "area": {
-                    "py/object": "model.entity.Entity",
-                    "key": "<deterministic>",
-                    "klass": "AreaClass",
-                    "name": "Town Courtyard"
+            "wellKnown": {
+                "entities": {
+                    "welcomeArea": "<deterministic>"
                 }
             },
             "identifiers": {

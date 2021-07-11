@@ -115,12 +115,15 @@ class TestWorld:
 
         await self.add_jacob()
 
-    def add_item_to_welcome_area(self, item, session=None):
+    async def add_item_to_welcome_area(self, item, session=None):
         assert session
         session.register(item)
-        with session.world.make(Welcoming) as welcoming:
-            with welcoming.area.make(carryable.Containing) as ground:
-                ground.add_item(item)
+
+        wa_key = get_well_known_key(session.world, WelcomeAreaKey)
+        assert wa_key
+        welcome_area = await session.materialize(key=wa_key)
+        with welcome_area.make(carryable.Containing) as ground:
+            ground.add_item(item)
         return item
 
     def dumps(self, item) -> Optional[str]:
@@ -164,7 +167,7 @@ class TestWorld:
         with tw.domain.session() as session:
             world = await session.prepare()
 
-            item = tw.add_item_to_welcome_area(
+            item = await tw.add_item_to_welcome_area(
                 scopes.item(creator=world, props=Common(name)),
                 session=session,
             )
@@ -229,7 +232,7 @@ def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
     def fix(value, key=None, keys=None):
         if isinstance(value, str):
             if keys:
-                if keys[-1] == "key":
+                if keys[-1] == "key" or keys[-1] == "welcomeArea":
                     return "<deterministic>"
                 if keys[-1] == "public" or keys[-1] == "private":
                     return "<deterministic>"

@@ -6,6 +6,7 @@ from .entity import Entity, Scope, RootEntityClass, find_entity_area
 from .context import Ctx
 
 WorldKey = "world"
+WelcomeAreaKey = "welcomeArea"
 log = logging.getLogger("dimsum.model")
 
 
@@ -13,12 +14,6 @@ class Identifiers(Scope):
     def __init__(self, gid: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.gid = gid
-
-
-class Welcoming(Scope):
-    def __init__(self, area: Optional[Entity] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.area = area
 
 
 class World(Entity):
@@ -39,16 +34,6 @@ class World(Entity):
             if ids.gid != gid:
                 ids.gid = gid
                 log.info("gid-updated: %d", gid)
-                self.touch()
-
-    def welcome_area(self) -> Entity:
-        with self.make(Welcoming) as welcoming:
-            return welcoming.area
-
-    def change_welcome_area(self, area: Entity):
-        with self.make(Welcoming) as welcoming:
-            if welcoming.area != area:
-                welcoming.area = area
                 self.touch()
 
     # TODO Removing these causes a very strange modified during

@@ -24,7 +24,8 @@ class Home(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        return await Go(area=world.welcome_area()).perform(
+        welcome_area = await materialize_well_known_entity(world, ctx, WelcomeAreaKey)
+        return await Go(area=welcome_area).perform(
             world=world, area=area, person=person, ctx=ctx, **kwargs
         )
 

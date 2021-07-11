@@ -260,7 +260,7 @@ async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     assert r.entities[0].make(carryable.Carryable).loose
     with tw.domain.session() as session:
         await session.prepare()
-        assert session.registrar.find_by_key(r.entities[0].key)
+        assert await session.materialize(key=r.entities[0].key)
 
 
 @pytest.mark.asyncio

@@ -26,13 +26,15 @@ from model import (
     Comms,
     Reply,
     ExtendHooks,
-    Welcoming,
     Condition,
     cleanup_entity,
     Ctx,
     context,
     find_entity_area,
     find_entity_area_maybe,
+    get_well_known_key,
+    set_well_known_key,
+    WelcomeAreaKey,
 )
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -239,18 +241,19 @@ class Session:
             return
 
         occupied = area.make(occupyable.Occupyable).occupied
-
-        with self.world.make(Welcoming) as welcoming:
-            if welcoming.area:
-                existing_occupied = welcoming.area.make(occupyable.Occupyable).occupied
-                if len(existing_occupied) < len(occupied):
-                    log.info("updating welcome-area")
-                    assert area
-                    welcoming.area = area
-            else:
+        wa_key = get_well_known_key(self.world, WelcomeAreaKey)
+        if not wa_key:
+            set_well_known_key(self.world, WelcomeAreaKey, area.key)
+        else:
+            existing = await self.materialize(key=wa_key)
+            assert existing
+            existing_occupied = existing.make_and_discard(
+                occupyable.Occupyable
+            ).occupied
+            if len(existing_occupied) < len(occupied):
                 log.info("updating welcome-area")
                 assert area
-                welcoming.area = area
+                set_well_known_key(self.world, WelcomeAreaKey, area.key)
 
         seen[area.key] = area.key
 

@@ -11,7 +11,13 @@ world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
 
 
-class Ctx:
+class TryMaterialize:
+    @abc.abstractmethod
+    async def try_materialize(self, key: str) -> Optional[Entity]:
+        raise NotImplementedError
+
+
+class Ctx(TryMaterialize):
     @abc.abstractmethod
     def register(self, entity: Entity) -> Entity:
         raise NotImplementedError
@@ -44,10 +50,6 @@ class Ctx:
     async def apply_item_finder(
         self, person: Entity, finder, **kwargs
     ) -> Optional[Entity]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def try_materialize(self, key: str) -> Optional[Entity]:
         raise NotImplementedError
 
 

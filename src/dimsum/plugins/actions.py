@@ -2,7 +2,19 @@ import dataclasses
 from typing import List, Dict, Optional
 
 import tools
-from model import Entity, World, Action, Ctx, Reply, event, StandardEvent, Success, infl
+from model import (
+    Entity,
+    World,
+    Action,
+    Ctx,
+    Reply,
+    event,
+    StandardEvent,
+    Success,
+    infl,
+    materialize_well_known_entity,
+    WelcomeAreaKey,
+)
 import scopes.carryable as carryable
 import scopes.occupyable as occupyable
 
@@ -62,7 +74,9 @@ class Join(PersonAction):
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         ctx.register(person)
-        with world.welcome_area().make(occupyable.Occupyable) as entering:
+
+        welcome_area = await materialize_well_known_entity(world, ctx, WelcomeAreaKey)
+        with welcome_area.make(occupyable.Occupyable) as entering:
             await ctx.publish(
                 PlayerJoined(
                     source=person,
