@@ -58,21 +58,28 @@ class AreaObservation(Observation):
         emd = [self.area.props.desc]
         if len(self.living) > 0:
             emd += [
-                "Also here is " + infl.join([x.entity.describe() for x in self.living])
+                "also here is " + infl.join([x.entity.describe() for x in self.living])
             ]
         if len(self.items) > 0:
             emd += [
-                "You can see " + infl.join([x.entity.describe() for x in self.items])
+                "you can see " + infl.join([x.entity.describe() for x in self.items])
             ]
         holding = tools.get_holding(self.person)
         if len(holding) > 0:
-            emd += ["You're holding " + infl.join([x.describe() for x in holding])]
+            emd += ["you're holding " + infl.join([x.describe() for x in holding])]
         return {"title": self.area.props.name, "description": emd}
 
 
 @dataclasses.dataclass
 class EntitiesObservation(Observation):
     entities: Sequence[Entity]
+
+    def render_tree(self) -> Dict[str, Any]:
+        if len(self.entities) == 0:
+            return {"lines": ["you see nothing."]}
+        return {
+            "lines": ["you see " + infl.join([x.describe() for x in self.entities])]
+        }
 
 
 @dataclasses.dataclass

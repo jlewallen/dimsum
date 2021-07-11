@@ -93,7 +93,9 @@ class Drop(PersonAction):
                         items=dropped,
                     )
                 )
-                return Success("you dropped %s" % (infl.join(dropped),))
+                return Success(
+                    "you dropped %s" % (infl.join([e.describe() for e in dropped]),)
+                )
 
             return Failure(failure)
 
@@ -150,7 +152,10 @@ class Hold(PersonAction):
                         items=[after_hold],
                     )
                 )
-                return Success("you picked up %s" % (after_hold,))
+                return Success(
+                    "you picked up %s"
+                    % (infl.join([e.describe() for e in [after_hold]]),)
+                )
 
 
 class Open(PersonAction):

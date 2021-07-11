@@ -87,7 +87,6 @@ export default defineComponent({
     background-color: #30475e;
     display: none;
 }
-
 .response.dynamic {
     padding: 1em;
 }
@@ -98,5 +97,9 @@ export default defineComponent({
     padding: 1em;
     background-color: #30475e;
     background-color: rgb(34, 39, 46);
+}
+
+.response.entities-observation {
+    padding: 1em;
 }
 </style>

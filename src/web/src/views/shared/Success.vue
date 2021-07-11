@@ -1,8 +1,8 @@
 <template>
     <template v-if="reply.message">
-        <div class="alert alert-dismissible alert-success">
-            <div class="response success" v-if="reply.message">{{ reply.message }}</div>
-            <div class="response success" v-if="false">{{ JSON.stringify(reply) }}</div>
+        <div class="response success">
+            <div class="" v-if="reply.message">{{ reply.message }}</div>
+            <div class="" v-if="false">{{ JSON.stringify(reply) }}</div>
         </div>
     </template>
 </template>
@@ -26,4 +26,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.response.success {
+    padding: 1em;
+}
+</style>

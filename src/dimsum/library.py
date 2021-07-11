@@ -359,7 +359,15 @@ class WelcomeArea(Factory):
         area = scopes.area(
             creator=world,
             parent=generics.area,
-            props=Common("Town Courtyard.", desc="There's a ton going on here."),
+            props=Common(
+                "Town Courtyard.",
+                desc="""A quaint, small town courtyard. Trees overhang the cobblestone sidewalks that segment the green. A damp, smokey smell wafts through the air. Along the edges of a large, well maintained parkland, there are several small, older buildings. Some of them appear to be very new and a few look embarrassingly modern.
+
+You can tell it's an easy place to ask for `help` and that people are eager for you to `look`  around and, when you're comfortable, even `go` places.
+
+Welcome! :)
+""",
+            ),
         )
         add_item(area, BeerKeg().create(world, generics))
         add_item(area, LargeOakTree().create(world, generics))
