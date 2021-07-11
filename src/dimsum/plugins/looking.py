@@ -55,25 +55,18 @@ class AreaObservation(Observation):
         ).available_routes
 
     def render_tree(self) -> Dict[str, Any]:
-        emd = self.area.props.desc
-        emd += "\n\n"
+        emd = [self.area.props.desc]
         if len(self.living) > 0:
-            emd += "Also here: " + infl.join([str(x) for x in self.living])
-            emd += "\n"
+            emd += [
+                "Also here is " + infl.join([x.entity.describe() for x in self.living])
+            ]
         if len(self.items) > 0:
-            emd += "You can see " + infl.join([str(x) for x in self.items])
-            emd += "\n"
+            emd += [
+                "You can see " + infl.join([x.entity.describe() for x in self.items])
+            ]
         holding = tools.get_holding(self.person)
         if len(holding) > 0:
-            emd += "You're holding " + infl.join([str(x) for x in holding])
-            emd += "\n"
-        directional = [
-            e for e in self.routes if isinstance(e, movement.DirectionalRoute)
-        ]
-        if len(directional) > 0:
-            directions = [d.direction for d in directional]
-            emd += "You can go " + infl.join([str(d) for d in directions])
-            emd += "\n"
+            emd += ["You're holding " + infl.join([x.describe() for x in holding])]
         return {"title": self.area.props.name, "description": emd}
 
 

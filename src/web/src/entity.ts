@@ -45,6 +45,7 @@ export interface Universal {
 }
 
 export interface ReplResponse {
+    rendered: Record<string, string | string[]>;
     reply:
         | { interactive: false; information: boolean; entities?: { key: string; serialized: string }[] }
         | AreaObservation
@@ -56,6 +57,8 @@ export interface ReplResponse {
         | InteractiveReply
         | Universal;
 }
+
+export type HistoryEntry = ReplResponse;
 
 export type PropertyMap = { [index: string]: any };
 export type UpdateEntityDetailsPayload = PropertyMap;

@@ -4,6 +4,7 @@
             <component
                 v-bind:is="viewFor(entry)"
                 :response="entry"
+                :entry="entry"
                 :reply="entry.reply"
                 @selected="onSelected"
                 @dismiss="onDismissed(entry)"
@@ -16,7 +17,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Replies from "../shared/replies";
-import store, { getObjectType, Entity, ReplAction, ReplResponse, RemoveHistoryEntry } from "@/store";
+import store, { getObjectType, Entity, ReplAction, HistoryEntry, RemoveHistoryEntry } from "@/store";
 
 export default defineComponent({
     name: "HistoryEntries",
@@ -25,13 +26,13 @@ export default defineComponent({
     },
     props: {
         entries: {
-            type: Object as () => ReplResponse[],
+            type: Object as () => HistoryEntry[],
             required: true,
         },
     },
     computed: {},
     methods: {
-        viewFor(response: ReplResponse): string | null {
+        viewFor(response: HistoryEntry): string | null {
             const info = getObjectType(response?.reply as any);
             if (info.simple) {
                 const keys = Object.keys(Replies);
@@ -48,12 +49,12 @@ export default defineComponent({
                 params: { key: entity.key },
             });
         },
-        onDismissed(entry: ReplResponse) {
+        onDismissed(entry: HistoryEntry) {
             console.log("explore:dismissed", entry);
             store.commit(new RemoveHistoryEntry(entry));
             this.$emit("resume-repl");
         },
-        async onCommand(entry: ReplResponse, command: { line: string }) {
+        async onCommand(entry: HistoryEntry, command: { line: string }) {
             console.log("explore:command", entry, command);
             await store.dispatch(new ReplAction(command.line));
         },

@@ -4,7 +4,9 @@
             "reply": {
                 "rendered": {
                     "title": "Welcome Area",
-                    "description": "A two lane street in a small town.\n\n"
+                    "description": [
+                        "A two lane street in a small town."
+                    ]
                 },
                 "model": {
                     "py/object": "plugins.looking.AreaObservation",
