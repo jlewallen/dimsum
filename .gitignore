@@ -2,6 +2,8 @@ env
 __pycache__
 .env
 .log
+.coverage
+htmlcov
 *.sqlite3
 
 web/dist
