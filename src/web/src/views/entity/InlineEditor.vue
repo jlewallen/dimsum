@@ -31,9 +31,16 @@
                 </div>
             </Tab>
         </Tabs>
+        <div class="alert alert-danger" v-if="error">
+            Oops, something has gone wrong. The most common cause of this is something in the world made changes to this object before you
+            could make yours. When this happens the backend refuses to overwrite those changes with the ones you're making now. I'm trying
+            to think up a good solution. See
+            <WikiLink word="OptimisticLocking" />
+            .
+        </div>
         <div class="buttons">
-            <button class="btn btn-primary" v-on:click="save">Save</button>
-            <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
+            <button class="btn btn-primary" v-on:click="save" :disabled="busy">Save</button>
+            <button class="btn btn-secondary" v-on:click="cancel" :disabled="busy">Cancel</button>
         </div>
     </div>
 </template>
@@ -46,10 +53,12 @@ import store, { UpdateEntityAction } from "@/store";
 import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
 import Tabs from "@/views/shared/Tabs.vue";
 import Tab from "@/views/shared/Tab.vue";
+import { CommonComponents } from "@/views/shared";
 
 export default defineComponent({
     name: "InlineEditor",
     components: {
+        ...CommonComponents,
         VCodeMirror,
         Tabs,
         Tab,
@@ -74,6 +83,8 @@ export default defineComponent({
         })();
 
         return {
+            error: false,
+            busy: false,
             logs: _.reverse(behavior?.logs || []),
             form: {
                 behavior: behavior?.python || "",
@@ -108,8 +119,17 @@ export default defineComponent({
                 }
             );
             console.log("updating entity", updating);
-            await store.dispatch(new UpdateEntityAction(updating));
-            this.$emit("dismiss");
+            try {
+                this.busy = true;
+                this.error = false;
+                await store.dispatch(new UpdateEntityAction(updating));
+                this.$emit("dismiss");
+            } catch (error) {
+                console.log("error", error);
+                this.error = true;
+            } finally {
+                this.busy = false;
+            }
         },
         async cancel(e: Event): Promise<void> {
             this.$emit("dismiss");
