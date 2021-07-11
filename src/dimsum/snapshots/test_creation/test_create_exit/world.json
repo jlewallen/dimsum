@@ -38,6 +38,7 @@
                     "value": 0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -46,6 +47,7 @@
                     "value": "World",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -54,6 +56,7 @@
                     "value": "World (#0)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -62,6 +65,7 @@
                     "value": "Ya know, everything",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -70,6 +74,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -78,6 +83,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -86,6 +92,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -94,6 +101,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -102,6 +110,7 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 }
@@ -176,6 +185,7 @@
                     "value": 1,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -184,6 +194,7 @@
                     "value": "Living room",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -192,6 +203,7 @@
                     "value": "Living room (#1)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -200,6 +212,7 @@
                     "value": "Living room",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -208,6 +221,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -216,6 +230,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -224,6 +239,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -232,6 +248,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -240,6 +257,7 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 }
@@ -330,6 +348,7 @@
                     "value": 2,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -338,6 +357,7 @@
                     "value": "Jacob",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -346,6 +366,7 @@
                     "value": "Jacob (#2)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -354,6 +375,7 @@
                     "value": "Curly haired bastard.",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -362,6 +384,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -370,6 +393,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -378,6 +402,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -386,6 +411,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -394,6 +420,7 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 }
@@ -458,6 +485,7 @@
                     "value": 3,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -466,6 +494,7 @@
                     "value": "Window",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -474,6 +503,7 @@
                     "value": "a Window (#3)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -482,6 +512,7 @@
                     "value": "Window",
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -490,6 +521,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -498,6 +530,7 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -506,6 +539,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -514,6 +548,7 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 },
@@ -522,6 +557,7 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
+                        "name": "<acls>",
                         "rules": []
                     }
                 }

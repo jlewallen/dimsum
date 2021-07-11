@@ -80,6 +80,7 @@
                                 "value": 2,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -88,6 +89,7 @@
                                 "value": "Jacob",
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -96,6 +98,7 @@
                                 "value": "Jacob (#2)",
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -104,6 +107,7 @@
                                 "value": "Jacob",
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -112,6 +116,7 @@
                                 "value": 1569369600.0,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -120,6 +125,7 @@
                                 "value": 1569369600.0,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -128,6 +134,7 @@
                                 "value": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -136,6 +143,7 @@
                                 "value": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             },
@@ -144,6 +152,7 @@
                                 "value": {},
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
+                                    "name": "<acls>",
                                     "rules": []
                                 }
                             }

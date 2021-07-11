@@ -20,6 +20,7 @@ class Acl:
 
 @dataclasses.dataclass
 class Acls:
+    name: str = "<acls>"
     rules: List[Acl] = dataclasses.field(default_factory=list)
 
     def has(self, p: Permission, identity: str, **kwargs) -> bool:
