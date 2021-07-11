@@ -331,13 +331,20 @@ class SqliteStorage(EntityStorage):
 
 
 class HttpStorage(EntityStorage):
-    def __init__(self, url: str):
+    def __init__(self, url: str, token: Optional[str] = None):
         super().__init__()
         self.url = url
+        self.token = token
+
+    def _get_headers(self):
+        if self.token:
+            return {"Authorization": "Bearer %s" % (self.token,)}
+        return {}
 
     def session(self):
         return Client(
-            transport=AIOHTTPTransport(url=self.url), fetch_schema_from_transport=True
+            transport=AIOHTTPTransport(url=self.url, headers=self._get_headers()),
+            fetch_schema_from_transport=True,
         )
 
     async def number_of_entities(self):

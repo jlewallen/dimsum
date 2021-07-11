@@ -105,12 +105,16 @@ def verify_token(info) -> Optional[str]:
     if info.context.request is None:
         return None
     headers = info.context.request.headers
+    log.info("headers: %s", headers)
     if "Authorization" not in headers:
-        # raise Exception("unauthorized (header)")
-        return None
-    token = headers["Authorization"].split(" ")[1]
-    decoded = jwt.decode(token, info.context.cfg.session_key, algorithms=["HS256"])
-    return decoded["key"]
+        raise Exception("unauthorized (header)")
+    try:
+        token = headers["Authorization"].split(" ")[1]
+        decoded = jwt.decode(token, info.context.cfg.session_key, algorithms=["HS256"])
+        return decoded["key"]
+    except:
+        log.exception("token", exc_info=True)
+        raise Exception("unauthorized")
 
 
 @query.field("world")

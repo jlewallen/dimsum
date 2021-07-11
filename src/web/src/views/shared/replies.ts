@@ -49,7 +49,6 @@ const Help = defineComponent({
         wikiBody(): string {
             const wikiWord = /([A-Z]+[a-z]+([A-Z]+[a-z]+)+)/g;
             return this.reply.body.replace(wikiWord, function(a, b) {
-                console.log("replacing", a, b);
                 return `[${a}](#)`;
             });
         },

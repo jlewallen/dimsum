@@ -6,18 +6,22 @@ import shortuuid
 import uvicorn
 import pytest
 import freezegun
+import ariadne.asgi
+import jwt
 from typing import Optional
 from multiprocessing import Process
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 
 import serializing
+import config
 import storage
 from model import *
-import dimsum
+import schema as schema_factory
 import test
 
 log = logging.getLogger("dimsum")
+session_key = "asdfasdf"
 
 
 @pytest.fixture(scope="function")
@@ -26,8 +30,15 @@ def silence_aihttp(caplog):
     yield
 
 
-def session(url: str):
-    return Client(transport=AIOHTTPTransport(url=url), fetch_schema_from_transport=True)
+def session(url: str, key: str = "jlewallen"):
+    global session_key
+    jwt_token = jwt.encode(dict(key=key), session_key, algorithm="HS256")
+    return Client(
+        transport=AIOHTTPTransport(
+            url=url, headers={"Authorization": "Bearer %s" % (jwt_token,)}
+        ),
+        fetch_schema_from_transport=True,
+    )
 
 
 async def initialize(url: str):
@@ -36,12 +47,25 @@ async def initialize(url: str):
         await s.execute(query)
 
 
+def app():
+    global session_key
+    log.info("starting test server")
+    cfg = config.symmetrical(":memory:", session_key=session_key)
+    schema = schema_factory.create()
+    domain = cfg.make_domain()
+    return ariadne.asgi.GraphQL(
+        schema,
+        context_value=schema_factory.context(cfg, domain),
+        debug=True,
+    )
+
+
 @pytest.fixture(scope="session")
 def server():
-    log.info("started server")
+    log.info("starting server")
     proc = Process(
         target=uvicorn.run,
-        args=(dimsum.app,),
+        args=(app,),
         kwargs={
             "host": "127.0.0.1",
             "port": 45600,
@@ -61,30 +85,34 @@ def server():
     proc.kill()
 
 
+def get_token(key: str, session_key="asdfasdf"):
+    return jwt.encode(dict(key=key), session_key, algorithm="HS256")
+
+
 @pytest.mark.asyncio
 async def test_storage_http_number_of_entities(server, silence_aihttp):
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     size = await store.number_of_entities()
     assert size == 60
 
 
 @pytest.mark.asyncio
 async def test_storage_load_by_key(server, silence_aihttp):
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     serialized = await store.load_by_key("world")
     assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
 async def test_storage_load_by_gid(server, silence_aihttp):
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     serialized = await store.load_by_gid(0)
     assert [json.loads(s.serialized) for s in serialized]
 
 
 @pytest.mark.asyncio
 async def test_storage_update_nothing(server, silence_aihttp):
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     serialized = await store.update({})
     assert serialized == {}
 
@@ -104,7 +132,7 @@ async def test_storage_update_one_entity(
     serialized = serializing.serialize(w)
     assert serialized
 
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     key = shortuuid.uuid(name="example-1")
 
     updated = await store.update({Keys(key): EntityUpdate(serialized)})
@@ -127,7 +155,7 @@ async def test_storage_delete_one_entity(
     serialized = serializing.serialize(w)
     assert serialized
 
-    store = storage.HttpStorage("http://127.0.0.1:45600")
+    store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     key = shortuuid.uuid(name="example-2")
     updated = await store.update({Keys(key): EntityUpdate(serialized)})
     snapshot.assert_match(test.pretty_json(updated), "before.json")
