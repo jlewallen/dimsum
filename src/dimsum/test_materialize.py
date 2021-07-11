@@ -27,7 +27,6 @@ async def test_materialize_infinite_reach(caplog):
     with tw.domain.session() as session:
         world = await session.prepare()
         await session.tick()
-        await session.tick()
         await session.save()
 
     reloaded = await tw.domain.reload()

@@ -5,13 +5,15 @@ import pytest
 import domains
 import library
 import test
+from test_utils import *
+
 
 log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_library(caplog):
+async def test_library(deterministic, caplog, snapshot):
     tw = test.TestWorld()
 
     with tw.domain.session() as session:
@@ -32,7 +34,6 @@ async def test_library(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare(reach=domains.infinite_reach)
-        await session.tick()
         await session.tick()
         await session.save()
 

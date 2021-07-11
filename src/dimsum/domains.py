@@ -76,7 +76,7 @@ class Session:
         self.bus = EventBus(handlers=handlers or [])
         self.registrar = Registrar()
 
-    async def save(self) -> None:
+    async def save(self) -> List[str]:
         log.info("saving %s", self.store)
         assert isinstance(self.world, World)
         self.world.update_gid(self.registrar.number)
@@ -84,6 +84,7 @@ class Session:
             mod.props.described = mod.describe()
         modified = serializing.modified(self.registrar)
         await self.store.update(modified)
+        return [keys.key for keys, _ in modified.items()]
 
     def __enter__(self) -> "Session":
         active_session.set(self)

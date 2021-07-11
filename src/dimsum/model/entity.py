@@ -475,28 +475,31 @@ class Registrar:
         if isinstance(entity, list):
             return [self.register(e) for e in entity]
 
-        if entity.key in self.entities:
-            log.info("[%d] register:noop %s '%s'", depth, entity.key, entity)
+        assigned = entity.registered(self.number)
+        if original:
+            self.originals[entity.key] = original
+        if assigned in self.numbered:
+            already = self.numbered[assigned]
+            if already.key != entity.key:
+                raise RegistrationException(
+                    "gid {0} already assigned to {1} (gave={2})".format(
+                        assigned, already.key, self.number
+                    )
+                )
+
+        overwrite = entity.key in self.entities
+        if overwrite:
+            log.info("[%d] register:overwrite %s '%s'", depth, entity.key, entity)
         else:
             log.info("[%d] register:new %s '%s'", depth, entity.key, entity)
-            assigned = entity.registered(self.number)
-            if original:
-                self.originals[entity.key] = original
-            if assigned in self.numbered:
-                already = self.numbered[assigned]
-                if already.key != entity.key:
-                    raise RegistrationException(
-                        "gid {0} already assigned to {1} (gave={2})".format(
-                            assigned, already.key, self.number
-                        )
-                    )
-            # We can instantiate entities in any order, so we need to
-            # be sure this is always the greatest gid we've seen.
-            if assigned + 1 > self.number:
-                self.number = assigned + 1
-            self.entities[entity.key] = entity
-            self.numbered[assigned] = entity
-            self.key_to_number[entity.key] = assigned
+
+        # We can instantiate entities in any order, so we need to
+        # be sure this is always the greatest gid we've seen.
+        if assigned + 1 > self.number:
+            self.number = assigned + 1
+        self.entities[entity.key] = entity
+        self.numbered[assigned] = entity
+        self.key_to_number[entity.key] = assigned
 
         return entity
 

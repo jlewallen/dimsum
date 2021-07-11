@@ -16,6 +16,8 @@ from plugins.actions import Join
 import scopes.users as users
 import schema as schema_factory
 import test
+from test_utils import *
+
 
 log = logging.getLogger("dimsum")
 
@@ -27,12 +29,6 @@ def get_test_context(domain: domains.Domain, **kwargs):
         None,  # type:ignore
         serializing.Identities.HIDDEN,
     )
-
-
-@pytest.fixture(scope="function")
-def deterministic():
-    with test.Deterministic():
-        yield
 
 
 @pytest.mark.asyncio
@@ -540,3 +536,34 @@ async def test_graphql_redeem_invite_bad_secret(deterministic, caplog):
         )
         assert ok
         assert "schema.UsernamePasswordError" in json.dumps(actual, indent=4)
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_correct_version_in_modified_return(
+    deterministic, caplog, snapshot
+):
+    domain = await test.make_simple_domain()
+
+    with domain.session() as session:
+        world = await session.prepare()
+        jacob_key = await users.lookup_username(world, "jlewallen")
+        jacob = await session.materialize(key=jacob_key)
+        invite_url, invite_token = jacob.make(users.Auth).invite("hunter42")
+
+    data = {
+        "query": """
+mutation {
+    language(criteria: { text: "edit help", evaluator: "%s", reach: 1 }) {
+        reply
+        entities { key serialized }
+    }
+}
+"""
+        % jacob.key
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(test.pretty_json(actual), "entities.json")

@@ -1,4 +1,5 @@
 import logging
+import json
 import pytest
 import freezegun
 
@@ -36,11 +37,12 @@ async def test_help_create_page(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_help_edit_help(snapshot):
+async def test_help_edit_help_root(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
-        await tw.success("edit help")
+        r = await tw.success("edit help")
+        assert r.source.version.i == 1
 
 
 @pytest.mark.asyncio

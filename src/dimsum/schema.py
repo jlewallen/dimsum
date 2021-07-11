@@ -371,7 +371,10 @@ async def resolve_language(obj, info, criteria):
         w = await session.materialize(key=WorldKey)
         assert w
         reply = await session.execute(player, lqc.text.strip())
-        await session.save()
+        modified_keys = await session.save()
+        for key in modified_keys:
+            log.warning("hacked reload: %s", key)
+            await session.materialize(key=key, refresh=True)
 
         async def send_entities(entities: List[EntityResolver]):
             subscriptions = info.context.domain.subscriptions
