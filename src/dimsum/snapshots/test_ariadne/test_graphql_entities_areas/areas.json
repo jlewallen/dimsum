@@ -68,39 +68,75 @@
                         "map": {
                             "gid": {
                                 "py/object": "model.properties.Property",
-                                "value": 1
+                                "value": 1,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "name": {
                                 "py/object": "model.properties.Property",
-                                "value": "welcome"
+                                "value": "welcome",
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "described": {
                                 "py/object": "model.properties.Property",
-                                "value": "welcome (#1)"
+                                "value": "welcome (#1)",
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "desc": {
                                 "py/object": "model.properties.Property",
-                                "value": "welcome"
+                                "value": "welcome",
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "created": {
                                 "py/object": "model.properties.Property",
-                                "value": 1569369600.0
+                                "value": 1569369600.0,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "touched": {
                                 "py/object": "model.properties.Property",
-                                "value": 1569369600.0
+                                "value": 1569369600.0,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "frozen": {
                                 "py/object": "model.properties.Property",
-                                "value": null
+                                "value": null,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "destroyed": {
                                 "py/object": "model.properties.Property",
-                                "value": null
+                                "value": null,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             },
                             "related": {
                                 "py/object": "model.properties.Property",
-                                "value": {}
+                                "value": {},
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": []
+                                }
                             }
                         }
                     }

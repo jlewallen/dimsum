@@ -4,6 +4,7 @@ import re
 import time
 from typing import Dict, Optional, Optional
 
+from .permissions import Acls
 from .crypto import Identity
 from .kinds import Kind
 
@@ -27,9 +28,9 @@ Drank = "drank"
 
 
 class Property:
-    def __init__(self, value=None, **kwargs):
-        self.__dict__ = kwargs
+    def __init__(self, value=None):
         self.value = value
+        self.acls = Acls()
 
     def set(self, value):
         self.value = value
