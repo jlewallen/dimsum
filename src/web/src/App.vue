@@ -147,7 +147,6 @@ body {
 }
 
 #lower {
-    border-top: 2px solid #dfdfdf;
 }
 
 .obscured {

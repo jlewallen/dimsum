@@ -1,39 +1,39 @@
 <template>
     <div class="inline-editor" @keydown.esc="cancel">
-        <div class="buttons" v-if="logs.length">
-            <span v-on:click="showEditor" :class="{ btn: true, 'btn-primary': editor }">Editor</span>
-            <span v-on:click="showLogs" :class="{ btn: true, 'btn-primary': !editor }">Logs</span>
-        </div>
-        <div class="inline-editor-row" v-if="editor">
-            <VCodeMirror v-model="form.behavior" :autoFocus="true" v-if="!help" />
-            <VCodeMirror v-model="form.pedia" :autoFocus="true" :mode="{ name: 'markdown' }" v-if="help" />
-        </div>
-        <div class="inline-editor-row" v-else>
-            <div class="logs">
-                <div v-for="(entry, index) in logs" v-bind:key="index">
-                    {{ entry }}
+        <Tabs @close="cancel">
+            <Tab title="General">
+                <div class="inline-form">
+                    <div class="label">Name</div>
+                    <input class="form-control col-sm-2" type="text" v-model="form.name" ref="name" />
                 </div>
-            </div>
-        </div>
-        <div class="inline-editor-row">
-            <form class="inline" @submit.prevent="saveForm">
-                <div class="form-group row">
-                    <label class="col-sm-2">Name</label>
-                    <div class="col-sm-5">
-                        <input class="form-control" type="text" v-model="form.name" ref="name" />
+                <div class="editor-grow">
+                    <div class="label">Description</div>
+                    <keep-alive>
+                        <VCodeMirror v-model="form.desc" :autoFocus="true" :mode="{ name: 'markdown' }" />
+                    </keep-alive>
+                </div>
+            </Tab>
+            <Tab title="Help">
+                <keep-alive>
+                    <VCodeMirror v-model="form.pedia" :autoFocus="true" :mode="{ name: 'markdown' }" />
+                </keep-alive>
+            </Tab>
+            <Tab title="Behavior">
+                <keep-alive>
+                    <VCodeMirror v-model="form.behavior" :autoFocus="true" />
+                </keep-alive>
+            </Tab>
+            <Tab title="Logs">
+                <div class="editor-grow logs">
+                    <div v-for="(entry, index) in logs" v-bind:key="index">
+                        {{ entry }}
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-2">Description</label>
-                    <div class="col-sm-5">
-                        <input class="form-control" type="text" v-model="form.desc" ref="desc" />
-                    </div>
-                </div>
-                <div class="buttons">
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                    <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
-                </div>
-            </form>
+            </Tab>
+        </Tabs>
+        <div class="buttons">
+            <button class="btn btn-primary" v-on:click="save">Save</button>
+            <button class="btn btn-secondary" v-on:click="cancel">Cancel</button>
         </div>
     </div>
 </template>
@@ -44,11 +44,15 @@ import { defineComponent } from "vue";
 import { Entity, PropertyMap } from "@/http";
 import store, { UpdateEntityAction } from "@/store";
 import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
+import Tabs from "@/views/shared/Tabs.vue";
+import Tab from "@/views/shared/Tab.vue";
 
 export default defineComponent({
     name: "InlineEditor",
     components: {
         VCodeMirror,
+        Tabs,
+        Tab,
     },
     props: {
         entity: {
@@ -70,7 +74,6 @@ export default defineComponent({
         })();
 
         return {
-            editor: true,
             logs: _.reverse(behavior?.logs || []),
             form: {
                 behavior: behavior?.python || "",
@@ -86,13 +89,7 @@ export default defineComponent({
         }
     },
     methods: {
-        showEditor(): void {
-            this.editor = true;
-        },
-        showLogs(): void {
-            this.editor = false;
-        },
-        async saveForm(): Promise<void> {
+        async save(): Promise<void> {
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
@@ -118,33 +115,44 @@ export default defineComponent({
         },
         async cancel(e: Event): Promise<void> {
             this.$emit("dismiss");
-            e.preventDefault();
+            if (e) {
+                e.preventDefault();
+            }
         },
     },
 });
 </script>
 <style>
-.buttons input {
-    margin-right: 1em;
+.logs {
+    padding: 1em;
+    overflow-y: scroll;
+    flex-grow: 1;
 }
-.buttons button {
-    margin-right: 1em;
-}
-.inline-editor-row {
-    padding-bottom: 1em;
-}
-form.inline {
+.buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1em;
     padding-left: 1em;
     padding-right: 1em;
 }
-.buttons {
+.buttons * {
+    margin-right: 1em;
 }
-.buttons span {
-    padding: 0.2em;
-}
-.logs {
-    height: 300px;
+.label {
+    color: #8f8f8f;
     padding: 1em;
-    overflow-y: scroll;
+}
+.editor-grow {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.v-code-mirror {
+    flex-grow: 1;
+}
+.inline-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 </style>
