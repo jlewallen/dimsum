@@ -481,6 +481,9 @@ class Registrar:
         if assigned in self.numbered:
             already = self.numbered[assigned]
             if already.key != entity.key:
+                log.error("gid collision: %d", assigned)
+                log.error("gid collision: registered key=%s '%s", already.key, already)
+                log.error("gid collision: incoming key=%s '%s", entity.key, entity)
                 raise RegistrationException(
                     "gid {0} already assigned to {1} (gave={2})".format(
                         assigned, already.key, self.number

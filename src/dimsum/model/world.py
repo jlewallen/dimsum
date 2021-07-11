@@ -38,6 +38,7 @@ class World(Entity):
         with self.make(Identifiers) as ids:
             if ids.gid != gid:
                 ids.gid = gid
+                log.info("gid-updated: %d", gid)
                 self.touch()
 
     def welcome_area(self) -> Entity:

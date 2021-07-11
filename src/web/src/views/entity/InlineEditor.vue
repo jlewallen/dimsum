@@ -69,8 +69,6 @@ export default defineComponent({
             return null;
         })();
 
-        console.log("pedia", pedia);
-
         return {
             editor: true,
             logs: _.reverse(behavior?.logs || []),
