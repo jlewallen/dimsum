@@ -83,7 +83,7 @@ class Say:
 
         self.player_queue = {}
 
-        heard = tools.default_heard_for(area)
+        heard = tools.default_heard_for(area, excepted=[source])
         for e in self.nearby_queue:
             await self._pub(
                 source=source,

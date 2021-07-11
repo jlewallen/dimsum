@@ -88,9 +88,13 @@ def on_ground(e: Entity) -> bool:
     return False
 
 
-def default_heard_for(area: Optional[Entity] = None) -> List[Entity]:
+def default_heard_for(
+    area: Optional[Entity] = None, excepted: Optional[List[Entity]] = None
+) -> List[Entity]:
     if area:
         with area.make_and_discard(occupyable.Occupyable) as here:
+            if excepted:
+                return [o for o in here.occupied if o not in excepted]
             return here.occupied
     return []
 

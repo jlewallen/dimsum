@@ -66,7 +66,7 @@ class Create(PersonAction):
                 source=person,
                 area=area,
                 entity=after_hold,
-                heard=default_heard_for(area),
+                heard=default_heard_for(area, excepted=[person]),
             )
 
 
@@ -112,7 +112,7 @@ class Make(PersonAction):
             ItemsMade(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area),
+                heard=default_heard_for(area=area, excepted=[person]),
                 items=[after_hold],
             )
         )
@@ -145,7 +145,7 @@ class Obliterate(PersonAction):
             ItemsObliterated(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area),
+                heard=default_heard_for(area=area, excepted=[person]),
                 items=items,
             )
         )

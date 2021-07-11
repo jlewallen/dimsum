@@ -89,7 +89,7 @@ class Drop(PersonAction):
                     ItemsDropped(
                         source=person,
                         area=area,
-                        heard=default_heard_for(area=area),
+                        heard=default_heard_for(area=area, excepted=[person]),
                         items=dropped,
                     )
                 )
@@ -146,7 +146,7 @@ class Hold(PersonAction):
                     ItemsHeld(
                         source=person,
                         area=area,
-                        heard=default_heard_for(area=area),
+                        heard=default_heard_for(area=area, excepted=[person]),
                         items=[after_hold],
                     )
                 )

@@ -64,6 +64,7 @@ async def wiggle(this, person, say):
 async def test_dynamic_language_say_nearby(caplog):
     tw = test.TestWorld()
     await tw.initialize()
+    await tw.add_carla()
 
     hammer = await tw.add_behaviored_thing(
         tw,
@@ -84,8 +85,8 @@ async def jingle(this, person, say):
     async def handle_message(item: Renderable):
         received.append(item)
 
-    assert tw.jacob_key
-    subscription = tw.domain.subscriptions.subscribe(tw.jacob_key, handle_message)
+    assert tw.carla_key
+    subscription = tw.domain.subscriptions.subscribe(tw.carla_key, handle_message)
     assert len(received) == 0
 
     await tw.success("jingle")

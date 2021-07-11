@@ -54,7 +54,7 @@ class Wear(PersonAction):
             ItemsWorn(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area),
+                heard=default_heard_for(area=area, excepted=[person]),
                 items=[item],
             )
         )
@@ -88,7 +88,7 @@ class Remove(PersonAction):
             ItemsUnworn(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area),
+                heard=default_heard_for(area=area, excepted=[person]),
                 items=[item],
             )
         )

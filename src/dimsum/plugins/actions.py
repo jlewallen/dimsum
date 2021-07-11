@@ -47,7 +47,7 @@ class AddItemArea(PersonAction):
             ItemsAppeared(
                 source=person,
                 area=self.area,
-                heard=tools.default_heard_for(area=area),
+                heard=tools.default_heard_for(area=area, excepted=[person]),
                 items=[self.item],
             )
         )
@@ -67,7 +67,7 @@ class Join(PersonAction):
                 PlayerJoined(
                     source=person,
                     area=entering.ourselves,
-                    heard=tools.default_heard_for(area=area),
+                    heard=tools.default_heard_for(area=area, excepted=[person]),
                 )
             )
             await entering.entered(person)
