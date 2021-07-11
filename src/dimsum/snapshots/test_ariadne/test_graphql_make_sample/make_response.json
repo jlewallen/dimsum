@@ -52,7 +52,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             },
                             "identifiers": {
@@ -243,11 +243,11 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Town Courtyard."
+                                    "value": "Town Courtyard"
                                 },
                                 "described": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Town Courtyard. (#4)"
+                                    "value": "Town Courtyard (#4)"
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
@@ -339,7 +339,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -449,7 +449,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -566,7 +566,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -676,7 +676,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -793,7 +793,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -910,7 +910,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -1027,7 +1027,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -1145,7 +1145,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -1263,7 +1263,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -1381,7 +1381,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             }
                         },
@@ -1588,7 +1588,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             },
                             "location": {
@@ -1809,7 +1809,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             },
                             "location": {
@@ -2042,7 +2042,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
-                                    "name": "Town Courtyard."
+                                    "name": "Town Courtyard"
                                 }
                             },
                             "location": {
