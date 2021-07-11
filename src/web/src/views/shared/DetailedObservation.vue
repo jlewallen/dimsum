@@ -1,24 +1,42 @@
 <template>
-    <div class="response detailed-observation"></div>
+    <div class="response detailed-observation">
+        <div class="markdown">
+            <Markdown :source="markdown" />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { defineComponent } from "vue";
-import { DetailedObservation } from "@/store";
+import { HistoryEntry, DetailedObservation } from "@/store";
+import Markdown from "vue3-markdown-it";
 
 export default defineComponent({
     name: "DetailedObservation",
+    components: {
+        Markdown,
+    },
     props: {
-        reply: {
-            type: Object as () => DetailedObservation,
+        entry: {
+            type: Object as () => HistoryEntry,
             required: true,
         },
     },
-    data(): {} {
-        return {};
+    computed: {
+        markdown(): string {
+            const r = this.entry.rendered;
+            if (_.isArray(r.description)) {
+                return `### ${r.title}\n\n` + r.description.join("\n\n");
+            }
+            return "";
+        },
     },
-    methods: {},
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.markdown {
+    padding: 1em;
+}
+</style>

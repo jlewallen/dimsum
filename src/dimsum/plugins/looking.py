@@ -30,6 +30,12 @@ class ObservedLiving(ObservedEntity):
 class DetailedObservation(Observation):
     item: ObservedEntity
 
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "title": self.item.entity.props.name,
+            "description": [self.item.entity.props.desc],
+        }
+
 
 @dataclasses.dataclass
 class AreaObservation(Observation):
@@ -149,7 +155,7 @@ class LookDown(PersonAction):
 
 
 class Look(PersonAction):
-    def __init__(self, item=None, **kwargs):
+    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
         super().__init__(**kwargs)
         self.item = item
 
@@ -157,7 +163,10 @@ class Look(PersonAction):
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         if self.item:
-            return DetailedObservation(ObservedEntity(self.item))
+            item = await ctx.apply_item_finder(person, self.item)
+            if not item:
+                return Failure("look at what?")
+            return DetailedObservation(ObservedEntity(item))
 
         assert area
         return AreaObservation(area, person)
