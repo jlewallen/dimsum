@@ -43,7 +43,7 @@ from model.entity import (
     set_entity_area_provider,
 )
 from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
-from model.world import World, WorldKey, Welcoming, materialize_well_known_entity
+from model.world import World, WorldKey, Welcoming
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
 from model.reply import (
@@ -63,6 +63,7 @@ from model.finders import (
     FindCurrentArea,
     ItemFactory,
 )
+from model.well_known import materialize_well_known_entity
 
 import model.hooks as hooks
 
