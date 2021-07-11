@@ -27,6 +27,6 @@ async def test_help_create_page(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
-        await tw.success("help creation")
-        await tw.success("help creation create")
-        await tw.success("help creation")
+        await tw.success("help Creation")
+        await tw.success("help Creation create")
+        await tw.success("help Creation")

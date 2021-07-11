@@ -25,7 +25,24 @@ EncyclopediaKey = "encyclopedia"
 DefaultBody = """
 # Default Help Page
 
-This is a brand new help page that you can edit by using `edit help`
+This is a brand new help page that you can edit by using `edit
+help`.
+
+First, a brief introduction to the syntax used in this particular help
+system, other systems may adopt their own style as all of these are
+edited live.
+
+One of the first things you should know is that you can also
+edit the help associated with anything in the world by using:
+
+```
+edit help box
+```
+
+Where, in this case box uniquely identifies something nearby with box
+in its name. You can use as much as needed to specify the thing you'd
+like to make changes to uniquely, just as you do when interacting with
+the object in other ways.
 """
 
 
@@ -112,8 +129,8 @@ class Grammar(grammars.Grammar):
 
         edit_help:              "edit" "help" help_page?    -> edit_help
 
-        help_page:              WORD
-
+        help_page:              WIKI_WORD
+        WIKI_WORD:              /[A-Z]+[a-zA-Z0-9]*/
 """
 
 
