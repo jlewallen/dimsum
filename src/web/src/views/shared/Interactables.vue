@@ -17,7 +17,6 @@ export default defineComponent({
         HistoryEntries,
         Repl,
     },
-    props: {},
     computed: {
         connected(): boolean {
             return store.state.connected;

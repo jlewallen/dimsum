@@ -11,6 +11,21 @@ import { Universal } from "@/entity";
 import { CommonComponents } from "./index";
 import Markdown from "vue3-markdown-it";
 
+const UniversalLink = defineComponent({
+    name: "UniversalLink",
+    props: { value: { type: String, required: true } },
+    template: `<a :href="value">{{ simple }}</a>`,
+    computed: {
+        simple(): string {
+            const i = this.value.indexOf("?");
+            if (i < 0) {
+                return this.value;
+            }
+            return this.value.substring(0, i);
+        },
+    },
+});
+
 const CommonProps = {
     reply: {
         type: Object as () => Record<string, unknown>,
@@ -20,11 +35,36 @@ const CommonProps = {
 
 const Help = defineComponent({
     name: "Help",
-    props: CommonProps,
+    props: {
+        reply: {
+            type: Object as () => { body: string },
+            required: true,
+        },
+    },
     components: {
         Markdown,
     },
-    template: `<div class="response help"><Markdown :source="reply.body" /></div>`,
+    template: `<div class="response help"><Markdown :source="wikiBody" v-on:click="onClick" /></div>`,
+    computed: {
+        wikiBody(): string {
+            const wikiWord = /([A-Z]+[a-z]+([A-Z]+[a-z]+)+)/g;
+            return this.reply.body.replace(wikiWord, function(a, b) {
+                console.log("replacing", a, b);
+                return `[${a}](#)`;
+            });
+        },
+    },
+    methods: {
+        onClick(ev: Event) {
+            if (ev.target) {
+                const el = ev.target as HTMLElement;
+                if (el.innerText) {
+                    console.log("navigate", el.innerText);
+                    this.$emit("command", { line: `help ${el.innerText}` });
+                }
+            }
+        },
+    },
 });
 
 const LivingEnteredArea = defineComponent({
@@ -114,21 +154,6 @@ const UniversalString = defineComponent({
     name: "UniversalString",
     props: { value: { type: String, required: true } },
     template: `<span>{{ value }}</span>`,
-});
-
-const UniversalLink = defineComponent({
-    name: "UniversalLink",
-    props: { value: { type: String, required: true } },
-    template: `<a :href="value">{{ simple }}</a>`,
-    computed: {
-        simple(): string {
-            const i = this.value.indexOf("?");
-            if (i < 0) {
-                return this.value;
-            }
-            return this.value.substring(0, i);
-        },
-    },
 });
 
 function render(value: string): { view: unknown; value: string } {

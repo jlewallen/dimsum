@@ -7,6 +7,7 @@
                 :reply="entry.reply"
                 @selected="onSelected"
                 @dismiss="onDismissed(entry)"
+                @command="(command) => onCommand(entry, command)"
             />
         </div>
     </div>
@@ -51,6 +52,10 @@ export default defineComponent({
             console.log("explore:dismissed", entry);
             store.commit(new RemoveHistoryEntry(entry));
             this.$emit("resume-repl");
+        },
+        async onCommand(entry: ReplResponse, command: { line: string }) {
+            console.log("explore:command", entry, command);
+            await store.dispatch(new ReplAction(command.line));
         },
     },
 });
