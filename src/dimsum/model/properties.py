@@ -28,9 +28,9 @@ Drank = "drank"
 
 
 class Property:
-    def __init__(self, value=None):
+    def __init__(self, value=None, name=None):
         self.value = value
-        self.acls = Acls()
+        self.acls = Acls(name)
 
     def set(self, value):
         self.value = value
@@ -68,7 +68,7 @@ class Map:
             if isinstance(value, Property):
                 self.map[key] = value
             else:
-                self.map[key] = Property(value)
+                self.map[key] = Property(value, name=key)
 
     def update(self, changes):
         for key, value in changes.items():

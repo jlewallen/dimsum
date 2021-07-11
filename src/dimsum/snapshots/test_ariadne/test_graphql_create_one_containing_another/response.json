@@ -76,7 +76,7 @@
                                     "value": 1,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "gid",
                                         "rules": []
                                     }
                                 },
@@ -85,7 +85,7 @@
                                     "value": "Thing A",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "name",
                                         "rules": []
                                     }
                                 },
@@ -94,7 +94,7 @@
                                     "value": "a Thing A (#1)",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "described",
                                         "rules": []
                                     }
                                 },
@@ -103,7 +103,7 @@
                                     "value": "Thing",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "desc",
                                         "rules": []
                                     }
                                 },
@@ -112,7 +112,7 @@
                                     "value": 1569369600.0,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "created",
                                         "rules": []
                                     }
                                 },
@@ -121,7 +121,7 @@
                                     "value": 1569369600.0,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "touched",
                                         "rules": []
                                     }
                                 },
@@ -130,7 +130,7 @@
                                     "value": null,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "frozen",
                                         "rules": []
                                     }
                                 },
@@ -139,7 +139,7 @@
                                     "value": null,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "destroyed",
                                         "rules": []
                                     }
                                 },
@@ -148,7 +148,7 @@
                                     "value": {},
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "related",
                                         "rules": []
                                     }
                                 }
@@ -221,7 +221,7 @@
                                     "value": 2,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "gid",
                                         "rules": []
                                     }
                                 },
@@ -230,7 +230,7 @@
                                     "value": "Thing B",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "name",
                                         "rules": []
                                     }
                                 },
@@ -239,7 +239,7 @@
                                     "value": "a Thing B (#2)",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "described",
                                         "rules": []
                                     }
                                 },
@@ -248,7 +248,7 @@
                                     "value": "Thing",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "desc",
                                         "rules": []
                                     }
                                 },
@@ -257,7 +257,7 @@
                                     "value": 1569369600.0,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "created",
                                         "rules": []
                                     }
                                 },
@@ -266,7 +266,7 @@
                                     "value": 1569369600.0,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "touched",
                                         "rules": []
                                     }
                                 },
@@ -275,7 +275,7 @@
                                     "value": null,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "frozen",
                                         "rules": []
                                     }
                                 },
@@ -284,7 +284,7 @@
                                     "value": null,
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "destroyed",
                                         "rules": []
                                     }
                                 },
@@ -293,7 +293,7 @@
                                     "value": {},
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
-                                        "name": "<acls>",
+                                        "name": "related",
                                         "rules": []
                                     }
                                 }
