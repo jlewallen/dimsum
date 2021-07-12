@@ -44,6 +44,9 @@ src/web/node_modules:
 web: src/web/node_modules src/web/src/config
 	cd src/web && yarn serve --port 8082
 
+wiki:
+	./ds load-wiki --directory docs  --user jlewallen --database world.sqlite3
+
 graph:
 	+@for m in *.sqlite3; do                                               \
 	n=`basename $$m .sqlite3`;                                             \
