@@ -57,10 +57,15 @@ class BehaviorMap(Map):
         return super().replace(**typed)
 
 
+@dataclasses.dataclass
+class BehaviorMeta:
+    pass
+
+
 class BehaviorCollection(Scope):
     def __init__(self, entities=None, **kwargs):
         super().__init__(**kwargs)
-        self.entities: List[Entity] = entities if entities else []
+        self.entities: Dict[str, List[BehaviorMeta]] = entities if entities else {}
 
 
 class Behaviors(Scope):
@@ -77,7 +82,10 @@ class Behaviors(Scope):
         # over everything? This has elegance.
         if world:
             with world.make(BehaviorCollection) as world_behaviors:
-                if self.ourselves not in world_behaviors.entities:
-                    world_behaviors.entities.append(self.ourselves)
+                key = self.ourselves.key
+                per_entity = world_behaviors.entities.setdefault(key, [])
+                if len(per_entity) == 0:
+                    per_entity.append(BehaviorMeta())
+                    world.touch()
         self.ourselves.touch()
         return self.behaviors.add(DefaultKey, **kwargs)

@@ -14,38 +14,33 @@
                         "parent": null,
                         "chimeras": {
                             "behaviorCollection": {
-                                "entities": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "18",
-                                        "klass": "ItemClass",
-                                        "name": "Large Oak Tree"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "24",
-                                        "klass": "ItemClass",
-                                        "name": "Mysterious Box"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "27",
-                                        "klass": "ItemClass",
-                                        "name": "Acoustic Guitar"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "30",
-                                        "klass": "ItemClass",
-                                        "name": "Large Steep Cliff"
-                                    },
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "56",
-                                        "klass": "ItemClass",
-                                        "name": "Large Maple Tree"
-                                    }
-                                ]
+                                "entities": {
+                                    "18": [
+                                        {
+                                            "py/object": "scopes.behavior.BehaviorMeta"
+                                        }
+                                    ],
+                                    "24": [
+                                        {
+                                            "py/object": "scopes.behavior.BehaviorMeta"
+                                        }
+                                    ],
+                                    "27": [
+                                        {
+                                            "py/object": "scopes.behavior.BehaviorMeta"
+                                        }
+                                    ],
+                                    "30": [
+                                        {
+                                            "py/object": "scopes.behavior.BehaviorMeta"
+                                        }
+                                    ],
+                                    "56": [
+                                        {
+                                            "py/object": "scopes.behavior.BehaviorMeta"
+                                        }
+                                    ]
+                                }
                             },
                             "wellKnown": {
                                 "entities": {

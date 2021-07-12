@@ -2,6 +2,8 @@ import base64
 import io
 import json
 import logging
+import re
+import functools
 from typing import Any, Callable, Dict, Optional, Union
 
 import domains
@@ -229,6 +231,27 @@ def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
     # "public": "qigxTieZXLSVokwOYHqlXO1QUKrUaaiSEFR1nREDcWs=",
     # "value": 1626034498.0281904
 
+    key_re = re.compile("[A-Za-z0-9]{22}")
+
+    counter = 0
+    cache: Dict[str, str] = {}
+
+    # @functools.cache
+    def sequential(key: str) -> str:
+        nonlocal counter
+        nonlocal cache
+        if key in cache:
+            return cache[key]
+        counter += 1
+        k = "D#{0}".format(counter)
+        cache[key] = k
+        return k
+
+    def fix_key(key: str) -> str:
+        if key_re.match(key):
+            return sequential(key)
+        return key
+
     def fix(value, key=None, keys=None):
         if isinstance(value, str):
             if keys:
@@ -246,7 +269,7 @@ def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
             return value
         if isinstance(value, dict):
             return {
-                key: fix(value, key=key, keys=(keys or []) + [key])
+                fix_key(key): fix(value, key=key, keys=(keys or []) + [key])
                 for key, value in value.items()
             }
         if isinstance(value, list):

@@ -5,6 +5,7 @@ import pytest
 import domains
 import library
 import test
+from model import *
 from test_utils import *
 
 
@@ -27,7 +28,10 @@ async def test_library(deterministic, caplog, snapshot):
         assert len(session.registrar.entities) == 60
 
     with tw.domain.session() as session:
-        world = await session.prepare(reach=domains.infinite_reach)
+        world = await session.prepare()
+        assert len(session.registrar.entities) == 1
+        wa_key = get_well_known_key(world, WelcomeAreaKey)
+        world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
         assert len(session.registrar.entities) == 59
 
     await tw.add_jacob()
@@ -40,8 +44,10 @@ async def test_library(deterministic, caplog, snapshot):
     reloaded = await tw.domain.reload()
 
     with reloaded.session() as session:
-        assert len(session.registrar.entities) == 0
-        await session.prepare(reach=domains.infinite_reach)
+        world = await session.prepare()
+        assert len(session.registrar.entities) == 1
+        wa_key = get_well_known_key(world, WelcomeAreaKey)
+        world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
         assert len(session.registrar.entities) == 63
 
         await session.tick()

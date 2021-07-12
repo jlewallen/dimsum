@@ -9,38 +9,33 @@
         "parent": null,
         "chimeras": {
             "behaviorCollection": {
-                "entities": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": "<deterministic>",
-                        "klass": "ItemClass",
-                        "name": "Large Oak Tree"
-                    },
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": "<deterministic>",
-                        "klass": "ItemClass",
-                        "name": "Mysterious Box"
-                    },
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": "<deterministic>",
-                        "klass": "ItemClass",
-                        "name": "Acoustic Guitar"
-                    },
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": "<deterministic>",
-                        "klass": "ItemClass",
-                        "name": "Large Steep Cliff"
-                    },
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": "<deterministic>",
-                        "klass": "ItemClass",
-                        "name": "Large Maple Tree"
-                    }
-                ]
+                "entities": {
+                    "D#1": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "D#2": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "D#3": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "D#4": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "D#5": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ]
+                }
             },
             "wellKnown": {
                 "entities": {

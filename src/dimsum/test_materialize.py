@@ -5,6 +5,7 @@ import scopes
 import domains
 import library
 import test
+from model import *
 
 log = logging.getLogger("dimsum")
 
@@ -33,7 +34,12 @@ async def test_materialize_infinite_reach(caplog):
 
     with reloaded.session() as session:
         assert len(session.registrar.entities) == 0
-        await session.prepare(reach=domains.infinite_reach)
+        world = await session.prepare(reach=domains.infinite_reach)
+        assert len(session.registrar.entities) == 1
+        wa_key = get_well_known_key(world, WelcomeAreaKey)
+        world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
+
+        assert len(session.registrar.entities) == 63
 
         await session.tick()
         await session.save()

@@ -212,13 +212,13 @@ class Session:
         assert self.world
 
         log.info("everywhere:%s %s", ev, kwargs)
-        everything: List[Entity] = []
+        everything: List[str] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
-            everything = world_behaviors.entities
-        for entity in everything:
+            everything = world_behaviors.entities.keys()
+        for key in everything:
             # Materialize from the target entity to ensure we have
             # enough in memory to carry out its behavior.
-            await get().materialize(key=entity.key, refresh=True)
+            entity = await get().materialize(key=key, refresh=True)
             with entity.make(behavior.Behaviors) as behave:
                 if behave.get_default():
                     log.info("everywhere: %s", entity)
