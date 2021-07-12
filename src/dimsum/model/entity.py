@@ -221,8 +221,8 @@ class Entity:
         klass: Optional[Type[EntityClass]] = None,
         identity: Optional[Identity] = None,
         props: Optional[Common] = None,
-        chimeras=None,
         scopes=None,
+        create_scopes=None,
         initialize=None,
         **kwargs
     ):
@@ -234,7 +234,7 @@ class Entity:
         # wrapt Proxy object.
         self.creator: Optional["Entity"] = creator
         self.parent: Optional["Entity"] = parent
-        self.chimeras = chimeras if chimeras else {}
+        self.scopes = scopes if scopes else {}
         self.klass: Type[EntityClass] = klass if klass else UnknownClass
 
         if identity:
@@ -253,8 +253,8 @@ class Entity:
 
         self.props: Common = props
 
-        if scopes:
-            for scope in scopes:
+        if create_scopes:
+            for scope in create_scopes:
                 args = {}
                 if initialize and scope in initialize:
                     args = initialize[scope]
@@ -349,27 +349,27 @@ class Entity:
 
     def has(self, ctor, **kwargs):
         key = _get_ctor_key(ctor)
-        return key in self.chimeras
+        return key in self.scopes
 
     def make(self, ctor, discarding=False, **kwargs):
         key = _get_ctor_key(ctor)
 
         chargs = {}
-        if key in self.chimeras:
-            chargs = self.chimeras[key]
+        if key in self.scopes:
+            chargs = self.scopes[key]
         chargs.update(**kwargs)
 
-        log.debug("%s splitting chimera: %s %s", self.key, key, chargs)
-        child = ctor(chimera=self, discarding=discarding, **chargs)
+        log.debug("%s splitting scopes: %s %s", self.key, key, chargs)
+        child = ctor(parent=self, discarding=discarding, **chargs)
         return child
 
     def update(self, child):
-        key = child.chimera_key
+        key = child.scope_key
         data = child.__dict__
-        del data["chimera"]
+        del data["parent"]
         del data["discarding"]
-        log.debug("%s updating chimera: %s %s", self.key, key, data)
-        self.chimeras[key] = data
+        log.debug("%s updating scopes: %s %s", self.key, key, data)
+        self.scopes[key] = data
 
     def __repr__(self):
         return "{0} (#{1})".format(self.props.name, self.props.gid)
@@ -380,20 +380,20 @@ class Entity:
 
 class Scope:
     def __init__(
-        self, chimera: Optional[Entity] = None, discarding: bool = False, **kwargs
+        self, parent: Optional[Entity] = None, discarding: bool = False, **kwargs
     ):
         super().__init__()
-        assert chimera
-        self.chimera = chimera
+        assert parent
+        self.parent = parent
         self.discarding = discarding
 
     @property
-    def chimera_key(self) -> str:
+    def scope_key(self) -> str:
         return _get_instance_key(self)
 
     @property
     def ourselves(self):
-        return self.chimera
+        return self.parent
 
     def __enter__(self):
         return self
@@ -407,7 +407,7 @@ class Scope:
     def save(self):
         if self.discarding:
             return
-        self.chimera.update(self)
+        self.parent.update(self)
 
 
 class RegistrationException(Exception):

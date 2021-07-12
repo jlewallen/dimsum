@@ -76,7 +76,7 @@ def create_klass(
     if desired in scopes_by_class:
         entity_scopes = scopes_by_class[desired]
     return proxy_factory(
-        Entity(scopes=entity_scopes, klass=desired, **kwargs)
+        Entity(create_scopes=entity_scopes, klass=desired, **kwargs)
     )  # TODO create
 
 

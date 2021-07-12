@@ -7,7 +7,7 @@
         },
         "creator": null,
         "parent": null,
-        "chimeras": {
+        "scopes": {
             "behaviorCollection": {
                 "entities": {
                     "D#1": [

@@ -193,7 +193,7 @@ async def smash(this, smashing, person, say):
 
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail.key)
-        assert nail.chimeras["smashes"]["smashes"] == 3
+        assert nail.scopes["smashes"]["smashes"] == 3
 
 
 @pytest.mark.asyncio
@@ -230,7 +230,7 @@ async def rusting(this, ev, say):
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail.key)
         assert nail
-        assert nail.chimeras["rusting"]["rust"] == 1
+        assert nail.scopes["rusting"]["rust"] == 1
 
 
 @pytest.mark.asyncio
@@ -265,14 +265,14 @@ async def dropped(this, ev, say):
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail.key)
         assert nail
-        assert "rusting" not in nail.chimeras
+        assert "rusting" not in nail.scopes
 
     await tw.success("drop Nail")
 
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail.key)
         assert nail
-        assert nail.chimeras["rusting"]["rust"] == 1
+        assert nail.scopes["rusting"]["rust"] == 1
 
 
 @pytest.mark.asyncio

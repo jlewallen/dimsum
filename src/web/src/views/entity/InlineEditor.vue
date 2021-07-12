@@ -74,10 +74,10 @@ export default defineComponent({
         },
     },
     data() {
-        const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"];
+        const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"];
         const pedia = (() => {
-            if (this.entity.chimeras.encyclopedia) {
-                return this.entity.chimeras.encyclopedia.body;
+            if (this.entity.scopes.encyclopedia) {
+                return this.entity.scopes.encyclopedia.body;
             }
             return null;
         })();
@@ -104,11 +104,11 @@ export default defineComponent({
             const updating = _.clone(this.entity);
             updating.props.map.name.value = this.form.name;
             updating.props.map.desc.value = this.form.desc;
-            updating.chimeras.encyclopedia = _.extend(updating.chimeras.encyclopedia || {}, {
+            updating.scopes.encyclopedia = _.extend(updating.scopes.encyclopedia || {}, {
                 body: this.form.pedia,
             });
-            const behavior = this.entity.chimeras.behaviors.behaviors.map["b:default"] || {};
-            updating.chimeras.behaviors.behaviors.map["b:default"] = _.merge(
+            const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"] || {};
+            updating.scopes.behaviors.behaviors.map["b:default"] = _.merge(
                 {
                     "py/object": "scopes.behavior.Behavior",
                 },

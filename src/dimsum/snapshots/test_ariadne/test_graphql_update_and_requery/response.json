@@ -12,7 +12,7 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "identifiers": {
                                 "gid": 2
                             }

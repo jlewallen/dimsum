@@ -131,7 +131,7 @@ export interface Entity {
     klass: Klass;
     creator: EntityRef;
     props: { map: Properties };
-    chimeras: {
+    scopes: {
         behaviors: { behaviors: { map: Behaviors } };
         containing?: Containing;
         encyclopedia?: Encyclopedia;

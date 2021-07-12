@@ -56,7 +56,7 @@ async def dropped(this, ev, say):
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
-        assert jacob.chimeras["bank"]["gold"] == 2
+        assert jacob.scopes["bank"]["gold"] == 2
 
 
 @pytest.mark.asyncio

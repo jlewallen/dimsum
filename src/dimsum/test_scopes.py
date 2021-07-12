@@ -38,19 +38,21 @@ def remember(world: World, e: Entity):
 
 
 @pytest.mark.asyncio
-async def test_chimeric_entities_serialize(caplog):
+async def test_scoped_entities_serialize(caplog):
     domain = domains.Domain()
 
     with domain.session() as session:
         universe = await session.prepare()
 
         jacob = Entity(
-            creator=universe, props=Common(name="Jacob"), scopes=[SimpleCore]
+            creator=universe, props=Common(name="Jacob"), create_scopes=[SimpleCore]
         )
         session.register(jacob)
         remember(universe, jacob)
 
-        toy = Entity(creator=universe, props=Common(name="Toy"), scopes=[SimpleCore])
+        toy = Entity(
+            creator=universe, props=Common(name="Toy"), create_scopes=[SimpleCore]
+        )
         session.register(toy)
         remember(universe, toy)
 
@@ -69,7 +71,7 @@ async def test_chimeric_entities_serialize(caplog):
 def make_person(
     props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
 ):
-    person = Entity(props=props, creator=creator, scopes=[SimpleCore], **kwargs)
+    person = Entity(props=props, creator=creator, create_scopes=[SimpleCore], **kwargs)
 
     assert props
 
@@ -85,7 +87,9 @@ def make_person(
 def make_thing(
     props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
 ):
-    thing = Entity(props=props, creator=creator, scopes=[ownership.Ownership], **kwargs)
+    thing = Entity(
+        props=props, creator=creator, create_scopes=[ownership.Ownership], **kwargs
+    )
 
     assert props
 

@@ -7,7 +7,7 @@
         },
         "creator": null,
         "parent": null,
-        "chimeras": {
+        "scopes": {
             "behaviorCollection": {
                 "entities": {
                     "D#1": [
@@ -156,7 +156,7 @@
             "name": "World"
         },
         "parent": null,
-        "chimeras": {},
+        "scopes": {},
         "klass": {
             "py/type": "model.entity.UnknownClass"
         },

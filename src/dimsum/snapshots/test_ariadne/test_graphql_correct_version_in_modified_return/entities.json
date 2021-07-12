@@ -45,7 +45,7 @@
                             "name": "World"
                         },
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -204,7 +204,7 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "wellKnown": {
                                 "entities": {
                                     "welcomeArea": "welcome",
@@ -338,7 +338,7 @@
                             "name": "World"
                         },
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -493,7 +493,7 @@
                             "name": "World"
                         },
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",

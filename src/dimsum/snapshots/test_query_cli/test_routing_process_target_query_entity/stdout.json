@@ -11,7 +11,7 @@
                     },
                     "creator": null,
                     "parent": null,
-                    "chimeras": {
+                    "scopes": {
                         "wellKnown": {
                             "entities": {
                                 "welcomeArea": "welcome"

@@ -12,7 +12,7 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.entity.Entity",

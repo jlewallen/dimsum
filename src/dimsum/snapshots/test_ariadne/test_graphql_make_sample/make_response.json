@@ -12,7 +12,7 @@
                         },
                         "creator": null,
                         "parent": null,
-                        "chimeras": {
+                        "scopes": {
                             "behaviorCollection": {
                                 "entities": {
                                     "18": [
@@ -169,7 +169,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -384,7 +384,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -553,7 +553,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -713,7 +713,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -885,7 +885,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1045,7 +1045,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1217,7 +1217,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1389,7 +1389,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1561,7 +1561,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1729,7 +1729,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -1897,7 +1897,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2065,7 +2065,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2225,7 +2225,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2380,7 +2380,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2546,7 +2546,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2701,7 +2701,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -2879,7 +2879,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3034,7 +3034,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3206,7 +3206,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3374,7 +3374,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3542,7 +3542,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3702,7 +3702,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -3857,7 +3857,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4029,7 +4029,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4184,7 +4184,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4352,7 +4352,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4520,7 +4520,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4692,7 +4692,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -4847,7 +4847,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5015,7 +5015,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5183,7 +5183,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5349,7 +5349,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5504,7 +5504,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5672,7 +5672,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5844,7 +5844,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -5999,7 +5999,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -6167,7 +6167,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -6335,7 +6335,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -6513,7 +6513,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -6668,7 +6668,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -6836,7 +6836,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7004,7 +7004,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7172,7 +7172,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7344,7 +7344,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7499,7 +7499,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7667,7 +7667,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -7835,7 +7835,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8001,7 +8001,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8156,7 +8156,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8324,7 +8324,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8496,7 +8496,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8651,7 +8651,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8819,7 +8819,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -8987,7 +8987,7 @@
                             "klass": "AreaClass",
                             "name": "generic area"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -9153,7 +9153,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",
@@ -9308,7 +9308,7 @@
                             "klass": "ItemClass",
                             "name": "generic thing"
                         },
-                        "chimeras": {
+                        "scopes": {
                             "ownership": {
                                 "owner": {
                                     "py/object": "model.world.World",

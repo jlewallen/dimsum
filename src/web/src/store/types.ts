@@ -116,7 +116,7 @@ export function entityToKind(entity: Entity): string {
 
 export function entityToClass(entity: Entity): string {
     const classes: string[] = [entityToKind(entity).toLowerCase()];
-    if (entity.chimeras.visibility && entity.chimeras.visibility.visible.hard_to_see) {
+    if (entity.scopes.visibility && entity.scopes.visibility.visible.hard_to_see) {
         classes.push("hard-to-see");
     }
     return classes.join(" ");
