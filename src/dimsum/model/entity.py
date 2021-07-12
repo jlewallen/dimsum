@@ -129,12 +129,22 @@ def _get_instance_key(instance) -> str:
 
 
 @dataclasses.dataclass(frozen=True)
+class CompiledJson:
+    text: str
+    compiled: Dict[str, Any]
+
+    @staticmethod
+    def compile(text: str) -> "CompiledJson":
+        return CompiledJson(text, json.loads(text))
+
+
+@dataclasses.dataclass(frozen=True)
 class Chimera:
     key: str
-    loaded: Optional[str] = None
+    loaded: Optional[CompiledJson] = None
     entity: Optional["Entity"] = None
-    compiled: Optional[Dict[str, Any]] = None
-    serialized: Optional[str] = None
+    saving: Optional[CompiledJson] = None
+    saved: Optional[CompiledJson] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -431,7 +441,7 @@ class Registrar:
         self._garbage: Dict[str, Entity] = {}
         self._numbered: Dict[int, Entity] = {}
         self._key_to_number: Dict[str, int] = {}
-        self._originals: Dict[str, str] = {}
+        self._originals: Dict[str, CompiledJson] = {}
         self._number: int = 0
 
     def purge(self):
@@ -462,7 +472,7 @@ class Registrar:
             original = self._originals[key]
             # TODO Parsing/diffing entity JSON
             return jsondiff.diff(
-                json.loads(original), json.loads(serialized), marshal=True
+                original.compiled, json.loads(serialized), marshal=True
             )
         return None
 
@@ -473,17 +483,16 @@ class Registrar:
             original = self._originals[key]
             assert original
 
-            if original == update.serialized:
+            if original.text == update.serialized:
                 return False
 
             # TODO Parsing/diffing entity JSON
-            parsed_original = json.loads(original)
             d = jsondiff.diff(
-                parsed_original,
+                original.compiled,
                 json.loads(update.serialized),
                 marshal=True,
             )
-            sc = generate_security_check_from_json_diff(parsed_original, d)
+            sc = generate_security_check_from_json_diff(original.compiled, d)
             log.info("%s acls=%s", e, sc)
 
             if e and not e.modified and update.serialized:
@@ -499,15 +508,15 @@ class Registrar:
     def register(
         self,
         entity: Union[Entity, List[Entity]],
-        original: Optional[str] = None,
+        compiled: Optional[CompiledJson] = None,
         depth: int = 0,
     ):
         if isinstance(entity, list):
             return [self.register(e) for e in entity]
 
         assigned = entity.registered(self._number)
-        if original:
-            self._originals[entity.key] = original
+        if compiled:
+            self._originals[entity.key] = compiled
         if assigned in self._numbered:
             already = self._numbered[assigned]
             if already.key != entity.key:

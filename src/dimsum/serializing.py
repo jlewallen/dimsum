@@ -20,6 +20,8 @@ from model import (
 )
 import scopes.movement as movement
 
+from model.entity import CompiledJson
+
 log = logging.getLogger("dimsum")
 
 entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
@@ -200,17 +202,14 @@ def serialize(
     )
 
 
-def _deserialize(encoded, lookup):
-    decoded = jsonpickle.decode(
-        encoded,
-        context=CustomUnpickler(lookup),
-        classes=list(classes.values()),
+def _deserialize(compiled: CompiledJson, lookup):
+    context = CustomUnpickler(lookup)
+    decoded = context.restore(
+        compiled.compiled, reset=True, classes=list(classes.values())
     )
-
     if type(decoded) in inverted:
         original = inverted[type(decoded)]
         return original(**decoded.__dict__)
-
     return decoded
 
 
@@ -296,8 +295,9 @@ async def materialize(
 
     cache.update(**{se.key: [se] for se in json})
 
-    serialized = json[0].serialized
-    deserialized = _deserialize(serialized, reference)  # TODO why not all json?
+    serialized = json[0].serialized  # TODO why not all json?
+    compiled = CompiledJson.compile(serialized)
+    deserialized = _deserialize(compiled, reference)
     proxied = proxy_factory(deserialized) if proxy_factory else deserialized
     loaded = proxied
 
@@ -318,7 +318,7 @@ async def materialize(
                 depths[loaded.key],
             )
 
-    registrar.register(loaded, original=serialized, depth=depth + choice)
+    registrar.register(loaded, compiled=compiled, depth=depth + choice)
 
     if deeper:
         for referenced_key, proxy in refs.items():

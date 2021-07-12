@@ -513,14 +513,18 @@ async def update(obj, info, entities):
     with domain.session() as session:
         world = await session.prepare()
 
-        incoming = await session.try_materialize(json=serialized, refresh=True)
+        log.info("update: loading %s", [row.key for row in serialized])
+        before = [await session.try_materialize(key=row.key) for row in serialized]
+
+        log.info("update: materializing")
+        incoming = await session.try_materialize(json=serialized)
         for e in incoming.entities:
             e.touch()
-        log.info("incoming=%s", incoming)
+        log.info("update: incoming=%s", incoming)
 
         modified_keys = await session.save()
         for key in modified_keys:
-            log.warning("hacked reload: %s", key)
+            log.warning("update: hacked reload: %s", key)
         affected = [
             EntityResolver(session, await session.materialize(key=key, refresh=True))
             for key in modified_keys
