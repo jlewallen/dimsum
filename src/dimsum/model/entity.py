@@ -129,6 +129,15 @@ def _get_instance_key(instance) -> str:
 
 
 @dataclasses.dataclass(frozen=True)
+class Chimera:
+    key: str
+    loaded: Optional[str] = None
+    entity: Optional["Entity"] = None
+    compiled: Optional[Dict[str, Any]] = None
+    serialized: Optional[str] = None
+
+
+@dataclasses.dataclass(frozen=True)
 class Serialized:
     key: str
     serialized: str
@@ -418,27 +427,39 @@ class Registrar:
     def __init__(self, **kwargs):
         super().__init__()
         log.info("registrar:ctor")
-        self.entities: Dict[str, Entity] = {}
-        self.garbage: Dict[str, Entity] = {}
-        self.numbered: Dict[int, Entity] = {}
-        self.key_to_number: Dict[str, int] = {}
-        self.originals: Dict[str, str] = {}
-        self.number: int = 0
+        self._entities: Dict[str, Entity] = {}
+        self._garbage: Dict[str, Entity] = {}
+        self._numbered: Dict[int, Entity] = {}
+        self._key_to_number: Dict[str, int] = {}
+        self._originals: Dict[str, str] = {}
+        self._number: int = 0
 
     def purge(self):
-        self.entities = {}
-        self.garbage = {}
-        self.numbered = {}
-        self.key_to_number = {}
-        self.originals = {}
-        self.number = 0
+        self._entities = {}
+        self._garbage = {}
+        self._numbered = {}
+        self._key_to_number = {}
+        self._originals = {}
+        self._number = 0
+
+    @property
+    def entities(self) -> Dict[str, Entity]:
+        return {key: e for key, e in self._entities.items()}
+
+    @property
+    def number(self) -> int:
+        return self._number
+
+    @number.setter
+    def number(self, value: int):
+        self._number = value
 
     def number_of_entities(self):
-        return len(self.entities)
+        return len(self._entities)
 
     def get_diff_if_available(self, key: str, serialized: str):
-        if key in self.originals:
-            original = self.originals[key]
+        if key in self._originals:
+            original = self._originals[key]
             # TODO Parsing/diffing entity JSON
             return jsondiff.diff(
                 json.loads(original), json.loads(serialized), marshal=True
@@ -448,8 +469,8 @@ class Registrar:
     def was_modified_from_original(
         self, key: str, e: Optional[Entity], update: EntityUpdate
     ) -> bool:
-        if key in self.originals:
-            original = self.originals[key]
+        if key in self._originals:
+            original = self._originals[key]
             assert original
 
             if original == update.serialized:
@@ -473,7 +494,7 @@ class Registrar:
         return e.modified
 
     def modified(self) -> Dict[str, Entity]:
-        return {key: e for key, e in self.entities.items() if self.was_modified(e)}
+        return {key: e for key, e in self._entities.items() if self.was_modified(e)}
 
     def register(
         self,
@@ -484,22 +505,22 @@ class Registrar:
         if isinstance(entity, list):
             return [self.register(e) for e in entity]
 
-        assigned = entity.registered(self.number)
+        assigned = entity.registered(self._number)
         if original:
-            self.originals[entity.key] = original
-        if assigned in self.numbered:
-            already = self.numbered[assigned]
+            self._originals[entity.key] = original
+        if assigned in self._numbered:
+            already = self._numbered[assigned]
             if already.key != entity.key:
                 log.error("gid collision: %d", assigned)
                 log.error("gid collision: registered key=%s '%s", already.key, already)
                 log.error("gid collision: incoming key=%s '%s", entity.key, entity)
                 raise RegistrationException(
                     "gid {0} already assigned to {1} (gave={2})".format(
-                        assigned, already.key, self.number
+                        assigned, already.key, self._number
                     )
                 )
 
-        overwrite = entity.key in self.entities
+        overwrite = entity.key in self._entities
         if overwrite:
             log.info("[%d] register:overwrite %s '%s'", depth, entity.key, entity)
         else:
@@ -507,50 +528,50 @@ class Registrar:
 
         # We can instantiate entities in any order, so we need to
         # be sure this is always the greatest gid we've seen.
-        if assigned + 1 > self.number:
-            self.number = assigned + 1
-        self.entities[entity.key] = entity
-        self.numbered[assigned] = entity
-        self.key_to_number[entity.key] = assigned
+        if assigned + 1 > self._number:
+            self._number = assigned + 1
+        self._entities[entity.key] = entity
+        self._numbered[assigned] = entity
+        self._key_to_number[entity.key] = assigned
 
         return entity
 
     def contains(self, key) -> bool:
-        return key in self.entities
+        return key in self._entities
 
     def entities_of_klass(self, klass: Type[EntityClass]):
-        return [e for key, e in self.entities.items() if e.klass == klass]
+        return [e for key, e in self._entities.items() if e.klass == klass]
 
     def find_by_gid(self, gid: int) -> Optional[Entity]:
-        if gid in self.numbered:
-            return self.numbered[gid]
+        if gid in self._numbered:
+            return self._numbered[gid]
         return None
 
     def find_by_key(self, key) -> Optional[Entity]:
-        if key in self.entities:
-            return self.entities[key]
+        if key in self._entities:
+            return self._entities[key]
         return None
 
     # TODO Move to tests.
     def find_entity_by_name(self, name):
-        for key, e in self.entities.items():
+        for key, e in self._entities.items():
             if name in e.props.name:
                 return e
         return None
 
     def empty(self) -> bool:
-        return len(self.entities.keys()) == 0
+        return len(self._entities.keys()) == 0
 
     def everything(self) -> List[Entity]:
-        return list(self.entities.values())
+        return list(self._entities.values())
 
     def all_of_type(self, klass: Type) -> List[Entity]:
-        return [e for e in self.entities.values() if isinstance(e, klass)]
+        return [e for e in self._entities.values() if isinstance(e, klass)]
 
     def unregister(self, entity: Union[Entity, Any]):
         entity.destroy()
-        self.garbage[entity.key] = entity
+        self._garbage[entity.key] = entity
 
     @property
     def undestroyed(self) -> List[Entity]:
-        return [e for e in self.entities.values() if e.props.destroyed is None]
+        return [e for e in self._entities.values() if e.props.destroyed is None]
