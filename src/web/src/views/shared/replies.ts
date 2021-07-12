@@ -32,7 +32,7 @@ const BasicMarkdown = defineComponent({
     name: "BasicMarkdown",
     props: {
         source: {
-            type: Object as () => string | Rendered,
+            type: Object as () => Rendered,
             required: true,
         },
     },
@@ -69,7 +69,7 @@ const BasicMarkdown = defineComponent({
 });
 
 const RenderedEntry = defineComponent({
-    name: "Help",
+    name: "RenderedEntry",
     props: {
         entry: {
             type: Object as () => HistoryEntry,
@@ -93,7 +93,7 @@ const Help = defineComponent({
     components: {
         BasicMarkdown,
     },
-    template: `<BasicMarkdown :source="this.reply.body" />`,
+    template: `<BasicMarkdown :source="{ lines: [reply.body] }" />`,
 });
 
 const LivingEnteredArea = RenderedEntry;
