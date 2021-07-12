@@ -135,14 +135,14 @@ async def test_storage_update_one_entity(
     store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     key = shortuuid.uuid(name="example-1")
 
-    updated = await store.update({Keys(key): EntityUpdate(serialized)})
+    updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "before.json")
 
     w.version.increase()
     serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
     assert serialized
 
-    updated = await store.update({Keys(key): EntityUpdate(serialized)})
+    updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "after.json")
 
 
@@ -157,7 +157,7 @@ async def test_storage_delete_one_entity(
 
     store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     key = shortuuid.uuid(name="example-2")
-    updated = await store.update({Keys(key): EntityUpdate(serialized)})
+    updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "before.json")
 
     w.version.increase()
@@ -165,5 +165,5 @@ async def test_storage_delete_one_entity(
     serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
     assert serialized
 
-    updated = await store.update({Keys(key): EntityUpdate(serialized)})
+    updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "after.json")

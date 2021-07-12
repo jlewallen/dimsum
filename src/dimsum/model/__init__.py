@@ -49,8 +49,9 @@ from model.entity import (
     set_entity_cleanup_handler,
     set_entity_describe_handler,
     set_entity_area_provider,
+    CompiledJson,
 )
-from model.entity import Keys, EntityUpdate, Serialized  # Can we move these?
+from model.entity import Serialized  # Can we move these?
 from model.world import World, WorldKey, WelcomeAreaKey
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
@@ -96,8 +97,6 @@ __all__: List[str] = [
     "Entity",
     "Version",
     "EntityRef",
-    "Keys",
-    "EntityUpdate",
     "Serialized",
     "EntityClass",
     "RootEntityClass",
@@ -158,4 +157,5 @@ __all__: List[str] = [
     "OwnerIdentity",
     "CreatorIdentity",
     "AdminIdentity",
+    "CompiledJson",
 ]

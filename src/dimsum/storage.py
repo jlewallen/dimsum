@@ -1,50 +1,49 @@
 import dataclasses
 import json
+import copy
 import logging
 import sqlite3
 from typing import Any, Dict, List, Optional, TextIO
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 
-from model import Entity, Keys, EntityUpdate, Serialized
+from model import Entity, CompiledJson, Serialized
 
 log = logging.getLogger("dimsum.storage")
 
 
 @dataclasses.dataclass
 class StorageFields:
-    parsed: Dict[str, Any]
     key: str
     gid: int
     version: int
     original: int
     destroyed: bool
-    serialized: str
-    provided: str
+    saving: CompiledJson
+    saved: CompiledJson
 
     @staticmethod
-    def parse(serialized: str):
-        parsed = json.loads(serialized)  # TODO Parsing entity JSON
+    def parse(cj: CompiledJson):
         try:
+            parsed = copy.copy(cj.compiled)
+            parsed["version"] = copy.copy(parsed["version"])
             key = parsed["key"]
             gid = parsed["props"]["map"]["gid"]["value"]
             destroyed = parsed["props"]["map"]["destroyed"]["value"] is not None
             original = parsed["version"]["i"]
             version = original + 1
             parsed["version"]["i"] = version
-            reserialized = json.dumps(parsed)
-            return StorageFields(
-                parsed, key, gid, version, original, destroyed, reserialized, serialized
-            )
+            saved = CompiledJson(json.dumps(parsed), parsed)
+            return StorageFields(key, gid, version, original, destroyed, cj, saved)
         except KeyError:
-            raise Exception("malformed entity: {0}".format(serialized))
+            raise Exception("malformed entity: {0}".format(cj.text))
 
 
 class EntityStorage:
     async def number_of_entities(self) -> int:
         raise NotImplementedError
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
+    async def update(self, updates: Dict[str, CompiledJson]) -> Dict[str, CompiledJson]:
         raise NotImplementedError
 
     async def load_by_gid(self, gid: int) -> List[Serialized]:
@@ -62,7 +61,7 @@ class All(EntityStorage):
     async def number_of_entities(self) -> int:
         return max([await child.number_of_entities() for child in self.children])
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[str, CompiledJson]):
         for child in self.children:
             returning = await child.update(diffs)
         return returning
@@ -95,7 +94,7 @@ class Prioritized(EntityStorage):
             return await child.number_of_entities()
         return 0
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[str, CompiledJson]):
         for child in self.children:
             return await child.update(diffs)
 
@@ -126,7 +125,7 @@ class Separated(EntityStorage):
     async def number_of_entities(self) -> int:
         return await self.read.number_of_entities()
 
-    async def update(self, diffs: Dict[Keys, EntityUpdate]):
+    async def update(self, diffs: Dict[str, CompiledJson]):
         return await self.write.update(diffs)
 
     async def load_by_gid(self, gid: int) -> List[Serialized]:
@@ -229,7 +228,7 @@ class SqliteStorage(EntityStorage):
                 [
                     fields.version,
                     fields.gid,
-                    fields.serialized,
+                    fields.saved.text,
                     fields.key,
                     fields.original,
                 ],
@@ -244,8 +243,8 @@ class SqliteStorage(EntityStorage):
                 fields.original,
                 fields.version,
             )
-            log.error("provided=%s", fields.provided)
-            log.error("serialized=%s", fields.serialized)
+            log.error("saving=%s", fields.saving)
+            log.error("saved=%s", fields.saved)
             raise
 
     def _insert_row(self, fields: StorageFields):
@@ -263,7 +262,7 @@ class SqliteStorage(EntityStorage):
                     fields.key,
                     fields.gid,
                     fields.version,
-                    fields.serialized,
+                    fields.saved.text,
                 ],
             )
         except:
@@ -274,20 +273,17 @@ class SqliteStorage(EntityStorage):
                 fields.original,
                 fields.version,
             )
-            log.error("provided=%s", fields.provided)
-            log.error("serialized=%s", fields.serialized)
+            log.error("saving=%s", fields.saving)
+            log.error("saved=%s", fields.saved)
             raise
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
+    async def update(self, updates: Dict[str, CompiledJson]) -> Dict[str, CompiledJson]:
         await self.open_if_necessary()
         assert self.db
 
         log.debug("applying %d updates", len(updates))
 
-        updating = {
-            key: StorageFields.parse(update.serialized)
-            for key, update in updates.items()
-        }
+        updating = {key: StorageFields.parse(update) for key, update in updates.items()}
 
         self.dbc = self.db.cursor()
         for key, fields in updating.items():
@@ -302,9 +298,7 @@ class SqliteStorage(EntityStorage):
 
         self.db.commit()
 
-        return {
-            keys.key: f.serialized for keys, f in updating.items() if not f.destroyed
-        }
+        return {key: f.saved for key, f in updating.items() if not f.destroyed}
 
     async def load_by_gid(self, gid: int):
         loaded = await self.load_query(
@@ -355,7 +349,7 @@ class HttpStorage(EntityStorage):
             response = await session.execute(query)
             return response["size"]
 
-    async def update(self, updates: Dict[Keys, EntityUpdate]) -> Dict[str, str]:
+    async def update(self, updates: Dict[str, CompiledJson]) -> Dict[str, CompiledJson]:
         async with self.session() as session:
             query = gql(
                 """
@@ -367,7 +361,7 @@ class HttpStorage(EntityStorage):
     """
             )
             entities = [
-                {"key": key.key, "serialized": update.serialized}
+                {"key": key, "serialized": update.text}
                 for key, update in updates.items()
             ]
             response = await session.execute(

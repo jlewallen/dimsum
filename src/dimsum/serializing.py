@@ -14,8 +14,6 @@ from model import (
     Registrar,
     Serialized,
     Identity,
-    EntityUpdate,
-    Keys,
     EntityRef,
 )
 import scopes.movement as movement
@@ -344,31 +342,27 @@ async def materialize(
     )
 
 
-def _entity_update(instance: Entity, serialized: Optional[str]) -> EntityUpdate:
+def _entity_update(instance: Entity, serialized: Optional[str]) -> CompiledJson:
     assert serialized
     assert instance
-    return EntityUpdate(serialized, instance)
+    return CompiledJson.compile(serialized)
 
 
 def for_update(
     entities: List[Entity], everything: bool = True, **kwargs
-) -> Dict[Keys, EntityUpdate]:
+) -> Dict[str, CompiledJson]:
     return {
-        Keys(key=e.key): _entity_update(
-            e, serialize(e, identities=Identities.PRIVATE, **kwargs)
-        )
+        e.key: _entity_update(e, serialize(e, identities=Identities.PRIVATE, **kwargs))
         for e in entities
         if everything or e.modified
     }
 
 
-def modified(registrar: Registrar, **kwargs) -> Dict[Keys, EntityUpdate]:
+def modified(registrar: Registrar, **kwargs) -> Dict[str, CompiledJson]:
     return {
-        key: serialized
-        for key, serialized in for_update(
+        key: compiled
+        for key, compiled in for_update(
             list(registrar.entities.values()), **kwargs
         ).items()
-        if registrar.was_modified_from_original(
-            key.key, registrar.find_by_key(key.key), serialized
-        )
+        if registrar.was_modified_from_original(key, compiled)
     }

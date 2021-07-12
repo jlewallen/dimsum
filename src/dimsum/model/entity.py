@@ -139,29 +139,18 @@ class CompiledJson:
 
 
 @dataclasses.dataclass(frozen=True)
-class Chimera:
-    key: str
-    loaded: Optional[CompiledJson] = None
-    entity: Optional["Entity"] = None
-    saving: Optional[CompiledJson] = None
-    saved: Optional[CompiledJson] = None
-
-
-@dataclasses.dataclass(frozen=True)
 class Serialized:
     key: str
     serialized: str
 
 
 @dataclasses.dataclass(frozen=True)
-class EntityUpdate:
-    serialized: str
-    entity: Optional["Entity"] = None
-
-
-@dataclasses.dataclass(frozen=True)
-class Keys:
+class Chimera:
     key: str
+    loaded: Optional[CompiledJson] = None
+    entity: Optional["Entity"] = None
+    saving: Optional[CompiledJson] = None
+    saved: Optional[CompiledJson] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -480,27 +469,27 @@ class Registrar:
             )
         return None
 
-    def was_modified_from_original(
-        self, key: str, e: Optional[Entity], update: EntityUpdate
-    ) -> bool:
+    def was_modified_from_original(self, key: str, update: CompiledJson) -> bool:
         if key in self._originals:
             original = self._originals[key]
             assert original
 
-            if original.text == update.serialized:
+            if original.text == update.text:
                 return False
 
             # TODO Parsing/diffing entity JSON
             d = jsondiff.diff(
                 original.compiled,
-                json.loads(update.serialized),
+                update.compiled,
                 marshal=True,
             )
             sc = generate_security_check_from_json_diff(original.compiled, d)
-            log.info("%s acls=%s", e, sc)
+            log.info("acls=%s", sc)
 
-            if e and not e.modified and update.serialized:
-                log.warning("%s: untouched save %s", key, d)
+            if key in self._entities:
+                entity = self._entities[key]
+                if entity and not entity.modified and update.text:
+                    log.warning("%s: untouched save %s", key, d)
         return True
 
     def was_modified(self, e: Entity) -> bool:
