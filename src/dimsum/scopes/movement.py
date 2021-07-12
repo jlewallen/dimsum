@@ -124,9 +124,9 @@ class FindNamedRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                area = navigable.make(Exit).area
-                assert area
-                return AreaRoute(area=area)
+                new_area = navigable.make(Exit).area
+                assert new_area
+                return AreaRoute(area=new_area)
         return None
 
 
@@ -142,9 +142,9 @@ class FindDirectionalRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                area = navigable.make(Exit).area
-                assert area
-                return AreaRoute(area=area)
+                new_area = navigable.make(Exit).area
+                assert new_area
+                return AreaRoute(area=new_area)
         return None
 
 

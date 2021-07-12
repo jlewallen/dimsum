@@ -269,8 +269,10 @@ async def shake(this, person, say):
         area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
-
-        assert area.make(carryable.Containing).holding[0].creator.key == jacob.key
+        assert jacob
+        holding = area.make(carryable.Containing).holding
+        assert holding and holding[0].creator
+        assert holding[0].creator.key == jacob.key
         assert (
             area.make(carryable.Containing)
             .holding[0]

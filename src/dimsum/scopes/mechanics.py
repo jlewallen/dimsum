@@ -116,12 +116,6 @@ class Visibility(Scope):
         return self.visible.hidden
 
 
-class Memorable:
-    @abc.abstractmethod
-    def describes(self, **kwargs) -> bool:
-        pass
-
-
 class Physics:
     def __init__(self, mass=None, **kwargs):
         super().__init__()
@@ -129,17 +123,17 @@ class Physics:
 
 
 class Memory(Scope):
-    def __init__(self, memory: Optional[Dict[str, Memorable]] = None, **kwargs):
+    def __init__(self, memory: Optional[Dict[str, Entity]] = None, **kwargs):
         super().__init__(**kwargs)
         self.memory = memory if memory else {}
 
-    def memorize(self, q: str, thing: Memorable):
+    def memorize(self, q: str, thing: Entity):
         self.memory[q] = thing
 
     def forget(self, q: str):
         del self.memory[q]
 
-    def find_memory(self, q: str) -> Optional[Memorable]:
+    def find_memory(self, q: str) -> Optional[Entity]:
         for name, entity in self.memory.items():
             if q.lower() in name.lower():
                 return entity

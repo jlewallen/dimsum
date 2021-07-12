@@ -6,7 +6,7 @@ import time
 import jsondiff
 import shortuuid
 import stringcase
-from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union
+from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union, TypeVar
 
 from .crypto import Identity, generate
 from .kinds import Kind
@@ -230,6 +230,42 @@ class Version:
         return "Version<{0}>".format(self.i)
 
 
+class Scope:
+    def __init__(
+        self, parent: Optional["Entity"] = None, discarding: bool = False, **kwargs
+    ):
+        super().__init__()
+        assert parent
+        self.parent = parent
+        self.discarding = discarding
+
+    @property
+    def scope_key(self) -> str:
+        return _get_instance_key(self)
+
+    @property
+    def ourselves(self):
+        return self.parent
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.save()
+
+    def discard(self):
+        self.discarding = True
+
+    def save(self):
+        if self.discarding:
+            return
+        self.parent.update(self)
+
+
+MakeT = TypeVar("MakeT", bound=Scope)
+MakeDiscardT = TypeVar("MakeDiscardT", bound=Scope)
+
+
 class Entity:
     def __init__(
         self,
@@ -363,14 +399,14 @@ class Entity:
                 return True
         return False
 
-    def make_and_discard(self, ctor, **kwargs):
+    def make_and_discard(self, ctor: Type[MakeDiscardT], **kwargs) -> MakeDiscardT:
         return self.make(ctor, discarding=True, **kwargs)
 
-    def has(self, ctor, **kwargs):
+    def has(self, ctor: Type, **kwargs) -> bool:
         key = _get_ctor_key(ctor)
         return key in self.scopes
 
-    def make(self, ctor, discarding=False, **kwargs):
+    def make(self, ctor: Type[MakeT], discarding=False, **kwargs) -> MakeT:
         key = _get_ctor_key(ctor)
 
         chargs = {}
@@ -395,38 +431,6 @@ class Entity:
 
     def __hash__(self):
         return hash(self.key)
-
-
-class Scope:
-    def __init__(
-        self, parent: Optional[Entity] = None, discarding: bool = False, **kwargs
-    ):
-        super().__init__()
-        assert parent
-        self.parent = parent
-        self.discarding = discarding
-
-    @property
-    def scope_key(self) -> str:
-        return _get_instance_key(self)
-
-    @property
-    def ourselves(self):
-        return self.parent
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.save()
-
-    def discard(self):
-        self.discarding = True
-
-    def save(self):
-        if self.discarding:
-            return
-        self.parent.update(self)
 
 
 class RegistrationException(Exception):
