@@ -48,7 +48,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Entity, PropertyMap } from "@/http";
+import { Entity } from "@/http";
 import store, { UpdateEntityAction } from "@/store";
 import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
 import Tabs from "@/views/shared/Tabs.vue";

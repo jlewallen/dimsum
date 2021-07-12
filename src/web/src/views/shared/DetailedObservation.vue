@@ -9,7 +9,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { HistoryEntry, DetailedObservation } from "@/store";
+import { HistoryEntry } from "@/store";
 import Markdown from "vue3-markdown-it";
 
 export default defineComponent({

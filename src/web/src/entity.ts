@@ -41,7 +41,7 @@ export interface Universal {
     interactive: false;
     information: false;
     f: string;
-    kwargs: Record<string, any>;
+    kwargs: Record<string, unknown>;
 }
 
 export interface ReplResponse {
@@ -60,7 +60,7 @@ export interface ReplResponse {
 
 export type HistoryEntry = ReplResponse;
 
-export type PropertyMap = { [index: string]: any };
+export type PropertyMap = { [index: string]: unknown };
 export type UpdateEntityDetailsPayload = PropertyMap;
 export type UpdateEntityBehaviorPayload = PropertyMap;
 

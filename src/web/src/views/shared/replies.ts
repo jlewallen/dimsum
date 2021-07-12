@@ -50,7 +50,7 @@ const BasicMarkdown = defineComponent({
         },
         wikiBody(): string {
             const wikiWord = /([A-Z]+[a-z]+([A-Z]+[a-z]+)+)/g;
-            return this.rendered.replace(wikiWord, function(a, b) {
+            return this.rendered.replace(wikiWord, function(a) {
                 return `[${a}](#)`;
             });
         },
@@ -159,12 +159,16 @@ const UniversalLink = defineComponent({
     },
 });
 
-function render(value: string): { view: unknown; value: string } {
-    if (value.indexOf("http") == 0) {
-        return { view: UniversalLink, value: value.toString() };
+function render(value: unknown): { view: unknown; value: string } {
+    if (_.isString(value)) {
+        if (value.indexOf("http") == 0) {
+            return { view: UniversalLink, value: value.toString() };
+        }
+        return { view: UniversalString, value: value.toString() };
     }
-    return { view: UniversalString, value: value.toString() };
+    return { view: UniversalString, value: "# Error" };
 }
+
 const Universal = defineComponent({
     name: "Universal",
     props: {
