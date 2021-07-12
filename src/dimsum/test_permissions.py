@@ -3,6 +3,7 @@ import dataclasses
 import jsondiff
 import json
 import functools
+import shortuuid
 import pytest
 from typing import Any, Dict, List
 
@@ -134,3 +135,9 @@ async def test_permissions_basics():
     assert not behavior.has(Permission.READ, "tomi")
     behavior.add(Permission.READ, "*")
     assert behavior.has(Permission.READ, "tomi")
+
+    behavior = Acls()
+    owner_key = shortuuid.uuid()
+    assert not behavior.has(Permission.READ, owner_key, {OwnerIdentity: owner_key})
+    behavior.add(Permission.READ, OwnerIdentity)
+    assert behavior.has(Permission.READ, owner_key, {OwnerIdentity: owner_key})

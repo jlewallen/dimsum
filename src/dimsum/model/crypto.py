@@ -23,6 +23,7 @@ def get_public_from_private_bytes(encoded_private):
 
 class Identity:
     def __init__(self, public=None, private=None, signature=None, **kwargs):
+        # TODO apply Acls here for reads?
         self.private = private
         self.public = public if public else get_public_from_private_bytes(self.private)
         self.signature = signature

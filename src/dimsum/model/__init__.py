@@ -12,7 +12,14 @@ from model.game import (
 )
 from model.crypto import Identity
 from model.kinds import Kind
-from model.permissions import Acls
+from model.permissions import (
+    Acls,
+    SystemIdentity,
+    OwnerIdentity,
+    CreatorIdentity,
+    AdminIdentity,
+)
+
 from model.properties import (
     Common,
     Map,
@@ -147,4 +154,8 @@ __all__: List[str] = [
     "ItemFactory",
     "FindCurrentArea",
     "Acls",
+    "SystemIdentity",
+    "OwnerIdentity",
+    "CreatorIdentity",
+    "AdminIdentity",
 ]

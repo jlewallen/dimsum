@@ -463,7 +463,7 @@ class Registrar:
                 marshal=True,
             )
             sc = generate_security_check_from_json_diff(parsed_original, d)
-            log.info("acls=%s", sc)
+            log.info("%s acls=%s", e, sc)
 
             if e and not e.modified and update.serialized:
                 log.warning("%s: untouched save %s", key, d)

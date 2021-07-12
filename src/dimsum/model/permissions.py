@@ -6,6 +6,11 @@ from typing import Optional, List, Dict, Any
 log = logging.getLogger("dimsum")
 
 EverybodyIdentity = "*"
+SystemIdentity = "$system"
+OwnerIdentity = "$owner"
+CreatorIdentity = "$creator"
+AdminIdentity = "$admin"
+AclsKey = "acls"
 
 
 class Permission(enum.Enum):
@@ -25,12 +30,24 @@ class Acls:
     name: str = "<acls>"
     rules: List[Acl] = dataclasses.field(default_factory=list)
 
-    def has(self, p: Permission, identity: str, **kwargs) -> bool:
+    def has(
+        self, p: Permission, identity: str, mappings: Optional[Dict[str, str]] = None
+    ) -> bool:
         for rule in self.rules:
             if rule.perm == p:
-                if identity in rule.keys or EverybodyIdentity in rule.keys:
+                if EverybodyIdentity in rule.keys:
+                    return True
+                mapped_keys = (
+                    [self._expand_key(k, mappings) for k in rule.keys]
+                    if mappings
+                    else rule.keys
+                )
+                if identity in mapped_keys:
                     return True
         return False
+
+    def _expand_key(self, key: str, mappings: Dict[str, str]) -> str:
+        return mappings[key] if key in mappings else key
 
     def add(self, p: Permission, identity: str):
         self.rules.append(Acl(p, [identity]))
@@ -40,9 +57,6 @@ class Acls:
 @dataclasses.dataclass
 class SecurityCheck:
     acls: List[Acl] = dataclasses.field(default_factory=list)
-
-
-AclsKey = "acls"
 
 
 def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
