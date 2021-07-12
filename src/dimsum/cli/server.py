@@ -94,7 +94,7 @@ async def server(
     Serve a database.
     """
 
-    cfg = config.symmetrical(database or ":memory")
+    cfg = config.symmetrical(database or ":memory:")
     if conf:
         cfg = config.get(conf)
     if read or write:

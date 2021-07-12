@@ -44,11 +44,14 @@ class InitializeWorld:
         assert session.world
         return session.world, player
 
-    async def initialize(self, users: List[str]):
+    async def initialize(self, users: List[str]) -> List[str]:
         with self.domain.session() as session:
-            for key in users:
-                await self.create_player_if_necessary(session, key)
+            created = [
+                await self.create_player_if_necessary(session, username)
+                for username in users
+            ]
             await session.save()
+            return [e.key for w, e in created]
 
 
 class Interactive(sshd.CommandHandler):
