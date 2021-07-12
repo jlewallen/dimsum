@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Type
 
 from .visual import Renderable
 from .entity import Entity  # type only
+from .inflection import infl
 
 log = logging.getLogger("dimsum.model")
 
@@ -39,7 +40,7 @@ class TickEvent(Event):
 class StandardEvent(Event, Renderable):
     source: Entity
     area: Entity
-    heard: Optional[List[Any]]
+    heard: Optional[List[Entity]]
 
-    def render_string(self) -> Dict[str, str]:
-        return {"standard": str(self)}
+    def render_entities(self, entities: List[Entity]) -> str:
+        return infl.join([e.props.described for e in entities])

@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from model import Entity, Scope, event, StandardEvent, context
 
@@ -11,14 +11,14 @@ log = logging.getLogger("dimsum.scopes")
 @event
 @dataclasses.dataclass(frozen=True)
 class LivingEnteredArea(StandardEvent):
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} arrived from {self.area}"}
 
 
 @event
 @dataclasses.dataclass(frozen=True)
 class LivingLeftArea(StandardEvent):
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} went to {self.area}"}
 
 

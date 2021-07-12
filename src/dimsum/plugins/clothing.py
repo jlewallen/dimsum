@@ -1,6 +1,6 @@
 import logging
 import dataclasses
-from typing import Type, Optional, List
+from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
@@ -19,11 +19,25 @@ log = logging.getLogger("dimsum")
 class ItemsWorn(StandardEvent):
     items: List[Entity]
 
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} wore {self.render_entities(self.items)}"
+            ]
+        }
+
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsUnworn(StandardEvent):
     items: List[Entity]
+
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} took off {self.render_entities(self.items)}"
+            ]
+        }
 
 
 class Wear(PersonAction):

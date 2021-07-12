@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Dict, Optional, Type
+from typing import Dict, Optional, Type, Any
 
 import grammars
 import transformers
@@ -17,13 +17,13 @@ log = logging.getLogger("dimsum")
 class PlayerSpoke(StandardEvent):
     message: str
 
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} said '{self.message}'"}
 
 
 @event
 class PlayerTold(PlayerSpoke):
-    def render_string(self) -> Dict[str, str]:
+    def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} whispered '{self.message}'"}
 
 

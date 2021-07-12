@@ -2,7 +2,7 @@ import enum
 import logging
 from typing import List, Optional, Tuple
 
-from model import Entity, Scope, context
+from model import Entity, Scope, Acls, context
 import scopes.carryable as carryable
 
 DefaultMoveVerb = "walk"
@@ -59,10 +59,6 @@ class DirectionalRoute(AreaRoute):
         return self.direction.exiting
 
 
-class Navigable:
-    pass
-
-
 class Movement(Scope):
     def __init__(self, routes=None, **kwargs):
         super().__init__(**kwargs)
@@ -103,6 +99,7 @@ class Movement(Scope):
 class Exit(Scope):
     def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
+        self.acls = Acls("exit")
         self.area = area if area else None
 
 

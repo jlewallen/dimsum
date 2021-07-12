@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { defineComponent } from "vue";
 
 import AreaObservation from "./AreaObservation.vue";
@@ -9,35 +10,29 @@ import Failure from "./Failure.vue";
 import DefaultReply from "./DefaultReply.vue";
 import { Universal } from "@/entity";
 import { CommonComponents } from "./index";
+import { HistoryEntry } from "@/store";
 import Markdown from "vue3-markdown-it";
 
-const UniversalLink = defineComponent({
-    name: "UniversalLink",
-    props: { value: { type: String, required: true } },
-    template: `<a :href="value">{{ simple }}</a>`,
-    computed: {
-        simple(): string {
-            const i = this.value.indexOf("?");
-            if (i < 0) {
-                return this.value;
-            }
-            return this.value.substring(0, i);
-        },
-    },
-});
-
 const CommonProps = {
+    entry: {
+        type: Object as () => HistoryEntry,
+        required: true,
+    },
     reply: {
         type: Object as () => Record<string, unknown>,
         required: true,
     },
 };
 
-const Help = defineComponent({
-    name: "Help",
+export interface Rendered {
+    lines: string[];
+}
+
+const BasicMarkdown = defineComponent({
+    name: "BasicMarkdown",
     props: {
-        reply: {
-            type: Object as () => { body: string },
+        source: {
+            type: Object as () => string | Rendered,
             required: true,
         },
     },
@@ -46,9 +41,16 @@ const Help = defineComponent({
     },
     template: `<div class="response help"><Markdown :source="wikiBody" v-on:click="onClick" /></div>`,
     computed: {
+        rendered(): string {
+            if (_.isString(this.source)) {
+                return this.source;
+            }
+            console.log("source", this.source);
+            return this.source.lines.join("\n\n");
+        },
         wikiBody(): string {
             const wikiWord = /([A-Z]+[a-z]+([A-Z]+[a-z]+)+)/g;
-            return this.reply.body.replace(wikiWord, function(a, b) {
+            return this.rendered.replace(wikiWord, function(a, b) {
                 return `[${a}](#)`;
             });
         },
@@ -66,54 +68,41 @@ const Help = defineComponent({
     },
 });
 
-const LivingEnteredArea = defineComponent({
-    name: "LivingEnteredArea",
-    props: CommonProps,
-    template: `
-		<div class="response living-entered-area">
-			{{ reply.source.name }} entered from {{ reply.area.name }}
-		</div>
-	`,
+const RenderedEntry = defineComponent({
+    name: "Help",
+    props: {
+        entry: {
+            type: Object as () => HistoryEntry,
+            required: true,
+        },
+    },
+    components: {
+        BasicMarkdown,
+    },
+    template: `<BasicMarkdown :source="entry.rendered" />`,
 });
 
-const LivingLeftArea = defineComponent({
-    name: "LivingLeftArea",
-    props: CommonProps,
-    template: `
-		<div class="response living-left-area">
-			{{ reply.source.name }} left to {{ reply.area.name }}
-		</div>`,
+const Help = defineComponent({
+    name: "Help",
+    props: {
+        reply: {
+            type: Object as () => { body: string },
+            required: true,
+        },
+    },
+    components: {
+        BasicMarkdown,
+    },
+    template: `<BasicMarkdown :source="this.reply.body" />`,
 });
 
-const PlayerSpoke = defineComponent({
-    name: "PlayerSpoke",
-    props: CommonProps,
-    template: `<div class="response player-spoke">{{ reply.source.name }} said "{{ reply.message }}"</div>`,
-});
-
-const ItemsHeld = defineComponent({
-    name: "ItemsHeld",
-    props: CommonProps,
-    template: `<div class="response items">{{ reply.source.name }} picked up {{ reply.items }}</div>`,
-});
-
-const ItemsDropped = defineComponent({
-    name: "ItemsDropped",
-    props: CommonProps,
-    template: `<div class="response items">{{ reply.source.name }} dropped {{ reply.items }}</div>`,
-});
-
-const ItemsObliterated = defineComponent({
-    name: "ItemsObliterated",
-    props: CommonProps,
-    template: `<div class="response items">{{ reply.source.name }} obliterated {{ reply.items }}</div>`,
-});
-
-const EntityCreated = defineComponent({
-    name: "EntityCreated",
-    props: CommonProps,
-    template: `<div class="response items">{{ reply.source.name }} created {{ reply.entity.name }}</div>`,
-});
+const LivingEnteredArea = RenderedEntry;
+const LivingLeftArea = RenderedEntry;
+const PlayerSpoke = RenderedEntry;
+const ItemsHeld = RenderedEntry;
+const ItemsDropped = RenderedEntry;
+const ItemsObliterated = RenderedEntry;
+const EntityCreated = RenderedEntry;
 
 import InlineEditor from "@/views/entity/InlineEditor.vue";
 
@@ -153,6 +142,21 @@ const UniversalString = defineComponent({
     name: "UniversalString",
     props: { value: { type: String, required: true } },
     template: `<span>{{ value }}</span>`,
+});
+
+const UniversalLink = defineComponent({
+    name: "UniversalLink",
+    props: { value: { type: String, required: true } },
+    template: `<a :href="value">{{ simple }}</a>`,
+    computed: {
+        simple(): string {
+            const i = this.value.indexOf("?");
+            if (i < 0) {
+                return this.value;
+            }
+            return this.value.substring(0, i);
+        },
+    },
 });
 
 function render(value: string): { view: unknown; value: string } {

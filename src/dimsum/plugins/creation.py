@@ -1,7 +1,7 @@
 import copy
 import dataclasses
 import logging
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Any
 
 import grammars
 import transformers
@@ -19,8 +19,12 @@ log = logging.getLogger("dimsum")
 class EntityCreated(StandardEvent):
     entity: Entity
 
-    def render_string(self) -> Dict[str, str]:
-        return {"text": f"{self.source.props.name} created '{self.entity.props.name}'"}
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} created {infl.join([self.entity.props.described])}"
+            ]
+        }
 
 
 @event
@@ -28,11 +32,25 @@ class EntityCreated(StandardEvent):
 class ItemsMade(StandardEvent):
     items: List[Entity]
 
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} created {self.render_entities(self.items)}"
+            ]
+        }
+
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsObliterated(StandardEvent):
     items: List[Entity]
+
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} obliterated {self.render_entities(self.items)}"
+            ]
+        }
 
 
 class Create(PersonAction):
@@ -108,15 +126,17 @@ class Make(PersonAction):
             ctx.register(after_hold)
 
         area = await find_entity_area(person)
-        await ctx.publish(
-            ItemsMade(
-                source=person,
-                area=area,
-                heard=default_heard_for(area=area, excepted=[person]),
-                items=[after_hold],
-            )
+
+        im = ItemsMade(
+            source=person,
+            area=area,
+            heard=default_heard_for(area=area, excepted=[person]),
+            items=[after_hold],
         )
-        return Success("you're now holding %s" % (after_hold,))
+
+        await ctx.publish(im)
+
+        return im
 
 
 class Obliterate(PersonAction):
@@ -141,16 +161,16 @@ class Obliterate(PersonAction):
         for item in items:
             ctx.unregister(item)
 
-        await ctx.publish(
-            ItemsObliterated(
-                source=person,
-                area=area,
-                heard=default_heard_for(area=area, excepted=[person]),
-                items=items,
-            )
+        io = ItemsObliterated(
+            source=person,
+            area=area,
+            heard=default_heard_for(area=area, excepted=[person]),
+            items=items,
         )
 
-        return Success("you obliterated %s" % (infl.join(list(map(str, items))),))
+        await ctx.publish(io)
+
+        return io
 
 
 class CallThis(PersonAction):

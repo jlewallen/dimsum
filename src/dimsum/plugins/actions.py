@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 import tools
 from model import (
@@ -31,11 +31,17 @@ class PersonAction(Action):
 class ItemsAppeared(StandardEvent):
     items: List[Entity]
 
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "text": f"{self.source.props.name} appeared {self.render_entities(self.items)}"
+        }
+
 
 @event
 @dataclasses.dataclass(frozen=True)
 class PlayerJoined(StandardEvent):
-    pass
+    def render_tree(self) -> Dict[str, Any]:
+        return {"text": f"{self.source.props.name} joined"}
 
 
 class AddItemArea(PersonAction):

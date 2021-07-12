@@ -1,7 +1,7 @@
 import logging
 import dataclasses
 import functools
-from typing import Type, Optional, List
+from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
@@ -20,11 +20,25 @@ log = logging.getLogger("dimsum")
 class ItemsDropped(StandardEvent):
     items: List[Entity]
 
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} dropped {self.render_entities(self.items)}"
+            ]
+        }
+
 
 @event
 @dataclasses.dataclass(frozen=True)
 class ItemsHeld(StandardEvent):
     items: List[Entity]
+
+    def render_tree(self) -> Dict[str, Any]:
+        return {
+            "lines": [
+                f"{self.source.props.described} held {self.render_entities(self.items)}"
+            ]
+        }
 
 
 @hooks.all.hold.target
@@ -52,7 +66,7 @@ class Drop(PersonAction):
         self,
         item: Optional[ItemFinder] = None,
         quantity: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.quantity = quantity if quantity else None
@@ -105,7 +119,7 @@ class Hold(PersonAction):
         self,
         item: Optional[ItemFinder] = None,
         quantity: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert item
@@ -215,7 +229,7 @@ class Lock(PersonAction):
         self,
         item: Optional[ItemFinder] = None,
         key: Optional[ItemFinder] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert item
@@ -254,7 +268,7 @@ class Unlock(PersonAction):
         self,
         item: Optional[ItemFinder] = None,
         key: Optional[ItemFinder] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert item
@@ -287,7 +301,7 @@ class PutInside(PersonAction):
         self,
         container: Optional[ItemFinder] = None,
         item: Optional[ItemFinder] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert container
@@ -325,7 +339,7 @@ class TakeOut(PersonAction):
         self,
         container: Optional[ItemFinder] = None,
         item: Optional[ItemFinder] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert container
@@ -370,7 +384,7 @@ class Pour(PersonAction):
         item: Optional[ItemFinder] = None,
         source: Optional[ItemFinder] = None,
         destination: Optional[ItemFinder] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.item = item
@@ -425,7 +439,7 @@ class ModifyPours(PersonAction):
         self,
         item: Optional[ItemFinder] = None,
         produces: Optional[MaybeItemOrRecipe] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         assert item
