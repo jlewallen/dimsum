@@ -1,0 +1,24 @@
+/* crimson-pro-regular - latin */
+@font-face {
+	font-family: 'Crimson Pro';
+	font-style: normal;
+	font-weight: 400;
+	src: local(''),
+		 url('/f/crimson-pro-v14-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+		 url('/f/crimson-pro-v14-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* crimson-pro-800 - latin */
+@font-face {
+	font-family: 'Crimson Pro';
+	font-style: normal;
+	font-weight: 800;
+	src: local(''),
+		 url('/f/crimson-pro-v14-latin-800.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+		 url('/f/crimson-pro-v14-latin-800.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+html, body {
+	/* font-family: 'Crimson Pro';
+	font-size: 16pt; */
+}
