@@ -15,7 +15,6 @@ from .permissions import (
     Acls,
     Permission,
     EverybodyIdentity,
-    generate_security_check_from_json_diff,
 )
 
 log = logging.getLogger("dimsum.model.entity")
@@ -151,6 +150,7 @@ class Chimera:
     entity: Optional["Entity"] = None
     saving: Optional[CompiledJson] = None
     saved: Optional[CompiledJson] = None
+    diff: Optional[Dict[str, Any]] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -467,11 +467,13 @@ class Registrar:
         assert key in self._diffs[key]
         return self._diffs[key]
 
-    def filter_modified(
-        self, updating: Dict[str, CompiledJson]
-    ) -> Dict[str, CompiledJson]:
+    def filter_modified(self, updating: Dict[str, CompiledJson]) -> Dict[str, Chimera]:
         return {
-            key: compiled
+            key: Chimera(
+                key,
+                saving=compiled,
+                diff=self._diffs[key] if key in self._diffs else None,
+            )
             for key, compiled in updating.items()
             if self._was_modified_from_original(key, compiled)
         }
@@ -491,8 +493,6 @@ class Registrar:
                 marshal=True,
             )
             self._diffs[key] = d
-            sc = generate_security_check_from_json_diff(original.compiled, d)
-            log.info("acls=%s", sc)
 
             if key in self._entities:
                 entity = self._entities[key]
@@ -517,6 +517,7 @@ class Registrar:
 
         assigned = entity.registered(self._number)
         if compiled:
+            # TODO no overwrite
             self._originals[entity.key] = compiled
         if assigned in self._numbered:
             already = self._numbered[assigned]
@@ -530,11 +531,16 @@ class Registrar:
                     )
                 )
 
-        overwrite = entity.key in self._entities
-        if overwrite:
-            log.info("[%d] register:overwrite %s '%s'", depth, entity.key, entity)
-        else:
-            log.info("[%d] register:new %s '%s'", depth, entity.key, entity)
+        has_compiled = "(c)" if compiled else ""
+        op = "overwrite" if entity.key in self._entities else "new"
+        log.info(
+            "[%d] register:%s %s '%s' %s",
+            depth,
+            op,
+            entity.key,
+            entity,
+            has_compiled,
+        )
 
         # We can instantiate entities in any order, so we need to
         # be sure this is always the greatest gid we've seen.

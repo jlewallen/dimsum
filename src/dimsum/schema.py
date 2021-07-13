@@ -509,6 +509,7 @@ async def update(obj, info, entities):
     with domain.session() as session:
         world = await session.prepare()
 
+        # TODO asyncio.gather
         log.info("update: loading %s", [row.key for row in serialized])
         before = [await session.try_materialize(key=row.key) for row in serialized]
 

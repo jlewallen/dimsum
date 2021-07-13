@@ -15,6 +15,7 @@ from bus import EventBus, SubscriptionManager
 from model import (
     Entity,
     World,
+    CompiledJson,
     Registrar,
     Serialized,
     WorldKey,
@@ -36,6 +37,7 @@ from model import (
     set_well_known_key,
     WelcomeAreaKey,
 )
+from model.permissions import generate_security_check_from_json_diff
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.movement as movement
@@ -86,7 +88,17 @@ class Session:
             mod.props.described = mod.describe()
         compiled = serializing.for_update(self.registrar.entities.values())
         modified = self.registrar.filter_modified(compiled)
-        updated = await self.store.update(modified)
+
+        updating: Dict[str, CompiledJson] = {}
+        for key, c in modified.items():
+            assert c.saving
+            if c.diff:
+                sc = generate_security_check_from_json_diff(c.saving.compiled, c.diff)
+                log.info("%s diff=%s", key, c.diff)
+                log.info("%s acls=%s", key, sc)
+            updating[key] = c.saving
+
+        updated = await self.store.update(updating)
         return [key for key, _ in updated.items()]
 
     def __enter__(self) -> "Session":
