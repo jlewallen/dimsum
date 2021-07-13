@@ -435,6 +435,7 @@ class Registrar:
         self._originals: Dict[str, CompiledJson] = {}
         self._numbered: Dict[int, Entity] = {}
         self._key_to_number: Dict[str, int] = {}
+        self._diffs: Dict[str, Dict[str, Any]] = {}
         self._number: int = 0
 
     def purge(self):
@@ -443,6 +444,7 @@ class Registrar:
         self._originals = {}
         self._numbered = {}
         self._key_to_number = {}
+        self._diffs = {}
         self._number = 0
 
     @property
@@ -461,14 +463,9 @@ class Registrar:
         return len(self._entities)
 
     # Called from the web.
-    def get_diff_if_available(self, key: str, serialized: str):
-        if key in self._originals:
-            original = self._originals[key]
-            # TODO Parsing/diffing entity JSON
-            return jsondiff.diff(
-                original.compiled, json.loads(serialized), marshal=True
-            )
-        return None
+    def get_diff_if_available(self, key: str):
+        assert key in self._diffs[key]
+        return self._diffs[key]
 
     def filter_modified(
         self, updating: Dict[str, CompiledJson]
@@ -493,6 +490,7 @@ class Registrar:
                 update.compiled,
                 marshal=True,
             )
+            self._diffs[key] = d
             sc = generate_security_check_from_json_diff(original.compiled, d)
             log.info("acls=%s", sc)
 

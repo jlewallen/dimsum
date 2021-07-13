@@ -93,9 +93,7 @@ class EntityResolver:
         return self.cached
 
     def diff(self, info, **data):
-        return self.session.registrar.get_diff_if_available(
-            self.entity.key, self.serialized(info)
-        )
+        return self.session.registrar.get_diff_if_available(self.entity.key)
 
 
 def verify_token(info) -> Optional[str]:
