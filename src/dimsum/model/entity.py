@@ -430,19 +430,19 @@ class Registrar:
     def __init__(self, **kwargs):
         super().__init__()
         log.info("registrar:ctor")
-        self._entities: Dict[str, Entity] = {}
         self._garbage: Dict[str, Entity] = {}
+        self._entities: Dict[str, Entity] = {}
+        self._originals: Dict[str, CompiledJson] = {}
         self._numbered: Dict[int, Entity] = {}
         self._key_to_number: Dict[str, int] = {}
-        self._originals: Dict[str, CompiledJson] = {}
         self._number: int = 0
 
     def purge(self):
-        self._entities = {}
         self._garbage = {}
+        self._entities = {}
+        self._originals = {}
         self._numbered = {}
         self._key_to_number = {}
-        self._originals = {}
         self._number = 0
 
     @property
@@ -460,6 +460,7 @@ class Registrar:
     def number_of_entities(self):
         return len(self._entities)
 
+    # Called from the web.
     def get_diff_if_available(self, key: str, serialized: str):
         if key in self._originals:
             original = self._originals[key]
@@ -469,7 +470,16 @@ class Registrar:
             )
         return None
 
-    def was_modified_from_original(self, key: str, update: CompiledJson) -> bool:
+    def filter_modified(
+        self, updating: Dict[str, CompiledJson]
+    ) -> Dict[str, CompiledJson]:
+        return {
+            key: compiled
+            for key, compiled in updating.items()
+            if self._was_modified_from_original(key, compiled)
+        }
+
+    def _was_modified_from_original(self, key: str, update: CompiledJson) -> bool:
         if key in self._originals:
             original = self._originals[key]
             assert original

@@ -84,7 +84,8 @@ class Session:
         self.world.update_gid(self.registrar.number)
         for key, mod in self.registrar.modified().items():
             mod.props.described = mod.describe()
-        modified = serializing.modified(self.registrar)
+        compiled = serializing.for_update(self.registrar.entities.values())
+        modified = self.registrar.filter_modified(compiled)
         updated = await self.store.update(modified)
         return [key for key, _ in updated.items()]
 

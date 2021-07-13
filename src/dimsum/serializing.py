@@ -4,7 +4,7 @@ import copy
 import enum
 import jsonpickle
 import wrapt
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Iterable
 
 import storage
 from model import (
@@ -342,27 +342,17 @@ async def materialize(
     )
 
 
-def _entity_update(instance: Entity, serialized: Optional[str]) -> CompiledJson:
-    assert serialized
-    assert instance
-    return CompiledJson.compile(serialized)
-
-
 def for_update(
-    entities: List[Entity], everything: bool = True, **kwargs
+    entities: Iterable[Entity], everything: bool = True, **kwargs
 ) -> Dict[str, CompiledJson]:
+    def _assert(s: Optional[str]) -> str:
+        assert s
+        return s
+
     return {
-        e.key: _entity_update(e, serialize(e, identities=Identities.PRIVATE, **kwargs))
+        e.key: CompiledJson.compile(
+            _assert(serialize(e, identities=Identities.PRIVATE, **kwargs))
+        )
         for e in entities
         if everything or e.modified
-    }
-
-
-def modified(registrar: Registrar, **kwargs) -> Dict[str, CompiledJson]:
-    return {
-        key: compiled
-        for key, compiled in for_update(
-            list(registrar.entities.values()), **kwargs
-        ).items()
-        if registrar.was_modified_from_original(key, compiled)
     }
