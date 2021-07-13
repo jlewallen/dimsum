@@ -72,3 +72,10 @@ class Auth(Scope):
         url = "http://127.0.0.1:8082/invite?token=%s" % (invite_token,)
         log.info("invite: %s", url)
         return url, invite_token
+
+
+class Groups(Scope):
+    def __init__(self, memberships: Optional[List[str]] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.acls = Acls("groups")
+        self.memberships = memberships if memberships else []
