@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import enum
+import copy
 from typing import Optional, List, Dict, Any
 
 log = logging.getLogger("dimsum")
@@ -64,7 +65,9 @@ def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
 
     def prepare_acl(d):
         if "py/object" in d:
-            del d["py/object"]
+            c = copy.copy(d)
+            del c["py/object"]
+            return c
         return d
 
     def walk(frame, value):
