@@ -6,7 +6,6 @@ from .entity import (
     Entity,
     Scope,
     RootEntityClass,
-    find_entity_area,
     default_permissions_for,
 )
 from .context import Ctx
@@ -44,11 +43,3 @@ class World(Entity):
             props=props if props else Common("World", desc="Ya know, everything"),
             **kwargs
         )
-
-    # TODO Removing these causes a very strange modified during
-    # iteration dict error. Would be worth seeing why!
-    def __str__(self):
-        return "$world"
-
-    def __repr__(self):
-        return "$world"
