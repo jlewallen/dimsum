@@ -1,5 +1,7 @@
 import logging
 import time
+import dataclasses
+import functools
 import contextvars
 from typing import Any, cast, Dict, List, Literal, Optional, Union
 
@@ -70,18 +72,16 @@ def default_reach(entity: Entity, depth: int):
     return 0
 
 
+@dataclasses.dataclass
 class Session:
-    def __init__(
-        self,
-        store: Optional[storage.EntityStorage] = None,
-        handlers: Optional[List[Any]] = None,
-    ):
-        super().__init__()
-        assert store
-        self.store: storage.EntityStorage = store
-        self.world: Optional[World] = None
-        self.bus = EventBus(handlers=handlers or [])
-        self.registrar = Registrar()
+    store: storage.EntityStorage
+    handlers: List[Any] = dataclasses.field(default_factory=list)
+    registrar: Registrar = dataclasses.field(default_factory=Registrar)
+    world: Optional[World] = None
+
+    @functools.cached_property
+    def bus(self):
+        return EventBus(handlers=self.handlers or [])
 
     async def save(self) -> List[str]:
         log.info("saving %s", self.store)
