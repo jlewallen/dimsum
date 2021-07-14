@@ -196,6 +196,10 @@ class UnknownClass(EntityClass):
     pass
 
 
+class MissingEntityException(Exception):
+    pass
+
+
 class Version:
     def __init__(self, i: int):
         super().__init__()

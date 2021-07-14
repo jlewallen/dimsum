@@ -16,6 +16,7 @@ from model import (
     Identity,
     EntityRef,
     Permission,
+    MissingEntityException,
 )
 import scopes.movement as movement
 
@@ -236,7 +237,7 @@ class Materialized:
     def one(self) -> Entity:
         if len(self.entities) == 1:
             return self.entities[0]
-        raise Exception()
+        raise MissingEntityException()
 
     def all(self) -> List[Entity]:
         return self.entities

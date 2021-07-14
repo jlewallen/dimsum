@@ -41,6 +41,7 @@ from model.entity import (
     EntityClass,
     RootEntityClass,
     Registrar,
+    MissingEntityException,
     generate_entity_identity,
     Version,
     EntityRef,
@@ -164,4 +165,5 @@ __all__: List[str] = [
     "CreatorIdentity",
     "AdminIdentity",
     "CompiledJson",
+    "MissingEntityException",
 ]

@@ -36,6 +36,7 @@ from model import (
     get_well_known_key,
     set_well_known_key,
     WelcomeAreaKey,
+    MissingEntityException,
 )
 from model.permissions import generate_security_check_from_json_diff
 import scopes.behavior as behavior
@@ -228,17 +229,25 @@ class Session:
         everything: List[str] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities.keys()
-        for key in everything:
-            log.info("everywhere: %s", key)
-            # Materialize from the target entity to ensure we have
-            # enough in memory to carry out its behavior.
-            entity = await get().materialize(key=key, refresh=True)
-            with entity.make(behavior.Behaviors) as behave:
-                if behave.get_default():
-                    log.info("everywhere: %s", entity)
-                    with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
-                        await ctx.notify(ev)
-                        await ctx.complete()
+            removing: List[str] = []
+            for key in everything:
+                log.info("everywhere: %s", key)
+                # Materialize from the target entity to ensure we have
+                # enough in memory to carry out its behavior.
+                try:
+                    entity = await get().materialize(key=key, refresh=True)
+                    with entity.make(behavior.Behaviors) as behave:
+                        if behave.get_default():
+                            log.info("everywhere: %s", entity)
+                            with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
+                                await ctx.notify(ev)
+                                await ctx.complete()
+                except MissingEntityException as e:
+                    log.exception("missing entity", exc_info=True)
+                    removing.append(key)
+            for key in removing:
+                log.warning("removing %s from world behaviors", key)
+                del world_behaviors.entities[key]
 
     async def add_area(
         self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
