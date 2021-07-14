@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Optional
 
 from .entity import Entity
@@ -14,19 +15,17 @@ class FindNone(ItemFinder):
         return None
 
 
+@dataclasses.dataclass
 class FindStaticItem(ItemFinder):
-    def __init__(self, item: Optional[Entity] = None, **kwargs):
-        super().__init__()
-        self.item = item
+    item: Entity
 
     async def find_item(self, **kwargs) -> Optional[Entity]:
         return self.item
 
 
+@dataclasses.dataclass
 class FindObjectByGid(ItemFinder):
-    def __init__(self, gid: int, **kwargs):
-        super().__init__()
-        self.gid = gid
+    gid: int
 
     async def find_item(self, **kwargs) -> Optional[Entity]:
         return await get().find_item(number=self.gid, **kwargs)

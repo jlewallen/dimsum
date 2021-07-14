@@ -1,5 +1,6 @@
 import logging
 import copy
+import dataclasses
 from typing import List, Optional
 
 from model import Entity, Scope, Common, ItemFinder, ItemFactory, context
@@ -12,11 +13,9 @@ import scopes
 log = logging.getLogger("dimsum.model")
 
 
+@dataclasses.dataclass
 class AnyItem(ItemFinder):
-    def __init__(self, q: str = ""):
-        super().__init__()
-        assert q
-        self.q = q
+    q: str
 
     async def find_item(
         self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
@@ -69,11 +68,9 @@ class AnyConsumableItem(AnyItem):
     pass
 
 
+@dataclasses.dataclass
 class UnheldItem(ItemFinder):
-    def __init__(self, q: str = ""):
-        super().__init__()
-        assert q
-        self.q = q
+    q: str
 
     async def find_item(
         self, person: Optional[Entity] = None, area: Optional[Entity] = None, **kwargs
@@ -107,14 +104,9 @@ class AnyHeldItem(ItemFinder):
             return await context.get().find_item(candidates=pockets.holding, **kwargs)
 
 
+@dataclasses.dataclass
 class HeldItem(ItemFinder):
-    def __init__(
-        self,
-        q: str = "",
-    ):
-        super().__init__()
-        assert q
-        self.q = q
+    q: str
 
     async def find_item(
         self, person: Optional[Entity] = None, **kwargs
@@ -147,11 +139,9 @@ class FindHeldContainer(ItemFinder):
         return None
 
 
+@dataclasses.dataclass
 class ContainedItem(ItemFinder):
-    def __init__(self, q: str = ""):
-        super().__init__()
-        assert q
-        self.q = q
+    q: str
 
     async def find_item(
         self, person: Optional[Entity] = None, **kwargs
@@ -167,11 +157,9 @@ class ContainedItem(ItemFinder):
         return None
 
 
+@dataclasses.dataclass
 class MaybeItemOrRecipe:
-    def __init__(self, q: str = ""):
-        super().__init__()
-        assert q
-        self.q = q
+    q: str
 
     def create_item(self, person: Optional[Entity] = None, **kwargs) -> Entity:
         assert person
@@ -185,10 +173,9 @@ class MaybeItemOrRecipe:
         return MaybeItem(self.q).create_item(person=person, **kwargs)
 
 
+@dataclasses.dataclass
 class MaybeItem(ItemFactory):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
+    name: str
 
     def create_item(self, quantity: Optional[float] = None, **kwargs) -> Entity:
         log.info(
@@ -200,21 +187,19 @@ class MaybeItem(ItemFactory):
         return scopes.item(props=Common(self.name), initialize=initialize, **kwargs)
 
 
+@dataclasses.dataclass
 class RecipeItem(ItemFactory):
-    def __init__(self, recipe: Entity):
-        super().__init__()
-        self.recipe = recipe
+    recipe: Entity
 
     def create_item(self, **kwargs) -> Entity:
         log.info("%s create-item recipe=%s %s", self, self.recipe, kwargs)
         return self.recipe.make(Recipe).create_item(**kwargs)
 
 
+@dataclasses.dataclass
 class MaybeQuantifiedItem(ItemFactory):
-    def __init__(self, template: MaybeItem, quantity: float):
-        super().__init__()
-        self.template: MaybeItem = template
-        self.quantity: float = quantity
+    template: MaybeItem
+    quantity: float
 
     def create_item(self, **kwargs) -> Entity:
         log.info(
@@ -228,9 +213,9 @@ class MaybeQuantifiedItem(ItemFactory):
 
 
 class Recipe(Scope, ItemFactory):
-    def __init__(self, template=None, **kwargs):
+    def __init__(self, template: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
-        self.template = template if template else None
+        self.template: Optional[Entity] = template if template else None
 
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, **kwargs

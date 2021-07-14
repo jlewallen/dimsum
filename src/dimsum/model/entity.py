@@ -258,7 +258,7 @@ class Entity:
         scopes=None,
         create_scopes=None,
         initialize=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.version = version if version else Version(0)
@@ -396,7 +396,11 @@ class Entity:
         chargs.update(**kwargs)
 
         log.debug("%s splitting scopes: %s %s", self.key, key, chargs)
-        child = ctor(parent=self, discarding=discarding, **chargs)
+        try:
+            child = ctor(parent=self, discarding=discarding, **chargs)
+        except:
+            log.exception(f"error creating scope {ctor}", exc_info=True)
+            raise
         return child
 
     def update(self, child):
