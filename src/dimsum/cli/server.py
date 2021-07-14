@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import uvicorn
+import shortuuid
 import asyncclick as click
 import ariadne.asgi
 from typing import List, Optional
@@ -125,9 +126,8 @@ async def server(
         return interactive.Interactive(domain, **kwargs)
 
     if user:
-        for key in user:
-            temp = interactive.InitializeWorld(domain)
-            await temp.initialize(user)
+        temp = interactive.InitializeWorld(domain)
+        await temp.initialize(user, key=lambda username: shortuuid.uuid(name=username))
 
     loop = asyncio.get_event_loop()
     gql_config = uvicorn.Config(app=app, loop=loop, port=web_port)

@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, TextIO
+from typing import List, Optional, TextIO, Callable
 
 import scopes
 import domains
@@ -18,7 +18,9 @@ class InitializeWorld:
     def __init__(self, domain: domains.Domain):
         self.domain: domains.Domain = domain
 
-    async def create_player_if_necessary(self, session: domains.Session, username: str):
+    async def create_player_if_necessary(
+        self, session: domains.Session, username: str, key: Optional[str]
+    ):
         world = await session.prepare()
 
         maybe_key = await lookup_username(world, username)
@@ -34,6 +36,7 @@ class InitializeWorld:
             await session.add_area(area)
 
         player = scopes.alive(
+            key=key,
             creator=session.world,
             props=Common(name=username, desc="A player"),
         )
@@ -44,10 +47,14 @@ class InitializeWorld:
         assert session.world
         return session.world, player
 
-    async def initialize(self, users: List[str]) -> List[str]:
+    async def initialize(
+        self, users: List[str], key: Optional[Callable[[str], str]] = None
+    ) -> List[str]:
         with self.domain.session() as session:
             created = [
-                await self.create_player_if_necessary(session, username)
+                await self.create_player_if_necessary(
+                    session, username, key(username) if key else None
+                )
                 for username in users
             ]
             await session.save()
@@ -81,7 +88,7 @@ class Interactive(sshd.CommandHandler):
 
         with self.domain.session() as session:
             world, player = await self.initialize.create_player_if_necessary(
-                session, self.username
+                session, self.username, None
             )
             reply = await session.execute(player, line.strip())
 
