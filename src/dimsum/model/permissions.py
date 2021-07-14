@@ -15,7 +15,7 @@ TrustedIdentity = "$trusted"
 AclsKey = "acls"
 
 
-class Permission(enum.Enum):
+class Permission:
     READ = "read"
     WRITE = "write"
     EXECUTE = "execute"
@@ -23,7 +23,7 @@ class Permission(enum.Enum):
 
 @dataclasses.dataclass
 class Acl:
-    perm: Permission
+    perm: str  # TODO phantom type?
     keys: List[str]
 
 
@@ -33,7 +33,7 @@ class Acls:
     rules: List[Acl] = dataclasses.field(default_factory=list)
 
     def has(
-        self, p: Permission, identity: str, mappings: Optional[Dict[str, str]] = None
+        self, p: str, identity: str, mappings: Optional[Dict[str, str]] = None
     ) -> bool:
         for rule in self.rules:
             if rule.perm == p:
@@ -51,7 +51,7 @@ class Acls:
     def _expand_key(self, key: str, mappings: Dict[str, str]) -> str:
         return mappings[key] if key in mappings else key
 
-    def add(self, p: Permission, identity: str):
+    def add(self, p: str, identity: str):
         self.rules.append(Acl(p, [identity]))
         return self
 

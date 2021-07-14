@@ -153,54 +153,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -428,54 +395,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -657,54 +591,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -877,54 +778,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -1109,54 +977,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -1329,54 +1164,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -1561,54 +1363,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -1793,54 +1562,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -2025,54 +1761,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -2258,54 +1961,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -2491,54 +2161,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -2724,54 +2361,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -2944,54 +2548,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -3164,54 +2735,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -3390,54 +2928,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -3610,54 +3115,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -3848,54 +3320,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -4068,54 +3507,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -4300,54 +3706,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -4533,54 +3906,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -4766,54 +4106,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -4986,54 +4293,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -5206,54 +4480,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -5438,54 +4679,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -5658,54 +4866,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -5891,54 +5066,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -6124,54 +5266,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -6356,54 +5465,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -6576,54 +5652,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -6809,54 +5852,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -7042,54 +6052,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -7268,54 +6245,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -7488,54 +6432,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -7721,54 +6632,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -7953,54 +6831,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -8173,54 +7018,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -8406,54 +7218,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -8639,54 +7418,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -8877,54 +7623,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -9097,54 +7810,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -9330,54 +8010,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -9563,54 +8210,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -9796,54 +8410,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -10028,54 +8609,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -10248,54 +8796,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -10481,54 +8996,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -10714,54 +9196,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -10940,54 +9389,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -11160,54 +9576,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -11393,54 +9776,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -11625,54 +9975,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -11845,54 +10162,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -12078,54 +10362,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -12311,54 +10562,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -12537,54 +10755,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -12757,54 +10942,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
@@ -12990,54 +11142,21 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "read"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "read",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "execute"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "execute",
                                     "keys": [
                                         "*"
                                     ]
                                 },
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": {
-                                        "py/reduce": [
-                                            {
-                                                "py/type": "model.permissions.Permission"
-                                            },
-                                            {
-                                                "py/tuple": [
-                                                    "write"
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                    "perm": "write",
                                     "keys": [
                                         ""
                                     ]
