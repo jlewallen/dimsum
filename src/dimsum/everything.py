@@ -20,12 +20,13 @@ import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 
 import plugins.helping  # noqa
+import plugins.admin  # noqa
+import plugins.chmod  # noqa
 import plugins.chatting  # noqa
 import plugins.creation  # noqa
 import plugins.digging  # noqa
 import plugins.editing  # noqa
 import plugins.fallback  # noqa
-import plugins.admin  # noqa
 import plugins.looking  # noqa
 import plugins.moving  # noqa
 import plugins.clothing  # noqa

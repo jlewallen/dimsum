@@ -112,6 +112,66 @@
                     }
                 }
             }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "name": "<acls>",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "read"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "execute"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "write"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        ""
+                    ]
+                }
+            ]
         }
     },
     {
@@ -264,6 +324,66 @@
                     }
                 }
             }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "name": "<acls>",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "read"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "execute"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "write"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        ""
+                    ]
+                }
+            ]
         }
     },
     {
@@ -432,6 +552,66 @@
                     }
                 }
             }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "name": "<acls>",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "read"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "execute"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "write"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        ""
+                    ]
+                }
+            ]
         }
     },
     {
@@ -590,6 +770,66 @@
                     }
                 }
             }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "name": "<acls>",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "read"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "execute"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        "*"
+                    ]
+                },
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": {
+                        "py/reduce": [
+                            {
+                                "py/type": "model.permissions.Permission"
+                            },
+                            {
+                                "py/tuple": [
+                                    "write"
+                                ]
+                            }
+                        ]
+                    },
+                    "keys": [
+                        ""
+                    ]
+                }
+            ]
         }
     }
 ]

@@ -109,7 +109,6 @@ async def find_entity_area(entity: "Entity") -> "Entity":
 
 
 def default_permissions_for(entity: "Entity") -> "Acls":
-    #
     owner_key = ""
     return (
         Acls()
@@ -265,6 +264,7 @@ class Entity:
         klass: Optional[Type[EntityClass]] = None,
         identity: Optional[Identity] = None,
         props: Optional[Common] = None,
+        acls: Optional[Acls] = None,
         scopes=None,
         create_scopes=None,
         initialize=None,
@@ -306,6 +306,8 @@ class Entity:
                 log.debug("scope %s %s %s", scope, kwargs, args)
                 with self.make(scope, **args) as change:
                     pass
+
+        self.acls = acls if acls else default_permissions_for(self)
 
         log.debug(
             "entity:ctor {0} {1} '{2}' creator={3} id={4} props={5}".format(
@@ -467,6 +469,9 @@ class Registrar:
         assert key in self._diffs[key]
         return self._diffs[key]
 
+    def get_original_if_available(self, key: str) -> Optional[CompiledJson]:
+        return self._originals[key] if key in self._originals else None
+
     def filter_modified(self, updating: Dict[str, CompiledJson]) -> Dict[str, Chimera]:
         return {
             key: Chimera(
@@ -517,8 +522,8 @@ class Registrar:
 
         assigned = entity.registered(self._number)
         if compiled:
-            # TODO no overwrite
-            self._originals[entity.key] = compiled
+            if entity.key not in self._originals:
+                self._originals[entity.key] = compiled
         if assigned in self._numbered:
             already = self._numbered[assigned]
             if already.key != entity.key:

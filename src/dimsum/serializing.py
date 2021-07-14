@@ -15,6 +15,7 @@ from model import (
     Serialized,
     Identity,
     EntityRef,
+    Permission,
 )
 import scopes.movement as movement
 
@@ -144,6 +145,15 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
         data["klass"] = obj.klass.__name__
         data["name"] = obj.props.name
         return data
+
+
+# @jsonpickle.handlers.register(Permission)
+class JsonEnumHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        pass
+
+    def flatten(self, obj: enum.Enum, data):
+        return obj.name
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):

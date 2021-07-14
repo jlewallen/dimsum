@@ -14,10 +14,14 @@ from model.crypto import Identity
 from model.kinds import Kind
 from model.permissions import (
     Acls,
+    Permission,
     SystemIdentity,
     OwnerIdentity,
     CreatorIdentity,
     AdminIdentity,
+    TrustedIdentity,
+    generate_security_check_from_json_diff,
+    find_all_acls,
 )
 
 from model.properties import (
@@ -153,6 +157,8 @@ __all__: List[str] = [
     "ItemFactory",
     "FindCurrentArea",
     "Acls",
+    "Permission",
+    "find_all_acls",
     "SystemIdentity",
     "OwnerIdentity",
     "CreatorIdentity",

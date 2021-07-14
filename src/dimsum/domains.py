@@ -229,6 +229,7 @@ class Session:
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities.keys()
         for key in everything:
+            log.info("everywhere: %s", key)
             # Materialize from the target entity to ensure we have
             # enough in memory to carry out its behavior.
             entity = await get().materialize(key=key, refresh=True)

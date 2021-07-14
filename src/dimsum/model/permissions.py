@@ -11,6 +11,7 @@ SystemIdentity = "$system"
 OwnerIdentity = "$owner"
 CreatorIdentity = "$creator"
 AdminIdentity = "$admin"
+TrustedIdentity = "$trusted"
 AclsKey = "acls"
 
 
@@ -60,15 +61,16 @@ class SecurityCheck:
     acls: List[Acl] = dataclasses.field(default_factory=list)
 
 
+def _prepare_acl(d):
+    if "py/object" in d:
+        c = copy.copy(d)
+        del c["py/object"]
+        return c
+    return d
+
+
 def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
     log.debug("walking diff: %s", diff)
-
-    def prepare_acl(d):
-        if "py/object" in d:
-            c = copy.copy(d)
-            del c["py/object"]
-            return c
-        return d
 
     def walk(frame, value):
         # Maybe we only consider the Acls nearest to the editing
@@ -81,7 +83,7 @@ def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
         if isinstance(value, dict):
             acls = []
             if AclsKey in value:
-                acls.append(prepare_acl(value[AclsKey]))
+                acls.append(_prepare_acl(value[AclsKey]))
             return {
                 key: walk_into(frame, key, value) + acls for key, value in value.items()
             }
@@ -98,7 +100,7 @@ def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
 
             acls = []
             if isinstance(frame, dict) and AclsKey in frame:
-                acls.append(prepare_acl(frame[AclsKey]))
+                acls.append(_prepare_acl(frame[AclsKey]))
 
             # If we can't find any more frame using this key then we
             # end. Notice this may contain a just now added acl.
@@ -131,6 +133,31 @@ def generate_security_check_from_json_diff(
     json along the way.
     """
     return SecurityCheck(_walk_diff(original, diff))
+
+
+def _walk_original(original: Dict[str, Any]):
+    def walk(value, path: List[str]):
+        if isinstance(value, str):
+            return []
+        if isinstance(value, list):
+            u = {}
+            for v, i in enumerate(value):
+                u.update(walk(v, path + [str(i)]))
+            return u
+        if isinstance(value, dict):
+            u = {}
+            if AclsKey in value:
+                u[".".join(path)] = Acls(**_prepare_acl(value[AclsKey]))
+            for key, value in value.items():
+                u.update(walk(value, path + [key]))
+            return u
+        return {}
+
+    return walk(original, [])
+
+
+def find_all_acls(original: Dict[str, Any]) -> Dict[str, Acls]:
+    return _walk_original(original)
 
 
 def flatten(l):
