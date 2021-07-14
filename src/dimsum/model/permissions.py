@@ -58,7 +58,13 @@ class Acls:
 
 @dataclasses.dataclass
 class SecurityCheck:
-    acls: List[Acl] = dataclasses.field(default_factory=list)
+    acls: List[Acls] = dataclasses.field(default_factory=list)
+
+    def passes(self, p: str, identity: str, mapping: Dict[str, str]) -> bool:
+        for acl in self.acls:
+            if acl.has(p, identity, mapping):
+                return True
+        return False
 
 
 def _prepare_acl(d):
