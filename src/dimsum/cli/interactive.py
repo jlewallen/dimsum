@@ -6,8 +6,7 @@ import domains
 import library
 import sshd
 from model import *
-
-
+from scopes.ownership import set_owner
 from plugins.actions import Join
 from plugins.admin import Auth, lookup_username, register_username
 
@@ -40,6 +39,7 @@ class InitializeWorld:
             creator=session.world,
             props=Common(name=username, desc="A player"),
         )
+        set_owner(player, player)
         await register_username(world, username, player.key)
         await session.perform(Join(), player)
         await session.perform(Auth(password="asdfasdf"), player)

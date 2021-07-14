@@ -2,7 +2,7 @@ import dataclasses
 import logging
 from typing import Dict, List, Optional, Any
 
-from model import Entity, Scope, event, StandardEvent, context
+from model import Entity, Scope, event, StandardEvent, Acls, context
 
 
 log = logging.getLogger("dimsum.scopes")
@@ -26,6 +26,7 @@ class Occupying(Scope):
     def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
+        self.acls = Acls.owner_writes("occupying")
 
     def update(self, area: Entity):
         self.area = area
@@ -37,6 +38,7 @@ class Occupyable(Scope):
         super().__init__(**kwargs)
         self.occupied: List[Entity] = occupied if occupied else []
         self.occupancy: int = 100
+        self.acls = Acls.owner_writes("occupied")
 
     def add_living(self, living: Entity) -> Entity:
         assert isinstance(living, Entity)

@@ -2,16 +2,22 @@ import dataclasses
 import logging
 import enum
 import copy
-from typing import Optional, List, Dict, Any
+import pprint
+import functools
+from typing import Optional, List, Dict, Any, Union
 
 log = logging.getLogger("dimsum")
 
-EverybodyIdentity = "*"
-SystemIdentity = "$system"
-OwnerIdentity = "$owner"
-CreatorIdentity = "$creator"
-AdminIdentity = "$admin"
-TrustedIdentity = "$trusted"
+
+class SecurityMappings:
+    Everybody = "*"
+    System = "$system"
+    Owner = "$owner"
+    Creator = "$creator"
+    Admin = "$admin"
+    Trusted = "$trusted"
+
+
 AclsKey = "acls"
 
 
@@ -22,6 +28,12 @@ class Permission:
 
 
 @dataclasses.dataclass
+class SecurityContext:
+    identity: str
+    mappings: Dict[str, str] = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass
 class Acl:
     perm: str  # TODO phantom type?
     keys: List[str]
@@ -29,22 +41,31 @@ class Acl:
 
 @dataclasses.dataclass
 class Acls:
-    name: str = "<acls>"
-    rules: List[Acl] = dataclasses.field(default_factory=list)
+    name: str = "<nnoname acls>"
+    rules: List[Union[Acl, Dict[str, Any]]] = dataclasses.field(default_factory=list)
 
-    def has(
-        self, p: str, identity: str, mappings: Optional[Dict[str, str]] = None
-    ) -> bool:
-        for rule in self.rules:
+    @property
+    def _rules(self) -> List[Acl]:
+        def prepare(v: Union[Acl, Dict[str, Any]]) -> Acl:
+            if isinstance(v, Acl):
+                return v
+            c = copy.copy(v)
+            del c["py/object"]
+            return Acl(**c)
+
+        return [prepare(acl) for acl in self.rules]
+
+    def has(self, p: str, sc: SecurityContext) -> bool:
+        for rule in self._rules:
             if rule.perm == p:
-                if EverybodyIdentity in rule.keys:
+                if SecurityMappings.Everybody in rule.keys:
                     return True
                 mapped_keys = (
-                    [self._expand_key(k, mappings) for k in rule.keys]
-                    if mappings
+                    [self._expand_key(k, sc.mappings) for k in rule.keys]
+                    if sc.mappings
                     else rule.keys
                 )
-                if identity in mapped_keys:
+                if sc.identity in mapped_keys:
                     return True
         return False
 
@@ -55,16 +76,59 @@ class Acls:
         self.rules.append(Acl(p, [identity]))
         return self
 
+    @staticmethod
+    def make_permissions(
+        name: Optional[str], default_readers=None, default_writers=None
+    ):
+        return
+
+    @staticmethod
+    def parse_chmod(chmod: str) -> "Acls":
+        return Acls()
+
+    @staticmethod
+    def owner_writes(name: Optional[str] = None) -> "Acls":
+        return Acls(name or "entity").add(Permission.WRITE, SecurityMappings.Owner)
+
+    @staticmethod
+    def everybody_writes(name: Optional[str] = None) -> "Acls":
+        return Acls(name or "entity").add(Permission.WRITE, SecurityMappings.Everybody)
+
+    @staticmethod
+    def system_writes(name: Optional[str] = None) -> "Acls":
+        return Acls(name or "entity").add(Permission.WRITE, SecurityMappings.System)
+
+
+@dataclasses.dataclass
+class SecurityCheckException(Exception):
+    permission: str
+    context: SecurityContext
+    acls: Dict[str, Acls]
+
+    def __str__(self):
+        return """Permission: {0}
+
+Context:
+{1}
+
+Acls:
+{2}
+""".format(
+            self.permission,
+            self.context,
+            pprint.pformat(self.acls),
+        )
+
 
 @dataclasses.dataclass
 class SecurityCheck:
-    acls: List[Acls] = dataclasses.field(default_factory=list)
+    acls: Dict[str, Acls] = dataclasses.field(default_factory=dict)
 
-    def passes(self, p: str, identity: str, mapping: Dict[str, str]) -> bool:
-        for acl in self.acls:
-            if acl.has(p, identity, mapping):
+    async def verify(self, p: str, sc: SecurityContext):
+        for key, acl in self.acls.items():
+            if acl.has(p, sc):
                 return True
-        return False
+        raise SecurityCheckException(p, sc, self.acls)
 
 
 def _prepare_acl(d):
@@ -75,79 +139,13 @@ def _prepare_acl(d):
     return d
 
 
-def _walk_diff(original: Dict[str, Any], diff: Dict[str, Any]):
-    log.debug("walking diff: %s", diff)
-
-    def walk(frame, value):
-        # Maybe we only consider the Acls nearest to the editing
-        # position, or should we consider all of them. It's easier
-        # to just do all of them for now.
-        if isinstance(value, str):
-            return []
-        if isinstance(value, list):
-            return []
-        if isinstance(value, dict):
-            acls = []
-            if AclsKey in value:
-                acls.append(_prepare_acl(value[AclsKey]))
-            return {
-                key: walk_into(frame, key, value) + acls for key, value in value.items()
-            }
-        return value
-
-    def walk_into(frame, key, value):
-        if frame is None:
-            # No more acls to dicsover if the frame is gone.
-            return []
-        try:
-            if isinstance(frame, list) and isinstance(key, str):
-                # We need to be indexed to get past one of these.
-                return []
-
-            acls = []
-            if isinstance(frame, dict) and AclsKey in frame:
-                acls.append(_prepare_acl(frame[AclsKey]))
-
-            # If we can't find any more frame using this key then we
-            # end. Notice this may contain a just now added acl.
-            if isinstance(frame, dict) and key not in frame:
-                return acls
-
-            walked = walk(frame[key], value)
-            if isinstance(walked, list):
-                return acls + walked
-            if isinstance(walked, dict):
-                return acls + flatten([v for _, v in walked.items()])
-            return acls
-        except:
-            logging.exception("security-check error", exc_info=True)
-            logging.error("frame=%s (%s)", frame, type(frame))
-            logging.error("key=%s (%s)", key, type(key))
-            logging.error("value=%s", value)
-            raise
-
-    walked = walk(original, diff)
-    acl_maps = flatten([v for _, v in walked.items()])
-    return [Acls(**v) for v in acl_maps]
-
-
-def generate_security_check_from_json_diff(
-    original: Dict[str, Any], diff: Dict[str, Any]
-) -> SecurityCheck:
-    """
-    Walks the given jsondiff and pulls Acl objects from the original
-    json along the way.
-    """
-    return SecurityCheck(_walk_diff(original, diff))
-
-
 def _walk_original(original: Dict[str, Any]):
     def walk(value, path: List[str]):
         if isinstance(value, str):
             return []
         if isinstance(value, list):
             u = {}
-            for v, i in enumerate(value):
+            for i, v in enumerate(value):
                 u.update(walk(v, path + [str(i)]))
             return u
         if isinstance(value, dict):
@@ -164,6 +162,57 @@ def _walk_original(original: Dict[str, Any]):
 
 def find_all_acls(original: Dict[str, Any]) -> Dict[str, Acls]:
     return _walk_original(original)
+
+
+def _walk_diff(diff: Dict[str, Any]):
+    def walk(value, path: List[str]):
+        log.debug("walking diff: %s", value)
+
+        if value is None:
+            return {}
+        if isinstance(value, str):
+            return {".".join(path): True}
+        if isinstance(value, int) or isinstance(value, float):
+            return {".".join(path): True}
+        if isinstance(value, list) or isinstance(value, tuple):
+            rv = {}
+            for key, v in enumerate(value):
+                rv.update(walk(v, path + [str(key)]))
+            return rv
+        if isinstance(value, dict):
+            rv = {}
+            if "py/object" in value:
+                return {".".join(path): True}
+            for key, v in value.items():
+                rv.update(walk(v, path + [str(key)]))
+            return rv
+
+        log.warning("unhandled: %s %s", type(value), value)
+
+        return {}
+
+    return walk(diff, [])
+
+
+def generate_security_check_from_json_diff(
+    original: Dict[str, Any], diff: Dict[str, Any]
+) -> SecurityCheck:
+    """
+    Walks the given jsondiff and pulls Acl objects from the original
+    json along the way.
+    """
+    acls = find_all_acls(original)
+    log.debug("security-check: acls=%s", acls)
+    modified_nodes = _walk_diff(diff)
+    log.debug("security-check: %s=%s", diff, modified_nodes)
+    for node in modified_nodes.keys():
+        matched: Dict[str, Acls] = {}
+        for key, child in acls.items():
+            if key and node.startswith(key + ".") or not key and node.startswith(key):
+                log.debug("add(%s) %s", key, child.name)
+                matched[key] = child
+        log.info("security-check(%s): %s", node, [v.name for _, v in matched.items()])
+    return SecurityCheck(matched)
 
 
 def flatten(l):

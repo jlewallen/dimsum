@@ -5,9 +5,10 @@ import json
 import functools
 import shortuuid
 import pytest
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import serializing
+import tools
 from model import *
 from model.permissions import *
 import test
@@ -39,8 +40,8 @@ class ExampleTree:
     value: str = "Original"
 
 
-def acl_names(acls) -> List[str]:
-    return [a.name for a in acls]
+def acl_names(acls: Dict[str, Acls]) -> List[str]:
+    return [a.name for key, a in acls.items()]
 
 
 @dataclasses.dataclass
@@ -126,18 +127,53 @@ async def test_permissions_basics():
     await tw.initialize()
 
     behavior = Acls()
-    assert not behavior.has(Permission.READ, "jacob")
+    assert not behavior.has(Permission.READ, SecurityContext("jacob"))
     behavior.add(Permission.READ, "jacob")
-    assert behavior.has(Permission.READ, "jacob")
-    assert not behavior.has(Permission.READ, "carla")
+    assert behavior.has(Permission.READ, SecurityContext("jacob"))
+    assert not behavior.has(Permission.READ, SecurityContext("carla"))
     behavior.add(Permission.READ, "carla")
-    assert behavior.has(Permission.READ, "carla")
-    assert not behavior.has(Permission.READ, "tomi")
+    assert behavior.has(Permission.READ, SecurityContext("carla"))
+    assert not behavior.has(Permission.READ, SecurityContext("tomi"))
     behavior.add(Permission.READ, "*")
-    assert behavior.has(Permission.READ, "tomi")
+    assert behavior.has(Permission.READ, SecurityContext("tomi"))
 
     behavior = Acls()
     owner_key = shortuuid.uuid()
-    assert not behavior.has(Permission.READ, owner_key, {OwnerIdentity: owner_key})
-    behavior.add(Permission.READ, OwnerIdentity)
-    assert behavior.has(Permission.READ, owner_key, {OwnerIdentity: owner_key})
+    assert not behavior.has(
+        Permission.READ, SecurityContext(owner_key, {SecurityMappings.Owner: owner_key})
+    )
+    behavior.add(Permission.READ, SecurityMappings.Owner)
+    assert behavior.has(
+        Permission.READ, SecurityContext(owner_key, {SecurityMappings.Owner: owner_key})
+    )
+
+
+@pytest.mark.asyncio
+async def test_permissions_save_create_thing_hands():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    area_before: Optional[Entity] = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+
+        assert await session.execute(jacob, "create thing Box")
+
+        await session.save(tools.get_person_security_context(jacob))
+
+
+@pytest.mark.asyncio
+async def test_permissions_save_create_thing_hands_drop():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    area_before: Optional[Entity] = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+
+        assert await session.execute(jacob, "create thing Box")
+        assert await session.execute(jacob, "drop Box")
+
+        await session.save(tools.get_person_security_context(jacob))

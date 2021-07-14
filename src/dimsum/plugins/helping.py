@@ -40,7 +40,7 @@ class EncyclopediaClass(scopes.ItemClass):
 class Encyclopedia(Scope):
     def __init__(self, body: Optional[str] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls: Acls = Acls("help")
+        self.acls: Acls = Acls.owner_writes("help")
         self.body: str = body if body else ""
 
 

@@ -11,6 +11,7 @@ import serializing
 import everything  # noqa
 from model import *
 from plugins.actions import Join
+from scopes.ownership import set_owner
 import scopes as scopes
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -61,6 +62,8 @@ class TestWorld:
                 creator=world,
                 props=Common("Carla", desc="Chief Salad Officer."),
             )
+            set_owner(carla, carla)
+
             await session.perform(Join(), carla)
             await session.save()
             self.carla_key = carla.key
@@ -78,6 +81,8 @@ class TestWorld:
                 creator=world,
                 props=Common("Tomi", desc="Chief Crying Officer."),
             )
+            set_owner(tomi, tomi)
+
             await session.perform(Join(), tomi)
             await session.save()
             self.tomi_key = tomi.key
@@ -95,6 +100,7 @@ class TestWorld:
                 creator=world,
                 props=Common("Jacob", desc="Curly haired bastard."),
             )
+            set_owner(jacob, jacob)
 
             await session.perform(Join(), jacob)
             await session.save()

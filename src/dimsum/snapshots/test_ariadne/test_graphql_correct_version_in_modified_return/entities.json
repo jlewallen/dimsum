@@ -64,7 +64,15 @@
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "name": "containing",
-                                    "rules": []
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$owner"
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "pattern": null,
                                 "locked": false,
@@ -93,6 +101,19 @@
                                     "key": "welcome",
                                     "klass": "AreaClass",
                                     "name": "welcome"
+                                },
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "occupying",
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$owner"
+                                            ]
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -198,20 +219,6 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": "read",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "execute",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
                                     "perm": "write",
                                     "keys": [
                                         "$owner"
@@ -242,7 +249,15 @@
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "name": "usernames",
-                                    "rules": []
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$system"
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "users": {
                                     "jlewallen": "6"
@@ -256,23 +271,9 @@
                                     "rules": [
                                         {
                                             "py/object": "model.permissions.Acl",
-                                            "perm": "read",
-                                            "keys": [
-                                                "*"
-                                            ]
-                                        },
-                                        {
-                                            "py/object": "model.permissions.Acl",
-                                            "perm": "execute",
-                                            "keys": [
-                                                "*"
-                                            ]
-                                        },
-                                        {
-                                            "py/object": "model.permissions.Acl",
                                             "perm": "write",
                                             "keys": [
-                                                "$owner"
+                                                "*"
                                             ]
                                         }
                                     ]
@@ -381,20 +382,6 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": "read",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "execute",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
                                     "perm": "write",
                                     "keys": [
                                         "$owner"
@@ -438,7 +425,15 @@
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "name": "containing",
-                                    "rules": []
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$owner"
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "pattern": null,
                                 "locked": false,
@@ -458,7 +453,20 @@
                                         "name": "Jacob"
                                     }
                                 ],
-                                "occupancy": 100
+                                "occupancy": 100,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "name": "occupied",
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$owner"
+                                            ]
+                                        }
+                                    ]
+                                }
                             }
                         },
                         "klass": {
@@ -563,20 +571,6 @@
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
-                                    "perm": "read",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "execute",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
                                     "perm": "write",
                                     "keys": [
                                         "$owner"
@@ -633,7 +627,15 @@
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "name": "help",
-                                    "rules": []
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$owner"
+                                            ]
+                                        }
+                                    ]
                                 },
                                 "body": "\nf'# WelcomePage'\n\nThis is your brand new help page that you can edit by using `edit help`.\n\nEnjoy!\n"
                             }
@@ -738,20 +740,6 @@
                             "py/object": "model.permissions.Acls",
                             "name": "entity",
                             "rules": [
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "read",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "execute",
-                                    "keys": [
-                                        "*"
-                                    ]
-                                },
                                 {
                                     "py/object": "model.permissions.Acl",
                                     "perm": "write",

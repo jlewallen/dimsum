@@ -21,23 +21,9 @@
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
-                            "perm": "read",
-                            "keys": [
-                                "*"
-                            ]
-                        },
-                        {
-                            "py/object": "model.permissions.Acl",
-                            "perm": "execute",
-                            "keys": [
-                                "*"
-                            ]
-                        },
-                        {
-                            "py/object": "model.permissions.Acl",
                             "perm": "write",
                             "keys": [
-                                "$owner"
+                                "*"
                             ]
                         }
                     ]
@@ -146,20 +132,6 @@
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
-                    "perm": "read",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "execute",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
                     "perm": "write",
                     "keys": [
                         "$owner"
@@ -200,7 +172,15 @@
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "name": "containing",
-                    "rules": []
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
                 },
                 "pattern": null,
                 "locked": false,
@@ -220,7 +200,20 @@
                         "name": "Jacob"
                     }
                 ],
-                "occupancy": 100
+                "occupancy": 100,
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "name": "occupied",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                }
             }
         },
         "klass": {
@@ -325,20 +318,6 @@
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
-                    "perm": "read",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "execute",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
                     "perm": "write",
                     "keys": [
                         "$owner"
@@ -363,10 +342,10 @@
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.world.World",
-                    "key": "world",
-                    "klass": "RootEntityClass",
-                    "name": "World"
+                    "py/object": "model.entity.Entity",
+                    "key": 6,
+                    "klass": "LivingClass",
+                    "name": "Jacob"
                 }
             },
             "behaviors": {
@@ -379,7 +358,15 @@
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "name": "containing",
-                    "rules": []
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
                 },
                 "pattern": null,
                 "locked": false,
@@ -415,6 +402,19 @@
                     "key": 4,
                     "klass": "AreaClass",
                     "name": "Living room"
+                },
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "name": "occupying",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
                 }
             }
         },
@@ -520,20 +520,6 @@
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
-                    "perm": "read",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "execute",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
                     "perm": "write",
                     "keys": [
                         "$owner"
@@ -587,7 +573,15 @@
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "name": "location",
-                    "rules": []
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
                 },
                 "container": {
                     "py/object": "model.entity.Entity",
@@ -697,20 +691,6 @@
             "py/object": "model.permissions.Acls",
             "name": "entity",
             "rules": [
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "read",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "execute",
-                    "keys": [
-                        "*"
-                    ]
-                },
                 {
                     "py/object": "model.permissions.Acl",
                     "perm": "write",

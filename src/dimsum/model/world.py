@@ -6,8 +6,8 @@ from .entity import (
     Entity,
     Scope,
     RootEntityClass,
-    default_permissions_for,
 )
+from .permissions import Acls
 from .context import Ctx
 
 WorldKey = "world"
@@ -19,7 +19,7 @@ class Identifiers(Scope):
     def __init__(self, gid: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.gid = gid
-        self.acls = default_permissions_for(self.ourselves, name="ids")
+        self.acls = Acls.everybody_writes("ids")
 
 
 def get_current_gid(entity: Entity) -> int:

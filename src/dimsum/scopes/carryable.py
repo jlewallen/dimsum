@@ -18,7 +18,7 @@ log = logging.getLogger("dimsum.scopes")
 class Key(Scope):
     def __init__(self, patterns: Optional[Dict[str, Identity]] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls("key")
+        self.acls = Acls.owner_writes("key")
         self.patterns = patterns if patterns else {}
 
     def has_pattern(self, pattern: Identity):
@@ -28,7 +28,7 @@ class Key(Scope):
 class Lockable(Scope):
     def __init__(self, pattern: Optional[Identity] = None, locked=None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls("lockable")
+        self.acls = Acls.owner_writes("lockable")
         self.pattern = pattern if pattern else None
         self.locked = locked if locked else False
 
@@ -204,7 +204,7 @@ class Producer:
 class Location(Scope):
     def __init__(self, container: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls("location")
+        self.acls = Acls.owner_writes("location")
         self.container = container
 
 
@@ -214,7 +214,7 @@ class Containing(Openable):
         self.holding: List[Entity] = holding if holding else []
         self.capacity = capacity if capacity else None
         self.produces: Dict[str, Producer] = produces if produces else {}
-        self.acls = Acls("containing")
+        self.acls = Acls.owner_writes("containing")
 
     def produces_when(self, verb: str, item: Producer):
         self.produces[verb] = item

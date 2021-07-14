@@ -2,6 +2,7 @@ import logging
 import time
 import dataclasses
 import functools
+import pprint
 import contextvars
 from typing import Any, cast, Dict, List, Literal, Optional, Union
 
@@ -23,6 +24,7 @@ from model import (
     WorldKey,
     Event,
     Action,
+    Permission,
     TickEvent,
     EntityFrozen,
     Failure,
@@ -38,11 +40,12 @@ from model import (
     get_well_known_key,
     set_well_known_key,
     WelcomeAreaKey,
-    MissingEntityException,
     get_current_gid,
     set_current_gid,
+    MissingEntityException,
+    SecurityCheckException,
 )
-from model.permissions import generate_security_check_from_json_diff
+from model.permissions import generate_security_check_from_json_diff, SecurityContext
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.movement as movement
@@ -73,6 +76,26 @@ def default_reach(entity: Entity, depth: int):
 
 
 @dataclasses.dataclass
+class DiffSecurityException(Exception):
+    entity: Entity
+    diff: Dict[str, Any]
+    sce: SecurityCheckException
+
+    def __str__(self):
+        return """
+Entity: '{2}'
+
+Diff:
+{0}
+
+SecurityException:
+{1}
+""".format(
+            pprint.pformat(self.diff), self.sce, self.entity
+        )
+
+
+@dataclasses.dataclass
 class Session:
     store: storage.EntityStorage
     handlers: List[Any] = dataclasses.field(default_factory=list)
@@ -83,7 +106,7 @@ class Session:
     def bus(self):
         return EventBus(handlers=self.handlers or [])
 
-    async def save(self) -> List[str]:
+    async def save(self, sc: Optional[SecurityContext] = None) -> List[str]:
         log.info("saving %s", self.store)
         assert isinstance(self.world, World)
         set_current_gid(self.world, self.registrar.number)
@@ -94,11 +117,21 @@ class Session:
 
         updating: Dict[str, CompiledJson] = {}
         for key, c in modified.items():
+            entity = self.registrar.find_by_key(key)
+            assert entity
             assert c.saving
             if c.diff:
-                sc = generate_security_check_from_json_diff(c.saving.compiled, c.diff)
-                log.info("%s diff=%s", key, c.diff)
-                log.info("%s acls=%s", key, sc)
+                log.info("verifying %s '%s'", c.key, entity)
+                check = generate_security_check_from_json_diff(
+                    c.saving.compiled, c.diff
+                )
+                log.debug("%s diff=%s", key, c.diff)
+                log.debug("%s acls=%s", key, check.acls)
+                if sc:
+                    try:
+                        await check.verify(Permission.WRITE, sc)
+                    except SecurityCheckException as sce:
+                        raise DiffSecurityException(entity, c.diff, sce)
             updating[key] = c.saving
 
         updated = await self.store.update(updating)

@@ -6,12 +6,14 @@ import traceback
 import time
 from typing import Any, Dict, List, Optional, Sequence
 
-from model import Entity, context
+from model import Entity, SecurityContext, SecurityMappings, context
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import scopes.occupyable as occupyable
 import scopes.behavior as behavior
+import scopes.users as users
+import scopes.ownership as owning
 import scopes
 
 
@@ -158,6 +160,14 @@ def log_behavior_exception(entity: Entity):
         ),
         executable=False,
     )
+
+
+def get_person_security_context(entity: Entity) -> SecurityContext:
+    owner_key = owning.get_owner_key(entity)
+    mappings: Dict[str, str] = {SecurityMappings.Owner: owner_key}
+    with entity.make_and_discard(users.Groups) as groups:
+        mappings.update({key: entity.key for key in groups.memberships})
+    return SecurityContext(entity.key, mappings)
 
 
 def flatten(l):

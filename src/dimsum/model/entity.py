@@ -11,12 +11,7 @@ from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union, 
 from .crypto import Identity, generate
 from .kinds import Kind
 from .properties import Common
-from .permissions import (
-    Acls,
-    Permission,
-    EverybodyIdentity,
-    OwnerIdentity,
-)
+from .permissions import Acls
 
 log = logging.getLogger("dimsum.model.entity")
 
@@ -107,15 +102,6 @@ async def find_entity_area(entity: "Entity") -> "Entity":
     area = await _area_fn(entity)
     assert area
     return area
-
-
-def default_permissions_for(entity: "Entity", name: Optional[str] = None) -> "Acls":
-    return (
-        Acls(name or "entity")
-        .add(Permission.READ, EverybodyIdentity)
-        .add(Permission.EXECUTE, EverybodyIdentity)
-        .add(Permission.WRITE, OwnerIdentity)
-    )
 
 
 def _get_ctor_key(ctor) -> str:
@@ -311,7 +297,7 @@ class Entity:
                 with self.make(scope, **args) as change:
                     pass
 
-        self.acls = acls if acls else default_permissions_for(self)
+        self.acls = acls if acls else Acls.owner_writes()
 
         log.debug(
             "entity:ctor {0} {1} '{2}' creator={3} id={4} props={5}".format(

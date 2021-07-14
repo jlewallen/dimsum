@@ -15,13 +15,11 @@ from model.kinds import Kind
 from model.permissions import (
     Acls,
     Permission,
-    SystemIdentity,
-    OwnerIdentity,
-    CreatorIdentity,
-    AdminIdentity,
-    TrustedIdentity,
+    SecurityMappings,
     generate_security_check_from_json_diff,
     find_all_acls,
+    SecurityContext,
+    SecurityCheckException,
 )
 
 from model.properties import (
@@ -165,13 +163,12 @@ __all__: List[str] = [
     "FindCurrentArea",
     "Acls",
     "Permission",
+    "SecurityContext",
     "find_all_acls",
-    "SystemIdentity",
-    "OwnerIdentity",
-    "CreatorIdentity",
-    "AdminIdentity",
+    "SecurityMappings",
     "CompiledJson",
-    "MissingEntityException",
     "get_current_gid",
     "set_current_gid",
+    "MissingEntityException",
+    "SecurityCheckException",
 ]

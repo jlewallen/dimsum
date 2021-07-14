@@ -50,23 +50,9 @@
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
-                            "perm": "read",
-                            "keys": [
-                                "*"
-                            ]
-                        },
-                        {
-                            "py/object": "model.permissions.Acl",
-                            "perm": "execute",
-                            "keys": [
-                                "*"
-                            ]
-                        },
-                        {
-                            "py/object": "model.permissions.Acl",
                             "perm": "write",
                             "keys": [
-                                "$owner"
+                                "*"
                             ]
                         }
                     ]
@@ -173,20 +159,6 @@
             "py/object": "model.permissions.Acls",
             "name": "entity",
             "rules": [
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "read",
-                    "keys": [
-                        "*"
-                    ]
-                },
-                {
-                    "py/object": "model.permissions.Acl",
-                    "perm": "execute",
-                    "keys": [
-                        "*"
-                    ]
-                },
                 {
                     "py/object": "model.permissions.Acl",
                     "perm": "write",
