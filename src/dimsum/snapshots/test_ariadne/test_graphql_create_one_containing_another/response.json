@@ -161,7 +161,7 @@
                         },
                         "acls": {
                             "py/object": "model.permissions.Acls",
-                            "name": "<acls>",
+                            "name": "entity",
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
@@ -181,7 +181,7 @@
                                     "py/object": "model.permissions.Acl",
                                     "perm": "write",
                                     "keys": [
-                                        ""
+                                        "$owner"
                                     ]
                                 }
                             ]
@@ -338,7 +338,7 @@
                         },
                         "acls": {
                             "py/object": "model.permissions.Acls",
-                            "name": "<acls>",
+                            "name": "entity",
                             "rules": [
                                 {
                                     "py/object": "model.permissions.Acl",
@@ -358,7 +358,7 @@
                                     "py/object": "model.permissions.Acl",
                                     "perm": "write",
                                     "keys": [
-                                        ""
+                                        "$owner"
                                     ]
                                 }
                             ]

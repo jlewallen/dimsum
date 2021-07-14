@@ -2,7 +2,13 @@ import logging
 from typing import Dict, List, Optional, Sequence, Type, Any
 
 from .properties import Common
-from .entity import Entity, Scope, RootEntityClass, find_entity_area
+from .entity import (
+    Entity,
+    Scope,
+    RootEntityClass,
+    find_entity_area,
+    default_permissions_for,
+)
 from .context import Ctx
 
 WorldKey = "world"
@@ -14,6 +20,20 @@ class Identifiers(Scope):
     def __init__(self, gid: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.gid = gid
+        self.acls = default_permissions_for(self.ourselves, name="ids")
+
+
+def get_current_gid(entity: Entity) -> int:
+    with entity.make(Identifiers) as ids:
+        return ids.gid
+
+
+def set_current_gid(entity: Entity, gid: int):
+    with entity.make(Identifiers) as ids:
+        if ids.gid != gid:
+            ids.gid = gid
+            log.info("gid-updated: %d", gid)
+            entity.touch()
 
 
 class World(Entity):
@@ -24,17 +44,6 @@ class World(Entity):
             props=props if props else Common("World", desc="Ya know, everything"),
             **kwargs
         )
-
-    def gid(self) -> int:
-        with self.make(Identifiers) as ids:
-            return ids.gid
-
-    def update_gid(self, gid: int):
-        with self.make(Identifiers) as ids:
-            if ids.gid != gid:
-                ids.gid = gid
-                log.info("gid-updated: %d", gid)
-                self.touch()
 
     # TODO Removing these causes a very strange modified during
     # iteration dict error. Would be worth seeing why!

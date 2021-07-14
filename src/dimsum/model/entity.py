@@ -15,6 +15,7 @@ from .permissions import (
     Acls,
     Permission,
     EverybodyIdentity,
+    OwnerIdentity,
 )
 
 log = logging.getLogger("dimsum.model.entity")
@@ -108,13 +109,12 @@ async def find_entity_area(entity: "Entity") -> "Entity":
     return area
 
 
-def default_permissions_for(entity: "Entity") -> "Acls":
-    owner_key = ""
+def default_permissions_for(entity: "Entity", name: Optional[str] = None) -> "Acls":
     return (
-        Acls()
+        Acls(name or "entity")
         .add(Permission.READ, EverybodyIdentity)
         .add(Permission.EXECUTE, EverybodyIdentity)
-        .add(Permission.WRITE, owner_key)
+        .add(Permission.WRITE, OwnerIdentity)
     )
 
 

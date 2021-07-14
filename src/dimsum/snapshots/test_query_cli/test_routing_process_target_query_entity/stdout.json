@@ -28,7 +28,34 @@
                             }
                         },
                         "identifiers": {
-                            "gid": 3
+                            "gid": 3,
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "name": "ids",
+                                "rules": [
+                                    {
+                                        "py/object": "model.permissions.Acl",
+                                        "perm": "read",
+                                        "keys": [
+                                            "*"
+                                        ]
+                                    },
+                                    {
+                                        "py/object": "model.permissions.Acl",
+                                        "perm": "execute",
+                                        "keys": [
+                                            "*"
+                                        ]
+                                    },
+                                    {
+                                        "py/object": "model.permissions.Acl",
+                                        "perm": "write",
+                                        "keys": [
+                                            "$owner"
+                                        ]
+                                    }
+                                ]
+                            }
                         }
                     },
                     "klass": {
@@ -129,7 +156,7 @@
                     },
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "<acls>",
+                        "name": "entity",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -149,7 +176,7 @@
                                 "py/object": "model.permissions.Acl",
                                 "perm": "write",
                                 "keys": [
-                                    ""
+                                    "$owner"
                                 ]
                             }
                         ]

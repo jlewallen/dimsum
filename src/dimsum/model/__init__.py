@@ -57,7 +57,13 @@ from model.entity import (
     CompiledJson,
 )
 from model.entity import Serialized  # Can we move these?
-from model.world import World, WorldKey, WelcomeAreaKey
+from model.world import (
+    World,
+    WorldKey,
+    WelcomeAreaKey,
+    get_current_gid,
+    set_current_gid,
+)
 from model.events import event, Event, StandardEvent, get_all_events, TickEvent
 from model.visual import Comms, NoopComms, Renderable, Updated, String
 from model.reply import (
@@ -166,4 +172,6 @@ __all__: List[str] = [
     "AdminIdentity",
     "CompiledJson",
     "MissingEntityException",
+    "get_current_gid",
+    "set_current_gid",
 ]

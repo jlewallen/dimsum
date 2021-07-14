@@ -37,6 +37,8 @@ from model import (
     set_well_known_key,
     WelcomeAreaKey,
     MissingEntityException,
+    get_current_gid,
+    set_current_gid,
 )
 from model.permissions import generate_security_check_from_json_diff
 import scopes.behavior as behavior
@@ -84,7 +86,7 @@ class Session:
     async def save(self) -> List[str]:
         log.info("saving %s", self.store)
         assert isinstance(self.world, World)
-        self.world.update_gid(self.registrar.number)
+        set_current_gid(self.world, self.registrar.number)
         for key, mod in self.registrar.modified().items():
             mod.props.described = mod.describe()
         compiled = serializing.for_update(self.registrar.entities.values())
@@ -158,7 +160,7 @@ class Session:
             assert isinstance(self.world, World)
 
         if self.world:
-            self.registrar.number = self.world.gid()
+            self.registrar.number = get_current_gid(self.world)
             return self.world
 
         log.info("creating new world")
