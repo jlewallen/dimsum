@@ -270,7 +270,7 @@ class Containing(Openable):
         return False
 
     def hold(self, item: Entity, quantity: Optional[float] = None, **kwargs):
-        log.info("holding %s", item)
+        log.debug("%s holding %s", self.ourselves, item)
         return self.add_item(item, **kwargs)
 
     def add_item(self, item: Entity, **kwargs) -> Entity:

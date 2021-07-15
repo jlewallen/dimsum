@@ -88,7 +88,7 @@ class Acls:
             key: flatten([g.keys for g in group])
             for key, group in groupby(self._rules, lambda r: r.perm)
         }
-        return f"Acls<{grouped}>"
+        return f"{grouped}"
 
     @staticmethod
     def make_permissions(default_readers=None, default_writers=None):
