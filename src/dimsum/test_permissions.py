@@ -18,9 +18,7 @@ log = logging.getLogger("dimsum")
 
 @dataclasses.dataclass
 class ExampleObject:
-    acls: Acls = dataclasses.field(
-        default_factory=functools.partial(Acls, "example-object")
-    )
+    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls))
     value: str = "Original"
 
 
@@ -32,16 +30,14 @@ class InnerObject:
 
 @dataclasses.dataclass
 class ExampleTree:
-    acls: Acls = dataclasses.field(
-        default_factory=functools.partial(Acls, "example-tree")
-    )
+    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls))
     left: InnerObject = dataclasses.field(default_factory=InnerObject)
     collection: List[InnerObject] = dataclasses.field(default_factory=list)
     value: str = "Original"
 
 
 def acl_names(acls: Dict[str, Acls]) -> List[str]:
-    return [a.name for key, a in acls.items()]
+    return [key for key, _ in acls.items()]
 
 
 @dataclasses.dataclass
@@ -58,7 +54,7 @@ async def test_permissions_wild_json_idea_1():
     assert before and after
     d = jsondiff.diff(json.loads(before), json.loads(after), marshal=True)
     check = generate_security_check_from_json_diff(json.loads(before), d)
-    assert acl_names(check.acls) == ["example-tree"]
+    assert acl_names(check.acls) == [""]
 
 
 @pytest.mark.asyncio
@@ -70,7 +66,7 @@ async def test_permissions_wild_json_idea_2():
     assert before and after
     d = jsondiff.diff(json.loads(before), json.loads(after), marshal=True)
     check = generate_security_check_from_json_diff(json.loads(before), d)
-    assert acl_names(check.acls) == ["example-tree"]
+    assert acl_names(check.acls) == [""]
 
 
 @pytest.mark.asyncio
@@ -85,7 +81,7 @@ async def test_permissions_wild_json_idea_3():
     log.info("%s", after)
     log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
-    assert acl_names(check.acls) == ["example-tree", "example-object"]
+    assert acl_names(check.acls) == ["", "left.example"]
 
 
 @pytest.mark.asyncio
@@ -100,7 +96,7 @@ async def test_permissions_wild_json_idea_4():
     log.info("%s", after)
     log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
-    assert acl_names(check.acls) == ["example-tree"]
+    assert acl_names(check.acls) == [""]
 
 
 @pytest.mark.asyncio
@@ -118,7 +114,7 @@ async def test_permissions_wild_json_idea_5():
     log.info("%s", after)
     log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
-    assert acl_names(check.acls) == ["example-tree", "example-object"]
+    assert acl_names(check.acls) == ["", "collection.1.example"]
 
 
 @pytest.mark.asyncio

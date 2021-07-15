@@ -81,7 +81,7 @@ class Visible:
 class Visibility(Scope):
     def __init__(self, visible: Optional[Visible] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls("visibility")
+        self.acls = Acls.owner_writes("visibility")
         self.visible: Visible = visible if visible else Visible()
 
     def make_visible(self):

@@ -17,7 +17,6 @@
                 "gid": 4,
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "ids",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -48,7 +47,6 @@
                     "value": 0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "gid",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -65,7 +63,6 @@
                     "value": "World",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "name",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -82,7 +79,6 @@
                     "value": "World (#0)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "described",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -99,7 +95,6 @@
                     "value": "Ya know, everything",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "desc",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -116,7 +111,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "created",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -133,7 +127,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "touched",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -150,7 +143,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "frozen",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -167,7 +159,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "destroyed",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -184,7 +175,6 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "related",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -200,7 +190,6 @@
         },
         "acls": {
             "py/object": "model.permissions.Acls",
-            "name": "entity",
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
@@ -243,7 +232,6 @@
             "containing": {
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "containing",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -275,7 +263,6 @@
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "occupied",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -306,7 +293,6 @@
                     "value": 1,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "gid",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -323,7 +309,6 @@
                     "value": "Living room",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "name",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -340,7 +325,6 @@
                     "value": "Living room (#1)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "described",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -357,7 +341,6 @@
                     "value": "Living room",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "desc",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -374,7 +357,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "created",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -391,7 +373,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "touched",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -408,7 +389,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "frozen",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -425,7 +405,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "destroyed",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -442,7 +421,6 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "related",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -458,7 +436,6 @@
         },
         "acls": {
             "py/object": "model.permissions.Acls",
-            "name": "entity",
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
@@ -501,7 +478,6 @@
             "containing": {
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "containing",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -549,7 +525,6 @@
                 },
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "occupying",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -580,7 +555,6 @@
                     "value": 2,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "gid",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -597,7 +571,6 @@
                     "value": "Jacob",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "name",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -614,7 +587,6 @@
                     "value": "Jacob (#2)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "described",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -631,7 +603,6 @@
                     "value": "Curly haired bastard.",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "desc",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -648,7 +619,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "created",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -665,7 +635,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "touched",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -682,7 +651,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "frozen",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -699,7 +667,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "destroyed",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -716,7 +683,6 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "related",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -732,7 +698,6 @@
         },
         "acls": {
             "py/object": "model.permissions.Acls",
-            "name": "entity",
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
@@ -775,7 +740,6 @@
             "exit": {
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "exit",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -791,7 +755,6 @@
             "location": {
                 "acls": {
                     "py/object": "model.permissions.Acls",
-                    "name": "location",
                     "rules": [
                         {
                             "py/object": "model.permissions.Acl",
@@ -828,7 +791,6 @@
                     "value": 3,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "gid",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -845,7 +807,6 @@
                     "value": "Window",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "name",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -862,7 +823,6 @@
                     "value": "a Window (#3)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "described",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -879,7 +839,6 @@
                     "value": "Window",
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "desc",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -896,7 +855,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "created",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -913,7 +871,6 @@
                     "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "touched",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -930,7 +887,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "frozen",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -947,7 +903,6 @@
                     "value": null,
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "destroyed",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -964,7 +919,6 @@
                     "value": {},
                     "acls": {
                         "py/object": "model.permissions.Acls",
-                        "name": "related",
                         "rules": [
                             {
                                 "py/object": "model.permissions.Acl",
@@ -980,7 +934,6 @@
         },
         "acls": {
             "py/object": "model.permissions.Acls",
-            "name": "entity",
             "rules": [
                 {
                     "py/object": "model.permissions.Acl",
