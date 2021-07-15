@@ -94,7 +94,7 @@ class GrammarEvaluator(CommandEvaluator):
     async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         try:
             tree = self._parser.parse(command)
-            log.debug("parsed=%s", tree)
+            log.info("parsed=%s", tree)
             if tree:
                 transformer = self.transformer_factory(**kwargs)
                 return transformer.transform(tree)

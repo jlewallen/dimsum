@@ -59,7 +59,12 @@ class ChmodLs(PersonAction):
 
 
 class Transformer(transformers.Base):
-    def chmod_path(self, args):
+    def chmod_entity_acl(self, args):
+        log.info("hello")
+        return Chmod(item=args[0])
+
+    def chmod_path_acl(self, args):
+        log.info("hello")
         return Chmod(item=args[0])
 
     def chmod_ls(self, args):
@@ -77,8 +82,13 @@ class ChmodGrammar(grammars.Grammar):
         return """
         start:             chmod
 
-        chmod:             "chmod" noun              -> chmod_ls
-                         | "chmod" noun PATH         -> chmod_path
+        chmod:             "chmod" noun                 -> chmod_ls
+                         | "chmod" noun acl             -> chmod_entity_acl
+                         | "chmod" noun PATH acl        -> chmod_path_acl
 
-        PATH:              /^S+/i
+        acl:               permission identity
+        permission:        ("write" | "read")
+        identity:          ("$owner" | "$everybody" | "$system" | /[^\\S]+/i)
+
+        PATH:              /[^\\S]+/i
 """

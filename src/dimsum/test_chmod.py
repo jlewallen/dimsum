@@ -29,3 +29,13 @@ async def test_chmod_ls(snapshot):
         await tw.initialize()
         await tw.success("create thing Box")
         await tw.success("chmod box")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_chmod_path(snapshot):
+    with test.Deterministic():
+        tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
+        await tw.initialize()
+        await tw.success("create thing Box")
+        await tw.success("chmod box write owner")
