@@ -158,9 +158,10 @@ class Separated(EntityStorage):
 
 
 class SqliteStorage(EntityStorage):
-    def __init__(self, path: str):
+    def __init__(self, path: str, read_only=False):
         super().__init__()
         self.path = path
+        self.read_only = read_only
         self.db: Optional[sqlite3.Connection] = None
         self.dbc: Optional[sqlite3.Cursor] = None
         self.saves = 0
@@ -169,11 +170,15 @@ class SqliteStorage(EntityStorage):
     async def open_if_necessary(self):
         if self.db:
             return
-        if os.path.isfile(self.path):
-            now = datetime.datetime.now()
-            suffix = now.strftime("%Y%m%d_%H%M%S")
-            shutil.copyfile(self.path, f"{self.path}.{suffix}")
-        self.db = sqlite3.connect(self.path)
+        if not self.read_only:
+            if os.path.isfile(self.path):
+                now = datetime.datetime.now()
+                suffix = now.strftime("%Y%m%d_%H%M%S")
+                shutil.copyfile(self.path, f"{self.path}.{suffix}")
+        if self.path == ":memory:" or not self.read_only:
+            self.db = sqlite3.connect(self.path)
+        else:
+            self.db = sqlite3.connect(f"file:{self.path}?mode=ro", uri=True)
         self.dbc = self.db.cursor()
         self.dbc.execute(
             "CREATE TABLE IF NOT EXISTS entities (key TEXT NOT NULL PRIMARY KEY, version INTEGER NOT NULL, gid INTEGER, serialized TEXT NOT NULL)"

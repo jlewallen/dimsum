@@ -29,7 +29,7 @@ async def diff(path: List[str]):
     """Display the differences between two databases."""
     if len(path) != 2:
         raise Exception("two (and only two) databases are required")
-    domains = [await utils.open_domain(p) for p in path]
+    domains = [await utils.open_domain(p, read_only=True) for p in path]
     all_keys = [set(await d.store.load_all_keys()) for d in domains]
     keeping = set.intersection(*all_keys)
     added = all_keys[-1].difference(*all_keys[0:-1])
