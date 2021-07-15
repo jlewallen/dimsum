@@ -12,10 +12,14 @@ class Ownership(Scope):
         self.owner = owner if owner else default_creator
 
 
-def get_owner_key(entity: Entity) -> str:
+def get_owner(entity: Entity) -> Entity:
     with entity.make_and_discard(Ownership) as owner:
         assert owner.owner
-        return owner.owner.key
+        return owner.owner
+
+
+def get_owner_key(entity: Entity) -> str:
+    return get_owner(entity).key
 
 
 def set_owner(entity: Entity, new_owner: Entity):

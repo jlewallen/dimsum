@@ -10,6 +10,7 @@ from finders import *
 from plugins.actions import PersonAction
 import scopes.users as users
 import scopes.movement as movement
+import scopes.ownership as owning
 
 log = logging.getLogger("dimsum")
 
@@ -31,9 +32,14 @@ class DetailedObservation(Observation):
     item: ObservedEntity
 
     def render_tree(self) -> Dict[str, Any]:
+        owner = owning.get_owner(self.item.entity)
         return {
             "title": self.item.entity.props.name,
-            "description": [self.item.entity.props.desc],
+            "description": [
+                self.item.entity.props.desc,
+                "\n",
+                f"Owner: {owner.props.described}",
+            ],
         }
 
 
@@ -172,6 +178,20 @@ class Look(PersonAction):
         return AreaObservation(area, person)
 
 
+class Examine(PersonAction):
+    def __init__(self, item: ItemFinder, **kwargs):
+        super().__init__(**kwargs)
+        self.item = item
+
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        item = await ctx.apply_item_finder(person, self.item)
+        if not item:
+            return Failure("examine what?")
+        return DetailedObservation(ObservedEntity(item))
+
+
 class Transformer(transformers.Base):
     def look(self, args):
         return Look()
@@ -191,6 +211,9 @@ class Transformer(transformers.Base):
     def look_inside(self, args):
         return LookInside(item=args[0])
 
+    def examine(self, args):
+        return Examine(item=args[0])
+
 
 @grammars.grammar()
 class LookingGrammar(grammars.Grammar):
@@ -201,7 +224,7 @@ class LookingGrammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:             look
+        start:             look | examine
 
         look:              "look"
                          | "look" ("down")                         -> look_down
@@ -209,6 +232,8 @@ class LookingGrammar(grammars.Grammar):
                          | "look" ("at" noun)                      -> look_item
                          | "look" ("for" noun)                     -> look_for
                          | "look" ("in" held)                      -> look_inside
+
+        examine:           "examine" noun                          -> examine
 """
 
 
