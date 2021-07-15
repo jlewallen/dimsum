@@ -174,7 +174,12 @@ class SqliteStorage(EntityStorage):
             if os.path.isfile(self.path):
                 now = datetime.datetime.now()
                 suffix = now.strftime("%Y%m%d_%H%M%S")
-                shutil.copyfile(self.path, f"{self.path}.{suffix}")
+                inside_dir = os.path.dirname(self.path)
+                file_name = os.path.basename(self.path)
+                backups_dir = os.path.join(inside_dir, ".backups")
+                os.makedirs(backups_dir, exist_ok=True)
+                backup_file = os.path.join(backups_dir, f"{file_name}.{suffix}")
+                shutil.copyfile(self.path, backup_file)
         if self.path == ":memory:" or not self.read_only:
             self.db = sqlite3.connect(self.path)
         else:
