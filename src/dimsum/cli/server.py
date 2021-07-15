@@ -12,6 +12,7 @@ import config
 import domains
 import sshd
 import schema as schema_factory
+import migration
 
 import everything  # noqa
 
@@ -107,6 +108,11 @@ async def server(
         cfg.session_key = session_key or config.generate_session_key()
 
     domain = cfg.make_domain()
+    with domain.session() as session:
+        m = migration.Migrator(domain)
+        await m.migrate(session)
+        await session.save()
+
     schema = schema_factory.create()
     gql_app = ariadne.asgi.GraphQL(
         schema,

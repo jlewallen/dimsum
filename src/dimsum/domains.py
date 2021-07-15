@@ -111,8 +111,8 @@ class Session:
         create_security_context: Optional[Callable[[Entity], SecurityContext]] = None,
     ) -> List[str]:
         log.info("saving %s", self.store)
-        assert isinstance(self.world, World)
-        set_current_gid(self.world, self.registrar.number)
+        if self.world:
+            set_current_gid(self.world, self.registrar.number)
         for key, mod in self.registrar.modified().items():
             mod.props.described = mod.describe()
         compiled = serializing.for_update(self.registrar.entities.values())

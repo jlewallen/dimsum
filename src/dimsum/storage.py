@@ -52,6 +52,9 @@ class EntityStorage:
     async def load_by_key(self, key: str) -> List[Serialized]:
         raise NotImplementedError
 
+    async def load_all_keys(self) -> List[str]:
+        raise NotImplementedError
+
 
 class All(EntityStorage):
     def __init__(self, children: List[EntityStorage]):
@@ -79,6 +82,9 @@ class All(EntityStorage):
             if maybe:
                 return maybe
         return []
+
+    async def load_all_keys(self) -> List[str]:
+        return flatten([c.load_all_keys() for c in self.children])
 
     def __str__(self):
         return "All<{0}>".format(self.children)
@@ -112,6 +118,13 @@ class Prioritized(EntityStorage):
                 return maybe
         return []
 
+    async def load_all_keys(self) -> List[str]:
+        for child in self.children:
+            maybe = await child.load_all_keys()
+            if maybe:
+                return maybe
+        return []
+
     def __str__(self):
         return "Prioritized<{0}>".format(self.children)
 
@@ -133,6 +146,9 @@ class Separated(EntityStorage):
 
     async def load_by_key(self, key: str) -> List[Serialized]:
         return await self.read.load_by_key(key)
+
+    async def load_all_keys(self) -> List[str]:
+        return await self.read.load_all_keys()
 
     def __str__(self):
         return "Separated<read={0}, write={1}>".format(self.read, self.write)
@@ -316,6 +332,14 @@ class SqliteStorage(EntityStorage):
             return loaded
         return []
 
+    async def load_all_keys(self) -> List[str]:
+        await self.open_if_necessary()
+        assert self.db
+
+        self.dbc = self.db.cursor()
+        rows = self.dbc.execute("SELECT key FROM entities").fetchall()
+        return [row[0] for row in rows]
+
     def freeze(self):
         self.frozen = True
 
@@ -398,3 +422,7 @@ class HttpStorage(EntityStorage):
 
     def __str__(self):
         return "Http<%s>" % (self.url,)
+
+
+def flatten(l):
+    return [item for sl in l for item in sl]
