@@ -12,7 +12,7 @@ log = logging.getLogger("dimsum.scopes")
 
 @dataclasses.dataclass
 class Behavior:
-    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls, "behavior"))
+    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls))
     python: Optional[str] = None
     executable: bool = True
     logs: List[Dict[str, Any]] = dataclasses.field(default_factory=list)

@@ -26,7 +26,7 @@ class Occupying(Scope):
     def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
         self.area = area
-        self.acls = Acls.owner_writes("occupying")
+        self.acls = Acls.owner_writes()
 
     def update(self, area: Entity):
         self.area = area
@@ -38,7 +38,7 @@ class Occupyable(Scope):
         super().__init__(**kwargs)
         self.occupied: List[Entity] = occupied if occupied else []
         self.occupancy: int = 100
-        self.acls = Acls.owner_writes("occupied")
+        self.acls = Acls.owner_writes()
 
     def add_living(self, living: Entity) -> Entity:
         assert isinstance(living, Entity)

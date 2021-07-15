@@ -19,7 +19,7 @@ class Identifiers(Scope):
     def __init__(self, gid: int = 0, **kwargs):
         super().__init__(**kwargs)
         self.gid = gid
-        self.acls = Acls.everybody_writes("ids")
+        self.acls = Acls.everybody_writes()
 
 
 def get_current_gid(entity: Entity) -> int:

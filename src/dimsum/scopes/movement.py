@@ -99,7 +99,7 @@ class Movement(Scope):
 class Exit(Scope):
     def __init__(self, area: Optional[Entity] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls.owner_writes("exit")
+        self.acls = Acls.owner_writes()
         self.area = area if area else None
 
 

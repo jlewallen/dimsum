@@ -33,9 +33,9 @@ class Property:
     def __init__(self, value=None, name=None):
         self.value = value
         if name in EverybodyWrites:
-            self.acls = Acls.everybody_writes(name)
+            self.acls = Acls.everybody_writes()
         else:
-            self.acls = Acls.owner_writes(name)
+            self.acls = Acls.owner_writes()
 
     def set(self, value):
         self.value = value

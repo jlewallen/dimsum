@@ -15,7 +15,7 @@ invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
 class Usernames(Scope):
     def __init__(self, users: Optional[Dict[str, str]] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls.system_writes("usernames")
+        self.acls = Acls.system_writes()
         self.users = users if users else {}
 
 
@@ -53,7 +53,7 @@ def try_password(secured: Tuple[str, str], password: str) -> bool:
 class Auth(Scope):
     def __init__(self, password: Optional[Tuple[str, str]] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls.system_writes("auth")
+        self.acls = Acls.system_writes()
         self.password = password if password else None
 
     def change(self, password: str):
@@ -77,5 +77,5 @@ class Auth(Scope):
 class Groups(Scope):
     def __init__(self, memberships: Optional[List[str]] = None, **kwargs):
         super().__init__(**kwargs)
-        self.acls = Acls.system_writes("groups")
+        self.acls = Acls.system_writes()
         self.memberships = memberships if memberships else []

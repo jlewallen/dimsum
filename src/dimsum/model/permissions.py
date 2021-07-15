@@ -87,25 +87,19 @@ class Acls:
         return f"Acls<{grouped}>"
 
     @staticmethod
-    def make_permissions(
-        name: Optional[str], default_readers=None, default_writers=None
-    ):
+    def make_permissions(default_readers=None, default_writers=None):
         return
 
     @staticmethod
-    def parse_chmod(chmod: str) -> "Acls":
-        return Acls()
-
-    @staticmethod
-    def owner_writes(name: Optional[str] = None) -> "Acls":
+    def owner_writes() -> "Acls":
         return Acls().add(Permission.WRITE, SecurityMappings.Owner)
 
     @staticmethod
-    def everybody_writes(name: Optional[str] = None) -> "Acls":
+    def everybody_writes() -> "Acls":
         return Acls().add(Permission.WRITE, SecurityMappings.Everybody)
 
     @staticmethod
-    def system_writes(name: Optional[str] = None) -> "Acls":
+    def system_writes() -> "Acls":
         return Acls().add(Permission.WRITE, SecurityMappings.System)
 
 
