@@ -34,7 +34,7 @@ def get_color(e: Entity) -> str:
 async def graph(path: str):
     """Graph the entities in a database."""
     name = os.path.splitext(path)[0]
-    template_loader = jinja2.FileSystemLoader(searchpath="./")
+    template_loader = jinja2.FileSystemLoader(searchpath="./templates")
     template_env = jinja2.Environment(loader=template_loader)
     template = template_env.get_template("graph.template")
 
