@@ -164,10 +164,18 @@ def log_behavior_exception(entity: Entity):
 
 def get_person_security_context(entity: Entity) -> SecurityContext:
     owner_key = owning.get_owner_key(entity)
-    mappings: Dict[str, str] = {SecurityMappings.Owner: owner_key}
+    mappings: Dict[str, str] = {}
     with entity.make_and_discard(users.Groups) as groups:
         mappings.update({key: entity.key for key in groups.memberships})
     return SecurityContext(entity.key, mappings)
+
+
+def get_entity_security_context(
+    outer: SecurityContext, entity: Entity
+) -> SecurityContext:
+    owner_key = owning.get_owner_key(entity)
+    mappings: Dict[str, str] = {SecurityMappings.Owner: owner_key}
+    return SecurityContext(outer.identity, {**outer.mappings, **mappings})
 
 
 def flatten(l):

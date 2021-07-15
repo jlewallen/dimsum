@@ -214,7 +214,7 @@ class Containing(Openable):
         self.holding: List[Entity] = holding if holding else []
         self.capacity = capacity if capacity else None
         self.produces: Dict[str, Producer] = produces if produces else {}
-        self.acls = Acls.owner_writes("containing")
+        self.acls = Acls.everybody_writes("containing")
 
     def produces_when(self, verb: str, item: Producer):
         self.produces[verb] = item

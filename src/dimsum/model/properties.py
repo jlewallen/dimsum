@@ -26,11 +26,16 @@ Opened = "opened"
 Eaten = "eaten"
 Drank = "drank"
 
+EverybodyWrites = [Touched]
+
 
 class Property:
     def __init__(self, value=None, name=None):
         self.value = value
-        self.acls = Acls(name)
+        if name in EverybodyWrites:
+            self.acls = Acls.everybody_writes(name)
+        else:
+            self.acls = Acls.owner_writes(name)
 
     def set(self, value):
         self.value = value

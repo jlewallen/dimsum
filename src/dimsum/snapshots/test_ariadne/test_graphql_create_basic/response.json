@@ -60,7 +60,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "gid",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "name": {
@@ -69,7 +77,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "name",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "described": {
@@ -78,7 +94,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "described",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "desc": {
@@ -87,7 +111,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "desc",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "created": {
@@ -96,7 +128,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "created",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "touched": {
@@ -105,7 +145,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "touched",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "*"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "frozen": {
@@ -114,7 +162,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "frozen",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "destroyed": {
@@ -123,7 +179,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "destroyed",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 },
                                 "related": {
@@ -132,7 +196,15 @@
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "name": "related",
-                                        "rules": []
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
                                     }
                                 }
                             }

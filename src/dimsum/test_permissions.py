@@ -148,27 +148,31 @@ async def test_permissions_basics():
     )
 
 
+def get_test_security_context(person: Entity, entity: Entity):
+    return tools.get_entity_security_context(
+        tools.get_person_security_context(person), entity
+    )
+
+
 @pytest.mark.asyncio
-async def test_permissions_save_create_thing_hands():
+async def test_permissions_save_create_thing_hands_hold():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before: Optional[Entity] = None
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
 
         assert await session.execute(jacob, "create thing Box")
 
-        await session.save(tools.get_person_security_context(jacob))
+        await session.save(functools.partial(get_test_security_context, jacob))
 
 
 @pytest.mark.asyncio
-async def test_permissions_save_create_thing_hands_drop():
+async def test_permissions_save_create_thing_hands_drop_jacob():
     tw = test.TestWorld()
     await tw.initialize()
 
-    area_before: Optional[Entity] = None
     with tw.domain.session() as session:
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
@@ -176,4 +180,20 @@ async def test_permissions_save_create_thing_hands_drop():
         assert await session.execute(jacob, "create thing Box")
         assert await session.execute(jacob, "drop Box")
 
-        await session.save(tools.get_person_security_context(jacob))
+        await session.save(functools.partial(get_test_security_context, jacob))
+
+
+@pytest.mark.asyncio
+async def test_permissions_save_create_thing_hands_drop_carla():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.add_carla()
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        carla = await session.materialize(key=tw.carla_key)
+
+        assert await session.execute(carla, "create thing Box")
+        assert await session.execute(carla, "drop Box")
+
+        await session.save(functools.partial(get_test_security_context, carla))

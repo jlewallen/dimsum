@@ -4,7 +4,7 @@ import dataclasses
 import functools
 import pprint
 import contextvars
-from typing import Any, cast, Dict, List, Literal, Optional, Union
+from typing import Any, cast, Dict, List, Literal, Optional, Union, Callable
 
 import dynamic
 import grammars
@@ -106,7 +106,10 @@ class Session:
     def bus(self):
         return EventBus(handlers=self.handlers or [])
 
-    async def save(self, sc: Optional[SecurityContext] = None) -> List[str]:
+    async def save(
+        self,
+        create_security_context: Optional[Callable[[Entity], SecurityContext]] = None,
+    ) -> List[str]:
         log.info("saving %s", self.store)
         assert isinstance(self.world, World)
         set_current_gid(self.world, self.registrar.number)
@@ -121,14 +124,16 @@ class Session:
             assert entity
             assert c.saving
             if c.diff:
-                log.info("verifying %s '%s' %s", c.key, entity, sc)
+                log.info("analysing %s '%s'", c.key, entity)
                 check = generate_security_check_from_json_diff(
                     c.saving.compiled, c.diff
                 )
                 log.debug("%s diff=%s", key, c.diff)
                 log.debug("%s acls=%s", key, check.acls)
-                if sc:
+                if create_security_context:
                     try:
+                        sc = create_security_context(entity)
+                        log.info("verifying %s '%s' %s", c.key, entity, sc)
                         await check.verify(Permission.WRITE, sc)
                     except SecurityCheckException as sce:
                         raise DiffSecurityException(entity, c.diff, sce)
