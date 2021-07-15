@@ -51,7 +51,7 @@ reply = ariadne.ScalarType("Reply")
 
 @reply.serializer
 def serialize_reply(value):
-    log.debug("ariadne:reply")
+    log.debug("ariadne:reply %s", value)
     serialized = serializing.serialize(value)
     if isinstance(value, Renderable):
         return dict(rendered=json.dumps(value.render_tree()), model=serialized)

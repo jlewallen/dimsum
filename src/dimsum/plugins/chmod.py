@@ -1,6 +1,6 @@
 import logging
 import dataclasses
-from typing import Type, Optional, List, Dict
+from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
@@ -28,9 +28,31 @@ class Chmod(PersonAction):
         return Success("done")
 
 
+def make_table(rows: List[List[str]]) -> str:
+    def prep(row: List[str]) -> str:
+        return "| " + " | ".join(row) + " |"
+
+    return "\n".join([prep(row) for row in rows])
+
+
 @dataclasses.dataclass
-class EntityChmods(Reply):
+class EntityChmods(Reply, Renderable):
+    entity: Entity
     chmods: Dict[str, Acls]
+
+    def render_tree(self) -> Dict[str, Any]:
+        def render_acls(acls) -> str:
+            return " ".join(
+                [f"{acl.perm} {' '.join(acl.keys)}" for acl in acls.hydrated]
+            )
+
+        rows = [[key, render_acls(acls)] for key, acls in self.chmods.items()]
+        return {
+            "lines": [
+                f"### {self.entity.props.described}",
+                make_table([["Path", "Acls"], ["----", "----"]] + rows),
+            ]
+        }
 
 
 class ChmodLs(PersonAction):
@@ -52,10 +74,8 @@ class ChmodLs(PersonAction):
         assert original
 
         acls = find_all_acls(original.compiled)
-        for key, value in acls.items():
-            log.info("'%s' = %s", key, value)
 
-        return EntityChmods(acls)
+        return EntityChmods(item, acls)
 
 
 class Transformer(transformers.Base):

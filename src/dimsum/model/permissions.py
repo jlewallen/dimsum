@@ -45,6 +45,10 @@ class Acls:
     rules: List[Union[Acl, Dict[str, Any]]] = dataclasses.field(default_factory=list)
 
     @property
+    def hydrated(self) -> List[Acl]:
+        return self._rules
+
+    @property
     def _rules(self) -> List[Acl]:
         def prepare(v: Union[Acl, Dict[str, Any]]) -> Acl:
             if isinstance(v, Acl):
