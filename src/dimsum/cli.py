@@ -13,6 +13,7 @@ import cli.query
 import cli.repl
 import cli.server
 import cli.wiki
+import cli.diff
 
 log = logging.getLogger("dimsum.cli")
 
@@ -38,6 +39,7 @@ if __name__ == "__main__":
         cli.server.commands,
         cli.broker.commands,
         cli.wiki.commands,
+        cli.diff.commands,
         cli.dummy.commands,
     ]
     for g in sources:
