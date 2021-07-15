@@ -31,7 +31,8 @@ def get_color(e: Entity) -> str:
 @click.option(
     "--path", required=True, help="Database to graph.", type=click.Path(exists=True)
 )
-async def graph(path: str):
+@click.option("--output", required=True, help="File to generate.", type=click.Path())
+async def graph(path: str, output: str):
     """Graph the entities in a database."""
     name = os.path.splitext(path)[0]
     template_loader = jinja2.FileSystemLoader(searchpath="./templates")
@@ -40,7 +41,7 @@ async def graph(path: str):
 
     domain = await utils.open_domain(path)
     with domain.session() as session:
-        with open("{0}.dot".format(name), "w") as file:
+        with open(output, "w") as file:
             file.write(
                 template.render(
                     registrar=session.registrar,

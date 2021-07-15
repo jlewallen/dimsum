@@ -48,12 +48,13 @@ wiki:
 	./ds load-wiki --directory docs  --user jlewallen --database world.sqlite3
 
 graph:
-	+@for m in *.sqlite3; do                                               \
-	n=`basename $$m .sqlite3`;                                             \
-	rm -f $n.json;                                                         \
-	env/bin/python3 src/dimsum/cli.py export --path $$m | jq . > $$n.json; \
-	env/bin/python3 src/dimsum/cli.py graph --path $$m;                    \
-	dot -T png $$n.dot > $$n.png;                                          \
+	rm -rf gen
+	mkdir -p gen
+	for m in *.sqlite3; do                                                     \
+	n=`basename $$m .sqlite3`;                                                 \
+	env/bin/python3 src/dimsum/cli.py export --path $$m | jq . > gen/$$n.json; \
+	env/bin/python3 src/dimsum/cli.py graph --path $$m --output gen/$$n.dot;   \
+	dot -T png gen/$$n.dot > gen/$$n.png;                                      \
 	done
 
 .PHONY: web
