@@ -93,7 +93,8 @@ export default defineComponent({
 .response.universal {
     padding: 1em;
 }
-.response.help {
+.response.help,
+.response.wiki {
     padding: 1em;
     background-color: #30475e;
     background-color: rgb(34, 39, 46);
