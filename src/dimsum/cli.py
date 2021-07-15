@@ -3,6 +3,8 @@
 import json
 import logging
 import logging.config
+from rich.logging import RichHandler
+from rich.console import Console
 
 import asyncclick as click
 import cli.broker
@@ -21,6 +23,14 @@ log = logging.getLogger("dimsum.cli")
 def configure_logging():
     with open("logging.json", "r") as file:
         config = json.loads(file.read())  # TODO Parsing logging config JSON
+        if "handlers" in config:
+            handlers = config["handlers"]
+            if "console" in handlers:
+                handlers["stderr"] = handlers["console"]
+                handlers["console"] = {
+                    "class": "rich.logging.RichHandler",
+                    "console": Console(stderr=True),
+                }
         logging.config.dictConfig(config)
 
 
