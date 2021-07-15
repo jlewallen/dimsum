@@ -434,15 +434,6 @@ class Registrar:
         self._diffs: Dict[str, Dict[str, Any]] = {}
         self._number: int = 0
 
-    def purge(self):
-        self._garbage = {}
-        self._entities = {}
-        self._originals = {}
-        self._numbered = {}
-        self._key_to_number = {}
-        self._diffs = {}
-        self._number = 0
-
     @property
     def entities(self) -> Dict[str, Entity]:
         return {key: e for key, e in self._entities.items()}
@@ -551,9 +542,6 @@ class Registrar:
 
         return entity
 
-    def contains(self, key) -> bool:
-        return key in self._entities
-
     def entities_of_klass(self, klass: Type[EntityClass]):
         return [e for key, e in self._entities.items() if e.klass == klass]
 
@@ -573,15 +561,6 @@ class Registrar:
             if name in e.props.name:
                 return e
         return None
-
-    def empty(self) -> bool:
-        return len(self._entities.keys()) == 0
-
-    def everything(self) -> List[Entity]:
-        return list(self._entities.values())
-
-    def all_of_type(self, klass: Type) -> List[Entity]:
-        return [e for e in self._entities.values() if isinstance(e, klass)]
 
     def unregister(self, entity: Union[Entity, Any]):
         entity.destroy()

@@ -44,34 +44,6 @@ class PlayerJoined(StandardEvent):
         return {"text": f"{self.source.props.name} joined"}
 
 
-class AddItemArea(PersonAction):
-    def __init__(self, item=None, area=None, **kwargs):
-        super().__init__(**kwargs)
-        self.item = item
-        self.area = area
-
-    async def perform(
-        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
-    ):
-        with self.area.make(carryable.Containing) as ground:
-            after_add = ground.add_item(self.item)
-            ctx.register(after_add)
-
-            # We do this after because we may consolidate this Item and
-            # this keeps us from having to unregister the item.
-            ctx.register(after_add)
-
-        await ctx.publish(
-            ItemsAppeared(
-                source=person,
-                area=self.area,
-                heard=tools.default_heard_for(area=area, excepted=[person]),
-                items=[self.item],
-            )
-        )
-        return Success("%s appeared" % (infl.join([self.item]),))
-
-
 class Join(PersonAction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

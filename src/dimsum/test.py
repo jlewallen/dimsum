@@ -156,6 +156,9 @@ class TestWorld:
             else:
                 await session.save()
 
+            if isinstance(response, Renderable):
+                log.info("response: %s", response.render_tree())
+
             return response
 
     async def success(self, *commands: str, **kwargs):
