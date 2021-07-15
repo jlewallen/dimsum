@@ -121,7 +121,7 @@ class Session:
             assert entity
             assert c.saving
             if c.diff:
-                log.info("verifying %s '%s'", c.key, entity)
+                log.info("verifying %s '%s' %s", c.key, entity, sc)
                 check = generate_security_check_from_json_diff(
                     c.saving.compiled, c.diff
                 )

@@ -4,6 +4,7 @@ import enum
 import copy
 import pprint
 import functools
+from itertools import groupby
 from typing import Optional, List, Dict, Any, Union
 
 log = logging.getLogger("dimsum")
@@ -27,7 +28,7 @@ class Permission:
     EXECUTE = "execute"
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class SecurityContext:
     identity: str
     mappings: Dict[str, str] = dataclasses.field(default_factory=dict)
@@ -75,6 +76,16 @@ class Acls:
     def add(self, p: str, identity: str):
         self.rules.append(Acl(p, [identity]))
         return self
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self) -> str:
+        grouped = {
+            key: flatten([g.keys for g in group])
+            for key, group in groupby(self._rules, lambda r: r.perm)
+        }
+        return f"Acls<'{self.name}': {grouped}>"
 
     @staticmethod
     def make_permissions(
@@ -209,9 +220,8 @@ def generate_security_check_from_json_diff(
         matched: Dict[str, Acls] = {}
         for key, child in acls.items():
             if key and node.startswith(key + ".") or not key and node.startswith(key):
-                log.debug("add(%s) %s", key, child.name)
                 matched[key] = child
-        log.info("security-check(%s): %s", node, [v.name for _, v in matched.items()])
+        log.info("security-check(%s): %s", node, [v for _, v in matched.items()])
     return SecurityCheck(matched)
 
 
