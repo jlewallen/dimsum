@@ -1,8 +1,11 @@
 import dataclasses
 import json
 import copy
+import datetime
 import logging
 import sqlite3
+import shutil
+import os.path
 from typing import Any, Dict, List, Optional, TextIO
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -166,6 +169,10 @@ class SqliteStorage(EntityStorage):
     async def open_if_necessary(self):
         if self.db:
             return
+        if os.path.isfile(self.path):
+            now = datetime.datetime.now()
+            suffix = now.strftime("%Y%m%d_%H%M%S")
+            shutil.copyfile(self.path, f"{self.path}.{suffix}")
         self.db = sqlite3.connect(self.path)
         self.dbc = self.db.cursor()
         self.dbc.execute(

@@ -3,7 +3,7 @@ __pycache__
 .env
 .log
 .coverage
-*.sqlite3
+*.sqlite3*
 
 ssh_host_key
 ssh_host_key.pub
