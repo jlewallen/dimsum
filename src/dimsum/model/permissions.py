@@ -191,8 +191,11 @@ def _walk_diff(diff: Dict[str, Any]):
             rv = {}
             if "py/object" in value:
                 return {".".join(path): True}
-            for key, v in value.items():
-                rv.update(walk(v, path + [str(key)]))
+            for sub_key, v in value.items():
+                if isinstance(sub_key, str) and sub_key.startswith("$"):
+                    return {".".join(path): True}
+                else:
+                    rv.update(walk(v, path + [str(sub_key)]))
             return rv
 
         log.warning("unhandled: %s %s", type(value), value)
