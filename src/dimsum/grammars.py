@@ -131,7 +131,7 @@ def _wrap_parser(custom: str) -> Lark:
         DIRECTION:         "north" | "west" | "east" | "south"
         direction:         DIRECTION
 
-        named_route:       USEFUL_WORD
+        named_route:       USEFUL_WORD+
         find_direction:    direction
         find_route_by_gid: object_by_gid
         route:             find_route_by_gid | find_direction | named_route

@@ -64,6 +64,41 @@ async def test_go_adjacent():
 
 
 @pytest.mark.asyncio
+async def test_go_adjacent_two_words():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        another_room = scopes.area(creator=session.world, props=Common("Another Room"))
+
+        exit = scopes.exit(
+            creator=session.world,
+            props=Common("Old Door"),
+            initialize={movement.Exit: dict(area=another_room)},
+        )
+        await tw.add_item_to_welcome_area(exit, session=session)
+        await session.add_area(another_room)
+        await session.save()
+
+    area_before = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = (await find_entity_area(jacob)).key
+
+    await tw.success("go old door")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = (await find_entity_area(jacob)).key
+        assert area_after != area_before
+        assert area_after == another_room.key
+
+
+@pytest.mark.asyncio
 async def test_directional_moving_nowhere():
     tw = test.TestWorld()
     await tw.initialize()
