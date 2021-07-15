@@ -119,10 +119,10 @@ def hold(c: Entity, e: Entity):
 
 def area_of(entity: Entity) -> Optional[Entity]:
     if entity.has(occupyable.Occupyable):
-        log.info("finding area for %s (self)", entity)
+        log.debug("finding area for %s (self)", entity)
         return entity
 
-    log.info("finding area for %s", entity)
+    log.debug("finding area for %s", entity)
     with entity.make_and_discard(occupyable.Occupying) as occupying:
         if occupying.area:
             log.debug("finding area for %s (occupying)", entity)
