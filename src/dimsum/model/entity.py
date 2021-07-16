@@ -521,7 +521,7 @@ class Registrar:
                     )
                 )
 
-        has_compiled = "(c)" if compiled else ""
+        has_compiled = "" if compiled else "(no-original)"
         op = "overwrite" if entity.key in self._entities else "new"
         log.info(
             "[%d] register:%s %s %s %s",

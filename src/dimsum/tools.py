@@ -29,6 +29,9 @@ class Relation(enum.Enum):
     AREA = "area"
     OTHER = "other"
 
+    def __repr__(self):
+        return self.name
+
 
 @dataclasses.dataclass
 class EntitySet:

@@ -16,7 +16,7 @@ class EventHandlers:
             event: Optional[DynamicMessage] = None, **kwargs
         ):
             assert event
-            log.info("%s: event=%s kwargs=%s", type(event), event, kwargs)
+            log.debug("event: %s kwargs=%s", event, kwargs)
             if event.heard:
                 for nearby in event.heard:
                     await comms.somebody(nearby.key, event)
@@ -26,7 +26,7 @@ class EventHandlers:
             event: Optional[StandardEvent] = None, **kwargs
         ):
             assert event
-            log.info("%s: event=%s kwargs=%s", type(event), event, kwargs)
+            log.debug("event: %s kwargs=%s", event, kwargs)
             if event.heard:
                 for nearby in event.heard:
                     await comms.somebody(nearby.key, event)
