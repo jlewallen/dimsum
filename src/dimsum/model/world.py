@@ -29,7 +29,7 @@ def get_current_gid(entity: Entity) -> int:
 
 def set_current_gid(entity: Entity, gid: int):
     with entity.make(Identifiers) as ids:
-        if ids.gid != gid:
+        if ids.gid < gid:
             log.info("gid-updated: %d (was %d)", gid, ids.gid)
             ids.gid = gid
             entity.touch()
