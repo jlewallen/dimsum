@@ -1,6 +1,6 @@
 digraph world {
 
-{% for entity in registrar.everything() %}
+{% for entity in registrar.entities.values() %}
 
 /*
 name: {{ entity.props.name }}
