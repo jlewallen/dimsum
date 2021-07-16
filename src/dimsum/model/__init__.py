@@ -40,6 +40,7 @@ from model.entity import (
     RootEntityClass,
     Registrar,
     MissingEntityException,
+    EntityConflictException,
     generate_entity_identity,
     Version,
     EntityRef,
@@ -171,4 +172,5 @@ __all__: List[str] = [
     "set_current_gid",
     "MissingEntityException",
     "SecurityCheckException",
+    "EntityConflictException",
 ]

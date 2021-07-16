@@ -268,6 +268,10 @@ def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
                     return "<deterministic>"
                 if keys[-1] == "public" or keys[-1] == "private":
                     return "<deterministic>"
+                if keys[-1] == "info" and keys[-2] == "context":
+                    return "<deterministic>"
+                if keys[-1] == "domain" and keys[-2] == "context":
+                    return "<deterministic>"
             return value
         if isinstance(value, float):
             if keys:

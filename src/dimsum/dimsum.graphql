@@ -72,10 +72,22 @@ type EntitiesUpdated {
   affected: [KeyedEntity!]
 }
 
+input CompareAndSwapField {
+  path: String!
+  previous: String!
+  value: String!
+}
+
+input EntityCompareAndSwap {
+  key: String!
+  paths: [CompareAndSwapField!]
+}
+
 type Mutation {
   login(credentials: Credentials!): Auth!
   makeSample: EntitiesUpdated
   update(entities: [EntityDiff!]): EntitiesUpdated
+  compareAndSwap(entities: [EntityCompareAndSwap!]): EntitiesUpdated
   language(criteria: LanguageQueryCriteria!): Evaluation!
   create(entities: [EntityTemplate!]): Evaluation!
 }

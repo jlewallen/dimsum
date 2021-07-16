@@ -7,7 +7,8 @@ import starlette.requests
 import ariadne
 import jwt
 import json
-from typing import List, Optional, Dict
+import jsondiff
+from typing import List, Optional, Dict, Any
 
 import config
 import domains
@@ -23,6 +24,7 @@ from model import (
     Reply,
     Updated,
     Common,
+    EntityConflictException,
 )
 from plugins.actions import Join
 from plugins.admin import lookup_username, register_username
@@ -517,6 +519,65 @@ async def update(obj, info, entities):
         for e in incoming.entities:
             e.touch()
         log.info("update: incoming=%s", incoming)
+
+        modified_keys = await session.save()
+        for key in modified_keys:
+            log.warning("update: hacked reload: %s", key)
+        affected = [
+            EntityResolver(session, await session.materialize(key=key, refresh=True))
+            for key in modified_keys
+        ]
+
+        return {"affected": affected}
+
+
+def make_diff(path: str, value: str):
+    keys = path.split(".")
+    diff: Dict[str, Any] = {}
+    curr = diff
+    for key in keys[:-1]:
+        curr[key] = {}
+        curr = curr[key]
+    curr[keys[-1]] = value
+    return diff
+
+
+@mutation.field("compareAndSwap")
+async def compare_and_swap(obj, info, entities):
+    verify_token(info)
+    domain = info.context.domain
+    log.info("ariadne:cas entities=%s", entities)
+    if len(entities) == 0:
+        return {"affected": []}
+
+    with domain.session() as session:
+        world = await session.prepare()
+
+        for row in entities:
+            log.info("materialize key=%s", row["key"])
+            entity = await session.materialize(key=row["key"])
+            compiled = session.registrar.get_original_if_available(row["key"])
+            assert compiled
+            for change in row["paths"]:
+                parsed_previous = json.loads(change["previous"])
+                log.info("'%s' = %s", change["path"], parsed_previous)
+                to_previous = make_diff(change["path"], parsed_previous)
+                previous = jsondiff.patch(compiled.compiled, to_previous)
+                diff_from_expected = jsondiff.diff(compiled.compiled, previous)
+                if diff_from_expected != {}:
+                    log.info("previous: %s", previous)
+                    log.info("diff-from-expected: %s", diff_from_expected)
+                    raise EntityConflictException()
+
+                log.info("'%s' = %s", change["path"], change["value"])
+                to_value = make_diff(change["path"], change["value"])
+                log.info("diff: %s", to_value)
+                after = jsondiff.patch(compiled.compiled, to_value)
+                log.debug("after: %s", after)
+                entity = await session.materialize(
+                    json=[Serialized(row["key"], json.dumps(after))]
+                )
+                entity.touch()
 
         modified_keys = await session.save()
         for key in modified_keys:

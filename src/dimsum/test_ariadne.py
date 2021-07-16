@@ -567,3 +567,88 @@ mutation {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "entities.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_compare_and_swap_invalid_previous(
+    deterministic, snapshot, caplog
+):
+    domain = await test.make_simple_domain()
+
+    data = {
+        "variables": {
+            "entities": [
+                {
+                    "key": WorldKey,
+                    "paths": [
+                        {
+                            "path": "props.map.name.value",
+                            "value": "Super Duper World",
+                            "previous": json.dumps("Not World"),
+                        }
+                    ],
+                }
+            ]
+        },
+        "query": """
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]) {
+    compareAndSwap(entities: $entities) {
+        affected {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+        ok, actual = await ariadne.graphql(
+            schema,
+            data,
+            debug=True,
+            context_value=get_test_context(domain),
+            logger="ariadne.errors.hidden",
+        )
+        assert ok
+        snapshot.assert_match(
+            test.pretty_json(actual, deterministic=True), "response.json"
+        )
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_compare_and_swap_valid_previous(deterministic, snapshot):
+    domain = await test.make_simple_domain()
+
+    data = {
+        "variables": {
+            "entities": [
+                {
+                    "key": WorldKey,
+                    "paths": [
+                        {
+                            "path": "props.map.name.value",
+                            "value": "Super Duper World",
+                            "previous": json.dumps("World"),
+                        }
+                    ],
+                }
+            ]
+        },
+        "query": """
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]) {
+    compareAndSwap(entities: $entities) {
+        affected {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(test.pretty_json(actual, deterministic=True), "response.json")

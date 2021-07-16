@@ -418,6 +418,10 @@ class Entity:
         return hash(self.key)
 
 
+class EntityConflictException(Exception):
+    pass
+
+
 class RegistrationException(Exception):
     pass
 

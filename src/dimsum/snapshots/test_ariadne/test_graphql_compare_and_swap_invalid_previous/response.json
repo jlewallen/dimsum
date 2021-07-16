@@ -1,0 +1,47 @@
+{
+    "data": {
+        "compareAndSwap": null
+    },
+    "errors": [
+        {
+            "message": "An unknown error occurred.",
+            "locations": [
+                {
+                    "line": 3,
+                    "column": 5
+                }
+            ],
+            "path": [
+                "compareAndSwap"
+            ],
+            "extensions": {
+                "exception": {
+                    "stacktrace": [
+                        "Traceback (most recent call last):",
+                        "  File \"/home/jlewallen/jlewallen/dimsum/env/lib/python3.8/site-packages/graphql/execution/execute.py\", line 625, in await_result",
+                        "    return_type, field_nodes, info, path, await result",
+                        "  File \"/home/jlewallen/jlewallen/dimsum/src/dimsum/schema.py\", line 570, in compare_and_swap",
+                        "    raise EntityConflictException()",
+                        "model.entity.EntityConflictException"
+                    ],
+                    "context": {
+                        "obj": "None",
+                        "info": "<deterministic>",
+                        "entities": "[{'key': 'world', 'paths': [{'path': 'props.map.name.value', 'previous': '\"Not World\"', 'value': 'Super Duper World'}]}]",
+                        "domain": "<deterministic>",
+                        "world": "'World (#0)'",
+                        "row": "{'key': 'world', 'paths': [{'path': 'props.map.name.value', 'previous': '\"Not World\"', 'value': 'Super Duper World'}]}",
+                        "entity": "'World (#0)'",
+                        "compiled": "CompiledJson(...'$owner']}]}})",
+                        "change": "{'path': 'props.map.name.value', 'previous': '\"Not World\"', 'value': 'Super Duper World'}",
+                        "parsed_previous": "'Not World'",
+                        "to_previous": "{'props': {'map': {'name': {'value': 'Not World'}}}}",
+                        "previous": "{'acls': {'py/object': 'model.permissions.Acls', 'rules': [{'keys': ['$owner'], 'perm': 'write', 'py/object': 'model.permissions.Acl'}]}, 'creator': None, 'identity': {'private': '1', 'public': '1', 'py/object': 'model.crypto.Identity', 'signature': '1'}, 'key': 'world', ...}",
+                        "diff_from_expected": "{'props': {'map': {'name': {'value': 'Not World'}}}}",
+                        "session": "Session(store...='World (#0)')"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -227,7 +227,7 @@ class Session:
         action,
         person: Optional[Entity] = None,
         dynamic_behavior: Optional["dynamic.Behavior"] = None,
-        **kwargs
+        **kwargs,
     ) -> Reply:
 
         log.info("-" * 100)
@@ -352,7 +352,7 @@ class Domain:
         self,
         store: Optional[storage.EntityStorage] = None,
         subscriptions: Optional[SubscriptionManager] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.store = store if store else storage.SqliteStorage(":memory:")
@@ -377,7 +377,7 @@ class WorldCtx(Ctx):
         session: Optional[Session] = None,
         person: Optional[Entity] = None,
         entity: Optional[Entity] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         assert session and session.world
