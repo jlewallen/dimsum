@@ -100,7 +100,6 @@ def verify_token(info) -> Optional[str]:
     if info.context.request is None:
         return None
     headers = info.context.request.headers
-    log.info("headers: %s", headers)
     if "Authorization" not in headers:
         raise Exception("unauthorized (header)")
     try:
@@ -218,7 +217,7 @@ async def nearby_generator(
 
     evaluator = decoded["key"]
 
-    log.info("evaluator=%s", evaluator)
+    log.debug("evaluator=%s", evaluator)
 
     q: asyncio.Queue = asyncio.Queue()
     subscriptions = info.context.domain.subscriptions

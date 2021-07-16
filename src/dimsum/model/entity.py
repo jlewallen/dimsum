@@ -412,7 +412,7 @@ class Entity:
         self.scopes[key] = data
 
     def __repr__(self):
-        return "{0} (#{1})".format(self.props.name, self.props.gid)
+        return "'{0} (#{1})'".format(self.props.name, self.props.gid)
 
     def __hash__(self):
         return hash(self.key)
@@ -425,7 +425,7 @@ class RegistrationException(Exception):
 class Registrar:
     def __init__(self, **kwargs):
         super().__init__()
-        log.info("registrar:ctor")
+        log.debug("registrar:ctor")
         self._garbage: Dict[str, Entity] = {}
         self._entities: Dict[str, Entity] = {}
         self._originals: Dict[str, CompiledJson] = {}
@@ -513,8 +513,8 @@ class Registrar:
             already = self._numbered[assigned]
             if already.key != entity.key:
                 log.error("gid collision: %d", assigned)
-                log.error("gid collision: registered key=%s '%s", already.key, already)
-                log.error("gid collision: incoming key=%s '%s", entity.key, entity)
+                log.error("gid collision: registered key=%s %s", already.key, already)
+                log.error("gid collision: incoming key=%s %s", entity.key, entity)
                 raise RegistrationException(
                     "gid {0} already assigned to {1} (gave={2})".format(
                         assigned, already.key, self._number
@@ -524,7 +524,7 @@ class Registrar:
         has_compiled = "(c)" if compiled else ""
         op = "overwrite" if entity.key in self._entities else "new"
         log.info(
-            "[%d] register:%s %s '%s' %s",
+            "[%d] register:%s %s %s %s",
             depth,
             op,
             entity.key,

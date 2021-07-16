@@ -52,7 +52,7 @@ import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes as scopes
 
-log = logging.getLogger("dimsum.model")
+log = logging.getLogger("dimsum.domains")
 active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session")
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
@@ -124,7 +124,7 @@ class Session:
             assert entity
             assert c.saving
             if c.diff:
-                log.info("analysing %s '%s'", c.key, entity)
+                log.info("analysing %s %s", c.key, entity)
                 check = generate_security_check_from_json_diff(
                     c.saving.compiled, c.diff
                 )
@@ -133,7 +133,7 @@ class Session:
                 if create_security_context:
                     try:
                         sc = create_security_context(entity)
-                        log.info("verifying %s '%s' %s", c.key, entity, sc)
+                        log.info("verifying %s %s %s", c.key, entity, sc)
                         await check.verify(Permission.WRITE, sc)
                     except SecurityCheckException as sce:
                         raise DiffSecurityException(entity, c.diff, sce)
@@ -216,7 +216,7 @@ class Session:
             [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
         )
         with ExtendHooks(dynamic_behavior.dynamic_hooks):
-            log.info("evaluator: '%s'", evaluator)
+            log.debug("evaluator: '%s'", evaluator)
             action = await evaluator.evaluate(command, world=self.world, player=player)
             assert action
             assert isinstance(action, Action)
