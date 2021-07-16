@@ -1,10 +1,12 @@
 import os
 import logging
+import inspect
 import asyncclick as click
 import jinja2
 
 from model import *
 import scopes
+import plugins.helping
 
 import cli.utils as utils
 
@@ -19,6 +21,7 @@ def commands():
 def get_color(e: Entity) -> str:
     map = {
         RootEntityClass: "white",
+        plugins.helping.EncyclopediaClass: "darkseagreen",
         scopes.LivingClass: "darkseagreen",
         scopes.ItemClass: "khaki",
         scopes.ExitClass: "salmon",
@@ -41,12 +44,15 @@ async def graph(path: str, output: str):
 
     domain = await utils.open_domain(path)
     with domain.session() as session:
+        for key in await domain.store.load_all_keys():
+            await session.materialize(key=key, reach=lambda e, d: 0)
         with open(output, "w") as file:
             file.write(
                 template.render(
                     registrar=session.registrar,
                     world=session.world,
                     get_color=get_color,
+                    getmro=inspect.getmro,
                 )
             )
             file.write("\n\n")

@@ -1,5 +1,4 @@
-{% if false -%}
-{% for verb, item in entity.produces.items() -%}
+{% for verb, item in entity.scopes.containing.produces.items() -%}
 <tr>
 	<td bgcolor="lightpink"> {{ verb }} </td>
 </tr>
@@ -7,16 +6,15 @@
 <tr>
 	<td>quantity = {{ entity.quantity }}</td>
 </tr>
-{% if entity.visible.hard_to_see -%}
+{% if entity.scopes.visibility.visible.hard_to_see -%}
 <tr><td bgcolor="tomato">hard-to-see</td></tr>
 {% endif -%}
-{% if entity.visible.hidden -%}
+{% if entity.scopes.visibility.visible.hidden -%}
 <tr><td bgcolor="tomato">hidden</td></tr>
 {% endif -%}
-{% if entity.loose -%}
+{% if entity.scopes.carryable.loose -%}
 <tr><td bgcolor="white">loose</td></tr>
 {% endif -%}
-{% for key, interaction in entity.interactions.items() -%}
+{% for key, interaction in entity.scopes.interactable.items() -%}
 <tr><td bgcolor="tan">{{ key }}</td></tr>
 {% endfor -%}
-{% endif -%}

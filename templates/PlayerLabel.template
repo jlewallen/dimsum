@@ -1,5 +1,0 @@
-{% for key, value in entity.memory %}
-<tr>
-	<td>{{ key }}</td>
-</tr>
-{% endfor %}

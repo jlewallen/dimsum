@@ -1,14 +1,16 @@
 <table border="0" cellborder="1" cellpadding="4">
   <tr>
-     <td bgcolor="{{ get_color(entity) }}">{{ entity.props.name }}</td>
+     <td bgcolor="{{ get_color(entity) }}">{{ entity.props.described }}</td>
   </tr>
-  {%- if False -%}
+
+  {%- if entity.parent -%}
   <tr>
-     <td bgcolor="{{ get_color(entity) }}">{{ entity.klass }}</td>
+     <td bgcolor="white">{{ entity.parent.props.name }}</td>
   </tr>
   {%- endif -%}
+
   {%- for key, value in entity.props.map.items() -%}
-	{%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' and key != 'related' -%}
+	{%- if key != 'name' and key != 'desc' and key != 'created' and key != 'presence' and key != 'touched' and key != 'related' and key != 'described' -%}
 		{%- if key != 'password' and value %}
 			{%- if key == 'navigable' -%}
 				<tr>
@@ -27,8 +29,8 @@
 	{%- endif -%}
   {%- endfor -%}
 
-  {% if false -%}
-  {% for key, behavior in entity.behaviors.items() -%}
+  {%- if entity.scopes.behaviors -%}
+  {% for key, behavior in entity.scopes.behaviors.behaviors.map.items() -%}
   <tr>
      <td bgcolor="lightcyan"> {{ key }} </td>
   </tr>

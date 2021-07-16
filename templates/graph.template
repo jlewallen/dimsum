@@ -13,75 +13,52 @@ klass: {{ entity.klass }}
 
 "{{ entity.key }}" [label=<{% include 'Label.template' %}> shape=plaintext]
 
+	{%- if entity.parent and entity.parent.parent -%}
+		"{{ entity.key }}" -> "{{ entity.parent.key }}" [ label="parent" ]
+	{%- endif -%}
+
 	{%- if entity.creator and entity.creator.key != "world" -%}
 		"{{ entity.key }}" -> "{{ entity.creator.key }}" [ label="creator" ]
 	{%- endif -%}
 
-	{%- if entity.props.owner and entity.props.owner.key != "world" -%}
-		"{{ entity.key }}" -> "{{ entity.props.owner.key }}" [ label="owner" ]
+	{%- if entity.scopes.ownership and entity.scopes.ownership.owner.key != "world" -%}
+		"{{ entity.key }}" -> "{{ entity.scopes.ownership.owner.key }}" [ label="owner" ]
 	{%- endif -%}
 
-	{%- if False and entity.props.navigable -%}
-		"{{ entity.key }}" -> "{{ entity.props.navigable.key }}" [ label="nav" ]
+	{%- if entity.scopes.wellKnown -%}
+		{% for key, other_key in entity.scopes.wellKnown.entities.items() -%}
+			"{{ entity.key }}" -> "{{ other_key }}" [ label="{{ key }}" ]
+		{%- endfor %}
 	{%- endif -%}
 
-	{%- if entity.parent -%}
-		"{{ entity.key }}" -> "{{ entity.parent.key }}" [ label="parent" ]
+	{%- if entity.scopes.exit -%}
+		"{{ entity.key }}" -> "{{ entity.scopes.exit.area.key }}" [ label="exit" ]
 	{%- endif -%}
 
-	{%- if entity.klass == "Area" -%}
-		/* Area */
-
-		{% for route in entity.routes -%}
-		/* route {{ route }} */
-		"{{ entity.key }}" -> "{{ route.area.key }}" [ label="{{ route.name() }}" ]
-		{% endfor -%}
-
-		{% for other in entity.occupied -%}
+	{%- if entity.scopes.occupyable -%}
+		{% for other in entity.scopes.occupyable.occupied -%}
 		/* occupied {{ other }} */
 		"{{ entity.key }}" -> "{{ other.key }}" [ label="occupied" ]
 		{% endfor -%}
-
 	{%- endif -%}
 
-	{% if entity.klass == "Item" -%}
-		/* Item */
-
-		{% for route in entity.routes -%}
-		/* route {{ route }} */
-		"{{ entity.key }}" -> "{{ route.area.key }}" [ label="{{ route.name() }}" ]
-		{% endfor -%}
-
-	{%- endif -%}
-
-	{%- if entity.klass == "Animal" -%}
-		/* Animal */
-
-		{% for wearable in entity.wearing -%}
+	{%- if entity.scopes.apparel -%}
+		{% for wearable in entity.scopes.apparel.wearing -%}
 			/* wearing {{ wearable }} */
 			"{{ entity.key }}" -> "{{ wearable.key }}" [ label="wearing" ]
 		{% endfor -%}
-
 	{%- endif %}
 
-	{%- if entity.klass == "Player" -%}
-		/* Player */
-
-		{% for wearable in entity.wearing -%}
-			/* wearing {{ wearable }} */
-			"{{ entity.key }}" -> "{{ wearable.key }}" [ label="wearing" ]
+	{%- if entity.scopes.containing -%}
+		{% for other in entity.scopes.containing.holding -%}
+			/* holding {{ other }} */
+			{%- if other.scopes and other.scopes.carryable and other.scopes.carryable.quantity > 1 %}
+				"{{ entity.key }}" -> "{{ other.key }}" [ label="holding {{ other.scopes.carryable.quantity }}" ]
+			{% else -%}
+				"{{ entity.key }}" -> "{{ other.key }}" [ label="holding" ]
+			{% endif -%}
 		{% endfor -%}
-
 	{%- endif %}
-
-	{% for other in entity.holding -%}
-		/* holding {{ other }} */
-		{%- if other.quantity > 1 %}
-			"{{ entity.key }}" -> "{{ other.key }}" [ label="holding {{ other.quantity }}" ]
-		{% else -%}
-			"{{ entity.key }}" -> "{{ other.key }}" [ label="holding" ]
-		{% endif -%}
-	{% endfor -%}
 
 {% endfor %}
 
