@@ -435,7 +435,7 @@ class WorldCtx(Ctx):
 
     async def notify(self, ev: Event, **kwargs):
         assert self.world
-        log.info("notify=%s entities=%s", ev, self.entities)
+        log.info("notify: %s entities=%s", ev, self.entities)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
         await dynamic_behavior.notify(saying.NotifyAll(ev.name, ev), say=self.say)
 

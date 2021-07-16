@@ -138,7 +138,7 @@ def area_of(entity: Entity) -> Optional[Entity]:
 
 def log_behavior(entity: Entity, entry: Dict[str, Any], executable=True):
     assert entity
-    log.info("logging %s behavior", entity)
+    log.debug("logging %s behavior", entity)
     with entity.make(behavior.Behaviors) as behave:
         b = behave.get_default()
         assert b

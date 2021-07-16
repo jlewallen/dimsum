@@ -549,7 +549,7 @@ class AriadneContext:
 
 def context(cfg: config.Configuration, domain: domains.Domain):
     def wrap(request):
-        log.info("ariadne:context %s", request)
+        log.debug("ariadne:context %s", request)
         return AriadneContext(
             cfg=cfg,
             domain=domain,

@@ -416,7 +416,7 @@ class Behavior:
 
     async def notify(self, notify: saying.Notify, say: Optional[saying.Say] = None):
         assert say
-        log.info("notify=%s n=%d", notify, len(self._compiled))
+        log.debug("notify: %s n=%d", notify, len(self._compiled))
         for target in [c for c in self._compiled]:
             await target.notify(notify, say=say)
 

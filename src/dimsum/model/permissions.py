@@ -213,15 +213,15 @@ def generate_security_check_from_json_diff(
     json along the way.
     """
     acls = find_all_acls(original)
-    log.debug("security-check: acls=%s", acls)
+    log.debug("security: acls=%s", acls)
     modified_nodes = _walk_diff(diff)
-    log.debug("security-check: %s=%s", diff, modified_nodes)
+    log.debug("security: %s modified=%s", diff, modified_nodes)
     for node in modified_nodes.keys():
         matched: Dict[str, Acls] = {}
         for key, child in acls.items():
             if key and node.startswith(key + ".") or not key and node.startswith(key):
                 matched[key] = child
-        log.info("security-check(%s): %s", node, matched)
+        log.info("security('%s'): %s", node, matched)
     return SecurityCheck(matched)
 
 

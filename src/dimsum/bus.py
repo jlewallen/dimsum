@@ -78,7 +78,7 @@ class EventBus:
 
     async def publish(self, event: Event, **kwargs):
         assert event
-        log.info("publish:%s", event)
+        log.info("publish: %s", event)
         await self._invoke_handlers(event)
 
     async def _invoke_handlers(self, event: Union[Any]):
