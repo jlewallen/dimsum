@@ -3,13 +3,14 @@ import dataclasses
 import functools
 import inspect
 import logging
+import jsonpickle
 import time
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import grammars
 import transformers
 import saying
-import domains as session
+import domains as session  # TODO circular
 import finders
 import tools
 from model import (
@@ -17,6 +18,7 @@ from model import (
     Scope,
     World,
     Ctx,
+    Event,
     Common,
     StandardEvent,
     Reply,
@@ -35,6 +37,7 @@ from model import (
 )
 import scopes.behavior as behavior
 import scopes.carryable as carryable
+import scopes.inbox as inbox
 
 log = logging.getLogger("dimsum.dynamic")
 errors_log = logging.getLogger("dimsum.dynamic.errors")
@@ -74,12 +77,27 @@ class Receive:
     condition: Condition
 
 
+@dataclasses.dataclass
+class DynamicPostMessage(inbox.PostMessage):
+    message: inbox.PostMessage
+
+
+@dataclasses.dataclass
+class DynamicPostService:
+    postService: inbox.PostService
+
+    async def future(self, receiver: Entity, when: float, message: inbox.PostMessage):
+        return await self.postService.future(
+            receiver, when, DynamicPostMessage(message)
+        )
+
+
 class EntityBehavior(grammars.CommandEvaluator):
     @property
     def hooks(self):
         return All()
 
-    async def notify(self, notify: saying.Notify, **kwargs):
+    async def notify(self, ev: Event, **kwargs):
         raise NotImplementedError
 
 
@@ -109,14 +127,15 @@ class SimplifiedAction(Action):
         area: Entity,
         person: Entity,
         ctx: Ctx,
-        say: Optional[saying.Say] = None,
         **kwargs,
     ):
-        assert say
         try:
             args = await self._args(world, person, ctx)
             reply = await self.registered.handler(
-                *args, this=self.entity, person=person, say=say, **kwargs
+                *args,
+                this=self.entity,
+                person=person,
+                **kwargs,
             )
             if reply:
                 return self._transform_reply(reply)
@@ -207,14 +226,14 @@ class Simplified:
 
         return None
 
-    async def notify(self, notify: saying.Notify, **kwargs):
+    async def notify(self, ev: Event, **kwargs):
         entity = await session.get().materialize(key=self.entity_key)
         assert entity
 
         for receive in self.receives:
-            if notify.applies(receive.hook):
+            if ev.name == receive.hook:
                 try:
-                    await notify.invoke(receive.handler, this=entity, **kwargs)
+                    await receive.handler(this=entity, ev=ev, **kwargs)
                     tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
@@ -231,7 +250,7 @@ class NoopEntityBehavior(EntityBehavior):
     async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         return None
 
-    async def notify(self, notify: saying.Notify, **kwargs):
+    async def notify(self, ev: Event, **kwargs):
         pass
 
 
@@ -257,8 +276,19 @@ class CompiledEntityBehavior(EntityBehavior):
             return Unknown()
         return None
 
-    async def notify(self, notify: saying.Notify, **kwargs):
-        return await self.simplified.notify(notify, **kwargs)
+    async def notify(self, ev: Event, **kwargs):
+        if isinstance(ev, DynamicPostMessage):
+            log.info("notify: %s", ev)
+            log.debug("notify: %s", self.frame)
+            context = jsonpickle.unpickler.Unpickler()
+            decoded = context.restore(
+                ev.message, reset=True, classes=list(self.frame.values())
+            )
+            log.info("notify: %s", decoded)
+            return await self.simplified.notify(decoded, **kwargs)
+        else:
+            log.debug("notify: %s", ev)
+        return await self.simplified.notify(ev, **kwargs)
 
 
 def _get_default_globals():
@@ -271,21 +301,32 @@ def _get_default_globals():
         tools=tools,
         Entity=Entity,
         Event=StandardEvent,
+        PostMessage=inbox.PostMessage,
         Scope=Scope,
         Carryable=carryable.Carryable,
         fail=Failure,
         ok=Success,
+        time=time.time,
         **event_classes,
     )
+
+
+class DynamicParameterException(Exception):
+    pass
 
 
 def _prepare_args(fn, args, kwargs):
     def _get_arg(name):
         if name in kwargs:
-            return kwargs[name]
+            arg = kwargs[name]
+            if isinstance(arg, inbox.PostService):
+                return DynamicPostService(arg)
+            if isinstance(arg, DynamicPostMessage):
+                log.warning("DynamicPostMessage %s", arg)
+            return arg
         if args:
             return args.pop(0)
-        raise Exception("unknown parameter: '%s'" % (name,))
+        raise DynamicParameterException("'%s'" % (name,))
 
     signature = inspect.signature(fn)
     return [_get_arg(p) for p in signature.parameters]
@@ -333,6 +374,7 @@ async def __ex(t=thunk):
         return thunk
 
     simplified = Simplified(found.key, thunk_factory)
+    # TODO chain?
     frame.update(
         dict(
             language=simplified.language,
@@ -414,11 +456,9 @@ class Behavior:
     def lazy_evaluator(self) -> grammars.CommandEvaluator:
         return grammars.LazyCommandEvaluator(lambda: self.evaluators)
 
-    async def notify(self, notify: saying.Notify, say: Optional[saying.Say] = None):
-        assert say
-        log.debug("notify: %s n=%d", notify, len(self._compiled))
+    async def notify(self, ev: Event, **kwargs):
         for target in [c for c in self._compiled]:
-            await target.notify(notify, say=say)
+            await target.notify(ev, **kwargs)
 
 
 def flatten(l):

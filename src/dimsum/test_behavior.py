@@ -319,8 +319,8 @@ async def tick(this, ev, say):
 
         await session.tick(0)
         assert len(area.make(carryable.Containing).holding) == 2
-        assert len(session.registrar.entities) == 5
+        assert len(session.registrar.entities) == 6
 
         await session.tick(1)
         assert len(area.make(carryable.Containing).holding) == 3
-        assert len(session.registrar.entities) == 6
+        assert len(session.registrar.entities) == 7

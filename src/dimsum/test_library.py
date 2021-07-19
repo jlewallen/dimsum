@@ -53,4 +53,4 @@ async def test_library(deterministic, caplog, snapshot):
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 63
+        assert len(session.registrar.entities) == 64

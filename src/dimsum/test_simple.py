@@ -94,6 +94,6 @@ async def test_freezing_others_unable_unfreeze():
 async def test_lookup_by_object_number():
     tw = test.TestWorld()
     await tw.initialize()
-    await tw.failure("freeze #3")
+    await tw.failure("freeze #4")
     await tw.success("make Box")
-    await tw.success("freeze #3")
+    await tw.success("freeze #4")

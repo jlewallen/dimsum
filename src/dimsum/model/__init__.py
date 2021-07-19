@@ -73,7 +73,7 @@ from model.reply import (
     observe_entity,
 )
 from model.hooks import ManagedHooks, All, ExtendHooks
-from model.context import Ctx, get, TryMaterialize
+from model.context import Ctx, get, MaterializeAndCreate
 from model.finders import (
     ItemFinder,
     FindNone,
@@ -92,7 +92,7 @@ import model.hooks as hooks
 
 __all__: List[str] = [
     "Ctx",
-    "TryMaterialize",
+    "MaterializeAndCreate",
     "get",
     "EntityFrozen",
     "Reply",

@@ -34,6 +34,7 @@ from model import (
     Condition,
     cleanup_entity,
     Ctx,
+    MaterializeAndCreate,
     context,
     find_entity_area,
     find_entity_area_maybe,
@@ -50,6 +51,7 @@ import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes.occupyable as occupyable
+import scopes.inbox as inbox
 import scopes as scopes
 
 log = logging.getLogger("dimsum.domains")
@@ -96,7 +98,7 @@ SecurityException:
 
 
 @dataclasses.dataclass
-class Session:
+class Session(MaterializeAndCreate):
     store: storage.EntityStorage
     handlers: List[Any] = dataclasses.field(default_factory=list)
     registrar: Registrar = dataclasses.field(default_factory=Registrar)
@@ -155,6 +157,10 @@ class Session:
 
     def unregister(self, entity: Entity) -> Entity:
         return self.registrar.unregister(entity)
+
+    async def try_materialize_key(self, key: str) -> Optional[Entity]:
+        maybe = await self.try_materialize(key=key)
+        return maybe.maybe_one()
 
     async def try_materialize(
         self,
@@ -239,6 +245,7 @@ class Session:
         area = await find_entity_area_maybe(person) if person else None
 
         with WorldCtx(session=self, person=person, **kwargs) as ctx:
+            post_service = await inbox.create_post_service(self, world)
             try:
                 reply = await action.perform(
                     world=world,
@@ -246,6 +253,7 @@ class Session:
                     person=person,
                     ctx=ctx,
                     say=ctx.say,
+                    post=post_service,
                 )
                 await ctx.complete()
                 return reply
@@ -266,6 +274,7 @@ class Session:
         assert self.world
 
         log.info("everywhere:%s %s", ev, kwargs)
+        post_service = await inbox.create_post_service(self, self.world)
         everything: List[str] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities.keys()
@@ -280,7 +289,7 @@ class Session:
                         if behave.get_default():
                             log.info("everywhere: %s", entity)
                             with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
-                                await ctx.notify(ev)
+                                await ctx.notify(ev, post=post_service)
                                 await ctx.complete()
                 except MissingEntityException as e:
                     log.exception("missing entity", exc_info=True)
@@ -288,6 +297,24 @@ class Session:
             for key in removing:
                 log.warning("removing %s from world behaviors", key)
                 del world_behaviors.entities[key]
+
+    async def service(self, now: float):
+        assert self.world
+
+        log.info("service:%s", now)
+        post_service = await inbox.create_post_service(self, self.world)
+        queued = await post_service.service(now)
+        for qm in queued:
+            try:
+                entity = await get().materialize(key=qm.entity_key, refresh=True)
+                with entity.make(behavior.Behaviors) as behave:
+                    if behave.get_default():
+                        log.info("everywhere: %s", entity)
+                        with WorldCtx(session=self, entity=entity) as ctx:
+                            await ctx.notify(qm.message, post=post_service)
+                            await ctx.complete()
+            except MissingEntityException as e:
+                log.exception("missing entity", exc_info=True)
 
     async def add_area(
         self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -345,6 +372,17 @@ class Session:
             await self.add_area(linked, depth=depth + 1, seen=seen)
 
         log.debug("area-done:%d %s", depth, area.key)
+
+    def create_item(
+        self, quantity: Optional[float] = None, initialize=None, register=True, **kwargs
+    ) -> Entity:
+        initialize = initialize if initialize else {}
+        if quantity:
+            initialize = {carryable.Carryable: dict(quantity=quantity)}
+        created = scopes.item(initialize=initialize, **kwargs)
+        if register:
+            return self.register(created)
+        return created
 
 
 class Domain:
@@ -436,8 +474,9 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify: %s entities=%s", ev, self.entities)
+        post_service = await inbox.create_post_service(self, self.world)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        await dynamic_behavior.notify(saying.NotifyAll(ev.name, ev), say=self.say)
+        await dynamic_behavior.notify(ev, say=self.say, post=post_service)
 
     async def complete(self):
         assert self.reference
@@ -451,13 +490,9 @@ class WorldCtx(Ctx):
     def create_item(
         self, quantity: Optional[float] = None, initialize=None, register=True, **kwargs
     ) -> Entity:
-        initialize = initialize if initialize else {}
-        if quantity:
-            initialize = {carryable.Carryable: dict(quantity=quantity)}
-        created = scopes.item(initialize=initialize, **kwargs)
-        if register:
-            return self.register(created)
-        return created
+        return self.session.create_item(
+            quantity=quantity, initialize=initialize, register=register, **kwargs
+        )
 
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
@@ -515,9 +550,8 @@ class WorldCtx(Ctx):
             log.info("found: nada")
         return found
 
-    async def try_materialize(self, key: str) -> Optional[Entity]:
-        maybe = await self.session.try_materialize(key=key)
-        return maybe.maybe_one()
+    async def try_materialize_key(self, key: str) -> Optional[Entity]:
+        return await self.session.try_materialize_key(key)
 
 
 def flatten(l):

@@ -216,8 +216,8 @@ def generate_security_check_from_json_diff(
     log.debug("security: acls=%s", acls)
     modified_nodes = _walk_diff(diff)
     log.debug("security: %s modified=%s", diff, modified_nodes)
+    matched: Dict[str, Acls] = {}
     for node in modified_nodes.keys():
-        matched: Dict[str, Acls] = {}
         for key, child in acls.items():
             if key and node.startswith(key + ".") or not key and node.startswith(key):
                 matched[key] = child

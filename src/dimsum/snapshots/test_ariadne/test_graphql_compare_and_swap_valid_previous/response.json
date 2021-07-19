@@ -15,7 +15,8 @@
                         "scopes": {
                             "wellKnown": {
                                 "entities": {
-                                    "welcomeArea": "<deterministic>"
+                                    "welcomeArea": "<deterministic>",
+                                    "postService": "8"
                                 }
                             },
                             "usernames": {
@@ -36,7 +37,7 @@
                                 }
                             },
                             "identifiers": {
-                                "gid": 3,
+                                "gid": 4,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [

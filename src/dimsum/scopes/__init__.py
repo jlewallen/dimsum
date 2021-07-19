@@ -30,6 +30,10 @@ class ExitClass(EntityClass):
     pass
 
 
+class ServiceClass(EntityClass):
+    pass
+
+
 Alive = [
     ownership.Ownership,
     behavior.Behaviors,
@@ -45,12 +49,17 @@ Area = [
     carryable.Containing,
     occupyable.Occupyable,
 ]
+Service = [
+    ownership.Ownership,
+    behavior.Behaviors,
+]
 
 scopes_by_class = {
     LivingClass: Alive,
     ItemClass: Item,
     AreaClass: Area,
     ExitClass: Exit,
+    ServiceClass: Service,
 }
 
 

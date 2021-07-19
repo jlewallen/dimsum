@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, Optional, Sequence, Type, Any
 
 from .entity import Entity, Scope, RootEntityClass, find_entity_area
-from .context import Ctx
+from .context import MaterializeAndCreate
 
 
 class WellKnown(Scope):
@@ -35,18 +35,17 @@ def set_well_known_key(entity: Entity, local_key: str, key: str):
 
 async def materialize_well_known_entity(
     origin: Entity,
-    ctx: Ctx,
+    ctx: MaterializeAndCreate,
     local_key: str,
     create_args: Optional[Dict[str, Any]] = None,
 ) -> Entity:
     entity_key = get_well_known_key(origin, local_key)
     if entity_key:
-        loaded = await ctx.try_materialize(key=entity_key)
+        loaded = await ctx.try_materialize_key(entity_key)
         if loaded:
             return loaded
     if not create_args:
         raise Exception()
     entity = ctx.create_item(creator=origin, **create_args)
-    ctx.register(entity)
     set_well_known_key(origin, local_key, entity.key)
     return entity

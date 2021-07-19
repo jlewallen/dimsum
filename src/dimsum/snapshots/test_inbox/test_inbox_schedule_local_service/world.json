@@ -28,6 +28,15 @@
                         }
                     ]
                 }
+            },
+            "behaviorCollection": {
+                "entities": {
+                    "10": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ]
+                }
             }
         },
         "klass": {
@@ -206,7 +215,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 3
         },
         "creator": {
             "py/object": "model.world.World",
@@ -248,7 +257,14 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [],
+                "holding": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 10,
+                        "klass": "ItemClass",
+                        "name": "Hammer"
+                    }
+                ],
                 "capacity": null,
                 "produces": {}
             },
@@ -452,7 +468,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 3
         },
         "creator": {
             "py/object": "model.world.World",
@@ -475,6 +491,9 @@
                     "py/object": "scopes.behavior.BehaviorMap",
                     "map": {}
                 }
+            },
+            "post": {
+                "queue": []
             }
         },
         "klass": {
@@ -524,7 +543,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "PostService",
+                    "value": "a PostService (#2)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -572,7 +591,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0,
+                    "value": 1569369605.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -653,7 +672,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 1
         },
         "creator": {
             "py/object": "model.world.World",
@@ -695,14 +714,7 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 10,
-                        "klass": "ExitClass",
-                        "name": "Window"
-                    }
-                ],
+                "holding": [],
                 "capacity": null,
                 "produces": {}
             },
@@ -918,41 +930,50 @@
             "i": 1
         },
         "creator": {
-            "py/object": "model.entity.Entity",
-            "key": 6,
-            "klass": "LivingClass",
-            "name": "Jacob"
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
         },
         "parent": null,
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.entity.Entity",
-                    "key": 6,
-                    "klass": "LivingClass",
-                    "name": "Jacob"
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
                 }
             },
             "behaviors": {
                 "behaviors": {
                     "py/object": "scopes.behavior.BehaviorMap",
-                    "map": {}
+                    "map": {
+                        "b:default": {
+                            "py/object": "scopes.behavior.Behavior",
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "rules": []
+                            },
+                            "python": "",
+                            "executable": true,
+                            "logs": []
+                        }
+                    }
                 }
             },
-            "exit": {
-                "acls": {
-                    "py/object": "model.permissions.Acls",
-                    "rules": [
-                        {
-                            "py/object": "model.permissions.Acl",
-                            "perm": "write",
-                            "keys": [
-                                "$owner"
-                            ]
-                        }
-                    ]
+            "carryable": {
+                "kind": {
+                    "py/object": "model.kinds.Kind",
+                    "identity": {
+                        "py/object": "model.crypto.Identity",
+                        "public": 11,
+                        "signature": 11,
+                        "private": 11
+                    }
                 },
-                "area": null
+                "quantity": 1,
+                "loose": false
             },
             "location": {
                 "acls": {
@@ -969,14 +990,14 @@
                 },
                 "container": {
                     "py/object": "model.entity.Entity",
-                    "key": 6,
-                    "klass": "LivingClass",
-                    "name": "Jacob"
+                    "key": 4,
+                    "klass": "AreaClass",
+                    "name": "Living room"
                 }
             }
         },
         "klass": {
-            "py/type": "scopes.ExitClass"
+            "py/type": "scopes.ItemClass"
         },
         "identity": {
             "py/object": "model.crypto.Identity",
@@ -1006,7 +1027,7 @@
                 },
                 "name": {
                     "py/object": "model.properties.Property",
-                    "value": "Window",
+                    "value": "Hammer",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1022,7 +1043,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "a Window (#4)",
+                    "value": "a Hammer (#4)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1038,7 +1059,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Window",
+                    "value": "Hammer",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

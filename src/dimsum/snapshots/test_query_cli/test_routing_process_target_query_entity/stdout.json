@@ -14,7 +14,8 @@
                     "scopes": {
                         "wellKnown": {
                             "entities": {
-                                "welcomeArea": "welcome"
+                                "welcomeArea": "welcome",
+                                "postService": "8"
                             }
                         },
                         "usernames": {
@@ -35,7 +36,7 @@
                             }
                         },
                         "identifiers": {
-                            "gid": 3,
+                            "gid": 4,
                             "acls": {
                                 "py/object": "model.permissions.Acls",
                                 "rules": [

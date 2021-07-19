@@ -129,7 +129,7 @@ async def test_quantified_drop_all():
 
     await tw.initialize()
 
-    assert await tw.domain.store.number_of_entities() == 3
+    assert await tw.domain.store.number_of_entities() == 4
 
     await tw.success("make 20 Coin")
 
