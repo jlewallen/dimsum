@@ -5,7 +5,6 @@ from typing import List, Optional, Tuple
 from model import Entity, Scope, Acls, context
 import scopes.carryable as carryable
 
-DefaultMoveVerb = "walk"
 log = logging.getLogger("dimsum.scopes")
 
 
@@ -31,19 +30,6 @@ class AreaRoute:
 
     def name(self) -> str:
         raise NotImplementedError
-
-
-class VerbRoute(AreaRoute):
-    def __init__(self, verb: Optional[str] = None, **kwargs):
-        super().__init__(**kwargs)
-        assert verb
-        self.verb = verb
-
-    def satisfies(self, verb=None, **kwargs) -> bool:
-        return verb and verb == self.verb
-
-    def name(self) -> str:
-        return self.verb
 
 
 class DirectionalRoute(AreaRoute):
@@ -78,9 +64,6 @@ class Movement(Scope):
             if r.satisfies(**kwargs):
                 return r
         return None
-
-    def link_area(self, area: Entity, verb=DefaultMoveVerb, **kwargs):
-        return self.add_route(VerbRoute(area=area, verb=verb))
 
     def add_route(self, route: AreaRoute) -> AreaRoute:
         self.routes.append(route)

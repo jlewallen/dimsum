@@ -37,19 +37,6 @@ class TestWorld:
         await self.domain.store.write(capture)  # type:ignore
         return pretty_json(capture.getvalue())
 
-    async def add_simple_area_here(self, door, name):
-        with self.domain.session() as session:
-            world = await session.prepare()
-            door = scopes.item(creator=world, props=Common(door))
-            area = scopes.area(creator=world, props=Common(name))
-            with door.make(movement.Movement) as nav:
-                nav.link_area(area)
-            with area.make(carryable.Containing) as ground:
-                ground.add_item(door)
-            session.register(door)
-            session.register(area)
-            return area
-
     async def add_carla(self):
         if self.carla_key:
             return self.carla_key
