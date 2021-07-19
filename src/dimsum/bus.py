@@ -69,7 +69,7 @@ class EventBus:
         """Decorator for marking handlers of Events"""
 
         def final_decorator(func, **kwargs):
-            log.info("add handler for %s (%s)", klass, func)
+            log.debug("add handler for %s (%s)", klass, func)
             if klass not in self.handlers:
                 self.handlers[klass] = []
             self.handlers[klass].append(func)

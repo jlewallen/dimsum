@@ -100,8 +100,8 @@ SecurityException:
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
-    handlers: List[Any] = dataclasses.field(default_factory=list)
-    registrar: Registrar = dataclasses.field(default_factory=Registrar)
+    handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
+    registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
     world: Optional[World] = None
 
     @functools.cached_property

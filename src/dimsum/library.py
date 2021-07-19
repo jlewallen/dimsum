@@ -1,8 +1,10 @@
 import logging
 import stringcase
-from typing import Tuple
+import dataclasses
+from typing import Tuple, Dict, List, Optional
 
 from model import Entity, World, Common
+from domains import Session
 import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -427,3 +429,93 @@ def create_example_world(world: World) -> Tuple[Generics, Entity]:
     generics = Generics(world)
     area = WelcomeArea().create(world, generics)
     return generics, area
+
+
+@dataclasses.dataclass
+class Train:
+    interior_name: str
+    enter_name: str
+    leave_name: str
+    stops: List[str] = dataclasses.field(default_factory=list)
+    enter: Optional[Entity] = None
+    leave: Optional[Entity] = None
+    interio: Optional[Entity] = None
+
+    def _behavior(self) -> str:
+        assert self.leave
+        return """
+@dataclass
+class Depart(PostMessage):
+    pass
+
+class Train(Scope):
+    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, leaving = False, **kwargs):
+        super().__init__(**kwargs)
+        self.stops = stops if stops else ["{0}", "{1}"]
+        self.door = door if door else "{2}"
+        self.leaving = leaving
+
+@received(TickEvent)
+async def move_train(this, ev, say, session, post):
+    log.info("move-train:scheduled")
+    await post.future(this, time() + 5, Depart())
+    say.nearby("the train is departing")
+
+@received(Depart)
+async def depart(this, ev, say, session, post):
+    area = tools.area_of(this)
+    with this.make(Train) as train:
+        log.info("move-train: area=%s stops=%s", area, train.stops)
+        if train.stops:
+            index = train.stops.index(area.key)
+            if index >= 0:
+                new_stop = train.stops[(index + 1) % len(train.stops)]
+                door = await session.materialize(key=train.door)
+                with door.make(Exit) as exit:
+                    exit.area = await session.materialize(key=new_stop)
+                    door.touch()
+                    log.info("move-train: %s new stop %s", this, exit.area)
+                    tools.move(this, exit.area)
+                    this.touch()
+
+@hooks.enter.hook
+def only_when_doors_open(resume, person, area):
+    log.info("only-when-doors-open: %s", person)
+    return resume(person, area)
+""".format(
+            self.stops[0], self.stops[1], self.leave.key
+        )
+
+    async def create(self, session: Session):
+        assert self.stops
+
+        first_stop_key = self.stops[0]
+        first_stop = await session.materialize(key=first_stop_key)
+        assert first_stop
+
+        world = await session.prepare()
+        self.interior = scopes.area(creator=world, props=Common(self.interior_name))
+        self.enter = scopes.exit(
+            creator=world,
+            props=Common(self.enter_name),
+            initialize={movement.Exit: dict(area=self.interior)},
+        )
+        self.leave = scopes.exit(
+            creator=world,
+            props=Common(self.leave_name),
+            initialize={movement.Exit: dict(area=first_stop)},
+        )
+
+        with self.enter.make(behavior.Behaviors) as behave:
+            behave.add_behavior(world, python=self._behavior())
+
+        with first_stop.make(carryable.Containing) as first_stop_ground:
+            first_stop_ground.hold(self.enter)
+            first_stop.touch()
+
+        with self.interior.make(carryable.Containing) as contains:
+            contains.hold(self.leave)
+
+        session.register(self.enter)
+        session.register(self.leave)
+        session.register(self.interior)
