@@ -31,6 +31,7 @@ class TestWorld:
         self.carla_key: Optional[str] = None
         self.jacob_key: Optional[str] = None
         self.tomi_key: Optional[str] = None
+        self.area_key: Optional[str] = None
 
     async def to_json(self):
         capture = io.StringIO()
@@ -107,6 +108,7 @@ class TestWorld:
 
             await session.add_area(area)
             await session.save()
+            self.area_key = area.key
 
         await self.add_jacob()
 
@@ -161,16 +163,15 @@ class TestWorld:
         assert isinstance(r, Failure)
         return r
 
-    async def add_behaviored_thing(
-        self, tw: "TestWorld", name: str, python: str
+    async def create_behaviored_thing(
+        self, name: str, python: str, ctor=scopes.item, **kwargs
     ) -> str:
-        with tw.domain.session() as session:
+        with self.domain.session() as session:
             world = await session.prepare()
 
-            item = await tw.add_item_to_welcome_area(
-                scopes.item(creator=world, props=Common(name)),
-                session=session,
-            )
+            item = ctor(creator=world, props=Common(name), **kwargs)
+
+            session.register(item)
 
             with item.make(behavior.Behaviors) as behave:
                 behave.add_behavior(world, python=python)
@@ -178,6 +179,19 @@ class TestWorld:
             await session.save()
 
             return item.key
+
+    async def add_behaviored_thing(
+        self, name: str, python: str, ctor=scopes.item, **kwargs
+    ) -> str:
+        thing_key = await self.create_behaviored_thing(
+            name, python, ctor=ctor, **kwargs
+        )
+        with self.domain.session() as session:
+            world = await session.prepare()
+            thing = await session.materialize(key=thing_key)
+            await self.add_item_to_welcome_area(thing, session=session)
+            await session.save()
+            return thing_key
 
 
 async def make_simple_domain(

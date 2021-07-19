@@ -181,5 +181,15 @@ def get_entity_security_context(
     return SecurityContext(outer.identity, {**outer.mappings, **mappings})
 
 
+def move(moving: Entity, destination: Entity):
+    location = moving.make_and_discard(carryable.Location).container
+    assert location
+    with location.make(carryable.Containing) as from_container:
+        with destination.make(carryable.Containing) as to_container:
+            assert from_container.contains(moving)
+            from_container.unhold(moving)
+            to_container.hold(moving)
+
+
 def flatten(l):
     return [item for sl in l for item in sl]

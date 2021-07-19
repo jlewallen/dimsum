@@ -3,7 +3,7 @@
         "py/object": "serializing.RootWorld",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 6
         },
         "creator": null,
         "parent": null,
@@ -15,7 +15,7 @@
                 }
             },
             "identifiers": {
-                "gid": 5,
+                "gid": 8,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -32,6 +32,21 @@
             "behaviorCollection": {
                 "entities": {
                     "10": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "12": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "14": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
+                    ],
+                    "16": [
                         {
                             "py/object": "scopes.behavior.BehaviorMeta"
                         }
@@ -215,7 +230,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",
@@ -260,23 +275,16 @@
                 "holding": [
                     {
                         "py/object": "model.entity.Entity",
-                        "key": 10,
-                        "klass": "ItemClass",
-                        "name": "Hammer"
+                        "key": 16,
+                        "klass": "ExitClass",
+                        "name": "Train"
                     }
                 ],
                 "capacity": null,
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 6,
-                        "klass": "LivingClass",
-                        "name": "Jacob"
-                    }
-                ],
+                "occupied": [],
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -468,7 +476,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 1
         },
         "creator": {
             "py/object": "model.world.World",
@@ -491,9 +499,6 @@
                     "py/object": "scopes.behavior.BehaviorMap",
                     "map": {}
                 }
-            },
-            "post": {
-                "queue": []
             }
         },
         "klass": {
@@ -543,7 +548,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "a PostService (#2)",
+                    "value": "PostService",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -591,7 +596,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369600.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -672,7 +677,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -733,9 +738,9 @@
             "occupying": {
                 "area": {
                     "py/object": "model.entity.Entity",
-                    "key": 4,
+                    "key": 14,
                     "klass": "AreaClass",
-                    "name": "Living room"
+                    "name": "Train Car"
                 },
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -927,6 +932,256 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
+            "i": 1
+        },
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
+        "parent": null,
+        "scopes": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "behaviors": {
+                "behaviors": {
+                    "py/object": "scopes.behavior.BehaviorMap",
+                    "map": {
+                        "b:default": {
+                            "py/object": "scopes.behavior.Behavior",
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "rules": []
+                            },
+                            "python": "",
+                            "executable": true,
+                            "logs": []
+                        }
+                    }
+                }
+            },
+            "containing": {
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "*"
+                            ]
+                        }
+                    ]
+                },
+                "pattern": null,
+                "locked": false,
+                "openable": {
+                    "py/object": "scopes.carryable.UnknownOpenClose"
+                },
+                "holding": [],
+                "capacity": null,
+                "produces": {}
+            },
+            "occupyable": {
+                "occupied": [],
+                "occupancy": 100,
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "klass": {
+            "py/type": "scopes.AreaClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 9,
+            "signature": 9,
+            "private": 9
+        },
+        "key": 10,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 4,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Wilshire/Western",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Wilshire/Western (#4)",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Wilshire/Western",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {},
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": "write",
+                    "keys": [
+                        "$owner"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
             "i": 2
         },
         "creator": {
@@ -962,18 +1217,541 @@
                     }
                 }
             },
-            "carryable": {
-                "kind": {
-                    "py/object": "model.kinds.Kind",
-                    "identity": {
-                        "py/object": "model.crypto.Identity",
-                        "public": 11,
-                        "signature": 11,
-                        "private": 11
+            "exit": {
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                },
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 4,
+                    "klass": "AreaClass",
+                    "name": "Living room"
+                }
+            },
+            "location": {
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                },
+                "container": {
+                    "py/object": "model.entity.Entity",
+                    "key": 14,
+                    "klass": "AreaClass",
+                    "name": "Train Car"
+                }
+            }
+        },
+        "klass": {
+            "py/type": "scopes.ExitClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 11,
+            "signature": 11,
+            "private": 11
+        },
+        "key": 12,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 5,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
                     }
                 },
-                "quantity": 1,
-                "loose": false
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Train Door",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "a Train Door (#5)",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Train Door",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {},
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": "write",
+                    "keys": [
+                        "$owner"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 3
+        },
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
+        "parent": null,
+        "scopes": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "behaviors": {
+                "behaviors": {
+                    "py/object": "scopes.behavior.BehaviorMap",
+                    "map": {
+                        "b:default": {
+                            "py/object": "scopes.behavior.Behavior",
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "rules": []
+                            },
+                            "python": "\n",
+                            "executable": true,
+                            "logs": []
+                        }
+                    }
+                }
+            },
+            "containing": {
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "*"
+                            ]
+                        }
+                    ]
+                },
+                "pattern": null,
+                "locked": false,
+                "openable": {
+                    "py/object": "scopes.carryable.UnknownOpenClose"
+                },
+                "holding": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 12,
+                        "klass": "ExitClass",
+                        "name": "Train Door"
+                    }
+                ],
+                "capacity": null,
+                "produces": {}
+            },
+            "occupyable": {
+                "occupied": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 6,
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    }
+                ],
+                "occupancy": 100,
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "klass": {
+            "py/type": "scopes.AreaClass"
+        },
+        "identity": {
+            "py/object": "model.crypto.Identity",
+            "public": 13,
+            "signature": 13,
+            "private": 13
+        },
+        "key": 14,
+        "props": {
+            "py/object": "model.properties.Common",
+            "map": {
+                "gid": {
+                    "py/object": "model.properties.Property",
+                    "value": 6,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "name": {
+                    "py/object": "model.properties.Property",
+                    "value": "Train Car",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "described": {
+                    "py/object": "model.properties.Property",
+                    "value": "Train Car (#6)",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "desc": {
+                    "py/object": "model.properties.Property",
+                    "value": "Train Car",
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "created": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "touched": {
+                    "py/object": "model.properties.Property",
+                    "value": 1569369600.0,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "*"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "frozen": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "destroyed": {
+                    "py/object": "model.properties.Property",
+                    "value": null,
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "related": {
+                    "py/object": "model.properties.Property",
+                    "value": {},
+                    "acls": {
+                        "py/object": "model.permissions.Acls",
+                        "rules": [
+                            {
+                                "py/object": "model.permissions.Acl",
+                                "perm": "write",
+                                "keys": [
+                                    "$owner"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "acls": {
+            "py/object": "model.permissions.Acls",
+            "rules": [
+                {
+                    "py/object": "model.permissions.Acl",
+                    "perm": "write",
+                    "keys": [
+                        "$owner"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "py/object": "serializing.RootEntity",
+        "version": {
+            "py/object": "model.entity.Version",
+            "i": 3
+        },
+        "creator": {
+            "py/object": "model.world.World",
+            "key": "world",
+            "klass": "RootEntityClass",
+            "name": "World"
+        },
+        "parent": null,
+        "scopes": {
+            "ownership": {
+                "owner": {
+                    "py/object": "model.world.World",
+                    "key": "world",
+                    "klass": "RootEntityClass",
+                    "name": "World"
+                }
+            },
+            "behaviors": {
+                "behaviors": {
+                    "py/object": "scopes.behavior.BehaviorMap",
+                    "map": {
+                        "b:default": {
+                            "py/object": "scopes.behavior.Behavior",
+                            "acls": {
+                                "py/object": "model.permissions.Acls",
+                                "rules": []
+                            },
+                            "python": "\nclass Train(Scope):\n    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, **kwargs):\n        super().__init__(**kwargs)\n        self.stops = stops if stops else [\"4\", \"10\"]\n        self.door = door if door else \"12\"\n\n@received(TickEvent)\nasync def move_train(this, ev, say, area, session):\n    with this.make(Train) as train:\n        log.info(\"move-train: area=%s stops=%s\", area, train.stops)\n        if train.stops:\n            index = train.stops.index(area.key)\n            if index >= 0:\n                new_stop = train.stops[(index + 1) % len(train.stops)]\n                door = await session.materialize(key=train.door)\n                with door.make(Exit) as exit:\n                    exit.area = await session.materialize(key=new_stop)\n                    door.touch()\n                    log.info(\"move-train: %s new stop %s\", this, exit.area)\n                    tools.move(this, exit.area)\n                    this.touch()\n\n@hooks.enter.hook\ndef only_when_doors_open(resume, person, area):\n    log.info(\"only_when_doors_open: %s\", person)\n    return resume(person, area)\n",
+                            "executable": true,
+                            "logs": []
+                        }
+                    }
+                }
+            },
+            "exit": {
+                "acls": {
+                    "py/object": "model.permissions.Acls",
+                    "rules": [
+                        {
+                            "py/object": "model.permissions.Acl",
+                            "perm": "write",
+                            "keys": [
+                                "$owner"
+                            ]
+                        }
+                    ]
+                },
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 14,
+                    "klass": "AreaClass",
+                    "name": "Train Car"
+                }
             },
             "location": {
                 "acls": {
@@ -997,21 +1775,21 @@
             }
         },
         "klass": {
-            "py/type": "scopes.ItemClass"
+            "py/type": "scopes.ExitClass"
         },
         "identity": {
             "py/object": "model.crypto.Identity",
-            "public": 9,
-            "signature": 9,
-            "private": 9
+            "public": 15,
+            "signature": 15,
+            "private": 15
         },
-        "key": 10,
+        "key": 16,
         "props": {
             "py/object": "model.properties.Common",
             "map": {
                 "gid": {
                     "py/object": "model.properties.Property",
-                    "value": 4,
+                    "value": 7,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1027,7 +1805,7 @@
                 },
                 "name": {
                     "py/object": "model.properties.Property",
-                    "value": "Hammer",
+                    "value": "Train",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1043,7 +1821,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "a Hammer (#4)",
+                    "value": "a Train (#7)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1059,7 +1837,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Hammer",
+                    "value": "Train",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

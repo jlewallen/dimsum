@@ -5,6 +5,7 @@ import inspect
 import logging
 import jsonpickle
 import time
+import typing as imported_typing
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import grammars
@@ -37,6 +38,7 @@ from model import (
 )
 import scopes.behavior as behavior
 import scopes.carryable as carryable
+import scopes.movement as movement
 import scopes.inbox as inbox
 
 log = logging.getLogger("dimsum.dynamic")
@@ -304,9 +306,11 @@ def _get_default_globals():
         PostMessage=inbox.PostMessage,
         Scope=Scope,
         Carryable=carryable.Carryable,
+        Exit=movement.Exit,
         fail=Failure,
         ok=Success,
         time=time.time,
+        t=imported_typing,
         **event_classes,
     )
 
@@ -321,8 +325,6 @@ def _prepare_args(fn, args, kwargs):
             arg = kwargs[name]
             if isinstance(arg, inbox.PostService):
                 return DynamicPostService(arg)
-            if isinstance(arg, DynamicPostMessage):
-                log.warning("DynamicPostMessage %s", arg)
             return arg
         if args:
             return args.pop(0)

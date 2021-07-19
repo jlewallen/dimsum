@@ -19,7 +19,6 @@ async def test_multiple_simple_verbs(caplog):
     await tw.failure("wiggle")
 
     hammer_key = await tw.add_behaviored_thing(
-        tw,
         "Hammer",
         """
 @language('start: "wiggle"')
@@ -45,7 +44,6 @@ async def test_dynamic_applies_only_when_held(caplog):
     await tw.initialize()
 
     hammer_key = await tw.add_behaviored_thing(
-        tw,
         "Hammer",
         """
 @language('start: "wiggle"', condition=Held())
@@ -67,7 +65,6 @@ async def test_dynamic_language_say_nearby(caplog):
     await tw.add_carla()
 
     hammer_key = await tw.add_behaviored_thing(
-        tw,
         "Keys",
         """
 @language('start: "jingle"', condition=Held())
@@ -99,7 +96,6 @@ async def test_dynamic_smash(caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 @dataclass(frozen=True)
@@ -114,7 +110,6 @@ async def smashed(this: Entity, ev: Smashed, say):
 """,
     )
     hammer_key = await tw.add_behaviored_thing(
-        tw,
         "Hammer",
         """
 @dataclass(frozen=True)
@@ -143,7 +138,6 @@ async def test_dynamic_maintains_scope(caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 @dataclass(frozen=True)
@@ -168,7 +162,6 @@ async def smashed(this, ev, say):
 """,
     )
     hammer_key = await tw.add_behaviored_thing(
-        tw,
         "Hammer",
         """
 @dataclass(frozen=True)
@@ -202,7 +195,6 @@ async def test_dynamic_receive_tick(caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 class Rusting(Scope):
@@ -239,7 +231,6 @@ async def test_dynamic_receive_drop_hook(caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 class Rusting(Scope):
@@ -281,7 +272,6 @@ async def test_no_evaluators_understands_nothing(caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 evaluators = []
@@ -297,7 +287,6 @@ async def test_exception_in_parse(silence_dynamic_errors, caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 asdf;
@@ -323,7 +312,6 @@ async def test_exception_in_compile(silence_dynamic_errors, caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 og.info("hello")
@@ -339,7 +327,6 @@ async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 @received(TickEvent)
@@ -370,7 +357,6 @@ async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
     await tw.initialize()
 
     nail_key = await tw.add_behaviored_thing(
-        tw,
         "Nail",
         """
 @language('start: "break"')
@@ -389,7 +375,6 @@ async def test_dynamic_inherited(caplog):
     await tw.initialize()
 
     jingles_base_key = await tw.add_behaviored_thing(
-        tw,
         "base:jingles",
         """
 @language('start: "jingle"', condition=Held())
@@ -419,9 +404,8 @@ async def test_dynamic_hook_observed(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    await tw.add_behaviored_thing(tw, "Door", "")
+    await tw.add_behaviored_thing("Door", "")
     await tw.add_behaviored_thing(
-        tw,
         "Keys",
         """
 @hooks.observed.hook
@@ -447,7 +431,6 @@ async def test_dynamic_hook_never_hold(caplog):
     await tw.initialize()
 
     await tw.add_behaviored_thing(
-        tw,
         "Keys",
         """
 @hooks.hold.hook
@@ -472,7 +455,6 @@ async def test_dynamic_hook_never_enter(caplog):
     await tw.success("go south")
 
     await tw.add_behaviored_thing(
-        tw,
         "Really Heavy Keys",
         """
 @hooks.enter.hook
@@ -497,7 +479,6 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
     await tw.success("go south")
 
     await tw.add_behaviored_thing(
-        tw,
         "Really Heavy Keys",
         """
 @hooks.enter.hook(condition=Held())
@@ -519,7 +500,6 @@ async def test_dynamic_received_say_nearby(caplog):
     await tw.initialize()
 
     await tw.add_behaviored_thing(
-        tw,
         "Keys",
         """
 @received(TickEvent)

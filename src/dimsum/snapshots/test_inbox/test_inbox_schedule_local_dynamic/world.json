@@ -927,7 +927,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",

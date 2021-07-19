@@ -41,3 +41,9 @@
    capture a flag or do something? See who can gather the most X in
    whatever time? People can also create their own scenarios, in a
    DnD-esque way and see if their friends can find their way out.
+
+** TODO Allow nesting of Scopes
+
+   Right now if you nest you end up creating two instances and they
+   can overwrite each other. A good example is in tools.move's use of
+   Location.

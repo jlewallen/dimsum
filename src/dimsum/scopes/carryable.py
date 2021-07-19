@@ -248,12 +248,14 @@ class Containing(Openable):
         return True
 
     def contains(self, e: Entity) -> bool:
-        return e in self.holding
+        return e.key in [f.key for f in self.holding]
 
     def unhold(self, e: Entity, **kwargs) -> Entity:
-        if e in self.holding:
-            self.holding.remove(e)
-            self.ourselves.touch()
+        removed = [f for f in self.holding if f.key == e.key]
+        for r in removed:
+            self.holding.remove(r)
+        assert removed
+        self.ourselves.touch()
         with e.make(Location) as location:
             location.container = None
         return e

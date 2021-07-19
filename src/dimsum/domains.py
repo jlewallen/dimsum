@@ -289,7 +289,9 @@ class Session(MaterializeAndCreate):
                         if behave.get_default():
                             log.info("everywhere: %s", entity)
                             with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
-                                await ctx.notify(ev, post=post_service)
+                                await ctx.notify(
+                                    ev, post=post_service, area=tools.area_of(entity)
+                                )
                                 await ctx.complete()
                 except MissingEntityException as e:
                     log.exception("missing entity", exc_info=True)
@@ -474,9 +476,8 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify: %s entities=%s", ev, self.entities)
-        post_service = await inbox.create_post_service(self, self.world)
         dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        await dynamic_behavior.notify(ev, say=self.say, post=post_service)
+        await dynamic_behavior.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def complete(self):
         assert self.reference

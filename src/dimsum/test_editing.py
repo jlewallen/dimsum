@@ -39,7 +39,6 @@ async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged(
     await tw.initialize()
 
     box_key = await tw.add_behaviored_thing(
-        tw,
         "Box",
         """
 og.info("hello")
@@ -50,10 +49,10 @@ og.info("hello")
 
     with tw.domain.session() as session:
         box = await session.materialize(key=box_key)
-        assert box.version.i == 2
+        assert box.version.i == 3
 
     await tw.success("edit box")
 
     with tw.domain.session() as session:
         box = await session.materialize(key=box_key)
-        assert box.version.i == 2
+        assert box.version.i == 3

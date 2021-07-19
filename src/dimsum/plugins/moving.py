@@ -53,7 +53,7 @@ class MovingAction(PersonAction):
                 area, person, world=world, builder=world
             )
             if route:
-                routed: Any = route.area
+                routed = route.area
                 destination = routed
 
         if destination is None:
