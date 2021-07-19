@@ -250,7 +250,7 @@ class Grammar(grammars.Grammar):
         make:                   "make" makeable                         -> make
                               | "make" number makeable                  -> make_quantified
 
-        create:                 "create" create_entity_kind TEXT
+        create:                 "create" create_entity_kind string
         create_entity_kind:     "thing" -> create_entity_kind_thing
                               | "area" -> create_entity_kind_area
                               | "exit" -> create_entity_kind_exit

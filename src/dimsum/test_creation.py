@@ -34,6 +34,16 @@ async def test_create_area(snapshot):
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
+async def test_create_area_quoted(snapshot):
+    with test.Deterministic():
+        tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
+        await tw.initialize()
+        await tw.success('create area "Wilshire/Western"')
+        snapshot.assert_match(await tw.to_json(), "world.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
 async def test_create_exit(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
