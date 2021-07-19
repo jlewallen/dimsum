@@ -18,7 +18,7 @@ async def test_multiple_simple_verbs(caplog):
 
     await tw.failure("wiggle")
 
-    hammer = await tw.add_behaviored_thing(
+    hammer_key = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -44,7 +44,7 @@ async def test_dynamic_applies_only_when_held(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = await tw.add_behaviored_thing(
+    hammer_key = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -66,7 +66,7 @@ async def test_dynamic_language_say_nearby(caplog):
     await tw.initialize()
     await tw.add_carla()
 
-    hammer = await tw.add_behaviored_thing(
+    hammer_key = await tw.add_behaviored_thing(
         tw,
         "Keys",
         """
@@ -98,7 +98,7 @@ async def test_dynamic_smash(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -113,7 +113,7 @@ async def smashed(this: Entity, ev: Smashed, say):
     say.nearby("%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
 """,
     )
-    hammer = await tw.add_behaviored_thing(
+    hammer_key = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -142,7 +142,7 @@ async def test_dynamic_maintains_scope(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -167,7 +167,7 @@ async def smashed(this, ev, say):
         say.nearby("smashes: %d" % (smashes.smashes))
 """,
     )
-    hammer = await tw.add_behaviored_thing(
+    hammer_key = await tw.add_behaviored_thing(
         tw,
         "Hammer",
         """
@@ -192,7 +192,7 @@ async def smash(this, smashing, person, say):
     await tw.success("smash nail")
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         assert nail.scopes["smashes"]["smashes"] == 3
 
 
@@ -201,7 +201,7 @@ async def test_dynamic_receive_tick(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -228,7 +228,7 @@ async def rusting(this, ev, say):
         await session.save()
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         assert nail
         assert nail.scopes["rusting"]["rust"] == 1
 
@@ -238,7 +238,7 @@ async def test_dynamic_receive_drop_hook(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -263,14 +263,14 @@ async def dropped(this, ev, say):
     await tw.success("hold Nail")
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         assert nail
         assert "rusting" not in nail.scopes
 
     await tw.success("drop Nail")
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         assert nail
         assert nail.scopes["rusting"]["rust"] == 1
 
@@ -280,7 +280,7 @@ async def test_no_evaluators_understands_nothing(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -296,7 +296,7 @@ async def test_exception_in_parse(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -305,14 +305,14 @@ asdf;
     )
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 0
 
     await tw.success("hold Nail")
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 1
 
@@ -322,7 +322,7 @@ async def test_exception_in_compile(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -338,7 +338,7 @@ async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -349,7 +349,7 @@ def tick(this, ev, say):
     )
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 0
 
@@ -359,7 +359,7 @@ def tick(this, ev, say):
         await session.save()
 
     with tw.domain.session() as session:
-        nail = await session.materialize(key=nail.key)
+        nail = await session.materialize(key=nail_key)
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 1
 
@@ -369,7 +369,7 @@ async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    nail = await tw.add_behaviored_thing(
+    nail_key = await tw.add_behaviored_thing(
         tw,
         "Nail",
         """
@@ -388,7 +388,7 @@ async def test_dynamic_inherited(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    jingles_base = await tw.add_behaviored_thing(
+    jingles_base_key = await tw.add_behaviored_thing(
         tw,
         "base:jingles",
         """
@@ -402,6 +402,8 @@ async def jingle(this, person, say):
 
     with tw.domain.session() as session:
         world = await session.prepare()
+        jingles_base = await session.materialize(key=jingles_base_key)
+        assert jingles_base
         keys = await tw.add_item_to_welcome_area(
             scopes.item(creator=world, parent=jingles_base, props=Common("Keys")),
             session=session,
@@ -417,8 +419,8 @@ async def test_dynamic_hook_observed(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    door = await tw.add_behaviored_thing(tw, "Door", "")
-    keys = await tw.add_behaviored_thing(
+    await tw.add_behaviored_thing(tw, "Door", "")
+    await tw.add_behaviored_thing(
         tw,
         "Keys",
         """
@@ -444,7 +446,7 @@ async def test_dynamic_hook_never_hold(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    keys = await tw.add_behaviored_thing(
+    await tw.add_behaviored_thing(
         tw,
         "Keys",
         """
@@ -469,7 +471,7 @@ async def test_dynamic_hook_never_enter(caplog):
 
     await tw.success("go south")
 
-    really_heavy_keys = await tw.add_behaviored_thing(
+    await tw.add_behaviored_thing(
         tw,
         "Really Heavy Keys",
         """
@@ -494,7 +496,7 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
 
     await tw.success("go south")
 
-    really_heavy_keys = await tw.add_behaviored_thing(
+    await tw.add_behaviored_thing(
         tw,
         "Really Heavy Keys",
         """
@@ -516,7 +518,7 @@ async def test_dynamic_received_say_nearby(caplog):
     tw = test.TestWorld()
     await tw.initialize()
 
-    hammer = await tw.add_behaviored_thing(
+    await tw.add_behaviored_thing(
         tw,
         "Keys",
         """

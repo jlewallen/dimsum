@@ -161,7 +161,9 @@ class TestWorld:
         assert isinstance(r, Failure)
         return r
 
-    async def add_behaviored_thing(self, tw: "TestWorld", name: str, python: str):
+    async def add_behaviored_thing(
+        self, tw: "TestWorld", name: str, python: str
+    ) -> str:
         with tw.domain.session() as session:
             world = await session.prepare()
 
@@ -175,7 +177,7 @@ class TestWorld:
 
             await session.save()
 
-            return item  # TODO return key
+            return item.key
 
 
 async def make_simple_domain(

@@ -28,11 +28,11 @@ async def test_inbox_schedule_local_service(snapshot):
         tw = test.TestWorld()
         await tw.initialize()
 
-        hammer = await tw.add_behaviored_thing(tw, "Hammer", "")
+        hammer_key = await tw.add_behaviored_thing(tw, "Hammer", "")
 
         with tw.domain.session() as session:
             world = await session.prepare()
-            hammer = await session.try_materialize_key(hammer.key)
+            hammer = await session.try_materialize_key(hammer_key)
             assert hammer
 
             post_service = await inbox.create_post_service(session, world)
@@ -59,7 +59,7 @@ async def test_inbox_schedule_local_dynamic(snapshot):
         tw = test.TestWorld()
         await tw.initialize()
 
-        hammer = await tw.add_behaviored_thing(
+        hammer_key = await tw.add_behaviored_thing(
             tw,
             "Hammer",
             """

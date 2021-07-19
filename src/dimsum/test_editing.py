@@ -38,7 +38,7 @@ async def test_edit_item_with_error_in_dynamic_leaves_version_unchanged(
     tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
     await tw.initialize()
 
-    box = await tw.add_behaviored_thing(
+    box_key = await tw.add_behaviored_thing(
         tw,
         "Box",
         """
@@ -49,11 +49,11 @@ og.info("hello")
     await tw.success("edit box")
 
     with tw.domain.session() as session:
-        box = await session.materialize(key=box.key)
+        box = await session.materialize(key=box_key)
         assert box.version.i == 2
 
     await tw.success("edit box")
 
     with tw.domain.session() as session:
-        box = await session.materialize(key=box.key)
+        box = await session.materialize(key=box_key)
         assert box.version.i == 2
