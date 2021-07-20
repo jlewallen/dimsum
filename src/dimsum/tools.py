@@ -123,29 +123,35 @@ def show(e: Entity):
         vis.make_visible()
 
 
-def presence(e: Entity, short=False, long=False):
+def set_presence(e: Entity, p: mechanics.Presence):
     with e.make(mechanics.Visibility) as vis:
-        if short:
-            vis.visible.presence = mechanics.Presence.INLINE_SHORT
-        elif long:
-            vis.visible.presence = mechanics.Presence.INLINE_LONG
-        else:
-            vis.discard()
+        if vis.visible.presence != p:
+            vis.visible.presence = p
+            e.touch()
+
+
+def presence(e: Entity, short=False, long=False):
+    if short:
+        set_presence(e, mechanics.Presence.INLINE_SHORT)
+    elif long:
+        set_presence(e, mechanics.Presence.INLINE_LONG)
+
+
+def is_presence(e: Entity, p: mechanics.Presence):
+    with e.make(mechanics.Visibility) as vis:
+        return vis.visible.presence == p
 
 
 def is_presence_distinct(e: Entity) -> bool:
-    with e.make_and_discard(mechanics.Visibility) as vis:
-        return vis.visible.presence == mechanics.Presence.DISTINCT
+    return is_presence(e, mechanics.Presence.DISTINCT)
 
 
 def is_presence_inline_short(e: Entity) -> bool:
-    with e.make_and_discard(mechanics.Visibility) as vis:
-        return vis.visible.presence == mechanics.Presence.INLINE_SHORT
+    return is_presence(e, mechanics.Presence.INLINE_SHORT)
 
 
 def is_presence_inline_long(e: Entity) -> bool:
-    with e.make_and_discard(mechanics.Visibility) as vis:
-        return vis.visible.presence == mechanics.Presence.INLINE_LONG
+    return is_presence(e, mechanics.Presence.INLINE_LONG)
 
 
 def hold(c: Entity, e: Entity):

@@ -132,7 +132,7 @@ class ModifyActivity(PersonAction):
 class Grammar(grammars.Grammar):
     @property
     def order(self) -> int:
-        return grammars.HIGHEST
+        return grammars.LOWEST
 
     @property
     def transformer_factory(self) -> Type[transformers.Base]:

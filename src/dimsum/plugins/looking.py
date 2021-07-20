@@ -213,6 +213,24 @@ class Examine(PersonAction):
         return DetailedObservation(ObservedEntity(item))
 
 
+class ModifyPresence(PersonAction):
+    def __init__(self, item: ItemFinder, presence: mechanics.Presence, **kwargs):
+        super().__init__(**kwargs)
+        self.item = item
+        self.presence = presence
+
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        item = await ctx.apply_item_finder(person, self.item)
+        if not item:
+            return Failure("modify what?")
+
+        tools.set_presence(item, self.presence)
+
+        return DetailedObservation(ObservedEntity(item))
+
+
 class Transformer(transformers.Base):
     def look(self, args):
         return Look()
@@ -235,6 +253,15 @@ class Transformer(transformers.Base):
     def examine(self, args):
         return Examine(item=args[0])
 
+    def presence_distinct(self, args):
+        return ModifyPresence(args[0], mechanics.Presence.DISTINCT)
+
+    def presence_inline_short(self, args):
+        return ModifyPresence(args[0], mechanics.Presence.INLINE_SHORT)
+
+    def presence_inline_long(self, args):
+        return ModifyPresence(args[0], mechanics.Presence.INLINE_LONG)
+
 
 @grammars.grammar()
 class LookingGrammar(grammars.Grammar):
@@ -245,16 +272,20 @@ class LookingGrammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:             look | examine
+        start:             look | examine | modify
 
         look:              "look"
-                         | "look" ("down")                         -> look_down
-                         | "look" ("at" "myself")                  -> look_myself
-                         | "look" ("at" noun)                      -> look_item
-                         | "look" ("for" noun)                     -> look_for
-                         | "look" ("in" held)                      -> look_inside
+                         | "look" ("down")                           -> look_down
+                         | "look" ("at" "myself")                    -> look_myself
+                         | "look" ("at" noun)                        -> look_item
+                         | "look" ("for" noun)                       -> look_for
+                         | "look" ("in" held)                        -> look_inside
 
-        examine:           "examine" noun                          -> examine
+        examine:           "examine" noun                            -> examine
+
+        modify:            "modify" "presence" noun "distinct"       -> presence_distinct
+                         | "modify" "presence" noun "inline" "short" -> presence_inline_short
+                         | "modify" "presence" noun "inline" "long"  -> presence_inline_long
 """
 
 

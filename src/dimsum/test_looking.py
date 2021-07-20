@@ -151,14 +151,7 @@ async def test_changing_presence_to_inline_short(snapshot):
     await tw.success("make Box")
     await tw.success("drop")
 
-    with tw.domain.session() as session:
-        world = await session.prepare()
-        jacob = await session.materialize(key=tw.jacob_key)
-        area = await find_entity_area(jacob)
-        box = area.make(carryable.Containing).holding[0]
-        assert box
-        tools.presence(box, short=True)
-        await session.save()
+    await tw.success("modify presence box inline short")
 
     r = await tw.success("look")
 
@@ -179,14 +172,7 @@ async def test_changing_presence_to_inline_long(snapshot):
     await tw.success("make Box")
     await tw.success("drop")
 
-    with tw.domain.session() as session:
-        world = await session.prepare()
-        jacob = await session.materialize(key=tw.jacob_key)
-        area = await find_entity_area(jacob)
-        box = area.make(carryable.Containing).holding[0]
-        assert box
-        tools.presence(box, long=True)
-        await session.save()
+    await tw.success("modify presence box inline long")
 
     r = await tw.success("look")
 
