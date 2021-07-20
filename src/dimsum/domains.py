@@ -156,7 +156,7 @@ class Session(MaterializeAndCreate):
         active_session.set(None)
         finished = time.time()
         elapsed = finished - self.created
-        log.info("session:elapsed %f", elapsed)
+        log.info("session:elapsed %fms", elapsed * 1000)
         return False
 
     def register(self, entity: Entity) -> Entity:
