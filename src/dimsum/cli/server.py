@@ -23,16 +23,18 @@ log = logging.getLogger("dimsum.cli")
 
 
 async def servicing(domain: domains.Domain):
+    first = True
     while True:
         try:
             await asyncio.sleep(1)
             try:
                 now = time.time()
-                if domain.time_to_service and now >= domain.time_to_service:
+                if first or (domain.time_to_service and now >= domain.time_to_service):
                     with domain.session() as session:
                         await session.prepare()
                         await session.service(now)
                         await session.save()
+                    first = False
             except:
                 log.exception("error", exc_info=True)
         except asyncio.exceptions.CancelledError:
