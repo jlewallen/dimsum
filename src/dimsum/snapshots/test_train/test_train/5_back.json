@@ -216,7 +216,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 5
+            "i": 7
         },
         "creator": {
             "py/object": "model.world.World",
@@ -258,12 +258,26 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [],
+                "holding": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 14,
+                        "klass": "ExitClass",
+                        "name": "Purple Line Train"
+                    }
+                ],
                 "capacity": null,
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [],
+                "occupied": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 6,
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    }
+                ],
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -374,7 +388,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -455,7 +469,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 4
+            "i": 7
         },
         "creator": {
             "py/object": "model.world.World",
@@ -578,7 +592,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -659,7 +673,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -720,9 +734,9 @@
             "occupying": {
                 "area": {
                     "py/object": "model.entity.Entity",
-                    "key": 10,
+                    "key": 4,
                     "klass": "AreaClass",
-                    "name": "Wilshire/Western"
+                    "name": "Living room"
                 },
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -833,7 +847,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -914,7 +928,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -956,26 +970,12 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 14,
-                        "klass": "ExitClass",
-                        "name": "Purple Line Train"
-                    }
-                ],
+                "holding": [],
                 "capacity": null,
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 6,
-                        "klass": "LivingClass",
-                        "name": "Jacob"
-                    }
-                ],
+                "occupied": [],
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -1086,7 +1086,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369615.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1167,7 +1167,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 4
+            "i": 7
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1208,6 +1208,18 @@
                                 },
                                 {
                                     "time": 1569369610.0,
+                                    "success": true
+                                },
+                                {
+                                    "time": 1569369610.0,
+                                    "success": true
+                                },
+                                {
+                                    "time": 1569369615.0,
+                                    "success": true
+                                },
+                                {
+                                    "time": 1569369620.0,
                                     "success": true
                                 }
                             ]
@@ -1250,9 +1262,9 @@
                 },
                 "container": {
                     "py/object": "model.entity.Entity",
-                    "key": 10,
+                    "key": 4,
                     "klass": "AreaClass",
-                    "name": "Wilshire/Western"
+                    "name": "Living room"
                 }
             },
             "train": {
@@ -1360,7 +1372,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1441,7 +1453,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 3
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1480,9 +1492,9 @@
                 },
                 "area": {
                     "py/object": "model.entity.Entity",
-                    "key": 10,
+                    "key": 4,
                     "klass": "AreaClass",
-                    "name": "Wilshire/Western"
+                    "name": "Living room"
                 }
             },
             "location": {
@@ -1601,7 +1613,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369615.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1682,7 +1694,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1847,7 +1859,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1928,7 +1940,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",
@@ -2086,7 +2098,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369610.0,
+                    "value": 1569369620.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

@@ -455,7 +455,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",
@@ -480,19 +480,7 @@
                 }
             },
             "post": {
-                "queue": [
-                    {
-                        "py/object": "scopes.inbox.QueuedMessage",
-                        "entity_key": 14,
-                        "when": 1569369610.0,
-                        "message": {
-                            "py/object": "dynamic.DynamicPostMessage",
-                            "message": {
-                                "py/object": "builtins.Arrive"
-                            }
-                        }
-                    }
-                ]
+                "queue": []
             }
         },
         "klass": {
@@ -590,7 +578,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369610.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -926,7 +914,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -968,7 +956,14 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [],
+                "holding": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 14,
+                        "klass": "ExitClass",
+                        "name": "Purple Line Train"
+                    }
+                ],
                 "capacity": null,
                 "produces": {}
             },
@@ -1036,7 +1031,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "Wilshire/Western",
+                    "value": "Wilshire/Western (#4)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1084,7 +1079,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0,
+                    "value": 1569369610.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1165,7 +1160,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1202,6 +1197,10 @@
                                 },
                                 {
                                     "time": 1569369605.0,
+                                    "success": true
+                                },
+                                {
+                                    "time": 1569369610.0,
                                     "success": true
                                 }
                             ]
@@ -1244,9 +1243,9 @@
                 },
                 "container": {
                     "py/object": "model.entity.Entity",
-                    "key": 18,
+                    "key": 10,
                     "klass": "AreaClass",
-                    "name": "Limbo"
+                    "name": "Wilshire/Western"
                 }
             },
             "train": {
@@ -1354,7 +1353,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369610.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1929,7 +1928,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1971,14 +1970,7 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 14,
-                        "klass": "ExitClass",
-                        "name": "Purple Line Train"
-                    }
-                ],
+                "holding": [],
                 "capacity": null,
                 "produces": {}
             },
@@ -2094,7 +2086,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369605.0,
+                    "value": 1569369610.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

@@ -100,7 +100,9 @@ SecurityException:
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
-    set_time_to_service: Callable[[Optional[float]], None]
+    set_time_to_service: Callable[[Optional[float]], None] = dataclasses.field(
+        repr=False
+    )
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
     world: Optional[World] = None

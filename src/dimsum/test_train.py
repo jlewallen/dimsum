@@ -55,7 +55,7 @@ async def test_train(snapshot, caplog, deterministic):
             await session.tick(0)
             await session.save()
 
-        for i in range(0, 5):
+        for i in range(0, 10):
             frozen_datetime.tick()
             with tw.domain.session() as session:
                 world = await session.prepare()
@@ -67,3 +67,20 @@ async def test_train(snapshot, caplog, deterministic):
         await tw.success("go door")
 
         snapshot.assert_match(await tw.to_json(), "4_arrived.json")
+
+        with tw.domain.session() as session:
+            await session.tick(0)
+            await session.save()
+
+        await tw.success("go train")
+
+        for i in range(0, 10):
+            frozen_datetime.tick()
+            with tw.domain.session() as session:
+                world = await session.prepare()
+                await session.service(time.time())
+                await session.save()
+
+        await tw.success("go door")
+
+        snapshot.assert_match(await tw.to_json(), "5_back.json")
