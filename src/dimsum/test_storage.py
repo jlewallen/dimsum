@@ -1,4 +1,6 @@
 import logging
+import shortuuid
+import sqlite3
 import pytest
 
 import domains
@@ -65,4 +67,50 @@ async def test_storage_only_save_modified_super_simple():
 
         store.freeze()
 
+        await session.save()
+
+
+@pytest.mark.asyncio
+async def test_storage_update_fails_and_rolls_back(caplog):
+    store = storage.SqliteStorage(":memory:")
+    domain = domains.Domain(store=store)
+
+    area_1_key = shortuuid.uuid()
+    area_2_key = shortuuid.uuid()
+    with domain.session() as session:
+        world = await session.prepare()
+        await session.add_area(
+            scopes.area(key=area_1_key, creator=world, props=Common("Area One"))
+        )
+        await session.add_area(
+            scopes.area(key=area_2_key, creator=world, props=Common("Area Two"))
+        )
+        await session.save()
+
+    with pytest.raises(sqlite3.IntegrityError):
+        with caplog.at_level(logging.CRITICAL):
+            with domain.session() as session:
+                world = await session.prepare()
+                area_1 = await session.materialize(key=area_1_key)
+                assert area_1
+                area_2 = await session.materialize(key=area_2_key)
+                assert area_2
+                area_1.props.name = "Area Three"
+                area_2.version.i = 0
+                area_1.touch()
+                area_2.touch()
+                await session.save()
+
+    with domain.session() as session:
+        world = await session.prepare()
+        area_2 = await session.materialize(key=area_2_key)
+        assert area_2
+        area_2.touch()
+        await session.save()
+
+    with domain.session() as session:
+        world = await session.prepare()
+        area_1 = await session.materialize(key=area_1_key)
+        assert area_1
+        area_1.touch()
         await session.save()

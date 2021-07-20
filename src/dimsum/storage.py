@@ -319,19 +319,23 @@ class SqliteStorage(EntityStorage):
         updating = {key: StorageFields.parse(update) for key, update in updates.items()}
 
         self.dbc = self.db.cursor()
-        for key, fields in updating.items():
-            assert not self.frozen
-            if fields.destroyed:
-                self._delete_row(fields)
-            else:
-                if fields.original == 0:
-                    self._insert_row(fields)
+        try:
+            for key, fields in updating.items():
+                log.info("updating %s", key)
+                assert not self.frozen
+                if fields.destroyed:
+                    self._delete_row(fields)
                 else:
-                    self._update_row(fields)
+                    if fields.original == 0:
+                        self._insert_row(fields)
+                    else:
+                        self._update_row(fields)
 
-        self.db.commit()
+            self.db.commit()
 
-        return {key: f.saved for key, f in updating.items() if not f.destroyed}
+            return {key: f.saved for key, f in updating.items() if not f.destroyed}
+        finally:
+            self.db.rollback()
 
     async def load_by_gid(self, gid: int):
         loaded = await self.load_query(

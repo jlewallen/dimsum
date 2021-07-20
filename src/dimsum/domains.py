@@ -71,7 +71,7 @@ def infinite_reach(entity: Entity, depth: int):
 
 def default_reach(entity: Entity, depth: int):
     if entity.klass == scopes.AreaClass:
-        if depth == 3:
+        if depth == 2:
             return -1
         return 1
     return 0
