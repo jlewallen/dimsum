@@ -13,6 +13,10 @@ log = logging.getLogger("dimsum")
 
 class MaterializeAndCreate:
     @abc.abstractmethod
+    def find_by_key(self, key: str) -> Entity:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def create_item(self, **kwargs) -> Entity:
         raise NotImplementedError
 

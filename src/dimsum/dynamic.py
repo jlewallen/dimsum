@@ -53,7 +53,7 @@ class Held(Condition):
     entity_key: str
 
     def applies(self) -> bool:
-        entity = session.get().registrar.find_by_key(self.entity_key)
+        entity = context.get().find_by_key(self.entity_key)
         assert entity
         return tools.in_pockets(entity)
 
@@ -63,7 +63,7 @@ class Ground(Condition):
     entity_key: str
 
     def applies(self) -> bool:
-        entity = session.get().registrar.find_by_key(self.entity_key)
+        entity = context.get().find_by_key(self.entity_key)
         assert entity
         return tools.on_ground(entity)
 
@@ -202,7 +202,7 @@ class Simplified:
     ) -> Optional[Action]:
         assert player
 
-        entity = await session.get().materialize(key=self.entity_key)
+        entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
 
         log.debug("%s evaluate %s", self, entity)
@@ -210,7 +210,7 @@ class Simplified:
         for registered in [r for r in self.registered if r.condition.applies()]:
 
             def transformer_factory(**kwargs):
-                assert world and player
+                assert world and player and entity
                 return SimplifiedTransformer(
                     registered=registered,
                     world=world,
@@ -232,7 +232,7 @@ class Simplified:
         return None
 
     async def notify(self, ev: Event, **kwargs):
-        entity = await session.get().materialize(key=self.entity_key)
+        entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
 
         for receive in self.receives:
@@ -387,7 +387,7 @@ async def __ex(t=thunk):
         return thunk
 
     def load_found():
-        return session.get().find_by_key(found.key)
+        return context.get().find_by_key(found.key)
 
     def create_hooks():
         return All(

@@ -59,7 +59,7 @@ active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session"
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
-def get() -> "Session":
+def _get() -> "Session":
     session = active_session.get()
     assert session
     return session
@@ -227,18 +227,22 @@ class Session(MaterializeAndCreate):
     async def execute(self, player: Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
-        contributing = tools.get_contributing_entities(self.world, player)
-        dynamic_behavior = dynamic.Behavior(self.world, contributing)
-        log.info("hooks: %s", dynamic_behavior.dynamic_hooks)
-        evaluator = grammars.PrioritizedEvaluator(
-            [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
-        )
-        with ExtendHooks(dynamic_behavior.dynamic_hooks):
-            log.debug("evaluator: '%s'", evaluator)
-            action = await evaluator.evaluate(command, world=self.world, player=player)
-            assert action
-            assert isinstance(action, Action)
-            return await self.perform(action, player)
+
+        with WorldCtx(session=self, person=player) as ctx:
+            contributing = tools.get_contributing_entities(self.world, player)
+            dynamic_behavior = dynamic.Behavior(self.world, contributing)
+            log.info("hooks: %s", dynamic_behavior.dynamic_hooks)
+            evaluator = grammars.PrioritizedEvaluator(
+                [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
+            )
+            with ExtendHooks(dynamic_behavior.dynamic_hooks):
+                log.debug("evaluator: '%s'", evaluator)
+                action = await evaluator.evaluate(
+                    command, world=self.world, player=player
+                )
+                assert action
+                assert isinstance(action, Action)
+                return await self.perform(action, player)
 
     async def perform(
         self,
@@ -294,7 +298,7 @@ class Session(MaterializeAndCreate):
                 # Materialize from the target entity to ensure we have
                 # enough in memory to carry out its behavior.
                 try:
-                    entity = await get().materialize(key=key, refresh=True)
+                    entity = await self.materialize(key=key, refresh=True)
                     with entity.make(behavior.Behaviors) as behave:
                         if behave.get_default():
                             log.info("everywhere: %s", entity)
@@ -320,7 +324,7 @@ class Session(MaterializeAndCreate):
         queued = await post_service.service(now)
         for qm in queued:
             try:
-                entity = await get().materialize(key=qm.entity_key, refresh=True)
+                entity = await self.materialize(key=qm.entity_key, refresh=True)
                 with entity.make(behavior.Behaviors) as behave:
                     if behave.get_default():
                         log.info("everywhere: %s", entity)
@@ -487,6 +491,9 @@ class WorldCtx(Ctx):
     def unregister(self, destroyed: Entity) -> Entity:
         cleanup_entity(destroyed, world=self.world)
         return self.session.unregister(destroyed)
+
+    def find_by_key(self, key: str) -> Entity:
+        return self.session.find_by_key(key)
 
     async def standard(self, klass, *args, **kwargs):
         assert self.world
