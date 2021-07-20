@@ -22,6 +22,7 @@ def get_color(e: Entity) -> str:
     map = {
         RootEntityClass: "white",
         plugins.helping.EncyclopediaClass: "darkseagreen",
+        scopes.ServiceClass: "darkseagreen",
         scopes.LivingClass: "darkseagreen",
         scopes.ItemClass: "khaki",
         scopes.ExitClass: "salmon",
