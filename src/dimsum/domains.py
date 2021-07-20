@@ -104,6 +104,7 @@ class Session(MaterializeAndCreate):
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
     world: Optional[World] = None
+    created: float = dataclasses.field(default_factory=time.time)
 
     @functools.cached_property
     def bus(self):
@@ -151,6 +152,9 @@ class Session(MaterializeAndCreate):
 
     def __exit__(self, type, value, traceback) -> Literal[False]:
         active_session.set(None)
+        finished = time.time()
+        elapsed = finished - self.created
+        log.info("session:elapsed %f", elapsed)
         return False
 
     def register(self, entity: Entity) -> Entity:
