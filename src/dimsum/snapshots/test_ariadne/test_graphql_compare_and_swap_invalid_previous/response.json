@@ -38,7 +38,7 @@
                         "to_previous": "{'props': {'map': {'name': {'value': 'Not World'}}}}",
                         "previous": "{'acls': {'py/object': 'model.permissions.Acls', 'rules': [{'keys': ['$owner'], 'perm': 'write', 'py/object': 'model.permissions.Acl'}]}, 'creator': None, 'identity': {'private': '1', 'public': '1', 'py/object': 'model.crypto.Identity', 'signature': '1'}, 'key': 'world', ...}",
                         "diff_from_expected": "{'props': {'map': {'name': {'value': 'Not World'}}}}",
-                        "session": "Session(store...='World (#0)')"
+                        "session": "<deterministic>"
                     }
                 }
             }
