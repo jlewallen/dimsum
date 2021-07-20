@@ -2,6 +2,7 @@ import abc
 import logging
 import dataclasses
 import functools
+import inspect
 import contextvars
 import asyncio
 from typing import List, Optional, Callable, Dict, Any
@@ -12,9 +13,44 @@ from .context import get
 log = logging.getLogger("dimsum.hooks")
 live_hooks: contextvars.ContextVar = contextvars.ContextVar("dimsum:hooks")
 
+HookFunction = Callable
+
+
+class ArgumentTransformer:
+    def transform(
+        self, fn: Callable, args: List[Any], kwargs: Dict[str, Any]
+    ) -> List[Any]:
+        return args
+
+
+@dataclasses.dataclass
+class InvokeHook:
+    args: ArgumentTransformer = dataclasses.field(default_factory=ArgumentTransformer)
+
+    def chain_hook_call(self, fn: HookFunction, resume: HookFunction):
+        def wrap_hook_call(
+            hook_fn: HookFunction, resume_fn: HookFunction, *args, **kwargs
+        ):
+            signature = inspect.signature(hook_fn)
+            log.info(
+                "hook:wrap fn='%s' resume='%s' signature='%s' args=%s kwargs=%s",
+                hook_fn,
+                resume_fn,
+                signature,
+                args,
+                kwargs,
+            )
+            # Noteice we only transform arguments for the hook
+            # functions, never for the actual final hook call itself.
+            prepared = self.args.transform(hook_fn, [resume_fn] + list(args), kwargs)
+            return hook_fn(*prepared)
+
+        return functools.partial(wrap_hook_call, fn, resume)
+
 
 @dataclasses.dataclass
 class RegisteredHook:
+    invoker: InvokeHook
     fn: Callable
     condition: Optional[Condition] = None
 
@@ -22,6 +58,7 @@ class RegisteredHook:
 @dataclasses.dataclass
 class Hook:
     manager: "ManagedHooks"
+    invoker: InvokeHook
     name: str
     fn: Optional[Callable] = None
     hooks: List[RegisteredHook] = dataclasses.field(default_factory=lambda: [])
@@ -43,18 +80,17 @@ class Hook:
 
         return wrap
 
-    @staticmethod
-    def _invoke(name, call, hooks, args, kwargs):
+    def _invoke(self, name, call, hooks, args, kwargs):
         log.debug(
             "hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs
         )
 
         for registered in hooks:
             if registered.condition:
-                value = registered.condition.applies()
-                if not value:
+                if not registered.condition.applies():
                     continue
-            call = functools.partial(registered.fn, call)
+
+            call = registered.invoker.chain_hook_call(registered.fn, call)
 
         return call(*args, **kwargs)
 
@@ -62,7 +98,7 @@ class Hook:
         if wrapped is None:
             return functools.partial(self.hook, condition=condition)
 
-        self.hooks.append(RegisteredHook(wrapped, condition))
+        self.hooks.append(RegisteredHook(self.invoker, wrapped, condition))
 
         def wrap(fn):
             return fn
@@ -72,10 +108,11 @@ class Hook:
 
 @dataclasses.dataclass
 class ManagedHooks:
+    invoker: InvokeHook = dataclasses.field(default_factory=InvokeHook)
     everything: Dict[str, Hook] = dataclasses.field(default_factory=dict, init=False)
 
     def create_hook(self, name: str) -> Hook:
-        return self.everything.setdefault(name, Hook(self, name))
+        return self.everything.setdefault(name, Hook(self, self.invoker, name))
 
     def _get_hooks(self, name: str) -> List[RegisteredHook]:
         if name in self.everything:

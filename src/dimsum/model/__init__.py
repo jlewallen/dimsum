@@ -72,7 +72,7 @@ from model.reply import (
     Observation,
     observe_entity,
 )
-from model.hooks import ManagedHooks, All, ExtendHooks
+from model.hooks import ManagedHooks, All, ExtendHooks, ArgumentTransformer, InvokeHook
 from model.context import Ctx, get, MaterializeAndCreate
 from model.finders import (
     ItemFinder,
@@ -141,6 +141,8 @@ __all__: List[str] = [
     "Observation",
     "HoldingActivity",
     "hooks",
+    "ArgumentTransformer",
+    "InvokeHook",
     "find_entity_area",
     "find_entity_area_maybe",
     "generate_entity_identity",

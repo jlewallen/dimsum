@@ -482,8 +482,8 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
         "Really Heavy Keys",
         """
 @hooks.enter.hook(condition=Held())
-def never_enter(resume, person, area):
-    log.info("never-enter: %s", person)
+def never_enter(resume, person, area, this):
+    log.info("never-enter: %s keys=%s", person, this)
     return False
 """,
     )

@@ -112,6 +112,11 @@ class Session(MaterializeAndCreate):
     def bus(self):
         return EventBus(handlers=self.handlers or [])
 
+    def find_by_key(self, key: str) -> Entity:
+        e = self.registrar.find_by_key(key)
+        assert e
+        return e
+
     async def save(
         self,
         create_security_context: Optional[Callable[[Entity], SecurityContext]] = None,
@@ -224,7 +229,7 @@ class Session(MaterializeAndCreate):
         log.info("executing: '%s'", command)
         contributing = tools.get_contributing_entities(self.world, player)
         dynamic_behavior = dynamic.Behavior(self.world, contributing)
-        log.info("dynamic-hooks: %s", dynamic_behavior.dynamic_hooks)
+        log.info("hooks: %s", dynamic_behavior.dynamic_hooks)
         evaluator = grammars.PrioritizedEvaluator(
             [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
         )

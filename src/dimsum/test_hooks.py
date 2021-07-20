@@ -20,7 +20,12 @@ async def test_simple_hook_one_arg():
 
     @h.observed.hook
     def hide_invisible_entities(fn, entity: Entity):
-        log.info("hiding invisible")
+        log.info("hiding invisible: %s", fn)
+        return fn(entity)
+
+    @h.observed.hook
+    def hide_randomly(fn, entity: Entity):
+        log.info("hiding randomly: %s", fn)
         return fn(entity)
 
     jacob = scopes.alive(props=Common("Jacob"))

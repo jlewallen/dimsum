@@ -7,6 +7,7 @@ import jsonpickle
 import time
 import typing as imported_typing
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
+from collections import ChainMap
 
 import grammars
 import transformers
@@ -34,6 +35,8 @@ from model import (
     Condition,
     AlwaysTrue,
     All,
+    InvokeHook,
+    ArgumentTransformer,
     ItemFinder,
 )
 import scopes.behavior as behavior
@@ -97,7 +100,7 @@ class DynamicPostService:
 class EntityBehavior(grammars.CommandEvaluator):
     @property
     def hooks(self):
-        return All()
+        return All()  # empty hooks
 
     async def notify(self, ev: Event, **kwargs):
         raise NotImplementedError
@@ -161,9 +164,9 @@ class SimplifiedTransformer(transformers.Base):
 class Simplified:
     entity_key: str
     thunk_factory: Callable = dataclasses.field(repr=False)
+    hooks: "All"
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
-    hooks: Optional["All"] = dataclasses.field(default_factory=All)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -319,19 +322,27 @@ class DynamicParameterException(Exception):
     pass
 
 
-def _prepare_args(fn, args, kwargs):
-    def _get_arg(name):
-        if name in kwargs:
-            arg = kwargs[name]
-            if isinstance(arg, inbox.PostService):
-                return DynamicPostService(arg)
-            return arg
-        if args:
-            return args.pop(0)
-        raise DynamicParameterException("'%s'" % (name,))
+@dataclasses.dataclass
+class CustomizeCallArguments(ArgumentTransformer):
+    extra: Dict[str, Any] = dataclasses.field(default_factory=dict)
 
-    signature = inspect.signature(fn)
-    return [_get_arg(p) for p in signature.parameters]
+    def transform(self, fn: Callable, args: List[Any], kwargs: Dict[str, Any]):
+        lookup: ChainMap = ChainMap(kwargs, self.extra)
+
+        def _get_arg(name: str):
+            if name in lookup:
+                arg = lookup[name]
+                if isinstance(arg, inbox.PostService):
+                    return DynamicPostService(arg)
+                if callable(arg):
+                    return arg()
+                return arg
+            if args:
+                return args.pop(0)
+            raise DynamicParameterException("'%s'" % (name,))
+
+        signature = inspect.signature(fn)
+        return [_get_arg(p) for p in signature.parameters]
 
 
 @functools.lru_cache
@@ -341,7 +352,7 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
     def thunk_factory(fn):
         async def thunk(*args, **kwargs):
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
-            actual_args = _prepare_args(fn, list(args), kwargs)
+            actual_args = CustomizeCallArguments().transform(fn, list(args), kwargs)
             lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
             frame.update(dict(ctx=context.get()))
 
@@ -375,7 +386,15 @@ async def __ex(t=thunk):
 
         return thunk
 
-    simplified = Simplified(found.key, thunk_factory)
+    def load_found():
+        return session.get().find_by_key(found.key)
+
+    def create_hooks():
+        return All(
+            invoker=InvokeHook(args=CustomizeCallArguments(dict(this=load_found)))
+        )
+
+    simplified = Simplified(found.key, thunk_factory, create_hooks())
     # TODO chain?
     frame.update(
         dict(
