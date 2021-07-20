@@ -104,7 +104,13 @@ class TestWorld:
                 world = await session.prepare()
 
             if not area:
-                area = scopes.area(creator=world, props=Common("Living room"))
+                area = scopes.area(
+                    creator=world,
+                    props=Common(
+                        "Living room",
+                        "The room isn't very big, just large enough for a functional couch and coffee table to be aimed at a credenza holding a record player.",
+                    ),
+                )
 
             await session.add_area(area)
             await session.save()

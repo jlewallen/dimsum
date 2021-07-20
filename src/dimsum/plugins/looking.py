@@ -1,6 +1,6 @@
 import logging
 import dataclasses
-from typing import Type, Optional, List, Sequence, Dict, Any
+from typing import Type, Optional, List, Sequence, Dict, Any, Callable
 
 import grammars
 import transformers
@@ -50,6 +50,7 @@ class AreaObservation(Observation):
 
     def __post_init__(self):
         occupied = self.area.make(occupyable.Occupyable).occupied
+
         self.living: List[ObservedLiving] = flatten(
             [observe_entity(e) for e in occupied if e != self.person]
         )
@@ -62,23 +63,43 @@ class AreaObservation(Observation):
                 or self.person.make(mechanics.Visibility).can_see(e.identity)
             ]
         )
+
         self.routes: List[movement.AreaRoute] = self.area.make(
             movement.Movement
         ).available_routes
 
     def render_tree(self) -> Dict[str, Any]:
+        def filter_items(predicate: Callable) -> List[ObservedEntity]:
+            return list(filter(lambda oe: predicate(oe.entity), self.items))
+
+        distinct_items = filter_items(tools.is_presence_distinct)
+        inline_shorts = filter_items(tools.is_presence_inline_short)
+        inline_longs = filter_items(tools.is_presence_inline_long)
+
         emd = [self.area.props.desc]
+
+        if len(inline_shorts) > 0:
+            emd[0] += "  You can see " + infl.join(
+                [x.entity.describe() for x in inline_shorts]
+            )
+
+        emd += [e.entity.props.desc for e in inline_longs]
+
         if len(self.living) > 0:
             emd += [
-                "also here is " + infl.join([x.entity.describe() for x in self.living])
+                "Also here is " + infl.join([x.entity.describe() for x in self.living])
             ]
-        if len(self.items) > 0:
+
+        if len(distinct_items) > 0:
             emd += [
-                "you can see " + infl.join([x.entity.describe() for x in self.items])
+                "You can see "
+                + infl.join([x.entity.describe() for x in distinct_items])
             ]
+
         holding = tools.get_holding(self.person)
         if len(holding) > 0:
-            emd += ["you're holding " + infl.join([x.describe() for x in holding])]
+            emd += ["You're holding " + infl.join([x.describe() for x in holding])]
+
         return {"title": self.area.props.name, "description": emd}
 
 

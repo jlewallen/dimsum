@@ -355,7 +355,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Living room",
+                    "value": "The room isn't very big, just large enough for a functional couch and coffee table to be aimed at a credenza holding a record player.",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

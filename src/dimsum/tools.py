@@ -133,6 +133,21 @@ def presence(e: Entity, short=False, long=False):
             vis.discard()
 
 
+def is_presence_distinct(e: Entity) -> bool:
+    with e.make_and_discard(mechanics.Visibility) as vis:
+        return vis.visible.presence == mechanics.Presence.DISTINCT
+
+
+def is_presence_inline_short(e: Entity) -> bool:
+    with e.make_and_discard(mechanics.Visibility) as vis:
+        return vis.visible.presence == mechanics.Presence.INLINE_SHORT
+
+
+def is_presence_inline_long(e: Entity) -> bool:
+    with e.make_and_discard(mechanics.Visibility) as vis:
+        return vis.visible.presence == mechanics.Presence.INLINE_LONG
+
+
 def hold(c: Entity, e: Entity):
     with c.make(carryable.Containing) as contains:
         held = contains.hold(e)

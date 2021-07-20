@@ -143,8 +143,8 @@ def get_first_item_on_ground(
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="wip")
-async def test_changing_presence_to_inline_short():
+@freezegun.freeze_time("2019-09-25")
+async def test_changing_presence_to_inline_short(snapshot):
     tw = test.TestWorld()
     await tw.initialize()
     await tw.add_carla()
@@ -158,9 +158,41 @@ async def test_changing_presence_to_inline_short():
         box = area.make(carryable.Containing).holding[0]
         assert box
         tools.presence(box, short=True)
+        await session.save()
 
     r = await tw.success("look")
 
-    log.info("%s", r)
+    log.info("reply: %s", r)
+    log.info("tree: %s", r.render_tree())
+
+    snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
+
+    assert len(r.items) == 1
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_changing_presence_to_inline_long(snapshot):
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.add_carla()
+    await tw.success("make Box")
+    await tw.success("drop")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = await find_entity_area(jacob)
+        box = area.make(carryable.Containing).holding[0]
+        assert box
+        tools.presence(box, long=True)
+        await session.save()
+
+    r = await tw.success("look")
+
+    log.info("reply: %s", r)
+    log.info("tree: %s", r.render_tree())
+
+    snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
 
     assert len(r.items) == 1
