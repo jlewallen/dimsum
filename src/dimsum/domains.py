@@ -100,6 +100,7 @@ SecurityException:
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
+    set_time_to_service: Callable[[Optional[float]], None]
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
     world: Optional[World] = None
@@ -399,12 +400,16 @@ class Domain:
         self.subscriptions = subscriptions if subscriptions else SubscriptionManager()
         self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]
+        self.time_to_service: Optional[float] = None
 
     def session(self) -> "Session":
         log.info("session:new")
+
+        def set_tts(value: Optional[float]):
+            self.time_to_service = value
+
         return Session(
-            store=self.store,
-            handlers=self.handlers,
+            store=self.store, handlers=self.handlers, set_time_to_service=set_tts
         )
 
     async def reload(self):
@@ -487,6 +492,14 @@ class WorldCtx(Ctx):
         await dynamic_behavior.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def complete(self):
+        post = await self.post()
+        tts = await post.get_time_to_service()
+        now = time.time()
+        if tts > now:
+            log.info("tts: %f sleep=%f", tts, tts - now)
+            self.session.set_time_to_service(tts)
+        else:
+            self.session.set_time_to_service(None)
         assert self.reference
         await self.say.publish(self.reference)
 

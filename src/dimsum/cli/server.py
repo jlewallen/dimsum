@@ -27,10 +27,12 @@ async def servicing(domain: domains.Domain):
         try:
             await asyncio.sleep(1)
             try:
-                with domain.session() as session:
-                    await session.prepare()
-                    await session.service(time.time())
-                    await session.save()
+                now = time.time()
+                if domain.time_to_service and now >= domain.time_to_service:
+                    with domain.session() as session:
+                        await session.prepare()
+                        await session.service(now)
+                        await session.save()
             except:
                 log.exception("error", exc_info=True)
         except asyncio.exceptions.CancelledError:
