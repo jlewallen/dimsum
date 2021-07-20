@@ -183,6 +183,8 @@ def _walk_diff(diff: Dict[str, Any]):
         if isinstance(value, int) or isinstance(value, float):
             return {".".join(path): True}
         if isinstance(value, list) or isinstance(value, tuple):
+            if len(value) == 0:
+                return {".".join(path): True}
             rv = {}
             for key, v in enumerate(value):
                 rv.update(walk(v, path + [str(key)]))
