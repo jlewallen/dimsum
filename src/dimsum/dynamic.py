@@ -198,9 +198,9 @@ class Simplified:
         self,
         command: str,
         world: Optional[World] = None,
-        player: Optional[Entity] = None,
+        person: Optional[Entity] = None,
     ) -> Optional[Action]:
-        assert player
+        assert person
 
         entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
@@ -210,11 +210,11 @@ class Simplified:
         for registered in [r for r in self.registered if r.condition.applies()]:
 
             def transformer_factory(**kwargs):
-                assert world and player and entity
+                assert world and person and entity
                 return SimplifiedTransformer(
                     registered=registered,
                     world=world,
-                    player=player,
+                    person=person,
                     entity=entity,
                 )
 

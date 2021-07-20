@@ -9,7 +9,7 @@ import scopes.movement as movement
 @dataclasses.dataclass
 class Base(lark.Transformer):
     world: World
-    player: Entity
+    person: Entity
 
     def start(self, args):
         return args[0]

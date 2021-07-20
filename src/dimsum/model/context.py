@@ -5,7 +5,6 @@ from typing import Any, Optional, List
 
 from .entity import Entity
 from .events import Event
-from .conditions import Condition
 
 world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
 log = logging.getLogger("dimsum")
@@ -35,15 +34,15 @@ class Ctx(MaterializeAndCreate):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def extend(self, **kwargs) -> "Ctx":
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def publish(self, ev: Event):
         raise NotImplementedError
 
     @abc.abstractmethod
     async def standard(self, klass, *args, **kwargs):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def extend(self, **kwargs) -> "Ctx":
         raise NotImplementedError
 
     @abc.abstractmethod

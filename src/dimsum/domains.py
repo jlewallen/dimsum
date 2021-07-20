@@ -224,12 +224,12 @@ class Session(MaterializeAndCreate):
         self.register(self.world)
         return self.world
 
-    async def execute(self, player: Entity, command: str):
+    async def execute(self, person: Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
 
-        with WorldCtx(session=self, person=player) as ctx:
-            contributing = tools.get_contributing_entities(self.world, player)
+        with WorldCtx(session=self, person=person) as ctx:
+            contributing = tools.get_contributing_entities(self.world, person)
             dynamic_behavior = dynamic.Behavior(self.world, contributing)
             log.info("hooks: %s", dynamic_behavior.dynamic_hooks)
             evaluator = grammars.PrioritizedEvaluator(
@@ -238,11 +238,11 @@ class Session(MaterializeAndCreate):
             with ExtendHooks(dynamic_behavior.dynamic_hooks):
                 log.debug("evaluator: '%s'", evaluator)
                 action = await evaluator.evaluate(
-                    command, world=self.world, player=player
+                    command, world=self.world, person=person
                 )
                 assert action
                 assert isinstance(action, Action)
-                return await self.perform(action, player)
+                return await self.perform(action, person)
 
     async def perform(
         self,
