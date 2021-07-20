@@ -70,7 +70,7 @@ async def test_dynamic_language_say_nearby(caplog):
 @language('start: "jingle"', condition=Held())
 async def jingle(this, person, say):
     log.info("jingle: %s", this)
-    say.nearby("you hear kings jingling")
+    say.nearby(this, "you hear kings jingling")
     return "hey there!"
 """,
     )
@@ -106,7 +106,7 @@ class Smashed(Event):
 @received(Smashed)
 async def smashed(this: Entity, ev: Smashed, say):
     log.info("smashed! %s", ev)
-    say.nearby("%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
+    say.nearby(this, "%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
 """,
     )
     hammer_key = await tw.add_behaviored_thing(
@@ -158,7 +158,7 @@ async def smashed(this, ev, say):
     with this.make(Smashes) as smashes:
         smashes.increase()
         this.touch()
-        say.nearby("smashes: %d" % (smashes.smashes))
+        say.nearby(this, "smashes: %d" % (smashes.smashes))
 """,
     )
     hammer_key = await tw.add_behaviored_thing(
@@ -211,7 +211,7 @@ async def rusting(this, ev, say):
         rust.increase()
         this.touch()
         log.info("rusting")
-        say.nearby("rust: %d" % (rust.rust))
+        say.nearby(this, "rust: %d" % (rust.rust))
 """,
     )
 
@@ -247,7 +247,7 @@ async def dropped(this, ev, say):
         rust.increase()
         this.touch()
         log.info("dropped, rusting %d", rust.rust)
-        say.nearby("rust: %d" % (rust.rust))
+        say.nearby(this, "rust: %d" % (rust.rust))
 """,
     )
 
@@ -380,7 +380,7 @@ async def test_dynamic_inherited(caplog):
 @language('start: "jingle"', condition=Held())
 async def jingle(this, person, say):
     log.info("jingle: %s", this)
-    say.nearby("you hear kings jingling")
+    say.nearby(this, "you hear kings jingling")
     return "hey there!"
 """,
     )
@@ -504,7 +504,7 @@ async def test_dynamic_received_say_nearby(caplog):
         """
 @received(TickEvent)
 async def make_noise(this, say):
-    say.nearby("you hear an annoying buzzing sound")
+    say.nearby(this, "you hear an annoying buzzing sound")
     return ok()
 """,
     )

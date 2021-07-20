@@ -85,7 +85,7 @@ async def tick(this, ev, say):
     register=False,
   )
   tools.hold(tools.area_of(this), item)
-  say.nearby("a Maple Leaf gently floats to the ground")
+  say.nearby(this, "a Maple Leaf gently floats to the ground")
 """,
             )
         return item
@@ -112,7 +112,7 @@ async def tick(this, ev, say):
     register=False,
   )
   tools.hold(tools.area_of(this), item)
-  say.nearby("an Oak Leaf gently floats to the ground")
+  say.nearby(this, "an Oak Leaf gently floats to the ground")
 """,
             )
         return item
@@ -175,7 +175,7 @@ async def tick(this, ev, say):
     register=False,
   )
   tools.hold(tools.area_of(this), item)
-  say.nearby("some Pebbles tumbled down the cliff")
+  say.nearby(this, "some Pebbles tumbled down the cliff")
 """,
             )
         return item
@@ -537,7 +537,7 @@ class Train(Scope):
 async def move_train(this, ev, say, session, post):
     log.info("move-train:scheduled")
     await post.future(this, time() + 5, Depart())
-    say.nearby("the train is departing")
+    say.nearby(this, "the train is departing")
 
 @received(Depart)
 async def depart(this, ev, say, session, post):
@@ -550,12 +550,12 @@ async def depart(this, ev, say, session, post):
                 new_stop = train.stops[(index + 1) % len(train.stops)]
                 door = await session.materialize(key=train.door)
                 with door.make(Exit) as exit:
+                    say.nearby(exit.area, "the train left")
                     exit.area = await session.materialize(key=new_stop)
                     door.touch()
                     log.info("move-train: %s new stop %s", this, exit.area)
-                    # say.nearby("the train left") # TODO need to target separate nearby areas in Say
                     tools.move(this, exit.area)
-                    say.nearby("the train is arriving")
+                    say.nearby(exit.area, "the train is arriving")
                     this.touch()
 
 @hooks.enter.hook

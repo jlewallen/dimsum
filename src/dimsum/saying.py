@@ -52,13 +52,13 @@ class NotifyAll(Notify):
 
 @dataclasses.dataclass
 class Say:
-    nearby_queue: List[Reply] = dataclasses.field(default_factory=list)
+    nearby_queue: Dict[Entity, List[Reply]] = dataclasses.field(default_factory=dict)
     player_queue: Dict[Entity, List[Reply]] = dataclasses.field(default_factory=dict)
 
-    def nearby(self, message: Union[Reply, str]):
+    def nearby(self, whatever: Entity, message: Union[Reply, str]):
         if isinstance(message, str):
             r = Success(message)
-        self.nearby_queue.append(r)
+        self.nearby_queue.setdefault(whatever, []).append(r)
 
     def player(self, person: Entity, message: Union[Reply, str]):
         if isinstance(message, str):
@@ -83,13 +83,16 @@ class Say:
 
         self.player_queue = {}
 
-        heard = tools.default_heard_for(area, excepted=[source])
-        for e in self.nearby_queue:
-            await self._pub(
-                source=source,
-                area=area,
-                heard=heard,
-                message=e,
-            )
+        for whatever, queue in self.nearby_queue.items():
+            whatever_area = tools.area_of(whatever)
+            assert whatever_area
+            heard = tools.default_heard_for(whatever_area, excepted=[source])
+            for e in queue:
+                await self._pub(
+                    source=source,
+                    area=whatever_area,
+                    heard=heard,
+                    message=e,
+                )
 
-        self.nearby_queue = []
+        self.nearby_queue = {}

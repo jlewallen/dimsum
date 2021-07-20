@@ -134,7 +134,7 @@ def area_of(entity: Entity) -> Optional[Entity]:
     with entity.make_and_discard(carryable.Location) as location:
         if location.container:
             log.debug("finding area for %s (container)", entity)
-            return location.container
+            return area_of(location.container)
 
     return None
 
