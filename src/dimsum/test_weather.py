@@ -13,11 +13,8 @@ async def test_area_weather_blows_small_items():
 
     with tw.domain.session() as session:
         world = await session.prepare()
-
-        generics, area = library.create_example_world(world)
-        session.register(generics.all)
-
-        await session.add_area(area)
+        factory = library.example_world_factory(world)
+        await factory(session)
         await session.save()
 
     await tw.add_jacob()

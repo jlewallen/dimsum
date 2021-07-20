@@ -1,7 +1,7 @@
 import logging
 import stringcase
 import dataclasses
-from typing import Tuple, Dict, List, Optional
+from typing import Tuple, Dict, List, Optional, Callable
 
 from model import Entity, World, Common
 from domains import Session
@@ -260,6 +260,24 @@ class ArtistsLoft(Factory):
         return area
 
 
+def add_directional(
+    world: World,
+    fr: Entity,
+    to: Entity,
+    direction: movement.Direction,
+    generics: Generics,
+):
+    add_item(
+        fr,
+        scopes.exit(
+            creator=world,
+            parent=generics.thing,
+            props=Common(name="%s Exit" % (direction.exiting.title(),)),
+            initialize={movement.Exit: dict(area=to)},
+        ),
+    )
+
+
 class RoomGrid(Factory):
     def __init__(self, w=1, h=1, **kwargs):
         super().__init__()
@@ -281,15 +299,7 @@ class RoomGrid(Factory):
         ]
 
         def add_doorway(from_cell, to_cell, direction):
-            add_item(
-                from_cell,
-                scopes.exit(
-                    creator=world,
-                    parent=generics.thing,
-                    props=Common(name="%s Exit" % (direction.exiting.title(),)),
-                    initialize={movement.Exit: dict(area=to_cell)},
-                ),
-            )
+            add_directional(world, from_cell, to_cell, direction, generics)
 
         def link_cells(cell1, cell2, direction):
             add_doorway(cell2, cell1, direction)
@@ -425,10 +435,78 @@ Welcome! :)
         return area
 
 
-def create_example_world(world: World) -> Tuple[Generics, Entity]:
+@dataclasses.dataclass
+class KtownAreas:
+    wilshire_western: Entity
+    wilshire_normandie: Entity
+    outside_bounty: Entity
+
+
+def create_ktown(world: World, generics: Generics) -> KtownAreas:
+    wilshire_western = scopes.area(creator=world, props=Common("Wilshire/Western"))
+    wilshire_normandie = scopes.area(creator=world, props=Common("Wilshire/Normandie"))
+    outside_bounty = scopes.area(creator=world, props=Common("Outside the Bounty"))
+    add_directional(
+        world, outside_bounty, wilshire_normandie, movement.Direction.NORTH, generics
+    )
+    add_directional(
+        world, wilshire_normandie, outside_bounty, movement.Direction.SOUTH, generics
+    )
+    return KtownAreas(wilshire_western, wilshire_normandie, outside_bounty)
+
+
+def bidirectional(world: World, a: Entity, b: Entity, name: str, generics: Generics):
+    add_item(
+        a,
+        scopes.exit(
+            creator=world,
+            parent=generics.thing,
+            props=Common(name),
+            initialize={movement.Exit: dict(area=b)},
+        ),
+    )
+    add_item(
+        b,
+        scopes.exit(
+            creator=world,
+            parent=generics.thing,
+            props=Common(name),
+            initialize={movement.Exit: dict(area=a)},
+        ),
+    )
+
+
+def _create_example_world(world: World) -> Tuple[Generics, Entity]:
     generics = Generics(world)
     area = WelcomeArea().create(world, generics)
     return generics, area
+
+
+def example_world_factory(world: World) -> Callable:
+    async def factory(session: Session):
+        generics, area = _create_example_world(world)
+
+        ktown = create_ktown(world, generics)
+
+        bidirectional(
+            world, area, ktown.wilshire_normandie, "Torn-up Sidewak", generics
+        )
+
+        stops: List[str] = [ktown.wilshire_normandie.key, ktown.wilshire_western.key]
+
+        train = Train(
+            interior_name="Train Car",
+            enter_name="Purple Line Train",
+            leave_name="Train Door",
+            stops=stops,
+        )
+
+        session.register(generics.all)
+        await session.add_area(area)
+        await session.add_area(ktown.wilshire_western)
+        await train.create(session)
+
+    return factory
 
 
 @dataclasses.dataclass
@@ -475,7 +553,9 @@ async def depart(this, ev, say, session, post):
                     exit.area = await session.materialize(key=new_stop)
                     door.touch()
                     log.info("move-train: %s new stop %s", this, exit.area)
+                    # say.nearby("the train left") # TODO need to target separate nearby areas in Say
                     tools.move(this, exit.area)
+                    say.nearby("the train is arriving")
                     this.touch()
 
 @hooks.enter.hook

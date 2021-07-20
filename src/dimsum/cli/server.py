@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import uvicorn
+import time
 import shortuuid
 import asyncclick as click
 import ariadne.asgi
@@ -19,6 +20,21 @@ import everything  # noqa
 import cli.interactive as interactive
 
 log = logging.getLogger("dimsum.cli")
+
+
+async def servicing(domain: domains.Domain):
+    while True:
+        try:
+            await asyncio.sleep(1)
+            try:
+                with domain.session() as session:
+                    await session.prepare()
+                    await session.service(time.time())
+                    await session.save()
+            except:
+                log.exception("error", exc_info=True)
+        except asyncio.exceptions.CancelledError:
+            return
 
 
 async def ticks(domain: domains.Domain):
@@ -141,11 +157,13 @@ async def server(
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
     tick_task = loop.create_task(ticks(domain))
+    servicing_task = loop.create_task(servicing(domain))
     await asyncio.gather(sshd_task, gql_task)
 
     tick_task.cancel()
+    servicing_task.cancel()
 
-    await asyncio.gather(tick_task)
+    await asyncio.gather(tick_task, servicing_task)
 
 
 # with proxy.start(

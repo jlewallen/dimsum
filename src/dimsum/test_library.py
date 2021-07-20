@@ -20,19 +20,18 @@ async def test_library(deterministic, caplog, snapshot):
     with tw.domain.session() as session:
         world = await session.prepare()
 
-        generics, area = library.create_example_world(world)
-        session.register(generics.all)
+        factory = library.example_world_factory(world)
+        await factory(session)
 
-        await session.add_area(area)
         await session.save()
-        assert len(session.registrar.entities) == 60
+        assert len(session.registrar.entities) == 70
 
     with tw.domain.session() as session:
         world = await session.prepare()
         assert len(session.registrar.entities) == 1
         wa_key = get_well_known_key(world, WelcomeAreaKey)
         world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
-        assert len(session.registrar.entities) == 59
+        assert len(session.registrar.entities) == 68
 
     await tw.add_jacob()
 
@@ -48,9 +47,9 @@ async def test_library(deterministic, caplog, snapshot):
         assert len(session.registrar.entities) == 1
         wa_key = get_well_known_key(world, WelcomeAreaKey)
         world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
-        assert len(session.registrar.entities) == 63
+        assert len(session.registrar.entities) == 72
 
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 64
+        assert len(session.registrar.entities) == 73

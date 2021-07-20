@@ -99,6 +99,12 @@ class PostService:
                 for qm in post.dequeue(now)
             ]
 
+    async def get_time_to_service(self) -> float:
+        with self.entity.make_and_discard(Post) as post:
+            if post.queue:
+                return post.queue[0].when
+            return 0
+
 
 PostServiceKey = "postService"
 

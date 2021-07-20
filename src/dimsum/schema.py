@@ -481,11 +481,8 @@ async def makeSample(obj, info):
 
     with domain.session() as session:
         world = await session.prepare()
-
-        generics, area = library.create_example_world(session.world)
-        session.register(generics.all)
-
-        await session.add_area(area)
+        factory = library.example_world_factory(world)
+        await factory(session)
         await session.save()
 
         affected = [

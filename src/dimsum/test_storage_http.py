@@ -93,7 +93,7 @@ def get_token(key: str, session_key="asdfasdf"):
 async def test_storage_http_number_of_entities(server, silence_aihttp):
     store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
     size = await store.number_of_entities()
-    assert size == 60
+    assert size == 70
 
 
 @pytest.mark.asyncio

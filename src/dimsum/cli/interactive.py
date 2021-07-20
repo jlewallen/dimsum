@@ -30,9 +30,8 @@ class InitializeWorld:
 
         if get_well_known_key(world, WelcomeAreaKey) is None:
             log.info("creating example world")
-            generics, area = library.create_example_world(world)
-            session.register(generics.all)
-            await session.add_area(area)
+            factory = library.example_world_factory(world)
+            await factory(session)
 
         player = scopes.alive(
             key=key,

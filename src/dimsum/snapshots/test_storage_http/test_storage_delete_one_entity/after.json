@@ -34,6 +34,11 @@
                         {
                             "py/object": "scopes.behavior.BehaviorMeta"
                         }
+                    ],
+                    "D#6": [
+                        {
+                            "py/object": "scopes.behavior.BehaviorMeta"
+                        }
                     ]
                 }
             },
@@ -43,7 +48,7 @@
                 }
             },
             "identifiers": {
-                "gid": 64,
+                "gid": 74,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [

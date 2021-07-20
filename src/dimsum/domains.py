@@ -245,7 +245,6 @@ class Session(MaterializeAndCreate):
         area = await find_entity_area_maybe(person) if person else None
 
         with WorldCtx(session=self, person=person, **kwargs) as ctx:
-            post_service = await inbox.create_post_service(self, world)
             try:
                 reply = await action.perform(
                     world=world,
@@ -253,7 +252,7 @@ class Session(MaterializeAndCreate):
                     person=person,
                     ctx=ctx,
                     say=ctx.say,
-                    post=post_service,
+                    post=await ctx.post(),
                 )
                 await ctx.complete()
                 return reply
@@ -274,7 +273,6 @@ class Session(MaterializeAndCreate):
         assert self.world
 
         log.info("everywhere:%s %s", ev, kwargs)
-        post_service = await inbox.create_post_service(self, self.world)
         everything: List[str] = []
         with self.world.make(behavior.BehaviorCollection) as world_behaviors:
             everything = world_behaviors.entities.keys()
@@ -290,7 +288,9 @@ class Session(MaterializeAndCreate):
                             log.info("everywhere: %s", entity)
                             with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
                                 await ctx.notify(
-                                    ev, post=post_service, area=tools.area_of(entity)
+                                    ev,
+                                    post=await ctx.post(),
+                                    area=tools.area_of(entity),
                                 )
                                 await ctx.complete()
                 except MissingEntityException as e:
@@ -428,6 +428,13 @@ class WorldCtx(Ctx):
         self.bus = session.bus
         self.entities: tools.EntitySet = self._get_default_entity_set(entity)
         self.say = saying.Say()
+        self._post: Optional[inbox.PostService] = None
+
+    async def post(self):
+        if self._post:
+            return self._post
+        self._post = await inbox.create_post_service(self, self.world)
+        return self._post
 
     def _get_default_entity_set(self, entity: Optional[Entity]) -> tools.EntitySet:
         assert self.world

@@ -16,11 +16,8 @@ async def test_materialize_infinite_reach(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-
-        generics, area = library.create_example_world(world)
-        session.register(generics.all)
-
-        await session.add_area(area)
+        factory = library.example_world_factory(world)
+        await factory(session)
         await session.save()
 
     await tw.add_jacob()
@@ -39,12 +36,12 @@ async def test_materialize_infinite_reach(caplog):
         wa_key = get_well_known_key(world, WelcomeAreaKey)
         world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
 
-        assert len(session.registrar.entities) == 63
+        assert len(session.registrar.entities) == 72
 
         await session.tick()
         await session.save()
 
-        assert len(session.registrar.entities) == 64
+        assert len(session.registrar.entities) == 73
 
 
 @pytest.mark.asyncio
@@ -53,11 +50,8 @@ async def test_materialize_reach_1(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-
-        generics, area = library.create_example_world(world)
-        session.register(generics.all)
-
-        await session.add_area(area)
+        factory = library.example_world_factory(world)
+        await factory(session)
         await session.save()
 
     await tw.add_jacob()
@@ -79,11 +73,8 @@ async def test_materialize_reach_by_area_3(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-
-        generics, area = library.create_example_world(world)
-        session.register(generics.all)
-
-        await session.add_area(area)
+        factory = library.example_world_factory(world)
+        await factory(session)
         await session.save()
 
     await tw.add_jacob()
