@@ -1,6 +1,7 @@
 import abc
 import datetime
 import logging
+import enum
 from typing import Dict, List, Optional
 
 from model import Entity, Scope, Identity, Worn, Eaten, Drank, Acls
@@ -49,17 +50,25 @@ class Observer:
         raise NotImplementedError
 
 
+class Presence(enum.Enum):
+    DISTINCT = dict(distinct=True)
+    INLINE_SHORT = dict(inline="short")
+    INLINE_LONG = dict(inline="long")
+
+
 class Visible:
     def __init__(
         self,
         hidden: bool = False,
         hard_to_see: bool = False,
+        presence: Optional[Presence] = None,
         observations: Optional[Dict[str, List[Observation]]] = None,
         **kwargs
     ):
         super().__init__()
         self.hidden = hidden
         self.hard_to_see = hard_to_see
+        self.presence = presence if presence else Presence.DISTINCT
         self.observations = observations if observations else {}
 
     def add_observation(self, identity: Identity):

@@ -1,8 +1,11 @@
 import logging
 import freezegun
 import pytest
+from typing import Optional, List
 
+import tools
 from model import *
+from domains import Session
 from plugins.looking import *
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -64,8 +67,7 @@ async def test_look_people_invisible():
     with tw.domain.session() as session:
         world = await session.prepare()
         carla = await session.materialize(key=tw.carla_key)
-        with carla.make(mechanics.Visibility) as vis:
-            vis.make_invisible()
+        tools.hide(carla)
         await session.save()
 
     r = await tw.success("look")
@@ -132,3 +134,33 @@ async def test_making_item_hard_to_see():
         log.info(tw.dumps(orb))
 
         assert len(r.items) == 1
+
+
+def get_first_item_on_ground(
+    key: Optional[str] = None, session: Optional[Session] = None
+):
+    pass
+
+
+@pytest.mark.asyncio
+@pytest.mark.skip(reason="wip")
+async def test_changing_presence_to_inline_short():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.add_carla()
+    await tw.success("make Box")
+    await tw.success("drop")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area = await find_entity_area(jacob)
+        box = area.make(carryable.Containing).holding[0]
+        assert box
+        tools.presence(box, short=True)
+
+    r = await tw.success("look")
+
+    log.info("%s", r)
+
+    assert len(r.items) == 1

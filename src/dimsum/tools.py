@@ -123,6 +123,16 @@ def show(e: Entity):
         vis.make_visible()
 
 
+def presence(e: Entity, short=False, long=False):
+    with e.make(mechanics.Visibility) as vis:
+        if short:
+            vis.visible.presence = mechanics.Presence.INLINE_SHORT
+        elif long:
+            vis.visible.presence = mechanics.Presence.INLINE_LONG
+        else:
+            vis.discard()
+
+
 def hold(c: Entity, e: Entity):
     with c.make(carryable.Containing) as contains:
         held = contains.hold(e)
