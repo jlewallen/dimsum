@@ -6,7 +6,16 @@ import traceback
 import time
 from typing import Any, Dict, List, Optional, Sequence
 
-from model import Entity, SecurityContext, SecurityMappings, context
+from model import (
+    Common,
+    Entity,
+    World,
+    SecurityContext,
+    SecurityMappings,
+    context,
+    MaterializeAndCreate,
+    materialize_well_known_entity,
+)
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -189,6 +198,23 @@ def move(moving: Entity, destination: Entity):
             assert from_container.contains(moving)
             from_container.unhold(moving)
             to_container.hold(moving)
+
+
+LimboKey = "limbo"
+
+
+async def move_to_limbo(world: World, ctx: MaterializeAndCreate, moving: Entity):
+    destination = await materialize_well_known_entity(
+        world,
+        ctx,
+        LimboKey,
+        create_args=dict(props=Common("Limbo"), klass=scopes.AreaClass),
+    )
+    move(moving, destination)
+
+
+async def move_from_limbo(world: World, moving: Entity, destination: Entity):
+    move(moving, destination)
 
 
 def flatten(l):

@@ -517,53 +517,93 @@ class Train:
     stops: List[str] = dataclasses.field(default_factory=list)
     enter: Optional[Entity] = None
     leave: Optional[Entity] = None
-    interio: Optional[Entity] = None
+    interior: Optional[Entity] = None
 
     def _behavior(self) -> str:
         assert self.leave
+        assert self.interior
         return """
+@dataclass
+class CloseDoors(PostMessage):
+    pass
+
+@dataclass
+class Arrive(PostMessage):
+    pass
+
 @dataclass
 class Depart(PostMessage):
     pass
 
 class Train(Scope):
-    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, leaving = False, **kwargs):
+    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, interior: t.Optional[str] = None, leaving = False, **kwargs):
         super().__init__(**kwargs)
         self.stops = stops if stops else ["{0}", "{1}"]
         self.door = door if door else "{2}"
+        self.interior = interior if interior else "{3}"
         self.leaving = leaving
+
+    async def get_interior(self, session):
+        return await session.materialize(key=self.interior)
+
+    async def get_stop(self, this, session):
+        area = tools.area_of(this)
+        index = self.stops.index(area.key)
+        assert index >= 0
+        new_stop = self.stops[(index + 1) % len(self.stops)]
+        return await session.materialize(key=new_stop)
+
+    async def leave_station(self, session, new_stop: Entity):
+        door = await session.materialize(key=self.door)
+        with door.make(Exit) as exiting:
+            exiting.area = new_stop
+            door.touch()
+        await tools.move_to_limbo(session.world, session, self.ourselves)
+
+    async def arrive_station(self, session):
+        door = await session.materialize(key=self.door)
+        with door.make_and_discard(Exit) as exiting:
+            await tools.move_from_limbo(session.world, self.ourselves, exiting.area)
 
 @received(TickEvent)
 async def move_train(this, ev, say, session, post):
     log.info("move-train:scheduled")
-    await post.future(this, time() + 5, Depart())
-    say.nearby(this, "the train is departing")
+    say.nearby(this, "the train is going to leave!")
+    with this.make(Train) as train:
+        interior = await train.get_interior(session)
+        say.nearby(interior, "the doors are closing!")
+    await post.future(this, time() + 5, CloseDoors())
 
-@received(Depart)
-async def depart(this, ev, say, session, post):
+
+@received(CloseDoors)
+async def close_doors(this, ev, say, session, post):
     area = tools.area_of(this)
     with this.make(Train) as train:
         log.info("move-train: area=%s stops=%s", area, train.stops)
-        if train.stops:
-            index = train.stops.index(area.key)
-            if index >= 0:
-                new_stop = train.stops[(index + 1) % len(train.stops)]
-                door = await session.materialize(key=train.door)
-                with door.make(Exit) as exit:
-                    say.nearby(exit.area, "the train left")
-                    exit.area = await session.materialize(key=new_stop)
-                    door.touch()
-                    log.info("move-train: %s new stop %s", this, exit.area)
-                    tools.move(this, exit.area)
-                    say.nearby(exit.area, "the train is arriving")
-                    this.touch()
+        new_stop = await train.get_stop(this, session)
+        say.nearby(tools.area_of(this), "the train just left")
+        await train.leave_station(session, new_stop)
+        await post.future(this, time() + 5, Arrive())
+
+        interior = await train.get_interior(session)
+        say.nearby(interior, "the train has left the station, hold on!")
+
+@received(Arrive)
+async def arrive(this, ev, say, session, post):
+    area = tools.area_of(this)
+    with this.make(Train) as train:
+        log.info("move-train: area=%s stops=%s", area, train.stops)
+        await train.arrive_station(session)
+        say.nearby(tools.area_of(this), "the train just arrived")
+        interior = await train.get_interior(session)
+        say.nearby(interior, "the train has arrived, get out")
 
 @hooks.enter.hook
 def only_when_doors_open(resume, person, area):
     log.info("only-when-doors-open: %s", person)
     return resume(person, area)
 """.format(
-            self.stops[0], self.stops[1], self.leave.key
+            self.stops[0], self.stops[1], self.leave.key, self.interior.key
         )
 
     async def create(self, session: Session):

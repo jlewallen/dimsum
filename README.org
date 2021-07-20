@@ -47,3 +47,7 @@
    Right now if you nest you end up creating two instances and they
    can overwrite each other. A good example is in tools.move's use of
    Location.
+
+** TODO A cron-like scheduling system.
+
+   With some jitter.
