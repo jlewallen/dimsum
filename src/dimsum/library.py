@@ -594,9 +594,10 @@ async def arrive(this, ev, say, session, post):
     with this.make(Train) as train:
         log.info("move-train: area=%s stops=%s", area, train.stops)
         await train.arrive_station(session)
-        say.nearby(tools.area_of(this), "the train just arrived")
+        arrived_at = tools.area_of(this)
+        say.nearby(arrived_at, "the train just arrived")
         interior = await train.get_interior(session)
-        say.nearby(interior, "the train has arrived, get out")
+        say.nearby(interior, "the train has arrived at {{0}}, get out".format(arrived_at.props.described))
 
 @hooks.enter.hook
 def only_when_doors_open(resume, person, area):
