@@ -280,7 +280,7 @@ class CompiledEntityBehavior(EntityBehavior):
 
     async def notify(self, ev: Event, **kwargs):
         if isinstance(ev, DynamicPostMessage):
-            log.info("notify: %s", ev)
+            log.debug("notify: %s", ev)
             log.debug("notify: %s", self.frame)
             context = jsonpickle.unpickler.Unpickler()
             decoded = context.restore(

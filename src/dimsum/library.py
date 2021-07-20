@@ -495,7 +495,7 @@ def example_world_factory(world: World) -> Callable:
         stops: List[str] = [ktown.wilshire_normandie.key, ktown.wilshire_western.key]
 
         train = Train(
-            interior_name="Train Car",
+            interior_name="Purple Line Car",
             enter_name="Purple Line Train",
             leave_name="Train Door",
             stops=stops,

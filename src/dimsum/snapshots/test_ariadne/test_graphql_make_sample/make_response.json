@@ -16319,7 +16319,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "189",
                                     "klass": "AreaClass",
-                                    "name": "Train Car"
+                                    "name": "Purple Line Car"
                                 }
                             },
                             "carryable": {
@@ -16596,7 +16596,7 @@
                                     "py/object": "model.entity.Entity",
                                     "key": "189",
                                     "klass": "AreaClass",
-                                    "name": "Train Car"
+                                    "name": "Purple Line Car"
                                 }
                             }
                         },
@@ -16880,7 +16880,7 @@
                                 },
                                 "name": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Train Car",
+                                    "value": "Purple Line Car",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "rules": [
@@ -16896,7 +16896,7 @@
                                 },
                                 "described": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Train Car (#69)",
+                                    "value": "Purple Line Car (#69)",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "rules": [
@@ -16912,7 +16912,7 @@
                                 },
                                 "desc": {
                                     "py/object": "model.properties.Property",
-                                    "value": "Train Car",
+                                    "value": "Purple Line Car",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "rules": [
