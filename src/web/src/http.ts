@@ -19,8 +19,11 @@ import { SubscriptionClient } from "subscriptions-transport-ws";
 // import { createClient } from "graphql-ws"; // Not supported by our server.
 import gql from "graphql-tag";
 
-function getWebsocketsUrl() {
-    const http = Config.baseUrl + "/graphql";
+function getWebSocketsUrl() {
+    let http = Config.baseUrl + "/graphql";
+    if (http.indexOf("http") < 0) {
+        http = window.location.origin + "/graphql";
+    }
     return http.replace("https", "ws").replace("http", "ws");
 }
 
@@ -35,7 +38,8 @@ export async function subscribe(
     onConnected: OnConnectedFunc,
     onDisconnected: OnDisconnectedFunc
 ) {
-    const wsUrl = getWebsocketsUrl();
+    const wsUrl = getWebSocketsUrl();
+    console.log("ws-url", wsUrl);
     const subscriptionClient = new SubscriptionClient(wsUrl, {
         reconnect: true,
         connectionParams: {

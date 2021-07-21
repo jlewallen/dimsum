@@ -11,6 +11,7 @@ ssh_host_key.pub
 /htmlcov
 /gen
 /prof
+/data
 
 web/dist
 web/node_modules

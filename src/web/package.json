@@ -11,6 +11,7 @@
     "dependencies": {
         "@apollo/client": "^3.3.20",
         "@types/codemirror": "^5.60.1",
+        "browserslist": "^4.16.6",
         "codemirror": "^5.62.0",
         "core-js": "^3.6.5",
         "graphql": "^15.5.1",

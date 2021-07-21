@@ -102,6 +102,10 @@ def commands():
     multiple=True,
     help="User to create.",
 )
+@click.option(
+    "--unix-socket",
+    help="Bind to a UNIX soket.",
+)
 async def server(
     database: str,
     session_key: Optional[str],
@@ -111,6 +115,7 @@ async def server(
     web_port: int,
     ssh_port: int,
     user: List[str],
+    unix_socket: Optional[str],
 ):
     """
     Serve a database.
@@ -156,7 +161,11 @@ async def server(
         await temp.initialize(user, key=lambda username: shortuuid.uuid(name=username))
 
     loop = asyncio.get_event_loop()
-    gql_config = uvicorn.Config(app=app, loop=loop, port=web_port)
+    gql_config = (
+        uvicorn.Config(app=app, loop=loop, uds=unix_socket)
+        if unix_socket
+        else uvicorn.Config(app=app, loop=loop, port=web_port)
+    )
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))

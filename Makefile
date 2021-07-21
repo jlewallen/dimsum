@@ -60,4 +60,8 @@ graph:
 container:
 	docker build -t jlewallen/dimsum .
 
+container-run:
+	mkdir -p data
+	docker run --rm -it -p 8088:80 -v `pwd`/data:/app/data jlewallen/dimsum --database /app/data/world.sqlite3 --session-key asdfasdf
+
 .PHONY: web

@@ -7,27 +7,32 @@ RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN ls -alh /app
 
 FROM node:16 AS build-nodejs-image
 
 WORKDIR /app
 COPY src/web /app/src/web/
-RUN cd src/web && npm install && npm run build
-RUN ls -alh /app
-RUN ls -alh /app/src
-RUN ls -alh /app/src/web/dist
+COPY src/web/src/config.ts.prod /app/src/web/src/config.ts
+RUN cd src/web && yarn install && npx browserslist@latest --update-db && yarn run build
 
-FROM bash
+FROM python:3.9-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends nginx && apt-get clean
 
 WORKDIR /app
 
 ENV PATH="/app/venv/bin:$PATH"
 
+COPY tools/nginx.conf /app
 COPY --from=python-venv-image /app/venv /app/venv
 COPY --from=build-nodejs-image /app/src/web/dist /app/static
 COPY src/dimsum /app
+COPY logging.json /app
+COPY dimsum.conf /app
+COPY ssh_host_key /app
+COPY ssh_host_key.pub /app
 
-RUN ls -alh /app
+ADD ./tools/startup.sh /app/startup.sh
+RUN chmod u+x /app/startup.sh
 
-CMD [ "python", "/app/src/dimsum/cli.py" ]
+ENTRYPOINT [ "/app/startup.sh" ]

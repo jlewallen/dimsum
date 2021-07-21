@@ -1,7 +1,7 @@
 <template>
     <div class="container login">
         <div class="row justify-content-center">
-            <form class="form col-4" @submit.prevent="login">
+            <form class="form col-4" @submit.stop.prevent="login">
                 <div class="form-group row" v-if="token">
                     <label class="col-sm-4 col-form-label">Invite Secret</label>
                     <div class="col-sm-8">
@@ -77,6 +77,7 @@ export default defineComponent({
                 await store.dispatch(new LoginAction(this.form.name, this.form.password, this.form.secret, this.token));
                 await this.$router.push("/explore");
             } catch (error) {
+                console.log("error", error);
                 this.invalidCredentials = true;
             } finally {
                 this.busy = false;
