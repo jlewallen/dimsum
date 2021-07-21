@@ -8,11 +8,6 @@
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item" v-if="authenticated">
                             <span class="nav-link">
-                                <router-link to="/">Home</router-link>
-                            </span>
-                        </li>
-                        <li class="nav-item" v-if="authenticated">
-                            <span class="nav-link">
                                 <router-link to="/explore">Explore</router-link>
                             </span>
                         </li>
