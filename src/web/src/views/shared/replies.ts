@@ -62,6 +62,12 @@ const EntityCreated = RenderedEntry;
 
 import InlineEditor from "@/views/entity/InlineEditor.vue";
 
+const Waiting = defineComponent({
+    name: "Waiting",
+    props: CommonProps,
+    template: `<div class="response waiting">Busy...</div>`,
+});
+
 const EditingEntityBehavior = defineComponent({
     name: "EditingEntityBehavior",
     props: CommonProps,
@@ -179,4 +185,5 @@ export default {
     DynamicMessage,
     Universal,
     Help,
+    Waiting,
 };

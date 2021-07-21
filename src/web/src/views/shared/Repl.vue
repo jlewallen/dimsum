@@ -25,8 +25,10 @@ export default defineComponent({
     },
     methods: {
         send(): void {
-            this.$emit("send", this.command);
-            this.command = "";
+            if (this.command.length > 0) {
+                this.$emit("send", this.command);
+                this.command = "";
+            }
         },
     },
 });

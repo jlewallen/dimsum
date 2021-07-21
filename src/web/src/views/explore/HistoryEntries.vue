@@ -30,7 +30,6 @@ export default defineComponent({
             required: true,
         },
     },
-    computed: {},
     methods: {
         viewFor(response: HistoryEntry): string | null {
             // eslint-disable-next-line
@@ -103,5 +102,10 @@ export default defineComponent({
 
 .response.entities-observation {
     padding: 1em;
+}
+
+.response.waiting {
+    padding: 1em;
+    background-color: #222;
 }
 </style>

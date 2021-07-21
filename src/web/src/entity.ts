@@ -46,16 +46,7 @@ export interface Universal {
 
 export interface ReplResponse {
     rendered: Record<string, string | string[]>;
-    reply:
-        | { interactive: false; information: boolean; entities?: { key: string; serialized: string }[] }
-        | AreaObservation
-        | EntitiesObservation
-        | DetailedObservation
-        | PersonalObservation
-        | Success
-        | Failure
-        | InteractiveReply
-        | Universal;
+    reply: { "py/object": string; interactive: boolean; information: boolean; entities?: { key: string; serialized: string }[] };
 }
 
 export type HistoryEntry = ReplResponse;

@@ -14,6 +14,7 @@ import {
     ReplAction,
     RemoveHistoryEntry,
     UpdateEntityAction,
+    UpdateWaitingMutation,
 } from "./types";
 import { getApi, subscribe } from "@/http";
 
@@ -79,6 +80,7 @@ export default createStore<RootState>({
                 }
                 return;
             }
+
             if (entry.reply.interactive === true) {
                 state.interactables.push(entry);
             } else {
@@ -86,7 +88,9 @@ export default createStore<RootState>({
                 if ((entry.reply as any)["py/object"] == "plugins.editing.ScreenCleared") {
                     state.responses = [];
                 } else {
+                    state.responses = state.responses.filter((r) => !r.reply || r.reply["py/object"] != "Waiting");
                     state.responses.push(entry);
+                    state.received++;
                 }
             }
         },
@@ -99,6 +103,12 @@ export default createStore<RootState>({
                 if (j >= 0) {
                     state.interactables.splice(j, 1);
                 }
+            }
+        },
+        [MutationTypes.WAITING]: (state: RootState, payload: UpdateWaitingMutation) => {
+            if (payload.waiting) {
+                state.responses.push({ rendered: {}, reply: { "py/object": "Waiting", interactive: false, information: true } });
+                state.received++;
             }
         },
     },
@@ -126,6 +136,7 @@ export default createStore<RootState>({
             commit(MutationTypes.AUTH, null);
         },
         [ActionTypes.REPL]: async ({ state, commit }: ActionParameters, payload: ReplAction) => {
+            commit(new UpdateWaitingMutation(true));
             const api = getApi(state.headers);
             const data = await api.language({ text: payload.command, evaluator: state.key });
             if (data.language) {

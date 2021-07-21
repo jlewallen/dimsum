@@ -27,9 +27,7 @@ export default defineComponent({
     },
     methods: {
         async send(command: string): Promise<void> {
-            if (command.length > 0) {
-                await store.dispatch(new ReplAction(command));
-            }
+            await store.dispatch(new ReplAction(command));
         },
     },
 });

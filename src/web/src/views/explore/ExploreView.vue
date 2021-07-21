@@ -21,17 +21,17 @@ export default defineComponent({
         entries(): ReplResponse[] {
             return store.state.responses;
         },
-        length(): number {
-            return store.state.responses.length;
+        received(): number {
+            return store.state.received;
         },
     },
     watch: {
-        length(): void {
+        received(): void {
             this.$emit("scroll-bottom");
         },
         connected(after: boolean): void {
             if (after) {
-                if (this.length == 0) {
+                if (this.received == 0) {
                     void store.dispatch(new ReplAction("look"));
                 }
             }

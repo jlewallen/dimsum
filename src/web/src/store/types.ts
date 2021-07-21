@@ -22,6 +22,8 @@ export class RootState {
     people: { [index: string]: Person } = {};
     interactables: ReplResponse[] = [];
     responses: ReplResponse[] = [];
+    received = 0;
+    waiting = false;
 }
 
 export enum ActionTypes {
@@ -48,6 +50,7 @@ export enum MutationTypes {
     REMOVE_HISTORY_ENTRY = "REMOVE_HISTORY_ENTRY",
     CONNECTED = "CONNECTED",
     DISCONNECTED = "DISCONNECTED",
+    WAITING = "WAITING",
 }
 
 export class LoadingAction {
@@ -132,4 +135,10 @@ export class UpdateEntityAction {
     type = ActionTypes.UPDATE_ENTITY;
 
     constructor(public readonly entity: Entity) {}
+}
+
+export class UpdateWaitingMutation {
+    type = MutationTypes.WAITING;
+
+    constructor(public readonly waiting: boolean) {}
 }

@@ -23,8 +23,10 @@ const BasicMarkdown = defineComponent({
             if (_.isString(this.source)) {
                 return this.source;
             }
-            console.log("source", this.source);
-            return this.source.lines.join("\n\n");
+            if (this.source.lines) {
+                return this.source.lines.join("\n\n");
+            }
+            return "";
         },
         wikiBody(): string {
             const wikiWord = /([A-Z]+[a-z]+([A-Z]+[a-z]+)+)/g;
