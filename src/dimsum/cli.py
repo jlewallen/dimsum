@@ -20,10 +20,10 @@ import cli.diff
 log = logging.getLogger("dimsum.cli")
 
 
-def configure_logging():
+def configure_logging(colors: bool):
     with open("logging.json", "r") as file:
         config = json.loads(file.read())  # TODO Parsing logging config JSON
-        if "handlers" in config:
+        if colors and "handlers" in config:
             handlers = config["handlers"]
             if "console" in handlers:
                 handlers["stderr"] = handlers["console"]
@@ -36,8 +36,9 @@ def configure_logging():
 
 @click.group()
 @click.option("--debug/--no-debug", default=False)
-def command_line(debug: bool):
-    configure_logging()
+@click.option("--colors/--no-colors", default=True)
+def command_line(debug: bool, colors: bool):
+    configure_logging(colors)
 
 
 if __name__ == "__main__":
