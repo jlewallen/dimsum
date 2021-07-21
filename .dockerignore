@@ -3,4 +3,8 @@
 .mypy_cache
 __pycache__
 env
-web/node_modules
+src/web/node_modules
+gen
+.backups
+htmlcov
+*.sqlite3
