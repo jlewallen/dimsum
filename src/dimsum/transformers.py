@@ -33,9 +33,22 @@ class Base(lark.Transformer):
         return finders.AnyHeldItem()
 
     def direction(self, args):
+        value = str(args[0]).lower()
         for d in movement.Direction:
-            if str(args[0]).lower() == d.name.lower():
+            if value == d.name.lower():
                 return d
+        shorthands = {
+            "ne": movement.Direction.NORTH_EAST,
+            "nw": movement.Direction.NORTH_WEST,
+            "se": movement.Direction.SOUTH_EAST,
+            "sw": movement.Direction.SOUTH_WEST,
+            "northeast": movement.Direction.NORTH_EAST,
+            "northwest": movement.Direction.NORTH_WEST,
+            "southeast": movement.Direction.SOUTH_EAST,
+            "southwest": movement.Direction.SOUTH_WEST,
+        }
+        if value in shorthands:
+            return shorthands[value]
         raise Exception("unknown movement.Direction")
 
     # Would love to move these closer to creation.

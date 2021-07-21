@@ -129,7 +129,7 @@ def _wrap_parser(custom: str) -> Lark:
         {0}
 
         // Decreasing specificity is important here.
-        DIRECTION:         "northeast" | "northwest" | "north" | "southwest" | "southeast" | "south" | "west" | "east"
+        DIRECTION:         "northeast" | "northwest" | "north" | "southwest" | "southeast" | "south" | "west" | "east" | "se" | "nw" | "sw" | "ne"
         direction:         DIRECTION
 
         named_route:       USEFUL_WORD+
