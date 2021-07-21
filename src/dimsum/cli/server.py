@@ -26,7 +26,6 @@ async def servicing(domain: domains.Domain):
     first = True
     while True:
         try:
-            await asyncio.sleep(1)
             try:
                 now = time.time()
                 if first or (domain.time_to_service and now >= domain.time_to_service):
@@ -37,6 +36,7 @@ async def servicing(domain: domains.Domain):
                     first = False
             except:
                 log.exception("error", exc_info=True)
+            await asyncio.sleep(1)
         except asyncio.exceptions.CancelledError:
             return
 

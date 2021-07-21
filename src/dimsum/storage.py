@@ -321,7 +321,6 @@ class SqliteStorage(EntityStorage):
         self.dbc = self.db.cursor()
         try:
             for key, fields in updating.items():
-                log.info("updating %s", key)
                 assert not self.frozen
                 if fields.destroyed:
                     self._delete_row(fields)
