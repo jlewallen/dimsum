@@ -33,6 +33,8 @@ def set_current_gid(entity: Entity, gid: int):
             log.info("gid-updated: %d (was %d)", gid, ids.gid)
             ids.gid = gid
             entity.touch()
+        else:
+            log.info("gid-ignored: %d (was %d)", gid, ids.gid)
 
 
 class World(Entity):

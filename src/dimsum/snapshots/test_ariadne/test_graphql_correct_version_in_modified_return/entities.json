@@ -31,6 +31,230 @@
             },
             "entities": [
                 {
+                    "key": "world",
+                    "serialized": {
+                        "py/object": "serializing.RootWorld",
+                        "version": {
+                            "py/object": "model.entity.Version",
+                            "i": 2
+                        },
+                        "creator": null,
+                        "parent": null,
+                        "scopes": {
+                            "wellKnown": {
+                                "entities": {
+                                    "welcomeArea": "welcome",
+                                    "postService": "8",
+                                    "encyclopedia": "10"
+                                }
+                            },
+                            "usernames": {
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "$system"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "users": {
+                                    "jlewallen": "6"
+                                }
+                            },
+                            "identifiers": {
+                                "gid": 5,
+                                "acls": {
+                                    "py/object": "model.permissions.Acls",
+                                    "rules": [
+                                        {
+                                            "py/object": "model.permissions.Acl",
+                                            "perm": "write",
+                                            "keys": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "klass": {
+                            "py/type": "model.entity.RootEntityClass"
+                        },
+                        "identity": {
+                            "py/object": "model.crypto.Identity",
+                            "public": "<public>",
+                            "signature": "<signature>",
+                            "private": "<private>"
+                        },
+                        "key": "world",
+                        "props": {
+                            "py/object": "model.properties.Common",
+                            "map": {
+                                "gid": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 0,
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "name": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "World",
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "described": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "World (#0)",
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "desc": {
+                                    "py/object": "model.properties.Property",
+                                    "value": "Ya know, everything",
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "created": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0,
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "touched": {
+                                    "py/object": "model.properties.Property",
+                                    "value": 1569369600.0,
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "*"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "frozen": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null,
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "destroyed": {
+                                    "py/object": "model.properties.Property",
+                                    "value": null,
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "related": {
+                                    "py/object": "model.properties.Property",
+                                    "value": {},
+                                    "acls": {
+                                        "py/object": "model.permissions.Acls",
+                                        "rules": [
+                                            {
+                                                "py/object": "model.permissions.Acl",
+                                                "perm": "write",
+                                                "keys": [
+                                                    "$owner"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "acls": {
+                            "py/object": "model.permissions.Acls",
+                            "rules": [
+                                {
+                                    "py/object": "model.permissions.Acl",
+                                    "perm": "write",
+                                    "keys": [
+                                        "$owner"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
                     "key": 6,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
@@ -179,230 +403,6 @@
                                 "desc": {
                                     "py/object": "model.properties.Property",
                                     "value": "Jacob",
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "created": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0,
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "touched": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 1569369600.0,
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "*"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "frozen": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null,
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "destroyed": {
-                                    "py/object": "model.properties.Property",
-                                    "value": null,
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "related": {
-                                    "py/object": "model.properties.Property",
-                                    "value": {},
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "acls": {
-                            "py/object": "model.permissions.Acls",
-                            "rules": [
-                                {
-                                    "py/object": "model.permissions.Acl",
-                                    "perm": "write",
-                                    "keys": [
-                                        "$owner"
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "key": "world",
-                    "serialized": {
-                        "py/object": "serializing.RootWorld",
-                        "version": {
-                            "py/object": "model.entity.Version",
-                            "i": 2
-                        },
-                        "creator": null,
-                        "parent": null,
-                        "scopes": {
-                            "wellKnown": {
-                                "entities": {
-                                    "welcomeArea": "welcome",
-                                    "postService": "8",
-                                    "encyclopedia": "10"
-                                }
-                            },
-                            "usernames": {
-                                "acls": {
-                                    "py/object": "model.permissions.Acls",
-                                    "rules": [
-                                        {
-                                            "py/object": "model.permissions.Acl",
-                                            "perm": "write",
-                                            "keys": [
-                                                "$system"
-                                            ]
-                                        }
-                                    ]
-                                },
-                                "users": {
-                                    "jlewallen": "6"
-                                }
-                            },
-                            "identifiers": {
-                                "gid": 5,
-                                "acls": {
-                                    "py/object": "model.permissions.Acls",
-                                    "rules": [
-                                        {
-                                            "py/object": "model.permissions.Acl",
-                                            "perm": "write",
-                                            "keys": [
-                                                "*"
-                                            ]
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        "klass": {
-                            "py/type": "model.entity.RootEntityClass"
-                        },
-                        "identity": {
-                            "py/object": "model.crypto.Identity",
-                            "public": "<public>",
-                            "signature": "<signature>",
-                            "private": "<private>"
-                        },
-                        "key": "world",
-                        "props": {
-                            "py/object": "model.properties.Common",
-                            "map": {
-                                "gid": {
-                                    "py/object": "model.properties.Property",
-                                    "value": 0,
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "name": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "World",
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "described": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "World (#0)",
-                                    "acls": {
-                                        "py/object": "model.permissions.Acls",
-                                        "rules": [
-                                            {
-                                                "py/object": "model.permissions.Acl",
-                                                "perm": "write",
-                                                "keys": [
-                                                    "$owner"
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                },
-                                "desc": {
-                                    "py/object": "model.properties.Property",
-                                    "value": "Ya know, everything",
                                     "acls": {
                                         "py/object": "model.permissions.Acls",
                                         "rules": [

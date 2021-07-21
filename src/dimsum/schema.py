@@ -364,12 +364,12 @@ async def resolve_language(obj, info, criteria):
     log.info("ariadne:language criteria=%s", lqc)
 
     with domain.session() as session:
+        log.debug("materialize world")
+        w = await session.prepare()
+        assert w
         log.debug("materialize player=%s", evaluator)
         player = await session.materialize(key=evaluator)
         assert player
-        log.debug("materialize world")
-        w = await session.materialize(key=WorldKey)
-        assert w
         reply = await session.execute(player, lqc.text.strip())
         modified_keys = await session.save()
         for key in modified_keys:

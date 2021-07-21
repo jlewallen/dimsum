@@ -9,10 +9,18 @@ log = logging.getLogger("dimsum.scopes")
 
 
 class Direction(enum.Enum):
-    NORTH = 1
-    SOUTH = 2
-    WEST = 3
-    EAST = 4
+    NORTHEAST = "NORTHEAST"
+    NORTH = "NORTH"
+    NORTHWEST = "NORTHWEST"
+    WEST = "WEST"
+    SOUTH = "SOUTH"
+    SOUTHWEST = "SOUTHWEST"
+    EAST = "EAST"
+    SOUTHEAST = "SOUTHEAST"
+
+    @property
+    def exit_name(self) -> str:
+        return "%s Exit" % (self.exiting.title(),)
 
     @property
     def exiting(self) -> str:

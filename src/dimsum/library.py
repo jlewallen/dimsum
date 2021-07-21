@@ -272,7 +272,7 @@ def add_directional(
         scopes.exit(
             creator=world,
             parent=generics.thing,
-            props=Common(name="%s Exit" % (direction.exiting.title(),)),
+            props=Common(name=direction.exit_name),
             initialize={movement.Exit: dict(area=to)},
         ),
     )

@@ -25,7 +25,7 @@ class DigDirection:
     @property
     def name(self):
         if self.direction:
-            return self.direction.exiting
+            return self.direction.exit_name
         if self.arbitrary:
             return self.arbitrary
         raise Exception("malformed dig")
