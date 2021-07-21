@@ -1,4 +1,4 @@
-import _ from "lodash";
+// import _ from "lodash";
 import { createLogger, createStore, ActionContext } from "vuex";
 import {
     RootState,
@@ -21,18 +21,6 @@ export * from "./types";
 
 type ActionParameters = ActionContext<RootState, RootState>;
 
-function base64ToHex(key: string): string {
-    if (!key) throw new Error("key is required");
-    let hex = "";
-    const bytes = atob(key);
-    for (let i = 0; i < bytes.length; ++i) {
-        const byte = bytes.charCodeAt(i).toString(16);
-        hex += byte.length === 2 ? byte : "0" + byte;
-    }
-    return hex;
-}
-
-const urlKey = base64ToHex;
 const disabledRefresh = true;
 
 export default createStore<RootState>({
@@ -94,6 +82,7 @@ export default createStore<RootState>({
             if (entry.reply.interactive === true) {
                 state.interactables.push(entry);
             } else {
+                // eslint-disable-next-line
                 if ((entry.reply as any)["py/object"] == "plugins.editing.ScreenCleared") {
                     state.responses = [];
                 } else {
@@ -130,7 +119,7 @@ export default createStore<RootState>({
             commit(MutationTypes.AUTH, data.login);
             return Promise.all([dispatch(new AuthenticatedAction(data.login)), dispatch(ActionTypes.LOADING)]);
         },
-        [ActionTypes.AUTHENTICATED]: ({ state }: ActionParameters, payload: AuthenticatedAction) => {
+        [ActionTypes.AUTHENTICATED]: (/*{ state }: ActionParameters, payload: AuthenticatedAction*/) => {
             return Promise.resolve();
         },
         [ActionTypes.LOGOUT]: ({ commit }: ActionParameters) => {
@@ -153,8 +142,6 @@ export default createStore<RootState>({
             }
         },
         [ActionTypes.LOADING]: async ({ state, commit }: ActionParameters) => {
-            const api = getApi(state.headers);
-
             await subscribe(
                 state.headers,
                 state.token,

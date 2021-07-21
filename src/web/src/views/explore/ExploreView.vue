@@ -26,10 +26,10 @@ export default defineComponent({
         },
     },
     watch: {
-        length(after: number, before: number): void {
+        length(): void {
             this.$emit("scroll-bottom");
         },
-        connected(after: boolean, before: boolean): void {
+        connected(after: boolean): void {
             if (after) {
                 if (this.length == 0) {
                     void store.dispatch(new ReplAction("look"));

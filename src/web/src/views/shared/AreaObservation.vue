@@ -29,7 +29,7 @@
 <script lang="ts">
 import _ from "lodash";
 import { defineComponent } from "vue";
-import { Entity, HistoryEntry, AreaObservation, Area } from "@/store";
+import { Entity, HistoryEntry, AreaObservation } from "@/store";
 import WithEntity from "../entity/WithEntity.vue";
 import TinyEntityPanel from "../entity/TinyEntityPanel.vue";
 import Markdown from "vue3-markdown-it";

@@ -59,6 +59,7 @@ export class VCodeMirror extends VueComponentBase {
     }
 
     mounted() {
+        // eslint-disable-next-line
         (CodeMirror.commands as any).save = () => {
             this.$emit("save", this.editor.getValue());
         };

@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { EntityRef, Entity } from "@/http";
+import { Entity } from "@/http";
 import { entityToClass } from "@/store";
 
 export default defineComponent({

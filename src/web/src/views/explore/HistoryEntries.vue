@@ -33,6 +33,7 @@ export default defineComponent({
     computed: {},
     methods: {
         viewFor(response: HistoryEntry): string | null {
+            // eslint-disable-next-line
             const info = getObjectType(response?.reply as any);
             if (info.simple) {
                 const keys = Object.keys(Replies);
@@ -42,9 +43,9 @@ export default defineComponent({
             }
             return "DefaultReply";
         },
-        onSelected(entity: Entity): Promise<any> {
+        async onSelected(entity: Entity): Promise<void> {
             console.log("explore:selected", entity);
-            return this.$router.push({
+            await this.$router.push({
                 name: "entity",
                 params: { key: entity.key },
             });

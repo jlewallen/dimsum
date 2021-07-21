@@ -22,6 +22,7 @@ export default defineComponent({
     },
     created(): void {
         if (this.$parent) {
+            // eslint-disable-next-line
             (this.$parent as any).tabs.push(this);
         }
     },

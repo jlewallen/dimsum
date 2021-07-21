@@ -8,7 +8,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Repl from "./Repl.vue";
-import store, { MutationTypes, LoadingAction, Entity, ReplAction, ReplResponse } from "@/store";
+import store, { ReplAction, ReplResponse } from "@/store";
 import HistoryEntries from "@/views/explore/HistoryEntries.vue";
 
 export default defineComponent({
