@@ -24,7 +24,7 @@ function getWebSocketsUrl() {
     if (http.indexOf("http") < 0) {
         http = window.location.origin + "/graphql";
     }
-    return http.replace("https", "ws").replace("http", "ws");
+    return http.replace("https", "wss").replace("http", "ws");
 }
 
 type OnReceivedFunc = (item: unknown) => Promise<void>;
