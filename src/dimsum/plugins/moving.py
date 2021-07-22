@@ -2,6 +2,7 @@ from typing import Type, Optional, Any
 
 import grammars
 import transformers
+import tools
 from loggers import get_logger
 from model import *
 from plugins.actions import PersonAction
@@ -26,6 +27,19 @@ class Home(PersonAction):
     ):
         welcome_area = await materialize_well_known_entity(world, ctx, WelcomeAreaKey)
         return await Go(area=welcome_area).perform(
+            world=world, area=area, person=person, ctx=ctx, **kwargs
+        )
+
+
+class Limbo(PersonAction):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        limbo = await materialize_well_known_entity(world, ctx, tools.LimboKey)
+        return await Go(area=limbo).perform(
             world=world, area=area, person=person, ctx=ctx, **kwargs
         )
 
@@ -93,6 +107,9 @@ class Transformer(transformers.Base):
     def home(self, args):
         return Home()
 
+    def limbo(self, args):
+        return Limbo()
+
     def go(self, args):
         return Go(finder=args[0])
 
@@ -106,9 +123,10 @@ class MovingGrammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:             go | home
+        start:             go | home | limbo
 
         home:              "home"
+        limbo:             "limbo"
         go:                "go" route
 
 """
