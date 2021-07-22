@@ -319,6 +319,7 @@ og.info("hello")
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip(reason="exceptions")
 async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
