@@ -10,6 +10,7 @@ from loggers import get_logger
 import cli.broker
 import cli.dummy
 import cli.export
+import cli.importing
 import cli.graph
 import cli.query
 import cli.repl
@@ -46,6 +47,7 @@ if __name__ == "__main__":
         cli.repl.commands,
         cli.graph.commands,
         cli.export.commands,
+        cli.importing.commands,
         cli.query.commands,
         cli.server.commands,
         cli.broker.commands,
