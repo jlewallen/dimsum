@@ -34,7 +34,7 @@ class EditEntity(PersonAction):
             return EditingEntityBehavior(
                 source=person, area=area, heard=[], entity=item
             )
-        return Failure("where's that?")
+        return Failure("Where's that?")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -61,7 +61,7 @@ class ModifyHardToSee(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("of what?")
+            return Failure("Modify what?")
 
         item.try_modify()
 
@@ -71,7 +71,7 @@ class ModifyHardToSee(PersonAction):
             else:
                 vis.make_easy_to_see()
 
-        return Success("done")
+        return Success("Done!")
 
 
 class ModifyField(PersonAction):
@@ -86,7 +86,7 @@ class ModifyField(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("of what?")
+            return Failure("Modify what?")
 
         item.try_modify()
 
@@ -98,7 +98,7 @@ class ModifyField(PersonAction):
 
         item.touch()
 
-        return Success("done")
+        return Success("Done!")
 
 
 class ModifyActivity(PersonAction):
@@ -118,14 +118,14 @@ class ModifyActivity(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("of what?")
+            return Failure("Modify what?")
 
         item.try_modify()
         with item.make(mechanics.Interactable) as inaction:
             inaction.link_activity(self.activity, self.value)
         item.props.set(self.activity, self.value)
         item.touch()
-        return Success("done")
+        return Success("Done!")
 
 
 @grammars.grammar()

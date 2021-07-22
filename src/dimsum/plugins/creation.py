@@ -117,7 +117,7 @@ class Make(PersonAction):
             )
 
         if not item:
-            return Failure("make what now?")
+            return Failure("Make what?")
 
         with person.make(carryable.Containing) as contain:
             after_hold = contain.hold(item)
@@ -156,7 +156,7 @@ class Obliterate(PersonAction):
         with person.make(carryable.Containing) as pockets:
             items = pockets.drop_all()
         if len(items) == 0:
-            return Failure("you're not holding anything")
+            return Failure("You're not holding anything.")
 
         for item in items:
             ctx.unregister(item)
@@ -196,7 +196,7 @@ class CallThis(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("you don't have anything")
+            return Failure("You don't have anything.")
 
         item.try_modify()
 
@@ -227,7 +227,7 @@ class CallThis(PersonAction):
         person.touch()
 
         return Success(
-            "cool, you'll be able to make another %s easier now" % (self.name,)
+            "Cool, you'll be able to make another %s easier now." % (self.name,)
         )
 
 

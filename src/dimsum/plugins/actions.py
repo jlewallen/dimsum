@@ -64,4 +64,4 @@ class Join(PersonAction):
                 )
             )
             await entering.entered(person)
-        return Success("welcome!")
+        return Success("Welcome!")

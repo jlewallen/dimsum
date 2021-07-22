@@ -63,8 +63,8 @@ class Tell(PersonAction):
             await ctx.publish(
                 PlayerTold(source=person, area=area, heard=[who], message=self.message)
             )
-            return Success("told")
-        return Failure("who?")
+            return Success()
+        return Failure("Who?")
 
 
 @grammars.grammar()

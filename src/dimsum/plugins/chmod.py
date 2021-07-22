@@ -25,7 +25,7 @@ class Chmod(PersonAction):
         if not item:
             return Failure("chmod what?")
 
-        return Success("done")
+        return Success("Done!")
 
 
 def make_table(rows: List[List[str]]) -> str:

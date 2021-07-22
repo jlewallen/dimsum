@@ -51,11 +51,11 @@ class Wear(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("wear what?")
+            return Failure("Wear what?")
 
         with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_worn():
-                return Failure("you can't wear that")
+                return Failure("You can't wear that.")
 
         with person.make(carryable.Containing) as contain:
             assert contain.is_holding(item)
@@ -72,7 +72,7 @@ class Wear(PersonAction):
                 items=[item],
             )
         )
-        return Success("you wore %s" % (item))
+        return Success("You wore %s." % (item))
 
 
 class Remove(PersonAction):
@@ -86,11 +86,11 @@ class Remove(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("remove what?")
+            return Failure("Remove what?")
 
         with person.make(apparel.Apparel) as wearing:
             if not wearing.is_wearing(item):
-                return Failure("you aren't wearing that")
+                return Failure("You aren't wearing that.")
 
             assert wearing.is_wearing(item)
 
@@ -106,7 +106,7 @@ class Remove(PersonAction):
                 items=[item],
             )
         )
-        return Success("you removed %s" % (item))
+        return Success("You removed %s." % (item))
 
 
 class Transformer(transformers.Base):

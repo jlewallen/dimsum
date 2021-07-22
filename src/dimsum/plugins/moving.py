@@ -57,10 +57,10 @@ class MovingAction(PersonAction):
                 destination = routed
 
         if destination is None:
-            return Failure("where?")
+            return Failure("Where?")
 
         if not can_enter(person, destination):
-            return Failure("sorry, you can't go there")
+            return Failure("Sorry, you can't go there.")
 
         with destination.make(occupyable.Occupyable) as entering:
             with area.make(occupyable.Occupyable) as leaving:

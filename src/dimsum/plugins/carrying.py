@@ -80,10 +80,10 @@ class Drop(PersonAction):
         if self.item:
             item = await ctx.apply_item_finder(person, self.item)
             if not item:
-                return Failure("drop what?")
+                return Failure("Drop what?")
 
             if not can_drop(person, item):
-                return Failure("drop what?")
+                return Failure("Drop what?")
 
         area = await find_entity_area(person)
 
@@ -108,7 +108,7 @@ class Drop(PersonAction):
                     )
                 )
                 return Success(
-                    "you dropped %s" % (infl.join([e.describe() for e in dropped]),)
+                    "You dropped %s" % (infl.join([e.describe() for e in dropped]),)
                 )
 
             return Failure(failure)
@@ -131,15 +131,15 @@ class Hold(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("sorry, hold what?")
+            return Failure("Sorry, hold what?")
 
         if not can_hold(person, item):
-            return Failure("sorry, you can't hold that")
+            return Failure("Sorry, you can't hold that.")
 
         with person.make(carryable.Containing) as pockets:
             # This should happen after? What if there's more on the ground?
             if pockets.is_holding(item):
-                return Failure("you're already holding that")
+                return Failure("You're already holding that.")
 
             area = await find_entity_area(person)
             with area.make(carryable.Containing) as ground:
@@ -167,7 +167,7 @@ class Hold(PersonAction):
                     )
                 )
                 return Success(
-                    "you picked up %s"
+                    "You picked up %s"
                     % (infl.join([e.describe() for e in [after_hold]]),)
                 )
 
@@ -183,19 +183,19 @@ class Open(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("open what?")
+            return Failure("Open what?")
 
         with item.make(carryable.Containing) as contain:
             if not contain.can_hold():
-                return Failure("you can't open that")
+                return Failure("You can't open that.")
 
             if not can_open(person, item):
-                return Failure("huh, won't open")
+                return Failure("Huh, won't open.")
 
             if not contain.open():
-                return Failure("huh, won't open")
+                return Failure("Huh, won't open.")
 
-        return Success("opened")
+        return Success("It opened.")
 
 
 class Close(PersonAction):
@@ -209,19 +209,19 @@ class Close(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("close what?")
+            return Failure("Close what?")
 
         with item.make(carryable.Containing) as contain:
             if not contain.can_hold():
-                return Failure("you can't open that")
+                return Failure("You can't open that.")
 
             if not can_close(person, item):
-                return Failure("huh, won't close")
+                return Failure("Huh, won't close.")
 
             if not contain.close():
-                return Failure("it's got other plans")
+                return Failure("It's got other plans.")
 
-        return Success("closed")
+        return Success("Closed.")
 
 
 class Lock(PersonAction):
@@ -244,7 +244,7 @@ class Lock(PersonAction):
 
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("what?")
+            return Failure("What?")
 
         maybe_key = await ctx.apply_item_finder(person, self.key, exclude=[item])
 
@@ -254,13 +254,13 @@ class Lock(PersonAction):
                     key=maybe_key, creator=person, owner=person, **kwargs
                 )
                 if not locked_with:
-                    return Failure("can't seem to lock that")
+                    return Failure("You can't seem to lock that.")
 
                 assert locking.is_locked()
                 hands.hold(locked_with)
                 ctx.register(locked_with)
 
-        return Success("done")
+        return Success("Done, locked.")
 
 
 class Unlock(PersonAction):
@@ -283,7 +283,7 @@ class Unlock(PersonAction):
 
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("unlock what?")
+            return Failure("Unlock what?")
 
         log.info("finding key %s", self.key)
         maybe_key = await ctx.apply_item_finder(person, self.key, exclude=[item])
@@ -291,9 +291,9 @@ class Unlock(PersonAction):
 
         with item.make(carryable.Containing) as unlocking:
             if unlocking.unlock(key=maybe_key, **kwargs):
-                return Success("done")
+                return Success("Done, unlocked.")
 
-        return Failure("nope")
+        return Failure("Nope, can't do.")
 
 
 class PutInside(PersonAction):
@@ -316,22 +316,22 @@ class PutInside(PersonAction):
 
         container = await ctx.apply_item_finder(person, self.container)
         if not container:
-            return Failure("what?")
+            return Failure("What?")
 
         with container.make(carryable.Containing) as containing:
             if not containing.can_hold():
-                return Failure("inside... that?")
+                return Failure("Inside... that?")
 
             item = await ctx.apply_item_finder(person, self.item)
             if not item:
-                return Failure("what?")
+                return Failure("What?")
 
             if containing.place_inside(item):
                 with person.make(carryable.Containing) as pockets:
                     pockets.drop(item)
-                return Success("inside, done")
+                return Success("Inside, done")
 
-        return Failure("you can't do that")
+        return Failure("You can't do that.")
 
 
 class TakeOut(PersonAction):
@@ -354,25 +354,25 @@ class TakeOut(PersonAction):
 
         container = await ctx.apply_item_finder(person, self.container)
         if not container:
-            return Failure("what?")
+            return Failure("What?")
 
         with container.make(carryable.Containing) as containing:
             if not containing.can_hold():
-                return Failure("outside of... that?")
+                return Failure("Outside of... that?")
 
             item = await ctx.apply_item_finder(person, self.item)
             if not item:
-                return Failure("what?")
+                return Failure("What?")
 
             if not can_hold(person, item):
-                return Failure("sorry, you can't hold that")
+                return Failure("Sorry, you can't hold that.")
 
             if containing.take_out(item):
                 with person.make(carryable.Containing) as pockets:
                     pockets.hold(item)
-                return Success("done, you're holding that now")
+                return Success("Done, you're holding that now.")
 
-        return Failure("doesn't seem like you can")
+        return Failure("It doesn't seem like you can.")
 
 
 PourVerb = "pour"
@@ -398,25 +398,25 @@ class Pour(PersonAction):
     ):
         source = await ctx.apply_item_finder(person, self.source)
         if not source:
-            return Failure("from what?")
+            return Failure("From what?")
 
         destination = await ctx.apply_item_finder(
             person, self.destination, exclude=[source]
         )
         if not destination:
-            return Failure("into what?")
+            return Failure("Into what?")
 
         with source.make(carryable.Containing) as produces:
             if not PourVerb in produces.produces:
-                return Failure("you can't pour from that")
+                return Failure("You can't pour from that.")
 
             produced = produces.produce_into(
                 PourVerb, destination, person=person, creator=person, owner=person
             )
             if produced:
-                return Success("done")
+                return Success("Done")
 
-        return Failure("oh no")
+        return Failure("Oh no.")
 
 
 class PourProducer(carryable.Producer):
@@ -452,7 +452,7 @@ class ModifyPours(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("nothing to modify")
+            return Failure("Modify what?")
 
         log.info("modifying %s to produce %s", item, self.produces)
 
@@ -463,7 +463,7 @@ class ModifyPours(PersonAction):
 
         item.touch()
 
-        return Success("done")
+        return Success("Done.")
 
 
 class ModifyCapacity(PersonAction):
@@ -479,12 +479,13 @@ class ModifyCapacity(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("nothing to modify")
+            return Failure("Modify what?")
         item.try_modify()
         with item.make(carryable.Containing) as contain:
             if contain.adjust_capacity(self.capacity):
-                return Success("done")
-        return Failure("no way")
+                return Success("Done.")
+
+        return Failure("No way.")
 
 
 class Transformer(transformers.Base):

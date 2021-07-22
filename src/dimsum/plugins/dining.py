@@ -27,7 +27,7 @@ class ModifyServings(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("nothing to modify")
+            return Failure("Nothing to modify.")
 
         item.try_modify()
 
@@ -36,7 +36,7 @@ class ModifyServings(PersonAction):
 
         item.touch()
 
-        return Success("done")
+        return Success("Done.")
 
 
 class Eat(PersonAction):
@@ -50,17 +50,17 @@ class Eat(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("dunno where that is")
+            return Failure("Eat what?")
 
         with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_eaten():
-                return Failure("you can't eat that")
+                return Failure("You can't eat that.")
 
         area = await find_entity_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
 
-        return Success("you ate %s" % (item))
+        return Success("You ate %s." % (item.props.described))
 
 
 class Drink(PersonAction):
@@ -74,17 +74,17 @@ class Drink(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("dunno where that is")
+            return Failure("Drink what?")
 
         with item.make(mechanics.Interactable) as inaction:
             if not inaction.when_drank():
-                return Failure("you can't drink that")
+                return Failure("You can't drink that.")
 
         area = await find_entity_area(person)
         with person.make(health.Health) as p:
             await p.consume(item, area=area, ctx=ctx)
 
-        return Success("you drank %s" % (item))
+        return Success("You drank %s." % (item.props.described))
 
 
 class Transformer(transformers.Base):

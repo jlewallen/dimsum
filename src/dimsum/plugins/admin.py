@@ -25,7 +25,7 @@ class Auth(PersonAction):
     ):
         with person.make(users.Auth) as auth:
             auth.change(self.password)
-        return Success("done, https://mud.espial.me")
+        return Success("Done, https://mud.espial.me")
 
 
 class Invite(PersonAction):
@@ -55,15 +55,15 @@ class Freeze(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("freeze what?")
+            return Failure("Freeze what?")
 
         if not item.can_modify():
-            return Failure("already frozen, pal")
+            return Failure("Already frozen, pal.")
 
         if not item.freeze(person.identity):
-            return Failure("you can't do that!")
+            return Failure("You can't do that!")
 
-        return Success("frozen")
+        return Success("Frozen")
 
 
 class Unfreeze(PersonAction):
@@ -77,15 +77,15 @@ class Unfreeze(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("unfreeze what?")
+            return Failure("Unfreeze what?")
 
         if item.can_modify():
-            return Failure("why do that?")
+            return Failure("Why do that?")
 
         if not item.unfreeze(person.identity):
-            return Failure("you can't do that! is that yours?")
+            return Failure("You can't do that! Is that yours?")
 
-        return Success("unfrozen")
+        return Success("Unfrozen!")
 
 
 class Transformer(transformers.Base):

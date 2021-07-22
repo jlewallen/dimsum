@@ -109,9 +109,9 @@ class EntitiesObservation(Observation):
 
     def render_tree(self) -> Dict[str, Any]:
         if len(self.entities) == 0:
-            return {"lines": ["you see nothing."]}
+            return {"lines": ["You see nothing."]}
         return {
-            "lines": ["you see " + infl.join([x.describe() for x in self.entities])]
+            "lines": ["You see " + infl.join([x.describe() for x in self.entities])]
         }
 
 
@@ -131,11 +131,11 @@ class LookInside(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("inside what?")
+            return Failure("Inside what?")
 
         with item.make(carryable.Containing) as contain:
             if not contain.is_open():
-                return Failure("you can't do that")
+                return Failure("You can't do that.")
 
             return EntitiesObservation(contain.holding)
 
@@ -151,7 +151,7 @@ class LookFor(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("i can't seem to find that")
+            return Failure("I can't seem to find that.")
 
         with person.make(mechanics.Visibility) as vis:
             vis.add_observation(item.identity)
@@ -192,7 +192,7 @@ class Look(PersonAction):
         if self.item:
             item = await ctx.apply_item_finder(person, self.item)
             if not item:
-                return Failure("look at what?")
+                return Failure("Look at what?")
             return DetailedObservation(ObservedEntity(item))
 
         assert area
@@ -209,7 +209,7 @@ class Examine(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("examine what?")
+            return Failure("Examine what?")
         return DetailedObservation(ObservedEntity(item))
 
 
@@ -224,7 +224,7 @@ class ModifyPresence(PersonAction):
     ):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
-            return Failure("modify what?")
+            return Failure("Modify what?")
 
         tools.set_presence(item, self.presence)
 
