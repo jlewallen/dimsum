@@ -136,7 +136,7 @@ class Session(MaterializeAndCreate):
             assert entity
             assert c.saving
             if c.diff:
-                log.info("analysing %s %s", c.key, entity)
+                log.info("security(%s) %s", entity, c.key)
                 check = generate_security_check_from_json_diff(
                     c.saving.compiled, c.diff
                 )
