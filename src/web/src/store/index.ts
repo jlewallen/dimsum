@@ -82,6 +82,8 @@ export default createStore<RootState>({
             }
 
             if (entry.reply.interactive === true) {
+                state.responses = state.responses.filter((r) => !r.reply || r.reply["py/object"] != "Waiting");
+                state.received++;
                 state.interactables.push(entry);
             } else {
                 // eslint-disable-next-line
