@@ -144,7 +144,6 @@ class Grammar(grammars.Grammar):
         start:             edit_entity | clear_screen | modify
 
         edit_entity:       ("edit" | "ed") (here | this | noun)
-        here:              "here"
         clear_screen:      "cls"
 
         modify:            "modify" TEXT_FIELD text                -> modify_field
@@ -155,9 +154,6 @@ class Grammar(grammars.Grammar):
 
 
 class Transformer(transformers.Base):
-    def here(self, args):
-        return FindCurrentArea()
-
     def edit_entity(self, args):
         return EditEntity(args[0])
 

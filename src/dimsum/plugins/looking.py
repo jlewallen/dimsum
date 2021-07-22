@@ -34,7 +34,7 @@ class DetailedObservation(Observation):
     def render_tree(self) -> Dict[str, Any]:
         owner = owning.get_owner(self.item.entity)
         return {
-            "title": self.item.entity.props.name,
+            "title": self.item.entity.props.described,
             "description": [
                 self.item.entity.props.desc,
                 "\n",
@@ -281,7 +281,8 @@ class LookingGrammar(grammars.Grammar):
                          | "look" ("for" noun)                       -> look_for
                          | "look" ("in" held)                        -> look_inside
 
-        examine:           "examine" noun                            -> examine
+                         // Order of here and noun is important.
+        examine:           "examine" (here | noun)                   -> examine
 
         modify:            "modify" "presence" noun "distinct"       -> presence_distinct
                          | "modify" "presence" noun "inline" "short" -> presence_inline_short

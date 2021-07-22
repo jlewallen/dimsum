@@ -1,7 +1,7 @@
 import dataclasses
 import lark
 
-from model import Entity, World, FindObjectByGid
+from model import Entity, World, FindObjectByGid, FindCurrentArea
 import finders as finders
 import scopes.movement as movement
 
@@ -91,3 +91,6 @@ class Base(lark.Transformer):
 
     def unheld(self, args):
         return args[0]
+
+    def here(self, args):
+        return FindCurrentArea()

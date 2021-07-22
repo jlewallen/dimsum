@@ -153,6 +153,7 @@ def _wrap_parser(custom: str) -> Lark:
 
         object_by_gid:     "#"NUMBER
 
+        here:              "here"
         this:              "this"
         that:              "that"
 
