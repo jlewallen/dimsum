@@ -243,6 +243,7 @@ class Simplified:
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
                     tools.log_behavior_exception(entity)
+                    raise
 
 
 @dataclasses.dataclass(frozen=True)

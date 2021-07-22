@@ -224,11 +224,16 @@ def get_entity_security_context(
 def move(moving: Entity, destination: Entity):
     location = moving.make_and_discard(carryable.Location).container
     assert location
-    with location.make(carryable.Containing) as from_container:
-        with destination.make(carryable.Containing) as to_container:
-            assert from_container.contains(moving)
-            from_container.unhold(moving)
-            to_container.hold(moving)
+    try:
+        with location.make(carryable.Containing) as from_container:
+            with destination.make(carryable.Containing) as to_container:
+                if from_container.contains(moving):
+                    from_container.unhold(moving)
+                to_container.hold(moving)
+    except:
+        log.error("failed to move %s to %s from %s", moving, destination, location)
+        log.exception("exception", exc_info=True)
+        raise
 
 
 LimboKey = "limbo"
