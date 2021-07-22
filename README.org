@@ -1,53 +1,110 @@
 * DimSum
 
-** TODO Permissions
+** Overview
 
-   Behavior (read/write)
-   Location (read/write)
-   Clone (execute)
-   Action (execute)
+   What is this? A reasonable question but it may take some
+   explaining. First, DimSum is a MOO. A MOO stands for "MUD, Object
+   Orienated" which isn't very helpful because now you're probably
+   wondering what a MUD is. MUD stands for Multi-user Dungeon and now
+   that we've established a clear pattern and I've acknowledged
+   history we can get into the details.
 
-** TODO Secure JSON
+   DimSum is basically a game engine for online, text-based social
+   worlds. Not games in the rouge-like sense, necessarily though the
+   concept could easily be expanded. Imagine second-life if computers
+   stayed with text-based terminals. All interaction with the world
+   happens via text based commands and at every turn as much
+   flexibility was left to the administrators as possible.
 
-** TODO Add --public/anonymous flag for insecure installations.
-** TODO Allow 'Scopes' to be @dataclasses
-** TODO Web tool for 'drawing' connected areas.
-** TODO Distance Effects.
+   In the end, it's probably better to look at a few examples and then
+   just dive in.
 
-   N-Hops aways, etc... This is mostly a tools related thing.
+** Design Overview
 
-** TODO Weather esp Wind
+   Everything is written in Python. In fact this has been my first
+   large-scale modern Python project in a long time and it's been an
+   absolute pleasure to use. What this means, though is that even the
+   code that users contribute to the worlds they participate in is
+   Python. This is different from other MOOs where a language is
+   embedded and needs to be learned. It also comes with some trade
+   offs, as we'll see.
 
-   Set logical zip code for an area, weather changes to reflect
-   that. Wind can blow light items from one area to another.
+   Another caveat is that much of the documentation is actually in the
+   example world itself and is intended to be consumed as part of
+   interacting with that world. If that's not for you, feel free to
+   poke around.
 
-** TODO Mode: Make Maze.
+** Internals
 
-   Just randomly generates a maze that gets populated with stuff.
+   Every world is made up of unique objects or, as they're known in
+   the code, entities. Entity is a common name for any object, thing,
+   player, NPC or even walls and doors that are in a game's world and
+   require simulation and participate in the game's rules. It sounds
+   intimidating but the word object is usually taken so us programmers
+   make up other ones because we can't always use the word `object`
+   where we'd like.
 
-** TODO Mode: Animal Crossing
+   In DimSum an entity can refer to others, forming a complicated
+   object graph that is serialized/deserialized to JSON blobs, one per
+   entity. This is a fairly complicated process and as much as
+   possible is hidden from users and developers by the framework. In
+   the end, DimSum is mostly about JSON, as we'll see later.
 
-   I think that eventually this will become a thing, but the idea is
-   that we can forage for supplies/resources and then use those to
-   build other items, using recipes.
+   All entities have a set of core attributes and behavior they come
+   with and additional behavior can be attached to them via the use of
+   a custom `Scope`. A Scope is basically a Python class that
+   encapsulates the behavior *and* the data for some concept or
+   idea. Examples of scopes:
 
-   .do recipe Super Cool Thing
-   You're holding a recipe.
-   .call this NAME
+*** Movement
+*** Carryable
+*** Occupyable
+*** Apparel
+*** Health
+*** Ownership
 
-** TODO Mode: Escape Room
+** TODOs
 
-   Everybody is thrown into a randomly generated world and has to
-   capture a flag or do something? See who can gather the most X in
-   whatever time? People can also create their own scenarios, in a
-   DnD-esque way and see if their friends can find their way out.
+*** TODO Secure JSON
+*** TODO Add --public/anonymous flag for insecure installations.
+*** TODO Allow 'Scopes' to be @dataclasses
+*** TODO Web tool for 'drawing' connected areas.
+*** TODO Distance Effects.
 
-** TODO Allow nesting of Scopes
+	N-Hops aways, etc... This is mostly a tools related thing.
 
-   Right now if you nest you end up creating two instances and they
-   can overwrite each other. A good example is in tools.move's use of
-   Location.
+*** TODO Weather esp Wind
 
-** TODO A cron-like scheduling system.
+	Set logical zip code for an area, weather changes to reflect
+	that. Wind can blow light items from one area to another.
 
-   With some jitter.
+*** TODO Mode: Make Maze.
+
+	Just randomly generates a maze that gets populated with stuff.
+
+*** TODO Mode: Animal Crossing
+
+	I think that eventually this will become a thing, but the idea is
+	that we can forage for supplies/resources and then use those to
+	build other items, using recipes.
+
+	.do recipe Super Cool Thing
+	You're holding a recipe.
+	.call this NAME
+
+*** TODO Mode: Escape Room
+
+	Everybody is thrown into a randomly generated world and has to
+	capture a flag or do something? See who can gather the most X in
+	whatever time? People can also create their own scenarios, in a
+	DnD-esque way and see if their friends can find their way out.
+
+*** TODO Allow nesting of Scopes
+
+	Right now if you nest you end up creating two instances and they
+	can overwrite each other. A good example is in tools.move's use of
+	Location.
+
+*** TODO A cron-like scheduling system.
+
+	With some jitter.
