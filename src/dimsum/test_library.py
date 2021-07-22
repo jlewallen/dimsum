@@ -1,4 +1,3 @@
-import logging
 import freezegun
 import pytest
 
@@ -7,9 +6,6 @@ import library
 import test
 from model import *
 from test_utils import *
-
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

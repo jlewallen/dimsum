@@ -1,4 +1,3 @@
-import logging
 import dataclasses
 import jsondiff
 import json
@@ -12,8 +11,6 @@ import tools
 from model import *
 from model.permissions import *
 import test
-
-log = logging.getLogger("dimsum")
 
 
 @dataclasses.dataclass
@@ -77,9 +74,6 @@ async def test_permissions_wild_json_idea_3():
     after = serializing.serialize(tree, indent=True)
     assert before and after
     d = jsondiff.diff(json.loads(before), json.loads(after), marshal=True)
-    log.info("%s", before)
-    log.info("%s", after)
-    log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
     assert acl_names(check.acls) == ["", "left.example"]
 
@@ -92,9 +86,6 @@ async def test_permissions_wild_json_idea_4():
     after = serializing.serialize(tree, indent=True)
     assert before and after
     d = jsondiff.diff(json.loads(before), json.loads(after), marshal=True)
-    log.info("%s", before)
-    log.info("%s", after)
-    log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
     assert acl_names(check.acls) == [""]
 
@@ -110,9 +101,6 @@ async def test_permissions_wild_json_idea_5():
     after = serializing.serialize(tree, indent=True)
     assert before and after
     d = jsondiff.diff(json.loads(before), json.loads(after), marshal=True)
-    log.info("%s", before)
-    log.info("%s", after)
-    log.info("%s", d)
     check = generate_security_check_from_json_diff(json.loads(before), d)
     assert acl_names(check.acls) == ["", "collection.1.example"]
 

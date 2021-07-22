@@ -1,12 +1,9 @@
-import logging
 import pytest
 
 import handlers
 from model import *
 import test
 from test_utils import *
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

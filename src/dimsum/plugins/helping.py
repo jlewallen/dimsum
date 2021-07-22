@@ -1,10 +1,10 @@
 import copy
 import dataclasses
-import logging
 from typing import Dict, List, Optional, Type
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from tools import *
@@ -12,7 +12,7 @@ from domains import Session
 import scopes
 from plugins.actions import PersonAction
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @dataclasses.dataclass

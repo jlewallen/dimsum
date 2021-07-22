@@ -1,11 +1,11 @@
 import dataclasses
-import logging
 from typing import Optional
 
+from loggers import get_logger
 from model import Entity, Scope, Event
 import scopes.carryable as carryable
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class FieldMergeStrategy:

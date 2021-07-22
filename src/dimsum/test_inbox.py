@@ -1,4 +1,3 @@
-import logging
 import dataclasses
 import time
 import pytest
@@ -11,8 +10,6 @@ import scopes.inbox as inbox
 import scopes as scopes
 import test
 from test_utils import *
-
-log = logging.getLogger("dimsum.tests")
 
 
 @dataclasses.dataclass

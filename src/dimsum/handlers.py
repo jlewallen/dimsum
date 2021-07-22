@@ -1,12 +1,12 @@
-import logging
 import functools
 from typing import Optional
 
 import bus
+from loggers import get_logger
 from model import Comms, Renderable, StandardEvent
 from saying import DynamicMessage
 
-log = logging.getLogger("dimsum.handlers")
+log = get_logger("dimsum.handlers")
 
 
 class EventHandlers:

@@ -7,10 +7,11 @@ import domains
 import scopes
 import serializing
 import storage
+from loggers import get_logger
 from model import *
 
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @pytest.mark.asyncio

@@ -1,14 +1,16 @@
-import logging
 import dataclasses
 from typing import Any, Dict, List, Sequence
+
+from loggers import get_logger
 
 from .hooks import *
 from .entity import *
 from .game import *
 from .visual import *
-import scopes.mechanics as mechanics
 
-log = logging.getLogger("dimsum.model")
+import scopes.mechanics as mechanics  # TODO bleh
+
+log = get_logger("dimsum.model")
 
 
 @dataclasses.dataclass

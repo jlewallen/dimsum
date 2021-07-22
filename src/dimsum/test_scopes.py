@@ -1,13 +1,9 @@
-import logging
 import pytest
 from typing import Optional, List
 
 import domains
 from model import *
 import scopes.ownership as ownership
-
-
-log = logging.getLogger("dimsum")
 
 
 class SimpleCore(Scope):

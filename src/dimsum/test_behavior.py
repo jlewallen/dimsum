@@ -1,6 +1,6 @@
-import logging
 import pytest
 
+from loggers import get_logger
 from model import *
 import scopes.behavior as behavior
 import scopes.carryable as carryable
@@ -8,7 +8,7 @@ import scopes.mechanics as mechanics
 import scopes as scopes
 import test
 
-log = logging.getLogger("dimsum.tests")
+# log = get_logger("dimsum.tests")
 
 
 @pytest.mark.asyncio

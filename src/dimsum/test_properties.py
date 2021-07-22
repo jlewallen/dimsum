@@ -1,9 +1,5 @@
-import logging
-
 from model import *
 import pytest
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

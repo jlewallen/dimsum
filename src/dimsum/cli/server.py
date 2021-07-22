@@ -1,4 +1,3 @@
-import logging
 import asyncio
 import uvicorn
 import time
@@ -9,6 +8,7 @@ from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
+from loggers import get_logger
 import config
 import domains
 import sshd
@@ -19,7 +19,7 @@ import everything  # noqa
 
 import cli.interactive as interactive
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 async def servicing(domain: domains.Domain):

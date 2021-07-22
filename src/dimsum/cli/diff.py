@@ -1,15 +1,15 @@
 import sys
 import os
-import logging
 import json
 import asyncclick as click
 import jsondiff
 import cli.utils as utils
 from typing import List, Dict, Any
 
+from loggers import get_logger
 from model import CompiledJson
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 @click.group()

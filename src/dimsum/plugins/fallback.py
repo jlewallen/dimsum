@@ -1,11 +1,11 @@
-import logging
 from typing import Type
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @grammars.grammar()

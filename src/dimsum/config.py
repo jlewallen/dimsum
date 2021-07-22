@@ -1,15 +1,15 @@
 import dataclasses
 import json
-import logging
 import os
 import os.path
 import shortuuid
 from typing import Dict, List, Optional
 
+from loggers import get_logger
 from domains import Domain
 from storage import *
 
-log = logging.getLogger("dimsum.config")
+log = get_logger("dimsum.config")
 
 
 @dataclasses.dataclass

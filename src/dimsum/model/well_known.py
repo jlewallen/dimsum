@@ -1,5 +1,6 @@
-import logging
 from typing import Dict, List, Optional, Sequence, Type, Any
+
+from loggers import get_logger
 
 from .entity import Entity, Scope, RootEntityClass, find_entity_area
 from .context import MaterializeAndCreate

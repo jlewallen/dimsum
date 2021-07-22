@@ -1,5 +1,4 @@
 import dataclasses
-import logging
 import multiprocessing
 import os
 import pathlib
@@ -8,9 +7,10 @@ import re
 import signal
 import threading
 import types
+import watchgod
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
-import watchgod
+from loggers import get_logger
 
 HANDLED_SIGNALS = (
     signal.SIGINT,  # Unix signal 2. Sent by Ctrl+C.
@@ -18,7 +18,7 @@ HANDLED_SIGNALS = (
 )
 
 
-log = logging.getLogger("dimsum.broker")
+log = get_logger("dimsum.broker")
 
 
 @dataclasses.dataclass(frozen=True)

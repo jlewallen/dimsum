@@ -1,15 +1,15 @@
-import logging
 from typing import List, Optional, Type
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes
 from plugins.actions import PersonAction
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 class DigDirection:

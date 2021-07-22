@@ -2,7 +2,6 @@ import dataclasses
 import json
 import copy
 import datetime
-import logging
 import sqlite3
 import shutil
 import os.path
@@ -10,9 +9,10 @@ from typing import Any, Dict, List, Optional, TextIO
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 
+from loggers import get_logger
 from model import Entity, CompiledJson, Serialized
 
-log = logging.getLogger("dimsum.storage")
+log = get_logger("dimsum.storage")
 
 
 @dataclasses.dataclass

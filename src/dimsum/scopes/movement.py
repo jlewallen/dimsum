@@ -1,11 +1,11 @@
 import enum
-import logging
 from typing import List, Optional, Tuple
 
+from loggers import get_logger
 from model import Entity, Scope, Acls, context
 import scopes.carryable as carryable
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class Direction(enum.Enum):

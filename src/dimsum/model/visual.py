@@ -1,9 +1,10 @@
-import logging
 import dataclasses
 import abc
 from typing import Dict, List, Any
 
-log = logging.getLogger("dimsum.visual")
+from loggers import get_logger
+
+log = get_logger("dimsum.visual")
 
 
 class Renderable:

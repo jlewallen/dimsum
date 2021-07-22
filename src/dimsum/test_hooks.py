@@ -1,16 +1,16 @@
 import inspect
-import logging
 import wrapt
 import pytest
 
+from loggers import get_logger
 from model import *
 import scopes
-
-log = logging.getLogger("dimsum.tests")
 
 
 @pytest.mark.asyncio
 async def test_simple_hook_one_arg():
+    log = get_logger("dimsum.tests")
+
     h = hooks.All()
 
     @h.observed.target

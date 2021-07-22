@@ -6,8 +6,6 @@ import scopes.carryable as carryable
 from plugins.looking import *
 import test
 
-log = logging.getLogger("dimsum")
-
 
 @pytest.mark.asyncio
 async def test_hold_missing_item():

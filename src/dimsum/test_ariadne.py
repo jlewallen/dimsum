@@ -1,6 +1,6 @@
+import logging
 import base64
 import json
-import logging
 import pytest
 import ariadne
 import freezegun
@@ -10,6 +10,7 @@ import config
 import domains
 import scopes
 import serializing
+from loggers import get_logger
 from model import *
 from schema import AriadneContext
 from plugins.actions import Join
@@ -19,7 +20,7 @@ import test
 from test_utils import *
 
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 def get_test_context(domain: domains.Domain, **kwargs):

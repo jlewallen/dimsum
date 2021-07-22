@@ -1,13 +1,13 @@
 import ast
-import logging
 import dataclasses
 import functools
 from typing import Dict, List, Optional, Any
 
+from loggers import get_logger
 from model import Entity, Scope, Map, Acls
 
 DefaultKey = "b:default"
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 @dataclasses.dataclass

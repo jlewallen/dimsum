@@ -1,16 +1,16 @@
 import dataclasses
-import logging
 from typing import Optional, Type
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from plugins.actions import PersonAction
 import scopes.mechanics as mechanics
 import scopes.health as health
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @event

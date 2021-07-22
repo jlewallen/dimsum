@@ -2,7 +2,6 @@ import ast
 import dataclasses
 import functools
 import inspect
-import logging
 import jsonpickle
 import time
 import typing as imported_typing
@@ -15,6 +14,7 @@ import saying
 import domains as session  # TODO circular
 import finders
 import tools
+from loggers import get_logger
 from model import (
     Entity,
     Scope,
@@ -44,8 +44,8 @@ import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes.inbox as inbox
 
-log = logging.getLogger("dimsum.dynamic")
-errors_log = logging.getLogger("dimsum.dynamic.errors")
+log = get_logger("dimsum.dynamic")
+errors_log = get_logger("dimsum.dynamic.errors")
 
 
 @dataclasses.dataclass
@@ -300,7 +300,7 @@ def _get_default_globals():
     # TODO Can we pass an exploded module here?
     event_classes = {k.__name__: k for k in get_all_events()}
     return dict(
-        log=logging.getLogger("dimsum.dynamic.user"),
+        log=get_logger("dimsum.dynamic.user"),
         dataclass=dataclasses.dataclass,
         Common=Common,
         tools=tools,

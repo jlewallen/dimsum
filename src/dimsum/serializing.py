@@ -1,4 +1,3 @@
-import logging
 import dataclasses
 import copy
 import enum
@@ -7,6 +6,7 @@ import wrapt
 from typing import Callable, Dict, List, Optional, Iterable
 
 import storage
+from loggers import get_logger
 from model import (
     Entity,
     World,
@@ -22,7 +22,7 @@ import scopes.movement as movement
 
 from model.entity import CompiledJson
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 

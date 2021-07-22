@@ -1,12 +1,12 @@
 #!env/bin/python3
 
 import json
-import logging
 import logging.config
+import asyncclick as click
 from rich.logging import RichHandler
 from rich.console import Console
 
-import asyncclick as click
+from loggers import get_logger
 import cli.broker
 import cli.dummy
 import cli.export
@@ -17,7 +17,7 @@ import cli.server
 import cli.wiki
 import cli.diff
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 def configure_logging(colors: bool):

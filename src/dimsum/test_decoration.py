@@ -1,9 +1,10 @@
-import logging
 import inspect
 import wrapt
 import pytest
 
-log = logging.getLogger("dimsum.tests")
+from loggers import get_logger
+
+log = get_logger("dimsum.tests")
 
 
 class MethodProxy(wrapt.ObjectProxy):

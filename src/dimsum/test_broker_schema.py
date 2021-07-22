@@ -3,11 +3,12 @@ import ariadne
 import freezegun
 import pytest
 
+from loggers import get_logger
 import routing
 import brokers.schema as schema_factory
 from brokers.schema import AriadneContext
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 def get_test_context(broker: routing.Broker, **kwargs):

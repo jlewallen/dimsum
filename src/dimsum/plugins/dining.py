@@ -1,9 +1,9 @@
-import logging
 import dataclasses
 from typing import Type, Optional, List
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from tools import *
@@ -11,7 +11,7 @@ from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
 import scopes.health as health
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 class ModifyServings(PersonAction):

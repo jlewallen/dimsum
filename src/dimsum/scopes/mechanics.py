@@ -1,12 +1,12 @@
 import abc
 import datetime
-import logging
 import enum
 from typing import Dict, List, Optional
 
+from loggers import get_logger
 from model import Entity, Scope, Identity, Worn, Eaten, Drank, Acls
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class Interactable(Scope):

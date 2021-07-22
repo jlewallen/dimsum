@@ -1,13 +1,13 @@
 import base64
 import hashlib
-import logging
 import os
 import jwt
 from typing import List, Optional, Tuple, Dict
 
+from loggers import get_logger
 from model import Entity, Scope, Acls
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
 

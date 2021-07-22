@@ -1,6 +1,6 @@
-import logging
 from typing import Optional
 
+from loggers import get_logger
 from model import (
     Entity,
     World,
@@ -33,7 +33,7 @@ import plugins.clothing  # noqa
 import plugins.dining  # noqa
 import plugins.carrying  # noqa
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 def describe_everything(entity: Entity) -> str:

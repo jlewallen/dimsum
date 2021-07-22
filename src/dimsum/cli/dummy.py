@@ -1,9 +1,10 @@
 import sys
 import json
-import logging
 import asyncclick as click
 
-log = logging.getLogger("dimsum.cli")
+from loggers import get_logger
+
+log = get_logger("dimsum.cli")
 
 
 @click.group()

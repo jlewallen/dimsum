@@ -1,8 +1,8 @@
-import logging
 import copy
 import dataclasses
 from typing import List, Optional
 
+from loggers import get_logger
 from model import Entity, Scope, Common, ItemFinder, ItemFactory, context
 import scopes.apparel as apparel
 import scopes.carryable as carryable
@@ -10,7 +10,7 @@ import scopes.mechanics as mechanics
 import scopes.occupyable as occupyable
 import scopes
 
-log = logging.getLogger("dimsum.model")
+log = get_logger("dimsum.model")
 
 
 @dataclasses.dataclass

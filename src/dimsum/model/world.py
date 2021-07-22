@@ -1,5 +1,6 @@
-import logging
 from typing import Dict, List, Optional, Sequence, Type, Any
+
+from loggers import get_logger
 
 from .properties import Common
 from .entity import (
@@ -12,7 +13,7 @@ from .context import Ctx
 
 WorldKey = "world"
 WelcomeAreaKey = "welcomeArea"
-log = logging.getLogger("dimsum.model")
+log = get_logger("dimsum.model")
 
 
 class Identifiers(Scope):

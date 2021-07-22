@@ -1,9 +1,9 @@
-import logging
 import dataclasses
 from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from tools import *
 from finders import *
@@ -11,7 +11,7 @@ from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
 import scopes.apparel as apparel
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @event

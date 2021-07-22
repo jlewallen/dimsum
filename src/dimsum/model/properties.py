@@ -1,14 +1,15 @@
 import copy
-import logging
 import re
 import time
 from typing import Dict, Optional, Optional
+
+from loggers import get_logger
 
 from .permissions import Acls
 from .crypto import Identity
 from .kinds import Kind
 
-log = logging.getLogger("dimsum.model")
+log = get_logger("dimsum.model")
 
 GlobalId = "gid"
 Name = "name"

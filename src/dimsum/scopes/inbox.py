@@ -1,5 +1,4 @@
 import dataclasses
-import logging
 import time
 import functools
 import bisect
@@ -7,6 +6,7 @@ import json
 import jsonpickle
 from typing import List, Dict, Optional, Any
 
+from loggers import get_logger
 from model import (
     Entity,
     World,
@@ -19,7 +19,7 @@ from model import (
 import serializing
 import scopes
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class PostMessage(Event):

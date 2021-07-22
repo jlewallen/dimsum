@@ -1,12 +1,13 @@
-import logging
 import dataclasses
 from typing import Any, Dict, List, Optional, Type
+
+from loggers import get_logger
 
 from .visual import Renderable
 from .entity import Entity  # type only
 from .inflection import infl
 
-log = logging.getLogger("dimsum.model")
+log = get_logger("dimsum.model")
 
 _all_events: List[Type["Event"]] = []
 

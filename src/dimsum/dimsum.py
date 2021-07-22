@@ -1,11 +1,12 @@
 #!env/bin/python3
 
 import ariadne.asgi
-import logging
+
 import config
 import schema as schema_factory
+from loggers import get_logger
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 def app():

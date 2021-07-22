@@ -1,13 +1,13 @@
 import dataclasses
-import logging
 import os.path
 import ariadne
 import starlette.requests
 from typing import Optional
 
+from loggers import get_logger
 import routing
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 target = ariadne.ScalarType("Target")
 

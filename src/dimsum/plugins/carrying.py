@@ -1,10 +1,10 @@
-import logging
 import dataclasses
 import functools
 from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from tools import *
@@ -12,7 +12,7 @@ from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
 import scopes.carryable as carryable
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @event

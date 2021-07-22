@@ -1,8 +1,8 @@
-import logging
 import stringcase
 import dataclasses
 from typing import Tuple, Dict, List, Optional, Callable
 
+from loggers import get_logger
 from model import Entity, World, Common
 from domains import Session
 import scopes.behavior as behavior
@@ -12,7 +12,7 @@ import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes as scopes
 
-log = logging.getLogger("dimsum.model")
+log = get_logger("dimsum.model")
 
 
 def add_item(container: Entity, item: Entity):

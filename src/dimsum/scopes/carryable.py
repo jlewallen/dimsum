@@ -1,6 +1,6 @@
-import logging
 from typing import Dict, List, Optional, Sequence, Tuple, Union, Callable
 
+from loggers import get_logger
 from model import (
     Entity,
     Scope,
@@ -12,7 +12,7 @@ from model import (
     context,
 )
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class Key(Scope):

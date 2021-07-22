@@ -2,6 +2,7 @@ import dataclasses
 from typing import List, Dict, Optional, Any
 
 import tools
+from loggers import get_logger
 from model import (
     Entity,
     World,

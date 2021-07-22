@@ -1,10 +1,10 @@
 import dataclasses
-import logging
 from typing import Optional, List, Dict
 
+from loggers import get_logger
 from domains import Domain, Session
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 @dataclasses.dataclass

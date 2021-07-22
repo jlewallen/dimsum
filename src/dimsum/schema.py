@@ -1,6 +1,5 @@
 import asyncio
 import dataclasses
-import logging
 import os.path
 import shortuuid
 import starlette.requests
@@ -15,6 +14,7 @@ import domains
 import serializing
 import scopes
 import library
+from loggers import get_logger
 from model import (
     Entity,
     World,
@@ -33,7 +33,7 @@ import scopes.carryable as carryable
 import scopes.users as users
 
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @dataclasses.dataclass

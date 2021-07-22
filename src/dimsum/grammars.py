@@ -1,13 +1,13 @@
 import abc
 import dataclasses
 import functools
-import logging
 from typing import Callable, List, Optional, Sequence, Type
 from lark import exceptions, Lark, Transformer
 
+from loggers import get_logger
 from model import Action
 
-log = logging.getLogger("dimsum.grammars")
+log = get_logger("dimsum.grammars")
 
 HIGHEST = 0
 CHATTING = 10

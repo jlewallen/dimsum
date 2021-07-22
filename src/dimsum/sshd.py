@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, TextIO, Union
 
 import asyncssh
@@ -9,7 +8,9 @@ import rich.live
 import rich.segment
 import rich.table
 
-log = logging.getLogger("dimsum.sshd")
+from loggers import get_logger
+
+log = get_logger("dimsum.sshd")
 
 
 class CommandHandler:

@@ -1,7 +1,6 @@
 import base64
 import io
 import json
-import logging
 import re
 import functools
 from typing import Any, Callable, Dict, Optional, Union
@@ -9,6 +8,7 @@ from typing import Any, Callable, Dict, Optional, Union
 import domains
 import serializing
 import everything  # noqa
+from loggers import get_logger
 from model import *
 from plugins.actions import Join
 from scopes.ownership import set_owner
@@ -18,7 +18,7 @@ import scopes.carryable as carryable
 import scopes.movement as movement
 import scopes.users as users
 
-log = logging.getLogger("dimsum.tests")
+log = get_logger("dimsum.tests")
 
 
 def create_empty_world():

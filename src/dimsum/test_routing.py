@@ -1,11 +1,8 @@
 import json
-import logging
 import pytest
 from typing import Optional
 
 from routing import *
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

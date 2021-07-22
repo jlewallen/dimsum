@@ -1,15 +1,15 @@
-import logging
 from typing import Type, Optional, Any
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from plugins.actions import PersonAction
 import scopes.movement as movement
 import scopes.occupyable as occupyable
 import plugins.looking as looking
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @hooks.all.enter.target

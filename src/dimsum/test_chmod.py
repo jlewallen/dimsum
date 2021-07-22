@@ -1,4 +1,3 @@
-import logging
 import pytest
 import freezegun
 
@@ -8,8 +7,6 @@ import scopes.behavior as behavior
 import scopes.carryable as carryable
 import scopes
 import test
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

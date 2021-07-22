@@ -1,8 +1,7 @@
-import logging
-
+from loggers import get_logger
 from model import Entity
 
-log = logging.getLogger("dimsum.proxying")
+log = get_logger("dimsum.proxying")
 
 
 def create(entity: Entity) -> Entity:

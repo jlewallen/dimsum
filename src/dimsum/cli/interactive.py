@@ -1,16 +1,16 @@
-import logging
 from typing import List, Optional, TextIO, Callable
 
 import scopes
 import domains
 import library
 import sshd
+from loggers import get_logger
 from model import *
 from scopes.ownership import set_owner
 from plugins.actions import Join
 from plugins.admin import Auth, lookup_username, register_username
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 class InitializeWorld:

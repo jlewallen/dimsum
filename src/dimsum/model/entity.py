@@ -1,19 +1,20 @@
 import copy
 import dataclasses
 import json
-import logging
 import time
 import jsondiff
 import shortuuid
 import stringcase
 from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union, TypeVar
 
+from loggers import get_logger
+
 from .crypto import Identity, generate
 from .kinds import Kind
 from .properties import Common
 from .permissions import Acls
 
-log = logging.getLogger("dimsum.model.entity")
+log = get_logger("dimsum.model.entity")
 
 _key_fn: Callable = shortuuid.uuid
 

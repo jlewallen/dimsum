@@ -1,9 +1,10 @@
 import json
-import logging
 import subprocess
 from typing import List, Optional
 
-log = logging.getLogger("dimsum")
+from loggers import get_logger
+
+log = get_logger("dimsum")
 
 
 class Target:

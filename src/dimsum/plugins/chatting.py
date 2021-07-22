@@ -1,15 +1,15 @@
 import dataclasses
-import logging
 from typing import Dict, Optional, Type, Any
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from plugins.actions import PersonAction
 import scopes.occupyable as occupyable
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @event

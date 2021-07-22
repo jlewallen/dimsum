@@ -1,10 +1,10 @@
-import logging
 import dataclasses
 from typing import Type, Optional, List, Sequence, Dict, Any, Callable
 
 import grammars
 import transformers
 import tools
+from loggers import get_logger
 from model import *
 from finders import *
 from plugins.actions import PersonAction
@@ -12,7 +12,7 @@ import scopes.users as users
 import scopes.movement as movement
 import scopes.ownership as owning
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 class ObservedLiving(ObservedEntity):

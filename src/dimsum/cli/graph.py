@@ -1,16 +1,16 @@
 import os
-import logging
 import inspect
 import asyncclick as click
 import jinja2
 
+from loggers import get_logger
 from model import *
 import scopes
 import plugins.helping
 
 import cli.utils as utils
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 @click.group()

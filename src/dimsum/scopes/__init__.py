@@ -1,6 +1,6 @@
-import logging
 from typing import Callable, Optional, Type
 
+from loggers import get_logger
 from model import Entity, EntityClass
 
 import scopes.behavior as behavior
@@ -11,7 +11,7 @@ import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes.ownership as ownership
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 class LivingClass(EntityClass):

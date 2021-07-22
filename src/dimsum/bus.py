@@ -1,12 +1,12 @@
 import inspect
-import logging
 import dataclasses
 import asyncio
 from typing import Any, Callable, Dict, List, Union, Awaitable
 
+from loggers import get_logger
 from model import Event, Comms, Renderable
 
-log = logging.getLogger("dimsum.bus")
+log = get_logger("dimsum.bus")
 
 
 @dataclasses.dataclass

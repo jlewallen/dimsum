@@ -16,11 +16,12 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import serializing
 import config
 import storage
+from loggers import get_logger
 from model import *
 import schema as schema_factory
 import test
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 session_key = "asdfasdf"
 
 

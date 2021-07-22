@@ -7,8 +7,6 @@ import library
 import test
 from model import *
 
-log = logging.getLogger("dimsum")
-
 
 @pytest.mark.asyncio
 async def test_materialize_infinite_reach(caplog):
@@ -83,7 +81,6 @@ async def test_materialize_reach_by_area_3(caplog):
     with tw.domain.session() as session:
 
         def reach(entity, depth):
-            log.info("%s", entity.klass)
             if depth == 3:
                 return -1
             if entity.klass == scopes.AreaClass:

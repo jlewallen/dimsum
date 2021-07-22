@@ -1,4 +1,3 @@
-import logging
 import time
 import dataclasses
 import functools
@@ -14,6 +13,7 @@ import proxying
 import saying
 import serializing
 import storage
+from loggers import get_logger
 from bus import EventBus, SubscriptionManager
 from model import (
     Entity,
@@ -54,7 +54,7 @@ import scopes.occupyable as occupyable
 import scopes.inbox as inbox
 import scopes as scopes
 
-log = logging.getLogger("dimsum.domains")
+log = get_logger("dimsum.domains")
 active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session")
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 

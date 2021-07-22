@@ -1,4 +1,3 @@
-import logging
 import pytest
 from typing import Dict, List, Optional
 
@@ -7,8 +6,6 @@ import scopes.behavior as behavior
 import scopes as scopes
 import test
 from test_utils import *
-
-log = logging.getLogger("dimsum.tests")
 
 
 @pytest.mark.asyncio

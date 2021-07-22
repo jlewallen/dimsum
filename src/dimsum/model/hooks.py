@@ -1,5 +1,4 @@
 import abc
-import logging
 import dataclasses
 import functools
 import inspect
@@ -7,10 +6,12 @@ import contextvars
 import asyncio
 from typing import List, Optional, Callable, Dict, Any
 
+from loggers import get_logger
+
 from .conditions import Condition
 from .context import get
 
-log = logging.getLogger("dimsum.hooks")
+log = get_logger("dimsum.hooks")
 live_hooks: contextvars.ContextVar = contextvars.ContextVar("dimsum:hooks")
 
 HookFunction = Callable

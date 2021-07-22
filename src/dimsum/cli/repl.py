@@ -1,12 +1,11 @@
-import logging
 import sys
 import asyncclick as click
 
+from loggers import get_logger
 import config
-
 import cli.interactive as interactive
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 @click.group()

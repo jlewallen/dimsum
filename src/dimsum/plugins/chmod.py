@@ -1,15 +1,15 @@
-import logging
 import dataclasses
 from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
+from loggers import get_logger
 from model import *
 from finders import *
 from plugins.actions import PersonAction
 import scopes.users as users
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 class Chmod(PersonAction):

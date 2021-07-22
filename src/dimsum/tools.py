@@ -1,11 +1,11 @@
 import sys
 import dataclasses
 import enum
-import logging
 import traceback
 import time
 from typing import Any, Dict, List, Optional, Sequence
 
+from loggers import get_logger
 from model import (
     Common,
     Entity,
@@ -26,7 +26,7 @@ import scopes.ownership as owning
 import scopes
 
 
-log = logging.getLogger("dimsum.tools")
+log = get_logger("dimsum.tools")
 
 
 class Relation(enum.Enum):

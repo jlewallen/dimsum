@@ -1,4 +1,3 @@
-import logging
 import freezegun
 import pytest
 from typing import Optional, List
@@ -10,8 +9,6 @@ from plugins.looking import *
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import test
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio
@@ -131,8 +128,6 @@ async def test_making_item_hard_to_see():
     with freezegun.freeze_time("2000-01-01 01:01:00"):
         r = await tw.success("look")
 
-        log.info(tw.dumps(orb))
-
         assert len(r.items) == 1
 
 
@@ -155,9 +150,6 @@ async def test_changing_presence_to_inline_short(snapshot):
 
     r = await tw.success("look")
 
-    log.info("reply: %s", r)
-    log.info("tree: %s", r.render_tree())
-
     snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
 
     assert len(r.items) == 1
@@ -175,9 +167,6 @@ async def test_changing_presence_to_inline_long(snapshot):
     await tw.success("modify presence box inline long")
 
     r = await tw.success("look")
-
-    log.info("reply: %s", r)
-    log.info("tree: %s", r.render_tree())
 
     snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
 

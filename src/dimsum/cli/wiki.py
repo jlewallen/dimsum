@@ -1,4 +1,3 @@
-import logging
 import asyncio
 import asyncclick as click
 import os.path
@@ -7,11 +6,12 @@ from typing import List, Optional
 
 import config
 import domains
+from loggers import get_logger
 from plugins.helping import WriteHelp
 
 import cli.interactive as interactive
 
-log = logging.getLogger("dimsum.cli")
+log = get_logger("dimsum.cli")
 
 
 @click.group()

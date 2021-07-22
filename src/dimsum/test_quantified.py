@@ -1,4 +1,3 @@
-import logging
 import pytest
 
 import finders
@@ -6,8 +5,6 @@ from model import *
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
 import test
-
-log = logging.getLogger("dimsum")
 
 
 @pytest.mark.asyncio

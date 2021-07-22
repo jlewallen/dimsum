@@ -1,5 +1,4 @@
 import dataclasses
-import logging
 import enum
 import copy
 import pprint
@@ -7,7 +6,9 @@ import functools
 from itertools import groupby
 from typing import Optional, List, Dict, Any, Union
 
-log = logging.getLogger("dimsum")
+from loggers import get_logger
+
+log = get_logger("dimsum")
 
 
 class SecurityMappings:

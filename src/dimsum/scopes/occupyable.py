@@ -1,11 +1,11 @@
 import dataclasses
-import logging
 from typing import Dict, List, Optional, Any
 
+from loggers import get_logger
 from model import Entity, Scope, event, StandardEvent, Acls, context
 
 
-log = logging.getLogger("dimsum.scopes")
+log = get_logger("dimsum.scopes")
 
 
 @event

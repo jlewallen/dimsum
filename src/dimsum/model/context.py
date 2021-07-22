@@ -1,13 +1,14 @@
 import abc
 import contextvars
-import logging
 from typing import Any, Optional, List
+
+from loggers import get_logger
 
 from .entity import Entity
 from .events import Event
 
 world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 class MaterializeAndCreate:

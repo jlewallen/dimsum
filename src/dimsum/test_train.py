@@ -1,4 +1,3 @@
-import logging
 import time
 import dataclasses
 import pytest
@@ -14,8 +13,6 @@ import tools
 import test
 import library
 from test_utils import *
-
-log = logging.getLogger("dimsum.tests")
 
 
 @pytest.mark.asyncio

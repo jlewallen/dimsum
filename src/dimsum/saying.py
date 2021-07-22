@@ -1,10 +1,10 @@
 import abc
 import dataclasses
 import json
-import logging
 from typing import Callable, Dict, List, Optional, Union, Any
 
 import tools
+from loggers import get_logger
 from model import (
     Entity,
     event,
@@ -16,7 +16,7 @@ from model import (
     context,
 )
 
-log = logging.getLogger("dimsum")
+log = get_logger("dimsum")
 
 
 @event

@@ -1,6 +1,5 @@
 import json
 import time
-import logging
 import logging.config
 import multiprocessing as mp
 import asyncclick as click
@@ -8,7 +7,9 @@ import brokers.brokers as brokers
 import uvicorn
 from typing import List, Optional, TextIO, TYPE_CHECKING
 
-log = logging.getLogger("dimsum.cli")
+from loggers import get_logger
+
+log = get_logger("dimsum.cli")
 
 
 def configure_logging():
