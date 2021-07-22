@@ -8,7 +8,7 @@ from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
-from loggers import get_logger
+from loggers import get_logger, setup_logging_queue
 import config
 import domains
 import sshd
@@ -120,6 +120,8 @@ async def server(
     """
     Serve a database.
     """
+
+    setup_logging_queue()
 
     cfg = config.symmetrical(database or ":memory:")
     if conf:
