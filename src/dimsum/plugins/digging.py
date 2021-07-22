@@ -133,7 +133,7 @@ class Transformer(transformers.Base):
         return DigDirection(direction=args[0])
 
     def dig_arbitrary(self, args):
-        return DigDirection(arbitrary=args[0])
+        return DigDirection(arbitrary=str(args[0]))
 
     def dig_linkages(self, args):
         return DigLinkage(args)
