@@ -88,6 +88,13 @@ class Unfreeze(PersonAction):
         return Success("Unfrozen!")
 
 
+class SystemTick(PersonAction):
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        return Success("Done!")
+
+
 class Transformer(transformers.Base):
     def auth(self, args):
         return Auth(password=str(args[0]))
@@ -100,6 +107,9 @@ class Transformer(transformers.Base):
 
     def unfreeze(self, args):
         return Unfreeze(item=args[0])
+
+    def system_tick(self):
+        return SystemTick()
 
 
 @grammars.grammar()
@@ -117,4 +127,5 @@ class AdminGrammar(grammars.Grammar):
         invite:            "invite" TEXT
         freeze:            "freeze" held                           -> freeze
         unfreeze:          "unfreeze" held                         -> unfreeze
+        system_tick:       "sys" "tick"                            -> system_tick
 """
