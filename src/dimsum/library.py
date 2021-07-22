@@ -546,9 +546,15 @@ class Train(Scope):
     async def get_interior(self, session):
         return await session.materialize(key=self.interior)
 
-    async def get_stop(self, this, session):
-        area = tools.area_of(this)
-        index = self.stops.index(area.key)
+    async def at_stop(self):
+        area = tools.area_of(self.ourselves)
+        return area.key in self.stops.index
+
+    async def get_stop(self, session):
+        area = tools.area_of(self.ourselves)
+        index = 0
+        if area.key in self.stops:
+            index = self.stops.index(area.key)
         assert index >= 0
         new_stop = self.stops[(index + 1) % len(self.stops)]
         return await session.materialize(key=new_stop)
@@ -580,7 +586,7 @@ async def close_doors(this, ev, say, session, post):
     area = tools.area_of(this)
     with this.make(Train) as train:
         log.info("move-train: area=%s stops=%s", area, train.stops)
-        new_stop = await train.get_stop(this, session)
+        new_stop = await train.get_stop(session)
         say.nearby(tools.area_of(this), "the train just left")
         await train.leave_station(session, new_stop)
         await post.future(this, time() + 5, Arrive())

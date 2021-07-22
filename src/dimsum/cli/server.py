@@ -34,6 +34,8 @@ async def servicing(domain: domains.Domain):
                         await session.service(now)
                         await session.save()
                     first = False
+                else:
+                    log.info("servicing: now=%s tts=%s", now, domain.time_to_service)
             except:
                 log.exception("error", exc_info=True)
             await asyncio.sleep(1)
