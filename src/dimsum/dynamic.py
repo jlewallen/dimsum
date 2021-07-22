@@ -437,6 +437,11 @@ class Behavior:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
         with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
+
+            ignoring = flatten([[b] if b and not b.executable else []])
+            if len(ignoring):
+                log.warning("ignoring unexecutable: %s", ignoring)
+
             return (
                 [EntityAndBehavior(e.key, b.python)]
                 if b and b.executable and b.python
