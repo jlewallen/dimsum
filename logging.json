@@ -20,6 +20,11 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "dimsum.noise": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "dimsum.security": {
             "level": "WARNING",
             "handlers": ["console"],

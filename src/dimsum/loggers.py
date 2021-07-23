@@ -49,3 +49,7 @@ def setup_logging_queue() -> None:
 
 def get_logger(name: str):
     return logging.getLogger(name)
+
+
+def get_noise_logger():
+    return logging.getLogger("dimsum.noise")

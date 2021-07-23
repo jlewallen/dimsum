@@ -8,7 +8,7 @@ from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
-from loggers import get_logger, setup_logging_queue
+from loggers import get_logger, get_noise_logger, setup_logging_queue
 import config
 import domains
 import sshd
@@ -35,7 +35,9 @@ async def servicing(domain: domains.Domain):
                         await session.save()
                     first = False
                 else:
-                    log.info("servicing: now=%s tts=%s", now, domain.time_to_service)
+                    get_noise_logger().info(
+                        "servicing: now=%s tts=%s", now, domain.time_to_service
+                    )
             except:
                 log.exception("error", exc_info=True)
             await asyncio.sleep(1)

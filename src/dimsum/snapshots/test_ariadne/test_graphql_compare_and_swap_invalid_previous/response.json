@@ -20,7 +20,7 @@
                         "Traceback (most recent call last):",
                         "  File \"/home/jlewallen/jlewallen/dimsum/env/lib/python3.8/site-packages/graphql/execution/execute.py\", line 625, in await_result",
                         "    return_type, field_nodes, info, path, await result",
-                        "  File \"/home/jlewallen/jlewallen/dimsum/src/dimsum/schema.py\", line 604, in compare_and_swap",
+                        "  File \"/home/jlewallen/jlewallen/dimsum/src/dimsum/schema.py\", line 606, in compare_and_swap",
                         "    raise EntityConflictException()",
                         "model.entity.EntityConflictException"
                     ],
