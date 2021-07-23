@@ -32,19 +32,8 @@ class InvokeHook:
         def wrap_hook_call(
             hook_fn: HookFunction, resume_fn: HookFunction, *args, **kwargs
         ):
-            signature = inspect.signature(hook_fn)
-            log.info(
-                "hook:wrap fn='%s' resume='%s' signature='%s' args=%s kwargs=%s",
-                hook_fn,
-                resume_fn,
-                signature,
-                args,
-                kwargs,
-            )
-            # Noteice we only transform arguments for the hook
-            # functions, never for the actual final hook call itself.
-            prepared = self.args.transform(hook_fn, [resume_fn] + list(args), kwargs)
-            return hook_fn(*prepared)
+            all_args = [resume_fn] + list(args)
+            return hook_fn(*all_args, **kwargs)
 
         return functools.partial(wrap_hook_call, fn, resume)
 
@@ -59,7 +48,6 @@ class RegisteredHook:
 @dataclasses.dataclass
 class Hook:
     manager: "ManagedHooks"
-    invoker: InvokeHook
     name: str
     fn: Optional[Callable] = None
     hooks: List[RegisteredHook] = dataclasses.field(default_factory=lambda: [])
@@ -99,7 +87,15 @@ class Hook:
         if wrapped is None:
             return functools.partial(self.hook, condition=condition)
 
-        self.hooks.append(RegisteredHook(self.invoker, wrapped, condition))
+        self.hooks.append(
+            RegisteredHook(
+                self.manager.invoker,
+                self.manager.wrapper_factory(wrapped)
+                if self.manager.wrapper_factory
+                else wrapped,
+                condition,
+            )
+        )
 
         def wrap(fn):
             return fn
@@ -110,10 +106,11 @@ class Hook:
 @dataclasses.dataclass
 class ManagedHooks:
     invoker: InvokeHook = dataclasses.field(default_factory=InvokeHook)
+    wrapper_factory: Optional[Callable] = dataclasses.field(repr=False, default=None)
     everything: Dict[str, Hook] = dataclasses.field(default_factory=dict, init=False)
 
     def create_hook(self, name: str) -> Hook:
-        return self.everything.setdefault(name, Hook(self, self.invoker, name))
+        return self.everything.setdefault(name, Hook(self, name))
 
     def _get_hooks(self, name: str) -> List[RegisteredHook]:
         if name in self.everything:

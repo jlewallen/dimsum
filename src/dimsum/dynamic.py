@@ -51,6 +51,14 @@ errors_log = get_logger("dimsum.dynamic.errors")
 
 
 @dataclasses.dataclass
+class DynamicCall:
+    name: str
+    context: Dict[str, Any]
+    logs: List[str]
+    time: float = dataclasses.field(default_factory=time.time)
+
+
+@dataclasses.dataclass
 class Held(Condition):
     entity_key: str
 
@@ -166,7 +174,7 @@ class SimplifiedTransformer(transformers.Base):
 @dataclasses.dataclass
 class Simplified:
     entity_key: str
-    thunk_factory: Callable = dataclasses.field(repr=False)
+    wrapper_factory: Callable = dataclasses.field(repr=False)
     hooks: "All"
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
@@ -176,7 +184,7 @@ class Simplified:
             log.info("prose: '%s' %s", prose, fn)
             self.registered.append(
                 Registered(
-                    prose, self.thunk_factory(fn), condition=condition or AlwaysTrue()
+                    prose, self.wrapper_factory(fn), condition=condition or AlwaysTrue()
                 )
             )
             return fn
@@ -191,7 +199,9 @@ class Simplified:
                 h = hook.__name__
             log.info("hook: '%s' %s", h, fn)
             self.receives.append(
-                Receive(h, self.thunk_factory(fn), condition=condition or AlwaysTrue())
+                Receive(
+                    h, self.wrapper_factory(fn), condition=condition or AlwaysTrue()
+                )
             )
             return fn
 
@@ -371,11 +381,63 @@ class CustomizeCallArguments(ArgumentTransformer):
 def _compile(found: EntityAndBehavior) -> EntityBehavior:
     frame = _get_default_globals()
 
-    def thunk_factory(fn):
-        async def thunk(*args, **kwargs):
+    def load_found() -> Entity:
+        return context.get().find_by_key(found.key)
+
+    def wrapper_factory(fn):
+        def create_dynamic_call():
+            logs = _get_buffered_logs(frame)
+            return DynamicCall(fn.__name__, {}, logs)
+
+        def sync_thunk(*args, **kwargs):
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
-            actual_args = CustomizeCallArguments().transform(fn, list(args), kwargs)
+            actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
+                fn, list(args), kwargs
+            )
             lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
+            # TODO ChainMap
+            frame.update(dict(ctx=context.get()))
+
+            def aexec():
+                exec(
+                    """
+# This seems to be an easy clever trick for capturing the global
+# during the eval into the method?
+def __ex(t=thunk):
+    __thunk_ex = None
+    try:
+        return t[0](*t[1], **t[2])
+    except Exception as e:
+        __thunk_ex = e
+        raise e
+""",
+                    frame,
+                    lokals,
+                )
+                try:
+                    return lokals["__ex"]()
+                except Exception as e:
+                    dc = create_dynamic_call()
+                    errors_log.exception("exception", exc_info=True)
+                    errors_log.error("globals: %s", frame.keys())
+                    errors_log.error("locals: %s", lokals)
+                    errors_log.error("args: %s", args)
+                    errors_log.error("kwargs: %s", kwargs)
+                    raise e
+
+            value = aexec()
+
+            dc = create_dynamic_call()
+
+            return value
+
+        async def async_thunk(*args, **kwargs):
+            log.info("thunking: args=%s kwargs=%s", args, kwargs)
+            actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
+                fn, list(args), kwargs
+            )
+            lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
+            # TODO ChainMap
             frame.update(dict(ctx=context.get()))
 
             async def aexec():
@@ -397,6 +459,7 @@ async def __ex(t=thunk):
                 try:
                     return await lokals["__ex"]()
                 except Exception as e:
+                    dc = create_dynamic_call()
                     errors_log.exception("exception", exc_info=True)
                     errors_log.error("globals: %s", frame.keys())
                     errors_log.error("locals: %s", lokals)
@@ -406,23 +469,22 @@ async def __ex(t=thunk):
 
             value = await aexec()
 
-            logs = _get_buffered_logs(frame)
-
-            # TODO propagate these up?
+            dc = create_dynamic_call()
 
             return value
 
-        return thunk
+        if inspect.iscoroutinefunction(fn):
+            return async_thunk
+        return sync_thunk
 
-    def load_found():
-        return context.get().find_by_key(found.key)
-
-    def create_hooks():
+    def create_hooks() -> All:
+        # TODO need a way to intercept these.
         return All(
-            invoker=InvokeHook(args=CustomizeCallArguments(dict(this=load_found)))
+            invoker=InvokeHook(args=CustomizeCallArguments(dict(this=load_found))),
+            wrapper_factory=wrapper_factory,
         )
 
-    simplified = Simplified(found.key, thunk_factory, create_hooks())
+    simplified = Simplified(found.key, wrapper_factory, create_hooks())
     # TODO chain?
     frame.update(
         dict(
