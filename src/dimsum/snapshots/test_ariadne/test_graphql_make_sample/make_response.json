@@ -1100,7 +1100,7 @@
                                                 "py/object": "model.permissions.Acls",
                                                 "rules": []
                                             },
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"an Oak Leaf gently floats to the ground\")\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say, ctx):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Oak Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"an Oak Leaf gently floats to the ground\")\n",
                                             "executable": true,
                                             "logs": []
                                         }
@@ -2101,7 +2101,7 @@
                                                 "py/object": "model.permissions.Acls",
                                                 "rules": []
                                             },
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=3, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"some Pebbles tumbled down the cliff\")\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say, ctx):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"pebble-1\"),\n    props=Common(\"Pebble\"),\n    initialize={ Carryable: dict(quantity=3, kind=this.get_kind(\"pebble-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"some Pebbles tumbled down the cliff\")\n",
                                             "executable": true,
                                             "logs": []
                                         }
@@ -4935,7 +4935,7 @@
                                                 "py/object": "model.permissions.Acls",
                                                 "rules": []
                                             },
-                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"a Maple Leaf gently floats to the ground\")\n",
+                                            "python": "\n@received(TickEvent)\nasync def tick(this, ev, say, ctx):\n  item = ctx.create_item(\n    creator=this,\n    kind=this.get_kind(\"leaf-1\"),\n    props=Common(\"Maple Leaf\"),\n    initialize={ Carryable: dict(quantity=1, kind=this.get_kind(\"leaf-1\")) },\n    register=False,\n  )\n  tools.hold(tools.area_of(this), item)\n  say.nearby(this, \"a Maple Leaf gently floats to the ground\")\n",
                                             "executable": true,
                                             "logs": []
                                         }

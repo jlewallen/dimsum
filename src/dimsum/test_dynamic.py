@@ -115,7 +115,7 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(this, smashing, person, say):
+async def smash(this, smashing, person, say, ctx):
     if smashing is None:
         return fail("smash what now?")
     log.info("smash: %s", this)
@@ -167,7 +167,7 @@ class Smashed(Event):
     smashed: Entity
 
 @language('start: "smash" noun', condition=Held())
-async def smash(this, smashing, person, say):
+async def smash(this, smashing, person, say, ctx):
     if smashing is None:
         return fail("smash what now?")
     log.info("smash: %s", this)

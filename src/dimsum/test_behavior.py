@@ -125,7 +125,7 @@ async def test_behavior_create_item(caplog):
                 w,
                 python="""
 @language('start: "shake"')
-async def shake(this, person, say):
+async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
         props=Common("Flower Petal")
@@ -181,7 +181,7 @@ async def test_behavior_create_item_same_kind(caplog):
                 w,
                 python="""
 @language('start: "shake"')
-async def shake(this, person, say):
+async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
         kind=this.get_kind("petal-1"),
@@ -238,7 +238,7 @@ async def test_behavior_create_quantified_item(caplog):
                 world,
                 python="""
 @language('start: "shake"')
-async def shake(this, person, say):
+async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
         props=Common("Flower Petal"),
@@ -301,7 +301,7 @@ async def test_behavior_time_passing(caplog):
                 world,
                 python="""
 @received(TickEvent)
-async def tick(this, ev, say):
+async def tick(this, ev, say, ctx):
     item = ctx.create_item(
         creator=this,
         props=Common("Flower Petal"),

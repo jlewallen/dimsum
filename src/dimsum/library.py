@@ -76,7 +76,7 @@ class LargeMapleTree(Factory):
                 world,
                 python="""
 @received(TickEvent)
-async def tick(this, ev, say):
+async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("leaf-1"),
@@ -103,7 +103,7 @@ class LargeOakTree(Factory):
                 world,
                 python="""
 @received(TickEvent)
-async def tick(this, ev, say):
+async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("leaf-1"),
@@ -166,7 +166,7 @@ class LargeSteepCliff(Factory):
                 world,
                 python="""
 @received(TickEvent)
-async def tick(this, ev, say):
+async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
     kind=this.get_kind("pebble-1"),

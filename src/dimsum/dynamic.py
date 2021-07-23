@@ -396,14 +396,14 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
         def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
             actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
-                fn, list(args), kwargs
+                fn, list(args), {**kwargs, **dict(ctx=context.get())}
             )
             return dict(thunk=(fn, actual_args, {}))
 
         def sync_thunk(*args, **kwargs):
+            assert context.get()
+
             lokals = create_thunk_locals(args, kwargs)
-            # TODO ChainMap
-            frame.update(dict(ctx=context.get()))
 
             def aexec():
                 exec(
@@ -440,9 +440,9 @@ def __ex(t=thunk):
             return value
 
         async def async_thunk(*args, **kwargs):
+            assert context.get()
+
             lokals = create_thunk_locals(args, kwargs)
-            # TODO ChainMap
-            frame.update(dict(ctx=context.get()))
 
             async def aexec():
                 exec(
@@ -485,16 +485,16 @@ async def __ex(t=thunk):
         return All(wrapper_factory=wrapper_factory)
 
     simplified = Simplified(found.key, wrapper_factory, create_hooks())
-    # TODO chain?
-    frame.update(
-        dict(
-            language=simplified.language,
-            received=simplified.received,
-            hooks=simplified.hooks,
-            Held=functools.partial(Held, found.key),
-            Ground=functools.partial(Ground, found.key),
-        )
+    eval_frame = dict(
+        language=simplified.language,
+        received=simplified.received,
+        hooks=simplified.hooks,
+        Held=functools.partial(Held, found.key),
+        Ground=functools.partial(Ground, found.key),
     )
+
+    # Wish we could use ChainMap here.
+    frame.update(eval_frame)
 
     log.info("compiling %s", found)
 
