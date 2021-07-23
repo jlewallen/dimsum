@@ -6,6 +6,7 @@ import functools
 import inspect
 import jsonpickle
 import time
+import contextvars
 import typing as imported_typing
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 from collections import ChainMap
@@ -47,6 +48,9 @@ import scopes.inbox as inbox
 
 log = get_logger("dimsum.dynamic")
 errors_log = get_logger("dimsum.dynamic.errors")
+active_behavior: contextvars.ContextVar = contextvars.ContextVar(
+    "dimsum:behavior", default=None
+)
 
 
 @dataclasses.dataclass
@@ -151,7 +155,6 @@ class SimplifiedAction(Action):
                 person=person,
                 **kwargs,
             )
-            # TODO logs
             if reply:
                 return self._transform_reply(reply)
             return Failure("no reply from handler?")
@@ -251,7 +254,6 @@ class Simplified:
             if ev.name == receive.hook:
                 try:
                     await receive.handler(this=entity, ev=ev, **kwargs)
-                    # TODO logs
                     tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
@@ -383,17 +385,23 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
     def load_found() -> Entity:
         return context.get().find_by_key(found.key)
 
+    # TODO dry up?
     def wrapper_factory(fn):
-        def create_dynamic_call():
+        def log_dynamic_call():
             logs = _get_buffered_logs(frame)
-            return DynamicCall(fn.__name__, {}, logs)
+            dc = DynamicCall(fn.__name__, {}, logs)
+            log.info("dc: %s", dc)
+            assert active_behavior.get()
 
-        def sync_thunk(*args, **kwargs):
+        def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
             actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
                 fn, list(args), kwargs
             )
-            lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
+            return dict(thunk=(fn, actual_args, {}))
+
+        def sync_thunk(*args, **kwargs):
+            lokals = create_thunk_locals(args, kwargs)
             # TODO ChainMap
             frame.update(dict(ctx=context.get()))
 
@@ -413,10 +421,11 @@ def __ex(t=thunk):
                     frame,
                     lokals,
                 )
+
                 try:
                     return lokals["__ex"]()
                 except Exception as e:
-                    dc = create_dynamic_call()
+                    log_dynamic_call()
                     errors_log.exception("exception", exc_info=True)
                     errors_log.error("globals: %s", frame.keys())
                     errors_log.error("locals: %s", lokals)
@@ -426,16 +435,12 @@ def __ex(t=thunk):
 
             value = aexec()
 
-            dc = create_dynamic_call()
+            log_dynamic_call()
 
             return value
 
         async def async_thunk(*args, **kwargs):
-            log.info("thunking: args=%s kwargs=%s", args, kwargs)
-            actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
-                fn, list(args), kwargs
-            )
-            lokals: Dict[str, Any] = dict(thunk=(fn, actual_args, {}))
+            lokals = create_thunk_locals(args, kwargs)
             # TODO ChainMap
             frame.update(dict(ctx=context.get()))
 
@@ -455,10 +460,11 @@ async def __ex(t=thunk):
                     frame,
                     lokals,
                 )
+
                 try:
                     return await lokals["__ex"]()
                 except Exception as e:
-                    dc = create_dynamic_call()
+                    log_dynamic_call()
                     errors_log.exception("exception", exc_info=True)
                     errors_log.error("globals: %s", frame.keys())
                     errors_log.error("locals: %s", lokals)
@@ -467,17 +473,15 @@ async def __ex(t=thunk):
                     raise e
 
             value = await aexec()
-
-            dc = create_dynamic_call()
-
+            log_dynamic_call()
             return value
 
         if inspect.iscoroutinefunction(fn):
             return async_thunk
+
         return sync_thunk
 
     def create_hooks() -> All:
-        # TODO need a way to intercept these.
         return All(wrapper_factory=wrapper_factory)
 
     simplified = Simplified(found.key, wrapper_factory, create_hooks())
@@ -517,6 +521,7 @@ async def __ex(t=thunk):
 class Behavior:
     world: World
     entities: tools.EntitySet
+    previous: Optional["Behavior"] = None
 
     def _get_behaviors(self, e: Entity, c: Entity) -> List[EntityAndBehavior]:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
@@ -571,6 +576,15 @@ class Behavior:
     async def notify(self, ev: Event, **kwargs):
         for target in [c for c in self._compiled]:
             await target.notify(ev, **kwargs)
+
+    def __enter__(self):
+        self.previous = active_behavior.get()
+        active_behavior.set(self)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        active_behavior.set(self.previous)
+        return False
 
 
 def flatten(l):

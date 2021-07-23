@@ -232,19 +232,19 @@ class Session(MaterializeAndCreate):
 
         with WorldCtx(session=self, person=person) as ctx:
             contributing = tools.get_contributing_entities(self.world, person)
-            dynamic_behavior = dynamic.Behavior(self.world, contributing)
-            log.info("hooks: %s", dynamic_behavior.dynamic_hooks)
-            evaluator = grammars.PrioritizedEvaluator(
-                [dynamic_behavior.lazy_evaluator] + grammars.create_static_evaluators()
-            )
-            with ExtendHooks(dynamic_behavior.dynamic_hooks):
-                log.debug("evaluator: '%s'", evaluator)
-                action = await evaluator.evaluate(
-                    command, world=self.world, person=person
+            with dynamic.Behavior(self.world, contributing) as db:
+                log.info("hooks: %s", db.dynamic_hooks)
+                evaluator = grammars.PrioritizedEvaluator(
+                    [db.lazy_evaluator] + grammars.create_static_evaluators()
                 )
-                assert action
-                assert isinstance(action, Action)
-                return await self.perform(action, person)
+                with ExtendHooks(db.dynamic_hooks):
+                    log.debug("evaluator: '%s'", evaluator)
+                    action = await evaluator.evaluate(
+                        command, world=self.world, person=person
+                    )
+                    assert action
+                    assert isinstance(action, Action)
+                    return await self.perform(action, person)
 
     async def perform(
         self,
@@ -508,8 +508,8 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify: %s entities=%s", ev, self.entities)
-        dynamic_behavior = dynamic.Behavior(self.world, self.entities)
-        await dynamic_behavior.notify(ev, say=self.say, session=self.session, **kwargs)
+        with dynamic.Behavior(self.world, self.entities) as db:
+            await db.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def complete(self):
         post = await self.post()
