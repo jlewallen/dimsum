@@ -295,7 +295,8 @@ asdf;
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 0
 
-    await tw.success("hold Nail")
+    with pytest.raises(NameError):
+        await tw.success("hold Nail")
 
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail_key)
@@ -315,11 +316,11 @@ og.info("hello")
 """,
     )
 
-    await tw.success("hold Nail")
+    with pytest.raises(NameError):
+        await tw.success("hold Nail")
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="exceptions")
 async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     tw = test.TestWorld()
     await tw.initialize()
@@ -338,10 +339,11 @@ def tick(this, ev, say):
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 0
 
-    with tw.domain.session() as session:
-        await session.prepare()
-        await session.tick(10)
-        await session.save()
+    with pytest.raises(NameError):
+        with tw.domain.session() as session:
+            await session.prepare()
+            await session.tick(10)
+            await session.save()
 
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail_key)

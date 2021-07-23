@@ -42,7 +42,8 @@ og.info("hello")
 """,
     )
 
-    await tw.success("edit box")
+    with pytest.raises(NameError):
+        await tw.success("edit box")
 
     with tw.domain.session() as session:
         box = await session.materialize(key=box_key)

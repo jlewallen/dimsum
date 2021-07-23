@@ -14,7 +14,7 @@ clean:
 
 test: env
 	rm -f test*.sqlite3
-	env/bin/coverage run -m pytest src/dimsum/test_*.py
+	env/bin/coverage run -m pytest src/dimsum/test_*.py -vv
 
 coverage: test
 	env/bin/coverage html

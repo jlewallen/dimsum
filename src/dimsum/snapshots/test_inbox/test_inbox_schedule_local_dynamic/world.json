@@ -927,7 +927,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 4
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -959,8 +959,27 @@
                             "executable": true,
                             "logs": [
                                 {
+                                    "context": {},
+                                    "logs": [
+                                        "swing: 'Hammer (#4)'"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
+                                    "time": 1569369600.0,
+                                    "elapsed": 0.0
+                                },
+                                {
+                                    "context": {},
+                                    "logs": [
+                                        "pong: ping#1",
+                                        "pong: 'Hammer (#4)'",
+                                        "pong: Map<{'gid': Property<4>, 'name': Property<Hammer>, 'described': Property<a Hammer (#4)>, 'desc': Property<Hammer>, 'created': Property<1569369600.0>, 'touched': Property<1569369600.0>, 'frozen': Property<None>, 'destroyed': Property<None>, 'related': Property<{}>, 'gold': Property<10>}>",
+                                        "pong: <class 'model.properties.Common'>"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
                                     "time": 1569369605.0,
-                                    "success": true
+                                    "elapsed": 0.0
                                 }
                             ]
                         }

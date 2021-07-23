@@ -98,19 +98,68 @@ SecurityException:
 
 
 @dataclasses.dataclass
+class SaveDynamicCalls(dynamic.DynamicCallsListener):
+    domain: "Domain"
+    session: "Session"
+
+    @property
+    def log(self):
+        return get_logger("dimsum.dynamic.calls")
+
+    async def _update_in_session(
+        self, session: "Session", calls: List[dynamic.DynamicCall], executable
+    ):
+        for call in calls:
+            entity = await session.materialize(key=call.entity_key)
+            assert entity
+            self.log.info("updating %s key=%s", entity, entity.key)
+            dynamic.log_behavior(
+                entity,
+                dict(
+                    context=call.context,
+                    logs=call.logs,
+                    exceptions=call.exceptions,
+                    success=not call.exceptions,
+                    time=call.time,
+                    elapsed=call.elapsed,
+                ),
+                executable=executable,
+            )
+
+    async def save_dynamic_calls_after_success(self, calls: List[dynamic.DynamicCall]):
+        self.log.info("success: using existing session")
+        await self._update_in_session(self.session, calls, True)
+
+    async def save_dynamic_calls_after_failure(self, calls: List[dynamic.DynamicCall]):
+        self.log.info("failure: using pristine session")
+        pristine = await self.domain.reload()
+        with pristine.session() as session:
+            await self._update_in_session(session, calls, False)
+            await session.save()
+
+        # Ensure no attempt is made.
+        session.rollback()
+
+
+@dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
     set_time_to_service: Callable[[Optional[float]], None] = dataclasses.field(
         repr=False
     )
+    calls_saver: Callable = dataclasses.field(repr=False)
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
     world: Optional[World] = None
-    created: float = dataclasses.field(default_factory=time.time)
+    created: float = dataclasses.field(default_factory=lambda: time.time())
+    failed: bool = False
 
     @functools.cached_property
     def bus(self):
         return EventBus(handlers=self.handlers or [])
+
+    def rollback(self):
+        self.failed = True
 
     def find_by_key(self, key: str) -> Entity:
         e = self.registrar.find_by_key(key)
@@ -122,6 +171,7 @@ class Session(MaterializeAndCreate):
         create_security_context: Optional[Callable[[Entity], SecurityContext]] = None,
     ) -> List[str]:
         log.info("saving %s", self.store)
+        assert not self.failed
         if self.world:
             assert self.world
             set_current_gid(self.world, self.registrar.number)
@@ -230,9 +280,11 @@ class Session(MaterializeAndCreate):
         assert self.world
         log.info("executing: '%s'", command)
 
-        with WorldCtx(session=self, person=person) as ctx:
+        with WorldCtx(session=self, person=person, calls_saver=self.calls_saver) as ctx:
             contributing = tools.get_contributing_entities(self.world, person)
-            with dynamic.Behavior(self.world, contributing) as db:
+            async with dynamic.Behavior(
+                self.calls_saver(self), self.world, contributing
+            ) as db:
                 log.info("hooks: %s", db.dynamic_hooks)
                 evaluator = grammars.PrioritizedEvaluator(
                     [db.lazy_evaluator] + grammars.create_static_evaluators()
@@ -262,7 +314,9 @@ class Session(MaterializeAndCreate):
 
         area = await find_entity_area_maybe(person) if person else None
 
-        with WorldCtx(session=self, person=person, **kwargs) as ctx:
+        with WorldCtx(
+            session=self, person=person, calls_saver=self.calls_saver, **kwargs
+        ) as ctx:
             try:
                 reply = await action.perform(
                     world=world,
@@ -304,7 +358,12 @@ class Session(MaterializeAndCreate):
                     with entity.make(behavior.Behaviors) as behave:
                         if behave.get_default():
                             log.info("everywhere: %s", entity)
-                            with WorldCtx(session=self, entity=entity, **kwargs) as ctx:
+                            with WorldCtx(
+                                session=self,
+                                calls_saver=self.calls_saver,
+                                entity=entity,
+                                **kwargs,
+                            ) as ctx:
                                 await ctx.notify(
                                     ev,
                                     post=await ctx.post(),
@@ -330,7 +389,11 @@ class Session(MaterializeAndCreate):
                 with entity.make(behavior.Behaviors) as behave:
                     if behave.get_default():
                         log.info("everywhere: %s", entity)
-                        with WorldCtx(session=self, entity=entity) as ctx:
+                        with WorldCtx(
+                            session=self,
+                            calls_saver=self.calls_saver,
+                            entity=entity,
+                        ) as ctx:
                             await ctx.notify(qm.message, post=post_service)
                             await ctx.complete()
             except MissingEntityException as e:
@@ -426,8 +489,14 @@ class Domain:
             self.time_to_service = value
 
         return Session(
-            store=self.store, handlers=self.handlers, set_time_to_service=set_tts
+            store=self.store,
+            handlers=self.handlers,
+            set_time_to_service=set_tts,
+            calls_saver=self.create_calls_saver,
         )
+
+    def create_calls_saver(self, session: "Session"):
+        return SaveDynamicCalls(self, session)
 
     async def reload(self):
         return Domain(empty=True, store=self.store)
@@ -437,12 +506,14 @@ class WorldCtx(Ctx):
     def __init__(
         self,
         session: Optional[Session] = None,
+        calls_saver: Optional[Callable] = None,
         person: Optional[Entity] = None,
         entity: Optional[Entity] = None,
         **kwargs,
     ):
         super().__init__()
         assert session and session.world
+        assert calls_saver
         self.session = session
         self.world: World = session.world
         self.person = person
@@ -451,6 +522,9 @@ class WorldCtx(Ctx):
         self.entities: tools.EntitySet = self._get_default_entity_set(entity)
         self.say = saying.Say()
         self._post: Optional[inbox.PostService] = None
+        self.calls_saver: Callable[
+            [], dynamic.DynamicCallsListener
+        ] = functools.partial(calls_saver, session)
 
     async def post(self):
         if self._post:
@@ -508,7 +582,9 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify: %s entities=%s", ev, self.entities)
-        with dynamic.Behavior(self.world, self.entities) as db:
+        async with dynamic.Behavior(
+            self.calls_saver(), self.world, self.entities
+        ) as db:
             await db.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def complete(self):

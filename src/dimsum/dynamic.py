@@ -1,4 +1,7 @@
 import ast
+import sys
+import abc
+import traceback
 import logging
 import copy
 import dataclasses
@@ -15,6 +18,7 @@ import grammars
 import transformers
 import saying
 import domains as session  # TODO circular
+import serializing
 import finders
 import tools
 from loggers import get_logger
@@ -56,10 +60,13 @@ active_behavior: contextvars.ContextVar = contextvars.ContextVar(
 @dataclasses.dataclass
 class DynamicCall:
     entity_key: str
+    behavior_key: str
     name: str
-    context: Dict[str, Any]
+    time: float
+    elapsed: float
     logs: List[str]
-    time: float = dataclasses.field(default_factory=time.time)
+    exceptions: Optional[List[Dict[str, Any]]]
+    context: Dict[str, Any] = dataclasses.field(repr=False, default_factory=dict)
 
 
 @dataclasses.dataclass
@@ -161,7 +168,6 @@ class SimplifiedAction(Action):
             return Failure("no reply from handler?")
         except Exception as e:
             errors_log.exception("handler:error", exc_info=True)
-            tools.log_behavior_exception(self.entity)
             return DynamicFailure(str(e), str(self.registered.handler))
 
 
@@ -255,16 +261,15 @@ class Simplified:
             if ev.name == receive.hook:
                 try:
                     await receive.handler(this=entity, ev=ev, **kwargs)
-                    tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
-                    tools.log_behavior_exception(entity)
                     raise
 
 
 @dataclasses.dataclass(frozen=True)
 class EntityAndBehavior:
     key: str
+    behavior_key: str
     behavior: str
 
 
@@ -315,6 +320,7 @@ class CompiledEntityBehavior(EntityBehavior):
 
 def _get_default_globals():
     log = get_logger("dimsum.dynamic.user")
+    log.setLevel(logging.INFO)  # affects tests, careful
     handler = logging.handlers.MemoryHandler(1024, target=logging.NullHandler())
     log.addHandler(handler)
 
@@ -379,24 +385,60 @@ class CustomizeCallArguments(ArgumentTransformer):
         return [_get_arg(p) for p in signature.parameters]
 
 
+def log_dynamic_call(
+    found: EntityAndBehavior,
+    name: str,
+    started: float,
+    frame: Dict[str, Any] = dataclasses.field(default_factory=dict),
+    lokals: Dict[str, Any] = dataclasses.field(default_factory=dict),
+    fnargs: List[Any] = dataclasses.field(default_factory=list),
+    fnkw: Dict[str, Any] = dataclasses.field(default_factory=dict),
+    exc_info: Optional[bool] = False,
+):
+    ex: Optional[Dict[str, Any]] = None
+    if exc_info:
+        ex_type, ex_value, tb = sys.exc_info()
+        ex = dict(
+            exception=ex_type,
+            value=ex_value,
+            traceback=traceback.format_exc(),
+        )
+
+    finished = time.time()
+    logs = _get_buffered_logs(frame)
+    dc = DynamicCall(
+        found.key,
+        found.behavior_key,
+        name,
+        started,
+        finished - started,
+        context=dict(
+            # frame=frame,
+            # locals=lokals,
+            # fnargs=serializing.serialize(fnargs),
+            # fnkw=serializing.serialize(fnkw),
+        ),
+        logs=logs,
+        exceptions=[ex] if ex else None,
+    )
+    log.debug("dc: %s", dc)
+    db = active_behavior.get()
+    assert db
+    db._record(dc)
+
+
 @functools.lru_cache
 def _compile(found: EntityAndBehavior) -> EntityBehavior:
     frame = _get_default_globals()
+    started = time.time()
 
     def load_found() -> Entity:
         return context.get().find_by_key(found.key)
 
     # TODO dry up?
     def wrapper_factory(fn):
-        def log_dynamic_call():
-            logs = _get_buffered_logs(frame)
-            dc = DynamicCall(found.key, fn.__name__, {}, logs)
-            log.debug("dc: %s", dc)
-            db = active_behavior.get()
-            assert db
-            db._record(dc)
-
         def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
+            assert context.get()
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
             actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
                 fn, list(args), {**kwargs, **dict(ctx=context.get())}
@@ -404,9 +446,17 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
             return dict(thunk=(fn, actual_args, {}))
 
         def sync_thunk(*args, **kwargs):
-            assert context.get()
-
             lokals = create_thunk_locals(args, kwargs)
+            log_dc = functools.partial(
+                log_dynamic_call,
+                found,
+                fn.__name__,
+                time.time(),
+                frame=frame,
+                lokals=lokals,
+                fnargs=args,
+                fnkw=kwargs,
+            )
 
             def aexec():
                 exec(
@@ -428,24 +478,27 @@ def __ex(t=thunk):
                 try:
                     return lokals["__ex"]()
                 except Exception as e:
-                    log_dynamic_call()
-                    errors_log.exception("exception", exc_info=True)
-                    errors_log.error("globals: %s", frame.keys())
-                    errors_log.error("locals: %s", lokals)
-                    errors_log.error("args: %s", args)
-                    errors_log.error("kwargs: %s", kwargs)
+                    log_dc(exc_info=True)
                     raise e
 
             value = aexec()
 
-            log_dynamic_call()
+            log_dc()
 
             return value
 
         async def async_thunk(*args, **kwargs):
-            assert context.get()
-
             lokals = create_thunk_locals(args, kwargs)
+            log_dc = functools.partial(
+                log_dynamic_call,
+                found,
+                fn.__name__,
+                time.time(),
+                frame=frame,
+                lokals=lokals,
+                fnargs=args,
+                fnkw=kwargs,
+            )
 
             async def aexec():
                 exec(
@@ -467,16 +520,13 @@ async def __ex(t=thunk):
                 try:
                     return await lokals["__ex"]()
                 except Exception as e:
-                    log_dynamic_call()
-                    errors_log.exception("exception", exc_info=True)
-                    errors_log.error("globals: %s", frame.keys())
-                    errors_log.error("locals: %s", lokals)
-                    errors_log.error("args: %s", args)
-                    errors_log.error("kwargs: %s", kwargs)
+                    log_dc(exc_info=True)
                     raise e
 
             value = await aexec()
-            log_dynamic_call()
+
+            log_dc()
+
             return value
 
         if inspect.iscoroutinefunction(fn):
@@ -496,32 +546,49 @@ async def __ex(t=thunk):
         Ground=functools.partial(Ground, found.key),
     )
 
-    # Wish we could use ChainMap here.
-    frame.update(eval_frame)
+    try:
+        # Wish we could use ChainMap here.
+        frame.update(eval_frame)
 
-    log.info("compiling %s", found)
+        log.info("compiling %s", found)
 
-    tree = ast.parse(found.behavior)
-    # TODO improve filename value here, we have entity.
-    compiled = compile(tree, filename="<ast>", mode="exec")
+        tree = ast.parse(found.behavior)
 
-    # We squash any declarations left in locals into our
-    # globals so they're available in future calls via a
-    # rebinding in our thunk factory above. I'm pretty sure
-    # this is the only way to get this to behave.
-    declarations: Dict[str, Any] = {}
-    eval(compiled, frame, declarations)
-    evaluator: Optional[grammars.CommandEvaluator] = None
-    EvaluatorsName = "evaluators"
-    if EvaluatorsName in declarations:
-        evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
-        del declarations[EvaluatorsName]
-    frame.update(**declarations)
-    return CompiledEntityBehavior(simplified, evaluator, declarations)
+        # TODO improve filename value using the entity.
+        compiled = compile(tree, filename="<ast>", mode="exec")
+
+        # We squash any declarations left in locals into our
+        # globals so they're available in future calls via a
+        # rebinding in our thunk factory above. I'm pretty sure
+        # this is the only way to get this to behave.
+        declarations: Dict[str, Any] = {}
+        eval(compiled, frame, declarations)
+        evaluator: Optional[grammars.CommandEvaluator] = None
+        EvaluatorsName = "evaluators"
+        if EvaluatorsName in declarations:
+            evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
+            del declarations[EvaluatorsName]
+        frame.update(**declarations)
+        return CompiledEntityBehavior(simplified, evaluator, declarations)
+    except:
+        errors_log.exception("dynamic:compile", exc_info=True)
+        log_dynamic_call(found, ":compile:", started, frame=frame, exc_info=True)
+        raise
+
+
+class DynamicCallsListener:
+    @abc.abstractmethod
+    async def save_dynamic_calls_after_success(self, calls: List[DynamicCall]):
+        raise NotImplemented
+
+    @abc.abstractmethod
+    async def save_dynamic_calls_after_failure(self, calls: List[DynamicCall]):
+        raise NotImplemented
 
 
 @dataclasses.dataclass
 class Behavior:
+    listener: DynamicCallsListener
     world: World
     entities: tools.EntitySet
     previous: Optional["Behavior"] = None
@@ -537,7 +604,7 @@ class Behavior:
                 log.warning("unexecutable: %s", ignoring)
 
             return (
-                [EntityAndBehavior(e.key, b.python)]
+                [EntityAndBehavior(e.key, behavior.DefaultKey, b.python)]
                 if b and b.executable and b.python
                 else []
             ) + inherited
@@ -549,12 +616,8 @@ class Behavior:
     def _compile_behavior(
         self, entity: Entity, found: EntityAndBehavior
     ) -> EntityBehavior:
-        try:
-            return _compile(found)
-        except Exception as e:
-            errors_log.exception("dynamic:compile", exc_info=True)
-            tools.log_behavior_exception(entity)
-            return NoopEntityBehavior()
+        started = time.time()
+        return _compile(found)
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
@@ -581,24 +644,44 @@ class Behavior:
         for target in [c for c in self._compiled]:
             await target.notify(ev, **kwargs)
 
-    def __enter__(self):
+    async def __aenter__(self):
         self.previous = active_behavior.get()
         active_behavior.set(self)
         return self
 
-    def __exit__(self, type, value, traceback):
+    async def __aexit__(self, type, value, traceback):
         if self.previous:
             for dc in self.calls:
                 self.previous._record(dc)
         else:
-            for dc in self.calls:
-                log.info("dc: %s", dc)
+            if type:
+                log.info("exiting: %s %s %s", type, value, traceback)
+            if self.calls:
+                if type:
+                    await self.listener.save_dynamic_calls_after_failure(self.calls)
+                else:
+                    await self.listener.save_dynamic_calls_after_success(self.calls)
+            else:
+                log.info("dynamic calls empty")
 
         active_behavior.set(self.previous)
         return False
 
     def _record(self, dc: DynamicCall):
         self.calls.append(dc)
+
+
+def log_behavior(entity: Entity, entry: Dict[str, Any], executable=True):
+    assert entity
+    log.debug("logging %s behavior", entity)
+    with entity.make(behavior.Behaviors) as behave:
+        # If there's no default behavior then we're here because of
+        # inherited behavior.
+        b = behave.get_or_create_default()
+        assert b
+        b.executable = executable
+        b.append(entry)
+        entity.touch()
 
 
 def flatten(l):

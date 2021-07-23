@@ -1,4 +1,5 @@
 import time
+import logging
 import dataclasses
 import pytest
 import freezegun

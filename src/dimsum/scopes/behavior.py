@@ -76,6 +76,14 @@ class Behaviors(Scope):
     def get_default(self) -> Optional[Behavior]:
         return self.behaviors.get(DefaultKey)
 
+    def get_or_create_default(self) -> Behavior:
+        if DefaultKey in self.behaviors:
+            b = self.behaviors.get(DefaultKey)
+            assert b
+            return b
+        self.ourselves.touch()
+        return self.behaviors.add(DefaultKey)
+
     def add_behavior(self, world: Entity, **kwargs):
         # TODO This should be smarter. Only necessary for tick
         # receivers currently. Maye we just make tick special and run

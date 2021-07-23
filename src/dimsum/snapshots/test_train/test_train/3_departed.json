@@ -1160,7 +1160,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 4
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1192,16 +1192,44 @@
                             "executable": true,
                             "logs": [
                                 {
+                                    "context": {},
+                                    "logs": [
+                                        "only-when-doors-open: 'Jacob (#3)'"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
                                     "time": 1569369600.0,
-                                    "success": true
+                                    "elapsed": 0.0
                                 },
                                 {
+                                    "context": {},
+                                    "logs": [
+                                        "move-train:scheduled"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
+                                    "time": 1569369600.0,
+                                    "elapsed": 0.0
+                                },
+                                {
+                                    "context": {},
+                                    "logs": [
+                                        "move-train: area='Living room (#1)' stops=['4', '10']"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
                                     "time": 1569369605.0,
-                                    "success": true
+                                    "elapsed": 0.0
                                 },
                                 {
+                                    "context": {},
+                                    "logs": [
+                                        "move-train: area='Limbo (#8)' stops=['4', '10']"
+                                    ],
+                                    "exceptions": null,
+                                    "success": true,
                                     "time": 1569369610.0,
-                                    "success": true
+                                    "elapsed": 0.0
                                 }
                             ]
                         }
