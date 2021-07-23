@@ -1,4 +1,6 @@
 import ast
+import logging
+import copy
 import dataclasses
 import functools
 import inspect
@@ -142,6 +144,7 @@ class SimplifiedAction(Action):
                 person=person,
                 **kwargs,
             )
+            # TODO logs
             if reply:
                 return self._transform_reply(reply)
             return Failure("no reply from handler?")
@@ -239,6 +242,7 @@ class Simplified:
             if ev.name == receive.hook:
                 try:
                     await receive.handler(this=entity, ev=ev, **kwargs)
+                    # TODO logs
                     tools.log_behavior(entity, dict(time=time.time(), success=True))
                 except:
                     errors_log.exception("notify:exception", exc_info=True)
@@ -298,10 +302,15 @@ class CompiledEntityBehavior(EntityBehavior):
 
 
 def _get_default_globals():
+    log = get_logger("dimsum.dynamic.user")
+    handler = logging.handlers.MemoryHandler(1024, target=logging.NullHandler())
+    log.addHandler(handler)
+
     # TODO Can we pass an exploded module here?
     event_classes = {k.__name__: k for k in get_all_events()}
     return dict(
-        log=get_logger("dimsum.dynamic.user"),
+        log=log,
+        log_handler=handler,
         dataclass=dataclasses.dataclass,
         Common=Common,
         tools=tools,
@@ -317,6 +326,18 @@ def _get_default_globals():
         t=imported_typing,
         **event_classes,
     )
+
+
+def _get_buffered_logs(frame: Dict[str, Any]) -> List[str]:
+    def prepare(lr: logging.LogRecord) -> str:
+        return lr.msg % lr.args
+
+    if "log_handler" in frame:
+        handler: logging.handlers.MemoryHandler = frame["log_handler"]
+        records = [prepare(lr) for lr in handler.buffer]
+        handler.flush()
+        return records
+    return []
 
 
 class DynamicParameterException(Exception):
@@ -383,7 +404,13 @@ async def __ex(t=thunk):
                     errors_log.error("kwargs: %s", kwargs)
                     raise e
 
-            return await aexec()
+            value = await aexec()
+
+            logs = _get_buffered_logs(frame)
+
+            # TODO propagate these up?
+
+            return value
 
         return thunk
 
