@@ -514,7 +514,7 @@ class WorldCtx(Ctx):
         post = await self.post()
         tts = await post.get_time_to_service()
         now = time.time()
-        if tts > now:
+        if tts:
             log.info("tts: %f sleep=%f", tts, tts - now)
             self.session.set_time_to_service(tts)
         else:
