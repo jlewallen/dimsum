@@ -55,6 +55,7 @@ active_behavior: contextvars.ContextVar = contextvars.ContextVar(
 
 @dataclasses.dataclass
 class DynamicCall:
+    entity_key: str
     name: str
     context: Dict[str, Any]
     logs: List[str]
@@ -389,9 +390,11 @@ def _compile(found: EntityAndBehavior) -> EntityBehavior:
     def wrapper_factory(fn):
         def log_dynamic_call():
             logs = _get_buffered_logs(frame)
-            dc = DynamicCall(fn.__name__, {}, logs)
-            log.info("dc: %s", dc)
-            assert active_behavior.get()
+            dc = DynamicCall(found.key, fn.__name__, {}, logs)
+            log.debug("dc: %s", dc)
+            db = active_behavior.get()
+            assert db
+            db._record(dc)
 
         def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
@@ -522,6 +525,7 @@ class Behavior:
     world: World
     entities: tools.EntitySet
     previous: Optional["Behavior"] = None
+    calls: List[DynamicCall] = dataclasses.field(default_factory=list)
 
     def _get_behaviors(self, e: Entity, c: Entity) -> List[EntityAndBehavior]:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
@@ -530,7 +534,7 @@ class Behavior:
 
             ignoring = flatten([[b] if b and not b.executable else []])
             if len(ignoring):
-                log.warning("ignoring unexecutable: %s", ignoring)
+                log.warning("unexecutable: %s", ignoring)
 
             return (
                 [EntityAndBehavior(e.key, b.python)]
@@ -583,8 +587,18 @@ class Behavior:
         return self
 
     def __exit__(self, type, value, traceback):
+        if self.previous:
+            for dc in self.calls:
+                self.previous._record(dc)
+        else:
+            for dc in self.calls:
+                log.info("dc: %s", dc)
+
         active_behavior.set(self.previous)
         return False
+
+    def _record(self, dc: DynamicCall):
+        self.calls.append(dc)
 
 
 def flatten(l):
