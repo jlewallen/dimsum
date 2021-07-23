@@ -37,7 +37,6 @@ from model import (
     Condition,
     AlwaysTrue,
     All,
-    InvokeHook,
     ArgumentTransformer,
     ItemFinder,
 )
@@ -479,10 +478,7 @@ async def __ex(t=thunk):
 
     def create_hooks() -> All:
         # TODO need a way to intercept these.
-        return All(
-            invoker=InvokeHook(args=CustomizeCallArguments(dict(this=load_found))),
-            wrapper_factory=wrapper_factory,
-        )
+        return All(wrapper_factory=wrapper_factory)
 
     simplified = Simplified(found.key, wrapper_factory, create_hooks())
     # TODO chain?

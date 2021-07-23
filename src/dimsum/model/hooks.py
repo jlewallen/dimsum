@@ -25,22 +25,7 @@ class ArgumentTransformer:
 
 
 @dataclasses.dataclass
-class InvokeHook:
-    args: ArgumentTransformer = dataclasses.field(default_factory=ArgumentTransformer)
-
-    def chain_hook_call(self, fn: HookFunction, resume: HookFunction):
-        def wrap_hook_call(
-            hook_fn: HookFunction, resume_fn: HookFunction, *args, **kwargs
-        ):
-            all_args = [resume_fn] + list(args)
-            return hook_fn(*all_args, **kwargs)
-
-        return functools.partial(wrap_hook_call, fn, resume)
-
-
-@dataclasses.dataclass
 class RegisteredHook:
-    invoker: InvokeHook
     fn: Callable
     condition: Optional[Condition] = None
 
@@ -79,7 +64,7 @@ class Hook:
                 if not registered.condition.applies():
                     continue
 
-            call = registered.invoker.chain_hook_call(registered.fn, call)
+            call = functools.partial(registered.fn, call)
 
         return call(*args, **kwargs)
 
@@ -89,7 +74,6 @@ class Hook:
 
         self.hooks.append(
             RegisteredHook(
-                self.manager.invoker,
                 self.manager.wrapper_factory(wrapped)
                 if self.manager.wrapper_factory
                 else wrapped,
@@ -105,7 +89,6 @@ class Hook:
 
 @dataclasses.dataclass
 class ManagedHooks:
-    invoker: InvokeHook = dataclasses.field(default_factory=InvokeHook)
     wrapper_factory: Optional[Callable] = dataclasses.field(repr=False, default=None)
     everything: Dict[str, Hook] = dataclasses.field(default_factory=dict, init=False)
 
