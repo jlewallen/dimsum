@@ -4,6 +4,7 @@ import json
 import time
 import jsondiff
 import shortuuid
+import functools
 import stringcase
 from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union, TypeVar
 
@@ -14,7 +15,6 @@ from .kinds import Kind
 from .properties import Common
 from .permissions import Acls
 
-log = get_logger("dimsum.model.entity")
 
 _key_fn: Callable = shortuuid.uuid
 
@@ -164,7 +164,9 @@ class IgnoreExtraConstructorArguments:
     def __init__(self, **kwargs):
         super().__init__()
         if len(kwargs) > 0:
-            log.debug("ignored kwargs: {0}".format(kwargs))
+            get_logger("dimsum.model.warnings").info(
+                "ignored kwargs: {0}".format(kwargs)
+            )
 
 
 class EntityFrozen(Exception):
@@ -294,17 +296,20 @@ class Entity:
                 if initialize and scope in initialize:
                     args = initialize[scope]
 
-                log.debug("scope %s %s %s", scope, kwargs, args)
+                self._log().debug("scope %s %s %s", scope, kwargs, args)
                 with self.make(scope, **args) as change:
                     pass
 
         self.acls = acls if acls else Acls.owner_writes()
 
-        log.debug(
+        self._log().debug(
             "entity:ctor {0} {1} '{2}' creator={3} id={4} props={5}".format(
                 self.key, self.version, self.props.name, creator, id(self), self.props
             )
         )
+
+    def _log(self):
+        return get_logger("dimsum.model.entity")
 
     def validate(self) -> None:
         assert self.key
@@ -396,11 +401,11 @@ class Entity:
             chargs = self.scopes[key]
         chargs.update(**kwargs)
 
-        log.debug("%s splitting scopes: %s %s", self.key, key, chargs)
+        self._log().debug("%s splitting scopes: %s %s", self.key, key, chargs)
         try:
             child = ctor(parent=self, discarding=discarding, **chargs)
         except:
-            log.exception(f"error creating scope {ctor}", exc_info=True)
+            self._log().exception(f"error creating scope {ctor}", exc_info=True)
             raise
         return child
 
@@ -409,7 +414,7 @@ class Entity:
         data = child.__dict__
         del data["parent"]
         del data["discarding"]
-        log.debug("%s updating scopes: %s %s", self.key, key, data)
+        self._log().debug("%s updating scopes: %s %s", self.key, key, data)
         self.scopes[key] = data
 
     def __repr__(self):
@@ -430,7 +435,7 @@ class RegistrationException(Exception):
 class Registrar:
     def __init__(self, **kwargs):
         super().__init__()
-        log.debug("registrar:ctor")
+        self._log.debug("registrar:ctor")
         self._garbage: Dict[str, Entity] = {}
         self._entities: Dict[str, Entity] = {}
         self._originals: Dict[str, CompiledJson] = {}
@@ -438,6 +443,10 @@ class Registrar:
         self._key_to_number: Dict[str, int] = {}
         self._diffs: Dict[str, Dict[str, Any]] = {}
         self._number: int = 0
+
+    @functools.cached_property
+    def _log(self):
+        return get_logger("dimsum.model.registrar")
 
     @property
     def entities(self) -> Dict[str, Entity]:
@@ -492,7 +501,7 @@ class Registrar:
             if key in self._entities:
                 entity = self._entities[key]
                 if entity and not entity.modified and update.text:
-                    log.warning("%s: untouched save %s", key, d)
+                    self._log.warning("%s: untouched save %s", key, d)
         return True
 
     def was_modified(self, e: Entity) -> bool:
@@ -517,9 +526,11 @@ class Registrar:
         if assigned in self._numbered:
             already = self._numbered[assigned]
             if already.key != entity.key:
-                log.error("gid collision: %d", assigned)
-                log.error("gid collision: registered key=%s %s", already.key, already)
-                log.error("gid collision: incoming key=%s %s", entity.key, entity)
+                self._log.error("gid collision: %d", assigned)
+                self._log.error(
+                    "gid collision: registered key=%s %s", already.key, already
+                )
+                self._log.error("gid collision: incoming key=%s %s", entity.key, entity)
                 raise RegistrationException(
                     "gid {0} already assigned to {1} (gave={2})".format(
                         assigned, already.key, self._number
@@ -528,7 +539,7 @@ class Registrar:
 
         has_compiled = "" if compiled else "(no-original)"
         op = "overwrite" if entity.key in self._entities else "new"
-        log.info(
+        self._log.debug(
             "[%d] register:%s %s %s %s",
             depth,
             op,
@@ -574,3 +585,6 @@ class Registrar:
     @property
     def undestroyed(self) -> List[Entity]:
         return [e for e in self._entities.values() if e.props.destroyed is None]
+
+    def log_summary(self):
+        self._log.info("registrar: %d entities", len(self._entities))

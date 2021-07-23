@@ -59,6 +59,14 @@ active_session: contextvars.ContextVar = contextvars.ContextVar("dimsum:session"
 scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
+def _finding_log():
+    return get_logger("dimsum.domain.finding")
+
+
+def _notify_log():
+    return get_logger("dimsum.domain.notify")
+
+
 def _get() -> "Session":
     session = active_session.get()
     assert session
@@ -112,7 +120,7 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
         for call in calls:
             entity = await session.materialize(key=call.entity_key)
             assert entity
-            self.log.info("updating %s key=%s", entity, entity.key)
+            self.log.info("diags: %s key=%s", entity, entity.key)
             dynamic.log_behavior(
                 entity,
                 dict(
@@ -127,11 +135,11 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
             )
 
     async def save_dynamic_calls_after_success(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("success: using existing session")
+        self.log.info("success: saving diags using existing session")
         await self._update_in_session(self.session, calls, True)
 
     async def save_dynamic_calls_after_failure(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("failure: using pristine session")
+        self.log.info("failure: saving diags using pristine session")
         pristine = await self.domain.reload()
         with pristine.session() as session:
             await self._update_in_session(session, calls, False)
@@ -213,6 +221,7 @@ class Session(MaterializeAndCreate):
         active_session.set(None)
         finished = time.time()
         elapsed = finished - self.created
+        self.registrar.log_summary()
         log.info("session:elapsed %fms", elapsed * 1000)
         return False
 
@@ -579,7 +588,7 @@ class WorldCtx(Ctx):
 
     async def notify(self, ev: Event, **kwargs):
         assert self.world
-        log.info("notify: %s entities=%s", ev, self.entities)
+        _notify_log().info("notify: %s entities=%s", ev, self.entities)
         async with dynamic.Behavior(self.calls_saver(), self.entities) as db:
             await db.notify(ev, say=self.say, session=self.session, **kwargs)
 
@@ -610,7 +619,7 @@ class WorldCtx(Ctx):
     async def find_item(
         self, candidates=None, scopes=[], exclude=None, number=None, **kwargs
     ) -> Optional[Entity]:
-        log.info(
+        _finding_log().info(
             "find-item: gid=%s candidates=%s exclude=%s scopes=%s kw=%s",
             number,
             candidates,
@@ -655,12 +664,12 @@ class WorldCtx(Ctx):
         assert person
         assert finder
         area = await find_entity_area(person)
-        log.info("applying finder:%s %s", finder, kwargs)
+        _finding_log().info("applying finder:%s %s", finder, kwargs)
         found = await finder.find_item(area=area, person=person, world=self, **kwargs)
         if found:
-            log.info("found: {0}".format(found))
+            _finding_log().info("found: {0}".format(found))
         else:
-            log.info("found: nada")
+            _finding_log().info("found: nada")
         return found
 
     async def try_materialize_key(self, key: str) -> Optional[Entity]:

@@ -1,12 +1,11 @@
 import inspect
 import dataclasses
 import asyncio
+import functools
 from typing import Any, Callable, Dict, List, Union, Awaitable
 
 from loggers import get_logger
 from model import Event, Comms, Renderable
-
-log = get_logger("dimsum.bus")
 
 
 @dataclasses.dataclass
@@ -29,7 +28,7 @@ class SubscriptionManager(Comms):
     def subscribe(self, path_key: str, handler_fn: Callable) -> Subscription:
         subscription = Subscription(self, path_key, handler_fn)
         self.by_key.setdefault(path_key, []).append(subscription)
-        log.info("subscribed: %s", path_key)
+        self._log.info("subscribed: %s", path_key)
         return subscription
 
     def _remove(self, subscription: Subscription) -> bool:
@@ -37,7 +36,7 @@ class SubscriptionManager(Comms):
         for_key = self.by_key[subscription.path_key]
         if subscription in for_key:
             for_key.remove(subscription)
-            log.info("unsubscribed: %s", subscription.path_key)
+            self._log.info("unsubscribed: %s", subscription.path_key)
             return True
         else:
             return False
@@ -58,6 +57,10 @@ class SubscriptionManager(Comms):
         )
         return True
 
+    @functools.cached_property
+    def _log(self):
+        return get_logger("dimsum.bus.subscriptions")
+
 
 class EventBus:
     def __init__(self, handlers=None):
@@ -69,7 +72,7 @@ class EventBus:
         """Decorator for marking handlers of Events"""
 
         def final_decorator(func, **kwargs):
-            log.debug("add handler for %s (%s)", klass, func)
+            self._log.debug("add handler for %s (%s)", klass, func)
             if klass not in self.handlers:
                 self.handlers[klass] = []
             self.handlers[klass].append(func)
@@ -78,7 +81,7 @@ class EventBus:
 
     async def publish(self, event: Event, **kwargs):
         assert event
-        log.info("publish: %s", event)
+        self._log.info("publish: %s", event)
         await self._invoke_handlers(event)
 
     async def _invoke_handlers(self, event: Union[Any]):
@@ -90,6 +93,10 @@ class EventBus:
             handlers = self.handlers[klass]
             for fn in handlers:
                 await fn(event=event)
+
+    @functools.cached_property
+    def _log(self):
+        return get_logger("dimsum.bus.publish")
 
 
 def flatten(l):

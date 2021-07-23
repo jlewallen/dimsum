@@ -20,6 +20,16 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "dimsum.bus": {
+            "level": "WARNING",
+            "handlers": ["console"],
+            "propagate": false
+        },
+        "dimsum.model.registrar": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "dimsum.dynamic.calls": {
             "level": "INFO",
             "handlers": ["console"],
