@@ -7,7 +7,7 @@ import ariadne
 import jwt
 import json
 import jsondiff
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 
 import config
 import domains
@@ -18,6 +18,7 @@ from loggers import get_logger
 from model import (
     Entity,
     World,
+    CompiledJson,
     WorldKey,
     Serialized,
     Renderable,
@@ -528,7 +529,7 @@ async def update(obj, info, entities):
         return {"affected": affected}
 
 
-def make_diff(path: str, value: str):
+def make_diff(path: str, value: Union[None, str, Dict[str, Any]]):
     keys = path.split(".")
     diff: Dict[str, Any] = {}
     curr = diff
@@ -537,6 +538,18 @@ def make_diff(path: str, value: str):
         curr = curr[key]
     curr[keys[-1]] = value
     return diff
+
+
+def is_only_path_being_added(path: str, diff: Dict[str, Any]) -> bool:
+    """This checks for the scenario where a new path is being inserted
+    into some JSON and so the diff, when comparing to the previous
+    value basically fills in the path with a null. We ignore these non-empty diffs."""
+    sub_diff = jsondiff.diff(make_diff(path, None), diff)
+    return sub_diff == {}
+
+
+def is_acceptable_non_empty_diff(path: str, diff: Dict[str, Any]) -> bool:
+    return is_only_path_being_added(path, diff)
 
 
 @mutation.field("compareAndSwap")
@@ -550,32 +563,63 @@ async def compare_and_swap(obj, info, entities):
     with domain.session() as session:
         world = await session.prepare()
 
+        # Multiple entities can be updated in a single transaction,
+        # loop over them and the path changes that are being
+        # attempted.
         for row in entities:
-            log.info("materialize key=%s", row["key"])
-            entity = await session.materialize(key=row["key"])
-            compiled = session.registrar.get_original_if_available(row["key"])
-            assert compiled
-            for change in row["paths"]:
-                parsed_previous = json.loads(change["previous"])
-                log.info("'%s' = %s", change["path"], parsed_previous)
-                to_previous = make_diff(change["path"], parsed_previous)
-                previous = jsondiff.patch(compiled.compiled, to_previous)
-                diff_from_expected = jsondiff.diff(compiled.compiled, previous)
-                if diff_from_expected != {}:
-                    log.info("previous: %s", previous)
-                    log.info("diff-from-expected: %s", diff_from_expected)
-                    raise EntityConflictException()
+            key = row["key"]
+            log.info("materialize key=%s", key)
+            entity = await session.materialize(key=key)
+            original = session.registrar.get_original_if_available(key)
+            assert original
 
-                log.info("'%s' = %s", change["path"], change["value"])
-                to_value = make_diff(change["path"], change["value"])
-                log.info("diff: %s", to_value)
-                after = jsondiff.patch(compiled.compiled, to_value)
-                log.debug("after: %s", after)
+            compiled: CompiledJson = original.compiled
+
+            # We allow multiple paths to be updated per entity.
+            for change in row["paths"]:
+                path = change["path"]
+                try:
+                    # We're given JSON strings with the previous value
+                    # and the value being written. Parse them here.
+                    parsed_previous = json.loads(change["previous"])
+                    parsed_value = json.loads(change["value"])
+
+                    log.info("%s: cas: '%s' = %s", key, path, parsed_previous)
+                    log.info("%s: cas: '%s' = %s", key, path, parsed_value)
+
+                    # Create a JSON diff object that recreates the
+                    # object in its original before state. This is
+                    # basically an easy way to set the given path to
+                    # the previous value. The idea here is that this
+                    # should be the same JSON before and after if
+                    # we're to continue with the update.
+                    to_previous = make_diff(path, parsed_previous)
+                    previous = jsondiff.patch(compiled, to_previous)
+                    diff_from_expected = jsondiff.diff(compiled, previous)
+                    if diff_from_expected != {} and not is_acceptable_non_empty_diff(
+                        path, diff_from_expected
+                    ):
+                        log.info("previous: %s", previous)
+                        log.info("diff-from-expected: %s", diff_from_expected)
+                        raise EntityConflictException()
+
+                    # Everything looks fine, so create a new JSON diff
+                    # to update the path to the new value and then
+                    # apply that before loading that into the session
+                    # as the updated entity.
+                    to_value = make_diff(path, parsed_value)
+                    compiled = jsondiff.patch(compiled, to_value)
+                except:
+                    log.error("compare-swap failed: patch=%s", change)
+                    raise
+
+                # Reload with the accumulated changes.
                 entity = await session.materialize(
-                    json=[Serialized(row["key"], json.dumps(after))]
+                    json=[Serialized(key, json.dumps(compiled))]
                 )
                 entity.touch()
 
+        # Save all our changes and return the affected entities.
         modified_keys = await session.save()
         for key in modified_keys:
             log.warning("update: hacked reload: %s", key)

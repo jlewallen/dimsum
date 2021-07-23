@@ -397,7 +397,7 @@ class HttpStorage(EntityStorage):
         async with self.session() as session:
             query = gql(
                 """
-        mutation Update($entities: [EntityDiff!]) {
+        mutation Update($entities: [EntityDiff!]!) {
             update(entities: $entities) {
                 affected { key serialized }
             }

@@ -250,7 +250,7 @@ async def test_graphql_update(deterministic, snapshot):
     data = {
         "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
-mutation UpdateEntities($entities: [EntityDiff!]) {
+mutation UpdateEntities($entities: [EntityDiff!]!) {
     update(entities: $entities) {
         affected {
             key
@@ -279,7 +279,7 @@ async def test_graphql_update_and_requery(deterministic, snapshot):
     data = {
         "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
-mutation UpdateEntities($entities: [EntityDiff!]) {
+mutation UpdateEntities($entities: [EntityDiff!]!) {
     update(entities: $entities) {
         affected { key serialized }
     }
@@ -345,7 +345,7 @@ async def test_graphql_delete(deterministic, snapshot):
     data = {
         "variables": {"entities": [{"key": WorldKey, "serialized": serialized}]},
         "query": """
-mutation UpdateEntities($entities: [EntityDiff!]) {
+mutation UpdateEntities($entities: [EntityDiff!]!) {
     update(entities: $entities) {
         affected { key serialized }
     }
@@ -585,15 +585,15 @@ async def test_graphql_compare_and_swap_invalid_previous(
                     "paths": [
                         {
                             "path": "props.map.name.value",
-                            "value": "Super Duper World",
                             "previous": json.dumps("Not World"),
+                            "value": json.dumps("Super Duper World"),
                         }
                     ],
                 }
             ]
         },
         "query": """
-mutation CompareAndSwap($entities: [EntityCompareAndSwap!]) {
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
     compareAndSwap(entities: $entities) {
         affected {
             key
@@ -630,15 +630,53 @@ async def test_graphql_compare_and_swap_valid_previous(deterministic, snapshot):
                     "paths": [
                         {
                             "path": "props.map.name.value",
-                            "value": "Super Duper World",
                             "previous": json.dumps("World"),
+                            "value": json.dumps("Super Duper World"),
                         }
                     ],
                 }
             ]
         },
         "query": """
-mutation CompareAndSwap($entities: [EntityCompareAndSwap!]) {
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
+    compareAndSwap(entities: $entities) {
+        affected {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+    ok, actual = await ariadne.graphql(
+        schema, data, context_value=get_test_context(domain)
+    )
+    assert ok
+    snapshot.assert_match(test.pretty_json(actual, deterministic=True), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_compare_and_swap_brand_new_path_value(deterministic, snapshot):
+    domain = await test.make_simple_domain()
+
+    data = {
+        "variables": {
+            "entities": [
+                {
+                    "key": WorldKey,
+                    "paths": [
+                        {
+                            "path": "scopes.encyclopedia.body",
+                            "previous": json.dumps(None),
+                            "value": json.dumps("Hello, world!"),
+                        }
+                    ],
+                }
+            ]
+        },
+        "query": """
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
     compareAndSwap(entities: $entities) {
         affected {
             key

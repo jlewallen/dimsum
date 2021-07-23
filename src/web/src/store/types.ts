@@ -131,10 +131,16 @@ export class RemoveHistoryEntry {
     constructor(public readonly entry: ReplResponse) {}
 }
 
+export type PathChange = string | Record<string, unknown> | boolean;
+
+export class EntityChange {
+    constructor(public readonly path: string, public readonly previous: PathChange | null, public readonly value: PathChange | null) {}
+}
+
 export class UpdateEntityAction {
     type = ActionTypes.UPDATE_ENTITY;
 
-    constructor(public readonly entity: Entity) {}
+    constructor(public readonly entity: Entity, public readonly changes: EntityChange[]) {}
 }
 
 export class UpdateWaitingMutation {

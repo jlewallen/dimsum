@@ -199,11 +199,21 @@ export default createStore<RootState>({
         [ActionTypes.UPDATE_ENTITY]: async ({ state, commit }: ActionParameters, payload: UpdateEntityAction) => {
             const api = getApi(state.headers);
             const data = await api.updateEntity({
-                key: payload.entity.key,
-                serialized: JSON.stringify(payload.entity),
+                entities: [
+                    {
+                        key: payload.entity.key,
+                        paths: payload.changes.map((change) => {
+                            return {
+                                path: change.path,
+                                previous: JSON.stringify(change.previous),
+                                value: JSON.stringify(change.value),
+                            };
+                        }),
+                    },
+                ],
             });
-            if (data.update && data.update.affected) {
-                for (const row of data.update.affected) {
+            if (data.compareAndSwap && data.compareAndSwap.affected) {
+                for (const row of data.compareAndSwap.affected) {
                     commit(MutationTypes.ENTITY, JSON.parse(row.serialized));
                 }
             }

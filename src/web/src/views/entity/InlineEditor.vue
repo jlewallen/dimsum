@@ -49,7 +49,7 @@
 import _ from "lodash";
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
-import store, { UpdateEntityAction } from "@/store";
+import store, { UpdateEntityAction, EntityChange } from "@/store";
 import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
 import Tabs from "@/views/shared/Tabs.vue";
 import Tab from "@/views/shared/Tab.vue";
@@ -101,28 +101,21 @@ export default defineComponent({
     },
     methods: {
         async save(): Promise<void> {
-            const updating = _.clone(this.entity);
-            updating.props.map.name.value = this.form.name;
-            updating.props.map.desc.value = this.form.desc;
-            updating.scopes.encyclopedia = _.extend(updating.scopes.encyclopedia || {}, {
-                body: this.form.pedia,
-            });
+            const changes: EntityChange[] = [];
+
+            changes.push(new EntityChange("props.map.name.value", this.entity.props.map.name.value, this.form.name));
+            changes.push(new EntityChange("props.map.desc.value", this.entity.props.map.desc.value, this.form.desc));
+            changes.push(new EntityChange("scopes.encyclopedia.body", this.entity.scopes.encyclopedia?.body || null, this.form.pedia));
+
             const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"] || {};
-            updating.scopes.behaviors.behaviors.map["b:default"] = _.merge(
-                {
-                    "py/object": "scopes.behavior.Behavior",
-                },
-                behavior,
-                {
-                    python: this.form.behavior,
-                    executable: true,
-                }
-            );
-            console.log("updating entity", updating);
+            changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.python", behavior?.python, this.form.behavior));
+            changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.executable", null, true));
+
+            console.log("updating entity", this.entity, changes);
             try {
                 this.busy = true;
                 this.error = false;
-                await store.dispatch(new UpdateEntityAction(updating));
+                await store.dispatch(new UpdateEntityAction(this.entity, changes));
                 this.$emit("dismiss");
             } catch (error) {
                 console.log("error", error);

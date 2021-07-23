@@ -86,8 +86,8 @@ input EntityCompareAndSwap {
 type Mutation {
   login(credentials: Credentials!): Auth!
   makeSample: EntitiesUpdated
-  update(entities: [EntityDiff!]): EntitiesUpdated
-  compareAndSwap(entities: [EntityCompareAndSwap!]): EntitiesUpdated
+  update(entities: [EntityDiff!]!): EntitiesUpdated
+  compareAndSwap(entities: [EntityCompareAndSwap!]!): EntitiesUpdated
   language(criteria: LanguageQueryCriteria!): Evaluation!
   create(entities: [EntityTemplate!]): Evaluation!
 }

@@ -20,6 +20,12 @@ export type Scalars = {
     SerializedEntity: any;
 };
 
+export type CompareAndSwapField = {
+    path: Scalars["String"];
+    previous: Scalars["String"];
+    value: Scalars["String"];
+};
+
 export type Credentials = {
     username: Scalars["String"];
     password: Scalars["String"];
@@ -30,6 +36,11 @@ export type Credentials = {
 export type EntitiesUpdated = {
     __typename?: "EntitiesUpdated";
     affected?: Maybe<Array<KeyedEntity>>;
+};
+
+export type EntityCompareAndSwap = {
+    key: Scalars["String"];
+    paths?: Maybe<Array<CompareAndSwapField>>;
 };
 
 export type EntityDiff = {
@@ -71,6 +82,7 @@ export type Mutation = {
     login: Scalars["Auth"];
     makeSample?: Maybe<EntitiesUpdated>;
     update?: Maybe<EntitiesUpdated>;
+    compareAndSwap?: Maybe<EntitiesUpdated>;
     language: Evaluation;
     create: Evaluation;
 };
@@ -80,7 +92,11 @@ export type MutationLoginArgs = {
 };
 
 export type MutationUpdateArgs = {
-    entities?: Maybe<Array<EntityDiff>>;
+    entities: Array<EntityDiff>;
+};
+
+export type MutationCompareAndSwapArgs = {
+    entities: Array<EntityCompareAndSwap>;
 };
 
 export type MutationLanguageArgs = {
@@ -163,12 +179,11 @@ export type LanguageMutation = { __typename?: "Mutation" } & {
 };
 
 export type UpdateEntityMutationVariables = Exact<{
-    key: Scalars["String"];
-    serialized: Scalars["String"];
+    entities: Array<EntityCompareAndSwap> | EntityCompareAndSwap;
 }>;
 
 export type UpdateEntityMutation = { __typename?: "Mutation" } & {
-    update?: Maybe<
+    compareAndSwap?: Maybe<
         { __typename?: "EntitiesUpdated" } & {
             affected?: Maybe<Array<{ __typename?: "KeyedEntity" } & Pick<KeyedEntity, "key" | "serialized">>>;
         }
@@ -222,8 +237,8 @@ export const LanguageDocument = gql`
     }
 `;
 export const UpdateEntityDocument = gql`
-    mutation updateEntity($key: String!, $serialized: String!) {
-        update(entities: [{ key: $key, serialized: $serialized }]) {
+    mutation updateEntity($entities: [EntityCompareAndSwap!]!) {
+        compareAndSwap(entities: $entities) {
             affected {
                 key
                 serialized

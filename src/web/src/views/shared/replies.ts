@@ -97,7 +97,7 @@ const ScreenCleared = defineComponent({
 const DynamicMessage = defineComponent({
     name: "DynamicMessage",
     props: CommonProps,
-    template: `<div class="response dynamic">{{ reply.message.message }} (from {{ reply.source.name }})</div>`,
+    template: `<div class="response dynamic">{{ reply.message.message }}<span v-if="false">{{ reply.source.name }}</span></div>`,
 });
 
 const UniversalString = defineComponent({
