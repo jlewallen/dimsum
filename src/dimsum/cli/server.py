@@ -36,7 +36,7 @@ async def servicing(domain: domains.Domain):
                     first = False
                 else:
                     get_noise_logger().info(
-                        "servicing: now=%s tts=%s", now, domain.time_to_service
+                        "servicing: tts=%s now=%s", domain.time_to_service, now
                     )
             except:
                 log.exception("error", exc_info=True)

@@ -20,7 +20,7 @@
                         "Traceback (most recent call last):",
                         "  File \"/home/jlewallen/jlewallen/dimsum/env/lib/python3.8/site-packages/graphql/execution/execute.py\", line 625, in await_result",
                         "    return_type, field_nodes, info, path, await result",
-                        "  File \"/home/jlewallen/jlewallen/dimsum/src/dimsum/schema.py\", line 606, in compare_and_swap",
+                        "  File \"/home/jlewallen/jlewallen/dimsum/src/dimsum/schema.py\", line 619, in compare_and_swap",
                         "    raise EntityConflictException()",
                         "model.entity.EntityConflictException"
                     ],
@@ -35,6 +35,7 @@
                         "entity": "'World (#0)'",
                         "original": "CompiledJson(...'$owner']}]}})",
                         "compiled": "{'acls': {'py/object': 'model.permissions.Acls', 'rules': [{'keys': ['$owner'], 'perm': 'write', 'py/object': 'model.permissions.Acl'}]}, 'creator': None, 'identity': {'private': '1', 'public': '1', 'py/object': 'model.crypto.Identity', 'signature': '1'}, 'key': 'world', ...}",
+                        "was_behavior_modified": "False",
                         "change": "{'path': 'props.map.name.value', 'previous': '\"Not World\"', 'value': '\"Super Duper World\"'}",
                         "path": "'props.map.name.value'",
                         "parsed_previous": "'Not World'",

@@ -17,15 +17,6 @@ class Behavior:
     executable: bool = True
     logs: List[Dict[str, Any]] = dataclasses.field(default_factory=list)
 
-    def check(self):
-        try:
-            if self.python:
-                ast.parse(self.python)
-                return True
-        except:
-            pass
-        return False
-
     def append(self, entry: Dict[str, Any]):
         self.logs.append(entry)
         self.logs = self.logs[-20:]
@@ -44,17 +35,10 @@ class BehaviorMap(Map):
 
     def add(self, name, **kwargs):
         b = self.map[name] = Behavior(**kwargs)  # type:ignore
-        b.check()
         return b
 
     def items(self):
         return self.map.items()
-
-    def replace(self, map):
-        typed = {key: Behavior(**value) for key, value in map.items()}
-        for key, value in typed.items():
-            value.check()
-        return super().replace(**typed)
 
 
 @dataclasses.dataclass

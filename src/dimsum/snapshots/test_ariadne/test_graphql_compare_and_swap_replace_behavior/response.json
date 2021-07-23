@@ -1,0 +1,19 @@
+{
+    "data": {
+        "compareAndSwap": null
+    },
+    "errors": [
+        {
+            "message": "name 'og' is not defined",
+            "locations": [
+                {
+                    "line": 3,
+                    "column": 5
+                }
+            ],
+            "path": [
+                "compareAndSwap"
+            ]
+        }
+    ]
+}

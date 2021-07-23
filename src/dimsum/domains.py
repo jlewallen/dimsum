@@ -282,9 +282,7 @@ class Session(MaterializeAndCreate):
 
         with WorldCtx(session=self, person=person, calls_saver=self.calls_saver) as ctx:
             contributing = tools.get_contributing_entities(self.world, person)
-            async with dynamic.Behavior(
-                self.calls_saver(self), self.world, contributing
-            ) as db:
+            async with dynamic.Behavior(self.calls_saver(self), contributing) as db:
                 log.info("hooks: %s", db.dynamic_hooks)
                 evaluator = grammars.PrioritizedEvaluator(
                     [db.lazy_evaluator] + grammars.create_static_evaluators()
@@ -582,9 +580,7 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         log.info("notify: %s entities=%s", ev, self.entities)
-        async with dynamic.Behavior(
-            self.calls_saver(), self.world, self.entities
-        ) as db:
+        async with dynamic.Behavior(self.calls_saver(), self.entities) as db:
             await db.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def complete(self):

@@ -3,12 +3,14 @@ import base64
 import json
 import pytest
 import ariadne
+import shortuuid
 import freezegun
 from typing import List
 
 import config
 import domains
 import scopes
+import tools
 import serializing
 from loggers import get_logger
 from model import *
@@ -210,6 +212,7 @@ async def test_graphql_login_good(deterministic):
     data = {
         "query": 'mutation { login(credentials: { username: "jlewallen", password: "asdfasdf" }) }'
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -260,6 +263,7 @@ mutation UpdateEntities($entities: [EntityDiff!]!) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -286,6 +290,7 @@ mutation UpdateEntities($entities: [EntityDiff!]!) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -313,6 +318,7 @@ async def test_graphql_make_sample(deterministic, snapshot):
         "variables": {"entities": [serialized]},
         "query": "mutation { makeSample { affected { key serialized } } }",
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -371,6 +377,7 @@ async def test_graphql_entities(deterministic, snapshot):
         "query": '{ entities(keys: ["%s"], identities: false) { key serialized } }'
         % (WorldKey)
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -384,11 +391,9 @@ async def test_graphql_create_basic(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
-        await session.prepare()
+        world = await session.prepare()
         await session.save()
-
-        assert session.world
-        session.world.destroy()
+        world.destroy()
 
     data = {
         "variables": {"key": "asdfasdf", "name": "Flute"},
@@ -403,6 +408,7 @@ mutation CreateThing($key: String!, $name: String!) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -416,11 +422,9 @@ async def test_graphql_create_two(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
-        await session.prepare()
+        world = await session.prepare()
         await session.save()
-
-        assert session.world
-        session.world.destroy()
+        world.destroy()
 
     data = {
         "variables": {
@@ -440,6 +444,7 @@ mutation CreateThing($entities: [EntityTemplate!]) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -453,11 +458,9 @@ async def test_graphql_create_one_containing_another(deterministic, snapshot):
     domain = domains.Domain()
 
     with domain.session() as session:
-        await session.prepare()
+        world = await session.prepare()
         await session.save()
-
-        assert session.world
-        session.world.destroy()
+        world.destroy()
 
     data = {
         "variables": {
@@ -483,6 +486,7 @@ mutation CreateThing($entities: [EntityTemplate!]) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -527,6 +531,7 @@ async def test_graphql_redeem_invite_bad_secret(deterministic, caplog):
         "query": 'mutation { login(credentials: { username: "carla@carla.com", password: "asdfasdf", token: "%s", secret: "hunter43" }) }'
         % (invite_token,)
     }
+
     with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
         ok, actual = await ariadne.graphql(
             schema,
@@ -563,6 +568,7 @@ mutation {
 """
         % jacob.key
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -603,6 +609,7 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
 }
 """,
     }
+
     with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
         ok, actual = await ariadne.graphql(
             schema,
@@ -648,6 +655,7 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
@@ -686,8 +694,78 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
 }
 """,
     }
+
     ok, actual = await ariadne.graphql(
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual, deterministic=True), "response.json")
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_graphql_compare_and_swap_replace_behavior(
+    caplog, deterministic, snapshot
+):
+    domain = await test.make_simple_domain()
+
+    box_key = shortuuid.uuid()
+
+    with domain.session() as session:
+        world = await session.prepare()
+
+        box = scopes.item(
+            key=box_key,
+            creator=world,
+            props=Common(name="Box"),
+        )
+
+        session.register(box)
+
+        welcome = await session.materialize(key="welcome")
+        assert welcome
+
+        await session.save()
+
+    data = {
+        "variables": {
+            "entities": [
+                {
+                    "key": box_key,
+                    "paths": [
+                        {
+                            "path": "scopes.behaviors.behaviors.map.b:default",
+                            "value": json.dumps(
+                                {
+                                    "py/object": "scopes.behavior.Behavior",
+                                    "python": 'og.info("fail")',
+                                }
+                            ),
+                        },
+                    ],
+                }
+            ]
+        },
+        "query": """
+mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
+    compareAndSwap(entities: $entities) {
+        affected {
+            key
+            serialized
+        }
+    }
+}
+""",
+    }
+
+    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+        ok, actual = await ariadne.graphql(
+            schema,
+            data,
+            context_value=get_test_context(domain),
+            logger="ariadne.errors.hidden",
+        )
+        assert ok
+        snapshot.assert_match(
+            test.pretty_json(actual, deterministic=True), "response.json"
+        )

@@ -74,7 +74,7 @@ type EntitiesUpdated {
 
 input CompareAndSwapField {
   path: String!
-  previous: String!
+  previous: String
   value: String!
 }
 

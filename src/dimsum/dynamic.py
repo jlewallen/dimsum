@@ -589,7 +589,6 @@ class DynamicCallsListener:
 @dataclasses.dataclass
 class Behavior:
     listener: DynamicCallsListener
-    world: World
     entities: tools.EntitySet
     previous: Optional["Behavior"] = None
     calls: List[DynamicCall] = dataclasses.field(default_factory=list)
@@ -644,6 +643,9 @@ class Behavior:
         for target in [c for c in self._compiled]:
             await target.notify(ev, **kwargs)
 
+    async def verify(self):
+        log.info("evaluators: %s", self.evaluators)
+
     async def __aenter__(self):
         self.previous = active_behavior.get()
         active_behavior.set(self)
@@ -662,7 +664,7 @@ class Behavior:
                 else:
                     await self.listener.save_dynamic_calls_after_success(self.calls)
             else:
-                log.info("dynamic calls empty")
+                log.debug("dynamic calls empty")
 
         active_behavior.set(self.previous)
         return False

@@ -11,9 +11,11 @@ from typing import List, Optional, Dict, Any, Union
 
 import config
 import domains
+import dynamic
 import serializing
 import scopes
 import library
+import tools
 from loggers import get_logger
 from model import (
     Entity,
@@ -31,6 +33,7 @@ from plugins.actions import Join
 from plugins.admin import lookup_username, register_username
 import plugins.admin as admin
 import scopes.carryable as carryable
+import scopes.behavior as behavior
 import scopes.users as users
 
 
@@ -574,36 +577,46 @@ async def compare_and_swap(obj, info, entities):
             assert original
 
             compiled: CompiledJson = original.compiled
+            was_behavior_modified = False
 
             # We allow multiple paths to be updated per entity.
             for change in row["paths"]:
                 path = change["path"]
+                if behavior.DefaultKey in path:
+                    was_behavior_modified = True
                 try:
                     # We're given JSON strings with the previous value
                     # and the value being written. Parse them here.
-                    parsed_previous = json.loads(change["previous"])
+                    parsed_previous = (
+                        json.loads(change["previous"]) if "previous" in change else None
+                    )
                     parsed_value = json.loads(change["value"])
 
                     log.debug("%s: cas: '%s' = %s", key, path, parsed_previous)
                     log.debug("%s: cas: '%s' = %s", key, path, parsed_value)
 
-                    # Create a JSON diff object that recreates the
-                    # object in its original before state. This is
-                    # basically an easy way to set the given path to
-                    # the previous value. The idea here is that this
-                    # should be the same JSON before and after if
-                    # we're to continue with the update.
-                    to_previous = make_diff(path, parsed_previous)
-                    previous = jsondiff.patch(compiled, to_previous)
-                    diff_from_expected = jsondiff.diff(compiled, previous)
-                    if diff_from_expected != {} and not is_acceptable_non_empty_diff(
-                        path, diff_from_expected
-                    ):
-                        log.info("%s: cas '%s' = %s", key, path, parsed_previous)
-                        log.info("%s: cas '%s' = %s", key, path, parsed_value)
-                        log.info("%s: cas previous: %s", key, previous)
-                        log.info("%s: cas unexpected: %s", key, diff_from_expected)
-                        raise EntityConflictException()
+                    if parsed_previous:
+                        # Create a JSON diff object that recreates the
+                        # object in its original before state. This is
+                        # basically an easy way to set the given path to
+                        # the previous value. The idea here is that this
+                        # should be the same JSON before and after if
+                        # we're to continue with the update.
+                        to_previous = make_diff(path, parsed_previous)
+                        previous = jsondiff.patch(compiled, to_previous)
+                        diff_from_expected = jsondiff.diff(compiled, previous)
+                        if (
+                            diff_from_expected != {}
+                            and not is_acceptable_non_empty_diff(
+                                path, diff_from_expected
+                            )
+                        ):
+                            log.info("%s: cas '%s' = %s", key, path, parsed_previous)
+                            log.info("%s: cas '%s' = %s", key, path, parsed_value)
+                            log.info("%s: cas before: %s", key, compiled)
+                            log.info("%s: cas after: %s", key, previous)
+                            log.info("%s: cas unexpected: %s", key, diff_from_expected)
+                            raise EntityConflictException()
 
                     # Everything looks fine, so create a new JSON diff
                     # to update the path to the new value and then
@@ -615,11 +628,21 @@ async def compare_and_swap(obj, info, entities):
                     log.error("compare-swap failed: patch=%s", change)
                     raise
 
-                # Reload with the accumulated changes.
-                entity = await session.materialize(
-                    json=[Serialized(key, json.dumps(compiled))]
-                )
-                entity.touch()
+            # Reload with the accumulated changes.
+            entity = await session.materialize(
+                json=[Serialized(key, json.dumps(compiled))]
+            )
+
+            entity.touch()
+
+            # If behavior was modified, then verify that behavior.
+            if was_behavior_modified:
+                contributing = tools.get_contributing_entities(world, entity)
+                log.info("%s: verifying behavior %s", key, contributing)
+                async with dynamic.Behavior(
+                    domain.create_calls_saver(session), contributing
+                ) as db:
+                    await db.verify()
 
         # Save all our changes and return the affected entities.
         modified_keys = await session.save()
