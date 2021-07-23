@@ -584,8 +584,8 @@ async def compare_and_swap(obj, info, entities):
                     parsed_previous = json.loads(change["previous"])
                     parsed_value = json.loads(change["value"])
 
-                    log.info("%s: cas: '%s' = %s", key, path, parsed_previous)
-                    log.info("%s: cas: '%s' = %s", key, path, parsed_value)
+                    log.debug("%s: cas: '%s' = %s", key, path, parsed_previous)
+                    log.debug("%s: cas: '%s' = %s", key, path, parsed_value)
 
                     # Create a JSON diff object that recreates the
                     # object in its original before state. This is
@@ -599,8 +599,10 @@ async def compare_and_swap(obj, info, entities):
                     if diff_from_expected != {} and not is_acceptable_non_empty_diff(
                         path, diff_from_expected
                     ):
-                        log.info("previous: %s", previous)
-                        log.info("diff-from-expected: %s", diff_from_expected)
+                        log.info("%s: cas '%s' = %s", key, path, parsed_previous)
+                        log.info("%s: cas '%s' = %s", key, path, parsed_value)
+                        log.info("%s: cas previous: %s", key, previous)
+                        log.info("%s: cas unexpected: %s", key, diff_from_expected)
                         raise EntityConflictException()
 
                     # Everything looks fine, so create a new JSON diff
