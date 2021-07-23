@@ -130,22 +130,23 @@ class Session(MaterializeAndCreate):
         compiled = serializing.for_update(self.registrar.entities.values())
         modified = self.registrar.filter_modified(compiled)
 
+        sec_log = get_logger("dimsum.security")
         updating: Dict[str, CompiledJson] = {}
         for key, c in modified.items():
             entity = self.registrar.find_by_key(key)
             assert entity
             assert c.saving
             if c.diff:
-                log.info("security(%s) %s", entity, c.key)
+                sec_log.info("security(%s) %s", entity, c.key)
                 check = generate_security_check_from_json_diff(
                     c.saving.compiled, c.diff
                 )
-                log.debug("%s diff=%s", key, c.diff)
-                log.debug("%s acls=%s", key, check.acls)
+                sec_log.debug("%s diff=%s", key, c.diff)
+                sec_log.debug("%s acls=%s", key, check.acls)
                 if create_security_context:
                     try:
                         sc = create_security_context(entity)
-                        log.info("verifying %s %s %s", c.key, entity, sc)
+                        sec_log.debug("verifying %s %s %s", c.key, entity, sc)
                         await check.verify(Permission.WRITE, sc)
                     except SecurityCheckException as sce:
                         raise DiffSecurityException(entity, c.diff, sce)

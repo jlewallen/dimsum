@@ -8,7 +8,7 @@ from typing import Optional, List, Dict, Any, Union
 
 from loggers import get_logger
 
-log = get_logger("dimsum")
+log = get_logger("dimsum.security")
 
 
 class SecurityMappings:
