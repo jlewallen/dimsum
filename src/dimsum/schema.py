@@ -640,7 +640,7 @@ async def compare_and_swap(obj, info, entities):
                 contributing = tools.get_contributing_entities(world, entity)
                 log.info("%s: verifying behavior %s", key, contributing)
                 async with dynamic.Behavior(
-                    domain.create_calls_saver(session), contributing
+                    dynamic.LogDynamicCalls(), contributing
                 ) as db:
                     await db.verify()
 
