@@ -24,8 +24,17 @@ class MaterializeAndCreate:
     async def try_materialize_key(self, key: str) -> Optional[Entity]:
         raise NotImplementedError
 
+    async def materialize_key(self, key: str) -> Optional[Entity]:
+        e = await self.try_materialize_key(key)
+        assert e
+        return e
+
 
 class Ctx(MaterializeAndCreate):
+    @property
+    def world(self) -> Entity:
+        raise NotImplementedError
+
     @abc.abstractmethod
     def register(self, entity: Entity) -> Entity:
         raise NotImplementedError

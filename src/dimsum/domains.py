@@ -599,7 +599,6 @@ class WorldCtx(Ctx):
         assert session and session.world
         assert calls_saver
         self.session = session
-        self.world: World = session.world
         self.person = person
         self.reference = person or entity
         self.bus = session.bus
@@ -609,6 +608,11 @@ class WorldCtx(Ctx):
         self.calls_saver: Callable[
             [], dynamic.DynamicCallsListener
         ] = functools.partial(calls_saver, session)
+
+    @property
+    def world(self) -> World:
+        assert self.session.world
+        return self.session.world
 
     async def post(self):
         if self._post:
