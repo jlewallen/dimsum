@@ -163,10 +163,16 @@ class WhenCron(FutureTask):
 
 
 @dataclasses.dataclass
+class QueuedTask(FutureTask):
+    entity_key: str
+    message: str
+
+
+@dataclasses.dataclass
 class CronTab:
     crons: List[dynamic.Cron]
 
-    def get_when_cron(self) -> Optional[WhenCron]:
+    def get_future_task(self) -> Optional[WhenCron]:
         wc: Optional[WhenCron] = None
         base = datetime.now()
         log.info("summarize: %s", base)
@@ -366,15 +372,13 @@ class Session(MaterializeAndCreate):
             except EntityFrozen:
                 return Failure("whoa, that's frozen")
 
-    async def tick(self, now: Optional[float] = None):
+    async def tick(self, now: Optional[datetime] = None):
         await self.prepare()
 
         if now is None:
-            now = time.time()
+            now = datetime.now()
 
         await self.everywhere(TickEvent(now))
-
-        return now
 
     async def everywhere(self, ev: Event, **kwargs):
         assert self.world
@@ -425,7 +429,7 @@ class Session(MaterializeAndCreate):
                     await ctx.notify(ev, **kwargs)
                     await ctx.complete()
 
-    async def service(self, now: float, scheduled: Optional[FutureTask] = None):
+    async def service(self, now: datetime, scheduled: Optional[FutureTask] = None):
         assert self.world
 
         log.info("service now=%s", now)
@@ -475,10 +479,10 @@ class Session(MaterializeAndCreate):
             crons = flatten([await _get_crons(key) for key in everything])
 
             tab = CronTab(crons)
-            wc = tab.get_when_cron()
-            if wc:
-                log.info("crons: %s", wc)
-                self.schedule(wc)
+            future_task = tab.get_future_task()
+            if future_task:
+                log.info("crons: %s", future_task)
+                self.schedule(future_task)
             for key in removing:
                 log.warning("removing %s from world behaviors", key)
                 del servicing.entities[key]
@@ -692,11 +696,9 @@ class WorldCtx(Ctx):
 
     async def complete(self):
         post = await self.post()
-        tts = await post.get_time_to_service()
-        now = time.time()
-        if tts:
-            log.info("tts: %f sleep=%f", tts, tts - now)
-            self.session.schedule(FutureTask(datetime.fromtimestamp(tts)))
+        pending = await post.peek()
+        if pending:
+            self.session.schedule(QueuedTask(*pending))
         else:
             self.session.schedule(None)
         assert self.reference

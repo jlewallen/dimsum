@@ -11,6 +11,7 @@ import jsonpickle
 import time
 import contextvars
 import typing as imported_typing
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 from collections import ChainMap
 
@@ -125,7 +126,9 @@ class DynamicPostMessage(inbox.PostMessage):
 class DynamicPostService:
     postService: inbox.PostService
 
-    async def future(self, receiver: Entity, when: float, message: inbox.PostMessage):
+    async def future(
+        self, receiver: Entity, when: datetime, message: inbox.PostMessage
+    ):
         return await self.postService.future(
             receiver, when, DynamicPostMessage(message)
         )

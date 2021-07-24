@@ -2,6 +2,7 @@ import dataclasses
 import time
 import pytest
 import freezegun
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from model import *
@@ -34,7 +35,9 @@ async def test_inbox_schedule_local_service(snapshot):
 
             post_service = await inbox.create_post_service(session, world)
 
-            await post_service.future(hammer, time.time() + 5, PingMessage())
+            await post_service.future(
+                hammer, datetime.now() + timedelta(seconds=5), PingMessage()
+            )
 
             await session.save()
 
@@ -43,7 +46,7 @@ async def test_inbox_schedule_local_service(snapshot):
             with freezegun.freeze_time() as frozen_datetime:
                 for i in range(0, 6):
                     frozen_datetime.tick()
-                    await session.service(time.time())
+                    await session.service(datetime.now())
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "world.json")
@@ -87,9 +90,9 @@ async def ping(this, ev):
             with freezegun.freeze_time() as frozen_datetime:
                 for i in range(0, 4):
                     frozen_datetime.tick()
-                    await session.service(time.time())
+                    await session.service(datetime.now())
                 frozen_datetime.tick()
-                await session.service(time.time())
+                await session.service(datetime.now())
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "world.json")

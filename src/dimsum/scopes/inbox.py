@@ -4,7 +4,8 @@ import functools
 import bisect
 import json
 import jsonpickle
-from typing import List, Dict, Optional, Any
+from datetime import datetime
+from typing import List, Dict, Optional, Tuple, Union, Any
 
 from loggers import get_logger
 from model import (
@@ -30,7 +31,7 @@ class PostMessage(Event):
 @functools.total_ordering
 class QueuedMessage:
     entity_key: str
-    when: float
+    when: datetime
     message: str
 
     def _is_valid_operand(self, other):
@@ -58,12 +59,14 @@ class Post(Scope):
         super().__init__(**kwargs)
         self.queue: List[QueuedMessage] = queue if queue else []
 
-    def enqueue(self, entity_key: str, when: float, message: str):
+    def enqueue(self, entity_key: str, when: Union[datetime, float], message: str):
+        if isinstance(when, float):
+            when = datetime.fromtimestamp(when)
         qm = QueuedMessage(entity_key, when, message)
         bisect.insort(self.queue, qm)
         self.parent.touch()
 
-    def dequeue(self, now: float) -> List[QueuedMessage]:
+    def dequeue(self, now: datetime) -> List[QueuedMessage]:
         if len(self.queue) == 0:
             return []
 
@@ -87,23 +90,24 @@ class Post(Scope):
 class PostService:
     entity: Entity
 
-    async def future(self, receiver: Entity, when: float, message: PostMessage):
+    async def future(self, receiver: Entity, when: datetime, message: PostMessage):
         with self.entity.make(Post) as post:
             serialized_message = serializing.serialize(message)
             post.enqueue(receiver.key, when, serialized_message)
 
-    async def service(self, now: float) -> List[DequeuedMessage]:
+    async def service(self, now: datetime) -> List[DequeuedMessage]:
         with self.entity.make(Post) as post:
             return [
                 DequeuedMessage(qm.entity_key, jsonpickle.decode(qm.message))
                 for qm in post.dequeue(now)
             ]
 
-    async def get_time_to_service(self) -> float:
+    async def peek(self) -> Optional[Tuple[datetime, str, str]]:
         with self.entity.make_and_discard(Post) as post:
             if post.queue:
-                return post.queue[0].when
-            return 0
+                first = post.queue[0]
+                return (first.when, first.entity_key, first.message)
+            return None
 
 
 PostServiceKey = "postService"

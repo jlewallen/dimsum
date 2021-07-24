@@ -1,4 +1,5 @@
 import dataclasses
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Type
 
 from loggers import get_logger
@@ -33,7 +34,7 @@ class Event:
 @event
 @dataclasses.dataclass
 class TickEvent(Event):
-    time: float
+    time: datetime
 
 
 @event

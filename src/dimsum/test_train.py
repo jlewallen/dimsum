@@ -3,6 +3,7 @@ import logging
 import dataclasses
 import pytest
 import freezegun
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from model import *
@@ -50,14 +51,14 @@ async def test_train(snapshot, caplog, deterministic):
         snapshot.assert_match(await tw.to_json(), "2_waiting.json")
 
         with tw.domain.session() as session:
-            await session.tick(0)
+            await session.tick()
             await session.save()
 
         for i in range(0, 10):
             frozen_datetime.tick()
             with tw.domain.session() as session:
                 world = await session.prepare()
-                await session.service(time.time())
+                await session.service(datetime.now())
                 await session.save()
 
         snapshot.assert_match(await tw.to_json(), "3_departed.json")
@@ -67,7 +68,7 @@ async def test_train(snapshot, caplog, deterministic):
         snapshot.assert_match(await tw.to_json(), "4_arrived.json")
 
         with tw.domain.session() as session:
-            await session.tick(0)
+            await session.tick()
             await session.save()
 
         await tw.success("go train")
@@ -76,7 +77,7 @@ async def test_train(snapshot, caplog, deterministic):
             frozen_datetime.tick()
             with tw.domain.session() as session:
                 world = await session.prepare()
-                await session.service(time.time())
+                await session.service(datetime.now())
                 await session.save()
 
         await tw.success("go door")

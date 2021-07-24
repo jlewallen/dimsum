@@ -317,10 +317,10 @@ async def tick(this, ev, say, ctx):
         jacob = await session.materialize(key=tw.jacob_key)
         area = await find_entity_area(jacob)
 
-        await session.tick(0)
+        await session.tick()
         assert len(area.make(carryable.Containing).holding) == 2
         assert len(session.registrar.entities) == 6
 
-        await session.tick(1)
+        await session.tick()
         assert len(area.make(carryable.Containing).holding) == 3
         assert len(session.registrar.entities) == 7

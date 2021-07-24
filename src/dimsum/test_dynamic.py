@@ -1,6 +1,7 @@
 import time
 import pytest
 import freezegun
+from datetime import datetime
 from typing import Dict, List, Optional
 
 import domains
@@ -217,7 +218,7 @@ async def rusting(this, ev, say):
     )
 
     with tw.domain.session() as session:
-        await session.tick(0)
+        await session.tick()
         await session.save()
 
     with tw.domain.session() as session:
@@ -346,7 +347,7 @@ def tick(this, ev, say):
     with pytest.raises(NameError):
         with tw.domain.session() as session:
             await session.prepare()
-            await session.tick(10)
+            await session.tick()
             await session.save()
 
     with tw.domain.session() as session:
@@ -524,7 +525,7 @@ async def make_noise(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.tick(10)
+        await session.tick()
         await session.save()
 
     assert len(received) == 1
@@ -556,7 +557,7 @@ async def make_noise(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.service(time.time())
+        await session.service(datetime.now())
         await session.save()
 
     assert tw.domain.scheduled
@@ -565,7 +566,7 @@ async def make_noise(this, say):
         frozen_datetime.move_to(tw.domain.scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
             await session.save()
 
     assert len(received) == 1
@@ -603,7 +604,7 @@ async def every_3(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.service(time.time())
+        await session.service(datetime.now())
         await session.save()
 
     assert len(received) == 0
@@ -616,7 +617,7 @@ async def every_3(this, say):
         frozen_datetime.move_to(tw.domain.scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
             await session.save()
 
     assert len(received) == 1
@@ -629,7 +630,7 @@ async def every_3(this, say):
         frozen_datetime.move_to(tw.domain.scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
             await session.save()
 
     assert len(received) == 2

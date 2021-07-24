@@ -32,9 +32,7 @@ async def servicing(domain: domains.Domain):
                 if first or (domain.scheduled and now >= domain.scheduled.when):
                     with domain.session() as session:
                         await session.prepare()
-                        await session.service(
-                            now.timestamp(), scheduled=domain.scheduled
-                        )
+                        await session.service(now, scheduled=domain.scheduled)
                         await session.save()
                     first = False
                 else:
@@ -55,7 +53,7 @@ async def ticks(domain: domains.Domain):
             try:
                 with domain.session() as session:
                     await session.prepare()
-                    now = time.time()
+                    now = datetime.now()
                     await session.tick(now)
                     await session.service(now)
                     await session.save()
