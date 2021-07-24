@@ -42,6 +42,7 @@
 import { defineComponent } from "vue";
 import store, { MutationTypes, LoadingAction } from "@/store";
 import Interactables from "./views/shared/Interactables.vue";
+import { ignoringKey } from "@/ux";
 
 export default defineComponent({
     name: "App",
@@ -63,15 +64,12 @@ export default defineComponent({
     },
     created() {
         window.addEventListener("keyup", (data) => {
+            if (ignoringKey(data)) {
+                return;
+            }
             if (data.key == " ") {
-                const focused = window.document.activeElement;
-                if (focused) {
-                    if (focused.localName == "body") {
-                        this.resumeRepl();
-                    } else {
-                        console.log("keyup.space", focused.localName);
-                    }
-                }
+                this.resumeRepl();
+                return;
             }
         });
     },

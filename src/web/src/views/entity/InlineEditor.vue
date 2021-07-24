@@ -1,6 +1,6 @@
 <template>
     <div class="inline-editor" @keydown.esc="cancel">
-        <Tabs @close="cancel">
+        <Tabs @close="cancel" ref="tabs">
             <Tab title="General">
                 <div class="inline-form">
                     <div class="label">Name</div>
@@ -54,6 +54,7 @@ import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
 import Tabs from "@/views/shared/Tabs.vue";
 import Tab from "@/views/shared/Tab.vue";
 import { CommonComponents } from "@/views/shared";
+import { ignoringKey } from "@/ux";
 
 export default defineComponent({
     name: "InlineEditor",
@@ -95,11 +96,40 @@ export default defineComponent({
         };
     },
     mounted() {
+        window.addEventListener("keyup", this.keyUp);
         if (this.form.behavior == "" && this.form.pedia == "") {
             (this.$refs.name as HTMLInputElement).focus();
         }
     },
+    unmounted() {
+        window.removeEventListener("keyup", this.keyUp);
+
+        console.log("editor:unmounted");
+    },
     methods: {
+        keyUp(data: KeyboardEvent) {
+            if (ignoringKey(data)) {
+                return;
+            }
+            if (data.altKey && data.keyCode == 66) {
+                // Alt-b
+                console.log("show-behavior");
+                (this.$refs.tabs as typeof Tabs).selectTab(2);
+                return;
+            }
+            if (data.altKey && data.keyCode == 72) {
+                // Alt-h
+                console.log("show-help");
+                (this.$refs.tabs as typeof Tabs).selectTab(1);
+                return;
+            }
+            if (data.altKey && data.keyCode == 76) {
+                // Alt-l
+                console.log("show-logs");
+                (this.$refs.tabs as typeof Tabs).selectTab(3);
+                return;
+            }
+        },
         async save(): Promise<void> {
             const changes: EntityChange[] = [];
 
