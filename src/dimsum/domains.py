@@ -193,7 +193,7 @@ class CronTab:
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
-    schedule: Callable[[Optional[FutureTask]], None] = dataclasses.field(repr=False)
+    schedule: Callable[[FutureTask], None] = dataclasses.field(repr=False)
     calls_saver: Callable = dataclasses.field(repr=False)
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
@@ -558,7 +558,7 @@ class Domain:
     def session(self) -> "Session":
         log.info("session:new")
 
-        def schedule(value: Optional[FutureTask]):
+        def schedule(value: FutureTask):
             logger = get_logger("dimsum.schedule")
 
             if value and self.scheduled:
@@ -566,7 +566,14 @@ class Domain:
                     value.when >= self.scheduled.when
                     and self.scheduled.when > datetime.now()
                 ):
-                    logger.info("ignored: %s vs %s", value.when, self.scheduled.when)
+                    if value.when == self.scheduled.when:
+                        logger.debug(
+                            "ignored: %s vs %s", value.when, self.scheduled.when
+                        )
+                    else:
+                        logger.info(
+                            "ignored: %s vs %s", value.when, self.scheduled.when
+                        )
                     return
             if self.scheduled != value:
                 logger.info("scheduled: %s", value)
@@ -684,8 +691,6 @@ class WorldCtx(Ctx):
         pending = await post.peek()
         if pending:
             self.session.schedule(QueuedTask(*pending))
-        else:
-            self.session.schedule(None)
         assert self.reference
         await self.say.publish(self.reference)
 

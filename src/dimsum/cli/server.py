@@ -27,12 +27,23 @@ async def servicing(domain: domains.Domain):
     first = True
     while True:
         try:
+            sleeping = 1.0
             try:
                 now = datetime.now()
-                if first or (domain.scheduled and now >= domain.scheduled.when):
+                triggered = False
+                if domain.scheduled:
+                    if now >= domain.scheduled.when:
+                        triggered = True
+                    else:
+                        sleeping = min(
+                            1.0, (domain.scheduled.when - now).total_seconds()
+                        )
+                if first or triggered:
                     with domain.session() as session:
+                        scheduled = domain.scheduled
+                        domain.scheduled = None
                         await session.prepare()
-                        await session.service(now, scheduled=domain.scheduled)
+                        await session.service(now, scheduled=scheduled)
                         await session.save()
                     first = False
                 else:
@@ -44,7 +55,8 @@ async def servicing(domain: domains.Domain):
                         )
             except:
                 log.exception("error", exc_info=True)
-            await asyncio.sleep(1)
+            log.debug("sleeping: %s", sleeping)
+            await asyncio.sleep(sleeping)
         except asyncio.exceptions.CancelledError:
             return
 
