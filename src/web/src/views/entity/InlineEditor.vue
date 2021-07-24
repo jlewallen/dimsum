@@ -168,9 +168,20 @@ export default defineComponent({
             changes.push(new EntityChange("props.map.desc.value", this.entity.props.map.desc.value, this.form.desc));
             changes.push(new EntityChange("scopes.encyclopedia.body", this.entity.scopes.encyclopedia?.body || null, this.form.pedia));
 
-            const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"] || {};
-            changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.python", behavior?.python, this.form.behavior));
-            changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.executable", null, true));
+            if (this.entity.scopes.behaviors.behaviors.map["b:default"]) {
+                const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"] || {};
+                changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.python", behavior?.python, this.form.behavior));
+                changes.push(new EntityChange("scopes.behaviors.behaviors.map.b:default.executable", null, true));
+            } else {
+                changes.push(
+                    new EntityChange("scopes.behaviors.behaviors.map.b:default", null, {
+                        "py/object": "scopes.behavior.Behavior",
+                        python: this.form.behavior,
+                        executable: true,
+                        logs: [],
+                    })
+                );
+            }
 
             console.log("updating entity", this.entity, changes);
             try {

@@ -17,6 +17,11 @@ class Behavior:
     executable: bool = True
     logs: List[Dict[str, Any]] = dataclasses.field(default_factory=list)
 
+    # TODO remove eventually
+    def __post_init__(self):
+        if not hasattr(self, "logs"):
+            self.logs = []
+
     def append(self, entry: Dict[str, Any]):
         self.logs.append(entry)
         self.logs = self.logs[-20:]
