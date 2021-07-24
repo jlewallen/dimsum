@@ -380,43 +380,9 @@ class Session(MaterializeAndCreate):
 
         await self.everywhere(TickEvent(now))
 
-    async def everywhere(self, ev: Event, **kwargs):
-        assert self.world
-
-        log.info("everywhere:%s %s", ev, kwargs)
-        everything: List[str] = []
-        with self.world.make(behavior.BehaviorCollection) as world_behaviors:
-            everything = world_behaviors.entities.keys()
-            removing: List[str] = []
-            for key in everything:
-                log.info("everywhere: %s", key)
-                # Materialize from the target entity to ensure we have
-                # enough in memory to carry out its behavior.
-                try:
-                    entity = await self.materialize(key=key, refresh=True)
-                    with entity.make(behavior.Behaviors) as behave:
-                        if behave.get_default():
-                            log.info("everywhere: %s", entity)
-                            with WorldCtx(
-                                session=self,
-                                calls_saver=self.calls_saver,
-                                entity=entity,
-                                **kwargs,
-                            ) as ctx:
-                                await ctx.notify(
-                                    ev,
-                                    post=await ctx.post(),
-                                    area=tools.area_of(entity),
-                                )
-                                await ctx.complete()
-                except MissingEntityException as e:
-                    log.exception("missing entity", exc_info=True)
-                    removing.append(key)
-            for key in removing:
-                log.warning("removing %s from world behaviors", key)
-                del world_behaviors.entities[key]
-
     async def _notify_entity(self, key: str, ev: Event, **kwargs):
+        # Materialize from the target entity to ensure we have
+        # enough in memory to carry out its behavior.
         entity = await self.materialize(key=key, refresh=True)
         with entity.make(behavior.Behaviors) as behave:
             if behave.get_default():
@@ -426,27 +392,28 @@ class Session(MaterializeAndCreate):
                     calls_saver=self.calls_saver,
                     entity=entity,
                 ) as ctx:
-                    await ctx.notify(ev, **kwargs)
+                    await ctx.notify(
+                        ev, area=tools.area_of(entity), post=await ctx.post(), **kwargs
+                    )
                     await ctx.complete()
 
     async def service(self, now: datetime, scheduled: Optional[FutureTask] = None):
         assert self.world
 
         log.info("service now=%s", now)
-        post_service = await inbox.create_post_service(self, self.world)
-
         if scheduled:
             log.info("scheduled: %s", scheduled)
             if isinstance(scheduled, WhenCron):
                 event = dynamic.CronEvent(
                     scheduled.cron.entity_key, scheduled.cron.spec
                 )
-                await self._notify_entity(event.entity_key, event, post=post_service)
+                await self._notify_entity(event.entity_key, event)
 
+        post_service = await inbox.create_post_service(self, self.world)
         queued = await post_service.service(now)
         for qm in queued:
             try:
-                await self._notify_entity(qm.entity_key, qm.message, post=post_service)
+                await self._notify_entity(qm.entity_key, qm.message)
             except MissingEntityException as e:
                 log.exception("missing entity", exc_info=True)
 
@@ -489,6 +456,25 @@ class Session(MaterializeAndCreate):
                 self.world.touch()
 
         log.info("service crons loaded")
+
+    async def everywhere(self, ev: Event, **kwargs):
+        assert self.world
+
+        log.info("everywhere:%s %s", ev, kwargs)
+        everything: List[str] = []
+        with self.world.make(behavior.BehaviorCollection) as world_behaviors:
+            everything = world_behaviors.entities.keys()
+            removing: List[str] = []
+            for key in everything:
+                log.info("everywhere: %s", key)
+                try:
+                    await self._notify_entity(key, ev)
+                except MissingEntityException as e:
+                    log.exception("missing entity", exc_info=True)
+                    removing.append(key)
+            for key in removing:
+                log.warning("removing %s from world behaviors", key)
+                del world_behaviors.entities[key]
 
     async def add_area(
         self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
