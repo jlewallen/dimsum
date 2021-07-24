@@ -5,7 +5,7 @@ import pprint
 import contextvars
 from croniter import croniter
 from datetime import datetime
-from typing import Any, cast, Dict, List, Literal, Optional, Union, Callable
+from typing import Any, cast, Dict, List, Literal, Optional, Union, Callable, Tuple
 
 import dynamic
 import grammars
@@ -159,7 +159,7 @@ class FutureTask:
 
 @dataclasses.dataclass
 class WhenCron(FutureTask):
-    cron: dynamic.Cron
+    crons: List[dynamic.Cron]
 
 
 @dataclasses.dataclass
@@ -176,13 +176,18 @@ class CronTab:
         wc: Optional[WhenCron] = None
         base = datetime.now()
         log.info("summarize: %s", base)
+        curr: Optional[Tuple[datetime, List[dynamic.Cron]]] = None
         for cron in self.crons:
             iter = croniter(cron.spec, base)
             when = iter.get_next(datetime)
-            if wc is None or when < wc.when:
-                wc = WhenCron(when, cron)
+            if curr is None or when < curr[0]:
+                curr = (when, [])
+            if when == curr[0]:
+                curr[1].append(cron)
             log.info("%s iter=%s wc=%s", cron, when, wc)
-        return wc
+        if curr:
+            return WhenCron(curr[0], curr[1])
+        return None
 
 
 @dataclasses.dataclass
@@ -404,10 +409,9 @@ class Session(MaterializeAndCreate):
         if scheduled:
             log.info("scheduled: %s", scheduled)
             if isinstance(scheduled, WhenCron):
-                event = dynamic.CronEvent(
-                    scheduled.cron.entity_key, scheduled.cron.spec
-                )
-                await self._notify_entity(event.entity_key, event)
+                for cron in scheduled.crons:
+                    event = dynamic.CronEvent(cron.entity_key, cron.spec)
+                    await self._notify_entity(event.entity_key, event)
 
         post_service = await inbox.create_post_service(self, self.world)
         queued = await post_service.service(now)

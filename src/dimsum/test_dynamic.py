@@ -611,7 +611,7 @@ async def every_3(this, say):
 
     assert tw.domain.scheduled
     assert isinstance(tw.domain.scheduled, domains.WhenCron)
-    assert tw.domain.scheduled.cron.spec == "*/3 * * * *"
+    assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
         frozen_datetime.move_to(tw.domain.scheduled.when)
@@ -624,7 +624,7 @@ async def every_3(this, say):
 
     assert tw.domain.scheduled
     assert isinstance(tw.domain.scheduled, domains.WhenCron)
-    assert tw.domain.scheduled.cron.spec == "*/5 * * * *"
+    assert tw.domain.scheduled.crons[0].spec == "*/5 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
         frozen_datetime.move_to(tw.domain.scheduled.when)
@@ -637,4 +637,4 @@ async def every_3(this, say):
 
     assert tw.domain.scheduled
     assert isinstance(tw.domain.scheduled, domains.WhenCron)
-    assert tw.domain.scheduled.cron.spec == "*/3 * * * *"
+    assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
