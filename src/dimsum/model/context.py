@@ -7,7 +7,7 @@ from loggers import get_logger
 from .entity import Entity
 from .events import Event
 
-world_ctx: Any = contextvars.ContextVar("dimsum:ctx")
+world_ctx: Any = contextvars.ContextVar("dimsum:ctx", default=None)
 log = get_logger("dimsum")
 
 
@@ -70,6 +70,10 @@ def get() -> Ctx:
     ctx = world_ctx.get()
     assert ctx
     return ctx
+
+
+def maybe_get() -> Optional[Ctx]:
+    return world_ctx.get()
 
 
 def set(ctx: Optional[Ctx]):

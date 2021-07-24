@@ -607,6 +607,7 @@ class WorldCtx(Ctx):
         assert calls_saver
         self.session = session
         self.person = person
+        self.previous: Optional[Ctx] = None
         self.reference = person or entity
         self.bus = session.bus
         self.entities: tools.EntitySet = self._get_default_entity_set(entity)
@@ -639,11 +640,12 @@ class WorldCtx(Ctx):
         return entitySet
 
     def __enter__(self):
+        self.previous = context.maybe_get()
         context.set(self)
         return self
 
     def __exit__(self, type, value, traceback):
-        context.set(None)
+        context.set(self.previous)
         return False
 
     def extend(self, **kwargs) -> "WorldCtx":
