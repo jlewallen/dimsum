@@ -33,7 +33,7 @@ async def test_library(deterministic, caplog, snapshot):
 
     with tw.domain.session() as session:
         world = await session.prepare(reach=domains.infinite_reach)
-        await session.tick()
+        await session.everywhere(TickEvent())
         await session.save()
 
     reloaded = await tw.domain.reload()
@@ -45,7 +45,7 @@ async def test_library(deterministic, caplog, snapshot):
         world = await session.materialize(key=wa_key, reach=domains.infinite_reach)
         assert len(session.registrar.entities) == 72
 
-        await session.tick()
+        await session.everywhere(TickEvent())
         await session.save()
 
         assert len(session.registrar.entities) == 73

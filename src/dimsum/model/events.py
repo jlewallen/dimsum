@@ -34,7 +34,7 @@ class Event:
 @event
 @dataclasses.dataclass
 class TickEvent(Event):
-    time: datetime
+    time: datetime = dataclasses.field(default_factory=datetime.now)
 
 
 @event

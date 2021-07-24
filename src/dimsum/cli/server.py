@@ -56,9 +56,7 @@ async def ticks(domain: domains.Domain):
             try:
                 with domain.session() as session:
                     await session.prepare()
-                    now = datetime.now()
-                    await session.tick(now)
-                    await session.service(now)
+                    await session.service(datetime.now())
                     await session.save()
             except:
                 log.exception("error", exc_info=True)

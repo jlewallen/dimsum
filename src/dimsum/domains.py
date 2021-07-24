@@ -122,8 +122,8 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
         for call in calls:
             entity = await session.materialize(key=call.entity_key)
             assert entity
-            self.log.info("dyncalls: %s key=%s", entity, entity.key)
-            self.log.info("dyncalls: %s %s", entity, call)
+            self.log.info("calls: %s key=%s", entity, entity.key)
+            self.log.info("calls: %s %s", entity, call)
             dynamic.log_behavior(
                 entity,
                 dict(
@@ -138,11 +138,11 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
             )
 
     async def save_dynamic_calls_after_success(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("success: saving dyncalls using existing session")
+        self.log.info("success: saving calls using existing session")
         await self._update_in_session(self.session, calls, True)
 
     async def save_dynamic_calls_after_failure(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("failure: saving dyncalls using pristine session")
+        self.log.info("failure: saving calls using pristine session")
         pristine = await self.domain.reload()
         with pristine.session() as session:
             await self._update_in_session(session, calls, False)
@@ -184,7 +184,7 @@ class CronTab:
                 curr = (when, [])
             if when == curr[0]:
                 curr[1].append(cron)
-            log.info("%s iter=%s wc=%s", cron, when, wc)
+            log.debug("%s iter=%s curr=%s", cron, when, curr)
         if curr:
             return WhenCron(curr[0], curr[1])
         return None
@@ -376,14 +376,6 @@ class Session(MaterializeAndCreate):
                 return reply
             except EntityFrozen:
                 return Failure("whoa, that's frozen")
-
-    async def tick(self, now: Optional[datetime] = None):
-        await self.prepare()
-
-        if now is None:
-            now = datetime.now()
-
-        await self.everywhere(TickEvent(now))
 
     async def _notify_entity(self, key: str, ev: Event, **kwargs):
         # Materialize from the target entity to ensure we have

@@ -22,7 +22,7 @@ async def test_materialize_infinite_reach(caplog):
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        await session.tick()
+        await session.everywhere(TickEvent())
         await session.save()
 
     reloaded = await tw.domain.reload()
@@ -36,7 +36,7 @@ async def test_materialize_infinite_reach(caplog):
 
         assert len(session.registrar.entities) == 72
 
-        await session.tick()
+        await session.everywhere(TickEvent())
         await session.save()
 
         assert len(session.registrar.entities) == 73

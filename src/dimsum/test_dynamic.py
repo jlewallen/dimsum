@@ -218,7 +218,8 @@ async def rusting(this, ev, say):
     )
 
     with tw.domain.session() as session:
-        await session.tick()
+        await session.prepare()
+        await session.everywhere(TickEvent())
         await session.save()
 
     with tw.domain.session() as session:
@@ -347,7 +348,7 @@ def tick(this, ev, say):
     with pytest.raises(NameError):
         with tw.domain.session() as session:
             await session.prepare()
-            await session.tick()
+            await session.everywhere(TickEvent())
             await session.save()
 
     with tw.domain.session() as session:
@@ -525,7 +526,7 @@ async def make_noise(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.tick()
+        await session.everywhere(TickEvent())
         await session.save()
 
     assert len(received) == 1

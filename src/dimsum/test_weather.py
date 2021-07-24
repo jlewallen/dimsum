@@ -1,5 +1,6 @@
 import pytest
 
+from model import TickEvent
 import library
 import test
 
@@ -19,4 +20,5 @@ async def test_area_weather_blows_small_items():
     assert await tw.success("go rocky")
 
     with tw.domain.session() as session:
-        await session.tick()
+        await session.prepare()
+        await session.everywhere(TickEvent())
