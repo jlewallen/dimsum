@@ -46,3 +46,20 @@ async def test_admin_invite():
 
     r = await tw.execute("invite foobar")
     assert r.kwargs
+
+
+@pytest.mark.asyncio
+async def test_admin_save_groups():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        with jacob.make(users.Groups) as groups:
+            groups.memberships = ["ktown"]
+            jacob.touch()
+        await session.save()
+
+    with tw.domain.session() as session:
+        jacob = await session.materialize(key=tw.jacob_key)
+        assert jacob.make(users.Groups).memberships == ["ktown"]

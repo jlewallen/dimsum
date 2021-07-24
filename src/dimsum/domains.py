@@ -218,15 +218,29 @@ class Session(MaterializeAndCreate):
         create_security_context: Optional[Callable[[Entity], SecurityContext]] = None,
     ) -> List[str]:
         log.info("saving %s", self.store)
+
+        # Make sure that we haven't been marked for failure by an
+        # earlier exception or issue.
         assert not self.failed
+
+        # If we materialized the world, then make sure we update the
+        # gid we're on.
         if self.world:
             assert self.world
             set_current_gid(self.world, self.registrar.number)
+
+        # Make sure every modified entity also has its described name
+        # updated to reflect its latest state.
         for key, mod in self.registrar.modified().items():
             mod.props.described = mod.describe()
+
+        # Compile all of the changes that are being attempted in this
+        # session, including changes that weren't explicitly touched
+        # by the developer.
         compiled = serializing.for_update(self.registrar.entities.values())
         modified = self.registrar.filter_modified(compiled)
 
+        # Security check.
         sec_log = get_logger("dimsum.security")
         updating: Dict[str, CompiledJson] = {}
         for key, c in modified.items():
@@ -243,12 +257,14 @@ class Session(MaterializeAndCreate):
                 if create_security_context:
                     try:
                         sc = create_security_context(entity)
-                        sec_log.debug("verifying %s %s %s", c.key, entity, sc)
+                        sec_log.info("verifying %s %s %s", c.key, entity, sc)
                         await check.verify(Permission.WRITE, sc)
                     except SecurityCheckException as sce:
                         raise DiffSecurityException(entity, c.diff, sce)
             updating[key] = c.saving
 
+        # Update the entities and return their new state, which should
+        # only be different by the updated version number.
         updated = await self.store.update(updating)
         return [key for key, _ in updated.items()]
 
@@ -342,6 +358,7 @@ class Session(MaterializeAndCreate):
                     )
                     assert action
                     assert isinstance(action, Action)
+                    roles = action.gather_roles()
                     return await self.perform(action, person)
 
     async def perform(
@@ -352,9 +369,7 @@ class Session(MaterializeAndCreate):
         **kwargs,
     ) -> Reply:
 
-        log.info("-" * 100)
-        log.info("%s", action)
-        log.info("-" * 100)
+        log.info("perform %s", action)
 
         world = await self.prepare()
 

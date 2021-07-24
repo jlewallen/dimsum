@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Optional
+from typing import List, Optional
 
 
 class Reply:
@@ -23,6 +23,9 @@ class Universal(Reply):
 class Action:
     def __init__(self, **kwargs):
         super().__init__()
+
+    def gather_roles(self) -> List[str]:
+        return []
 
 
 class Unknown(Action):

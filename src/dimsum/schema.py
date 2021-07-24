@@ -4,6 +4,7 @@ import os.path
 import shortuuid
 import starlette.requests
 import ariadne
+import functools
 import jwt
 import json
 import jsondiff
@@ -375,7 +376,15 @@ async def resolve_language(obj, info, criteria):
         player = await session.materialize(key=evaluator)
         assert player
         reply = await session.execute(player, lqc.text.strip())
-        modified_keys = await session.save()
+
+        def get_security_context(person: Entity, entity: Entity):
+            return tools.get_entity_security_context(
+                tools.get_person_security_context(person), entity
+            )
+
+        modified_keys = await session.save(
+            functools.partial(get_security_context, player)
+        )
         for key in modified_keys:
             log.warning("hacked reload: %s", key)
             await session.materialize(key=key, refresh=True)
@@ -439,7 +448,7 @@ async def resolve_create(obj, info, entities):
     domain = info.context.domain
     templates = [Template(**e) for e in entities]
     key_space = "key-space"
-    log.info("ariadne:create entities = %s", templates)
+    log.info("ariadne:create entities=%s", templates)
 
     with domain.session() as session:
         world = await session.prepare()
@@ -455,7 +464,19 @@ async def resolve_create(obj, info, entities):
                     with container.make(carryable.Containing) as containing:
                         containing.add_item(e)
 
-        await session.save()
+        if auth_key:
+            person = await session.materialize(key=auth_key)
+            assert person
+
+            def get_security_context(person: Entity, entity: Entity):
+                return tools.get_entity_security_context(
+                    tools.get_person_security_context(person), entity
+                )
+
+            await session.save(functools.partial(get_security_context, person))
+        else:
+            await session.save()
+
         return Evaluation(
             Reply(),
             [EntityResolver(session, r[1]) for r in created],
