@@ -3,6 +3,8 @@ import dataclasses
 import functools
 import pprint
 import contextvars
+from croniter import croniter
+from datetime import datetime
 from typing import Any, cast, Dict, List, Literal, Optional, Union, Callable
 
 import dynamic
@@ -121,6 +123,7 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
             entity = await session.materialize(key=call.entity_key)
             assert entity
             self.log.info("diags: %s key=%s", entity, entity.key)
+            self.log.info("diags: %s %s", entity, call)
             dynamic.log_behavior(
                 entity,
                 dict(
@@ -150,11 +153,36 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
 
 
 @dataclasses.dataclass
+class FutureTask:
+    when: datetime
+
+
+@dataclasses.dataclass
+class WhenCron(FutureTask):
+    cron: dynamic.Cron
+
+
+@dataclasses.dataclass
+class CronTab:
+    crons: List[dynamic.Cron]
+
+    def get_when_cron(self) -> Optional[WhenCron]:
+        wc: Optional[WhenCron] = None
+        base = datetime.now()
+        log.info("summarize: %s", base)
+        for cron in self.crons:
+            iter = croniter(cron.spec, base)
+            when = iter.get_next(datetime)
+            if wc is None or when < wc.when:
+                wc = WhenCron(when, cron)
+            log.info("%s iter=%s wc=%s", cron, when, wc)
+        return wc
+
+
+@dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: storage.EntityStorage
-    set_time_to_service: Callable[[Optional[float]], None] = dataclasses.field(
-        repr=False
-    )
+    schedule: Callable[[Optional[FutureTask]], None] = dataclasses.field(repr=False)
     calls_saver: Callable = dataclasses.field(repr=False)
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
     registrar: Registrar = dataclasses.field(default_factory=Registrar, repr=False)
@@ -384,27 +412,79 @@ class Session(MaterializeAndCreate):
                 log.warning("removing %s from world behaviors", key)
                 del world_behaviors.entities[key]
 
-    async def service(self, now: float):
+    async def _notify_entity(self, key: str, ev: Event, **kwargs):
+        entity = await self.materialize(key=key, refresh=True)
+        with entity.make(behavior.Behaviors) as behave:
+            if behave.get_default():
+                log.info("notifying: %s", entity)
+                with WorldCtx(
+                    session=self,
+                    calls_saver=self.calls_saver,
+                    entity=entity,
+                ) as ctx:
+                    await ctx.notify(ev, **kwargs)
+                    await ctx.complete()
+
+    async def service(self, now: float, scheduled: Optional[FutureTask] = None):
         assert self.world
 
-        log.info("service:%s", now)
+        log.info("service now=%s", now)
         post_service = await inbox.create_post_service(self, self.world)
+
+        if scheduled:
+            log.info("scheduled: %s", scheduled)
+            if isinstance(scheduled, WhenCron):
+                event = dynamic.CronEvent(
+                    scheduled.cron.entity_key, scheduled.cron.spec
+                )
+                await self._notify_entity(event.entity_key, event, post=post_service)
+
         queued = await post_service.service(now)
         for qm in queued:
             try:
-                entity = await self.materialize(key=qm.entity_key, refresh=True)
+                await self._notify_entity(qm.entity_key, qm.message, post=post_service)
+            except MissingEntityException as e:
+                log.exception("missing entity", exc_info=True)
+
+        log.info("service loading crons")
+
+        removing: List[str] = []
+
+        async def _get_crons(key: str):
+            try:
+                entity = await self.materialize(
+                    key=key
+                )  # NOTE refresh intentionally False
                 with entity.make(behavior.Behaviors) as behave:
                     if behave.get_default():
-                        log.info("everywhere: %s", entity)
                         with WorldCtx(
                             session=self,
                             calls_saver=self.calls_saver,
                             entity=entity,
                         ) as ctx:
-                            await ctx.notify(qm.message, post=post_service)
-                            await ctx.complete()
+                            crons = await ctx.find_crons()
+                            assert crons is not None
+                            return crons
             except MissingEntityException as e:
                 log.exception("missing entity", exc_info=True)
+                removing.append(key)
+                return []
+
+        with self.world.make(behavior.BehaviorCollection) as servicing:
+            everything = servicing.entities.keys()
+            crons = flatten([await _get_crons(key) for key in everything])
+
+            tab = CronTab(crons)
+            wc = tab.get_when_cron()
+            if wc:
+                log.info("crons: %s", wc)
+                self.schedule(wc)
+            for key in removing:
+                log.warning("removing %s from world behaviors", key)
+                del servicing.entities[key]
+                self.world.touch()
+
+        log.info("service crons loaded")
 
     async def add_area(
         self, area: Entity, depth=0, seen: Optional[Dict[str, str]] = None
@@ -487,18 +567,29 @@ class Domain:
         self.subscriptions = subscriptions if subscriptions else SubscriptionManager()
         self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]
-        self.time_to_service: Optional[float] = None
+        self.scheduled: Optional[FutureTask] = None
 
     def session(self) -> "Session":
         log.info("session:new")
 
-        def set_tts(value: Optional[float]):
-            self.time_to_service = value
+        def schedule(value: Optional[FutureTask]):
+            logger = get_logger("dimsum.schedule")
+
+            if value and self.scheduled:
+                if (
+                    value.when >= self.scheduled.when
+                    and self.scheduled.when > datetime.now()
+                ):
+                    logger.info("ignored: %s vs %s", value.when, self.scheduled.when)
+                    return
+            if self.scheduled != value:
+                logger.info("scheduled: %s", value)
+            self.scheduled = value
 
         return Session(
             store=self.store,
             handlers=self.handlers,
-            set_time_to_service=set_tts,
+            schedule=schedule,
             calls_saver=self.create_calls_saver,
         )
 
@@ -589,8 +680,15 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         _notify_log().info("notify: %s entities=%s", ev, self.entities)
+        log.info("%s", self.calls_saver)
         async with dynamic.Behavior(self.calls_saver(), self.entities) as db:
             await db.notify(ev, say=self.say, session=self.session, **kwargs)
+
+    async def find_crons(self):
+        assert self.world
+        _notify_log().info("find-crons: entities=%s", self.entities)
+        async with dynamic.Behavior(dynamic.ErrorOnDynamicCall(), self.entities) as db:
+            return await db.find_crons()
 
     async def complete(self):
         post = await self.post()
@@ -598,9 +696,9 @@ class WorldCtx(Ctx):
         now = time.time()
         if tts:
             log.info("tts: %f sleep=%f", tts, tts - now)
-            self.session.set_time_to_service(tts)
+            self.session.schedule(FutureTask(datetime.fromtimestamp(tts)))
         else:
-            self.session.set_time_to_service(None)
+            self.session.schedule(None)
         assert self.reference
         await self.say.publish(self.reference)
 

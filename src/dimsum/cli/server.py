@@ -4,6 +4,7 @@ import time
 import shortuuid
 import asyncclick as click
 import ariadne.asgi
+from datetime import datetime
 from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
@@ -27,16 +28,18 @@ async def servicing(domain: domains.Domain):
     while True:
         try:
             try:
-                now = time.time()
-                if first or (domain.time_to_service and now >= domain.time_to_service):
+                now = datetime.now()
+                if first or (domain.scheduled and now >= domain.scheduled.when):
                     with domain.session() as session:
                         await session.prepare()
-                        await session.service(now)
+                        await session.service(
+                            now.timestamp(), scheduled=domain.scheduled
+                        )
                         await session.save()
                     first = False
                 else:
                     get_noise_logger().info(
-                        "servicing: tts=%s now=%s", domain.time_to_service, now
+                        "servicing: schedule=%s now=%s", domain.scheduled, now
                     )
             except:
                 log.exception("error", exc_info=True)
@@ -52,7 +55,9 @@ async def ticks(domain: domains.Domain):
             try:
                 with domain.session() as session:
                     await session.prepare()
-                    await session.tick()
+                    now = time.time()
+                    await session.tick(now)
+                    await session.service(now)
                     await session.save()
             except:
                 log.exception("error", exc_info=True)

@@ -399,6 +399,8 @@ class Entity:
         chargs = {}
         if key in self.scopes:
             chargs = self.scopes[key]
+        else:
+            pass  # self.touch()
         chargs.update(**kwargs)
 
         self._log().debug("%s splitting scopes: %s %s", self.key, key, chargs)

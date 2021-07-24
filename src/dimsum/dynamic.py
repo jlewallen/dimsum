@@ -103,6 +103,19 @@ class Receive:
     condition: Condition
 
 
+@dataclasses.dataclass(frozen=True)
+class Cron:
+    entity_key: str
+    spec: str
+    handler: Callable = dataclasses.field(repr=False)
+
+
+@dataclasses.dataclass(frozen=True)
+class CronEvent(Event):
+    entity_key: str
+    spec: str
+
+
 @dataclasses.dataclass
 class DynamicPostMessage(inbox.PostMessage):
     message: inbox.PostMessage
@@ -122,6 +135,10 @@ class EntityBehavior(grammars.CommandEvaluator):
     @property
     def hooks(self):
         return All()  # empty hooks
+
+    @property
+    def crons(self) -> List[Cron]:
+        return []
 
     async def notify(self, ev: Event, **kwargs):
         raise NotImplementedError
@@ -187,6 +204,7 @@ class Simplified:
     hooks: "All"
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
+    crons: List[Cron] = dataclasses.field(default_factory=list)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -196,6 +214,14 @@ class Simplified:
                     prose, self.wrapper_factory(fn), condition=condition or AlwaysTrue()
                 )
             )
+            return fn
+
+        return wrap
+
+    def cron(self, spec: str):
+        def wrap(fn):
+            log.info("cron: '%s' %s", spec, fn)
+            self.crons.append(Cron(self.entity_key, spec, self.wrapper_factory(fn)))
             return fn
 
         return wrap
@@ -257,13 +283,22 @@ class Simplified:
         entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
 
-        for receive in self.receives:
-            if ev.name == receive.hook:
-                try:
-                    await receive.handler(this=entity, ev=ev, **kwargs)
-                except:
-                    errors_log.exception("notify:exception", exc_info=True)
-                    raise
+        if isinstance(ev, CronEvent):
+            for cron in self.crons:
+                if ev.spec == cron.spec:
+                    try:
+                        await cron.handler(this=entity, ev=ev, **kwargs)
+                    except:
+                        errors_log.exception("notify:exception", exc_info=True)
+                        raise
+        else:
+            for receive in self.receives:
+                if ev.name == receive.hook:
+                    try:
+                        await receive.handler(this=entity, ev=ev, **kwargs)
+                    except:
+                        errors_log.exception("notify:exception", exc_info=True)
+                        raise
 
 
 @dataclasses.dataclass(frozen=True)
@@ -290,6 +325,10 @@ class CompiledEntityBehavior(EntityBehavior):
     @property
     def hooks(self):
         return self.simplified.hooks
+
+    @property
+    def crons(self) -> List[Cron]:
+        return self.simplified.crons
 
     async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         log.debug("%s evaluate '%s'", self, command)
@@ -541,6 +580,7 @@ async def __ex(t=thunk):
     eval_frame = dict(
         language=simplified.language,
         received=simplified.received,
+        cron=simplified.cron,
         hooks=simplified.hooks,
         Held=functools.partial(Held, found.key),
         Ground=functools.partial(Ground, found.key),
@@ -577,13 +617,16 @@ async def __ex(t=thunk):
 
 
 class DynamicCallsListener:
-    @abc.abstractmethod
     async def save_dynamic_calls_after_success(self, calls: List[DynamicCall]):
-        raise NotImplemented
+        raise NotImplementedError
 
-    @abc.abstractmethod
     async def save_dynamic_calls_after_failure(self, calls: List[DynamicCall]):
-        raise NotImplemented
+        raise NotImplementedError
+
+
+class ErrorOnDynamicCall(DynamicCallsListener):
+    def __init__(self, *args):
+        super().__init__()
 
 
 @dataclasses.dataclass
@@ -638,6 +681,9 @@ class Behavior:
     @property
     def lazy_evaluator(self) -> grammars.CommandEvaluator:
         return grammars.LazyCommandEvaluator(lambda: self.evaluators)
+
+    async def find_crons(self) -> List[Cron]:
+        return flatten([c.crons for c in self._compiled])
 
     async def notify(self, ev: Event, **kwargs):
         for target in [c for c in self._compiled]:

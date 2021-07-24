@@ -1,7 +1,11 @@
+import time
 import pytest
+import freezegun
 from typing import Dict, List, Optional
 
+import domains
 from model import *
+from loggers import get_logger
 import scopes.behavior as behavior
 import scopes as scopes
 import test
@@ -524,3 +528,112 @@ async def make_noise(this, say):
         await session.save()
 
     assert len(received) == 1
+
+
+@pytest.mark.asyncio
+async def test_dynamic_cron_5_minutes(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.add_behaviored_thing(
+        "Keys",
+        """
+@cron("*/5 * * * *")
+async def make_noise(this, say):
+    say.nearby(this, "you hear an annoying buzzing sound")
+    return ok()
+""",
+    )
+
+    received: List[Renderable] = []
+
+    async def handle_message(item: Renderable):
+        received.append(item)
+
+    assert tw.jacob_key
+    subscription = tw.domain.subscriptions.subscribe(tw.jacob_key, handle_message)
+    assert len(received) == 0
+
+    with tw.domain.session() as session:
+        await session.prepare()
+        await session.service(time.time())
+        await session.save()
+
+    assert tw.domain.scheduled
+
+    with freezegun.freeze_time() as frozen_datetime:
+        frozen_datetime.move_to(tw.domain.scheduled.when)
+        with tw.domain.session() as session:
+            await session.prepare()
+            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.save()
+
+    assert len(received) == 1
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_dynamic_cron_5_minutes_and_3_minutes(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.add_behaviored_thing(
+        "Keys",
+        """
+@cron("*/5 * * * *")
+async def every_5(this, say):
+    say.nearby(this, "every 5")
+    return ok()
+
+@cron("*/3 * * * *")
+async def every_3(this, say):
+    say.nearby(this, "every 3")
+    return ok()
+""",
+    )
+
+    received: List[Renderable] = []
+
+    async def handle_message(item: Renderable):
+        received.append(item)
+
+    assert tw.jacob_key
+    subscription = tw.domain.subscriptions.subscribe(tw.jacob_key, handle_message)
+    assert len(received) == 0
+
+    with tw.domain.session() as session:
+        await session.prepare()
+        await session.service(time.time())
+        await session.save()
+
+    assert len(received) == 0
+
+    assert tw.domain.scheduled
+    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert tw.domain.scheduled.cron.spec == "*/3 * * * *"
+
+    with freezegun.freeze_time() as frozen_datetime:
+        frozen_datetime.move_to(tw.domain.scheduled.when)
+        with tw.domain.session() as session:
+            await session.prepare()
+            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.save()
+
+    assert len(received) == 1
+
+    assert tw.domain.scheduled
+    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert tw.domain.scheduled.cron.spec == "*/5 * * * *"
+
+    with freezegun.freeze_time() as frozen_datetime:
+        frozen_datetime.move_to(tw.domain.scheduled.when)
+        with tw.domain.session() as session:
+            await session.prepare()
+            await session.service(time.time(), scheduled=tw.domain.scheduled)
+            await session.save()
+
+    assert len(received) == 2
+
+    assert tw.domain.scheduled
+    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert tw.domain.scheduled.cron.spec == "*/3 * * * *"
