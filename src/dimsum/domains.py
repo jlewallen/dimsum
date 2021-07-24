@@ -122,8 +122,8 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
         for call in calls:
             entity = await session.materialize(key=call.entity_key)
             assert entity
-            self.log.info("diags: %s key=%s", entity, entity.key)
-            self.log.info("diags: %s %s", entity, call)
+            self.log.info("dyncalls: %s key=%s", entity, entity.key)
+            self.log.info("dyncalls: %s %s", entity, call)
             dynamic.log_behavior(
                 entity,
                 dict(
@@ -138,11 +138,11 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
             )
 
     async def save_dynamic_calls_after_success(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("success: saving diags using existing session")
+        self.log.info("success: saving dyncalls using existing session")
         await self._update_in_session(self.session, calls, True)
 
     async def save_dynamic_calls_after_failure(self, calls: List[dynamic.DynamicCall]):
-        self.log.info("failure: saving diags using pristine session")
+        self.log.info("failure: saving dyncalls using pristine session")
         pristine = await self.domain.reload()
         with pristine.session() as session:
             await self._update_in_session(session, calls, False)
@@ -175,7 +175,7 @@ class CronTab:
     def get_future_task(self) -> Optional[WhenCron]:
         wc: Optional[WhenCron] = None
         base = datetime.now()
-        log.info("summarize: %s", base)
+        log.debug("summarize: %s", base)
         curr: Optional[Tuple[datetime, List[dynamic.Cron]]] = None
         for cron in self.crons:
             iter = croniter(cron.spec, base)
@@ -674,13 +674,12 @@ class WorldCtx(Ctx):
     async def notify(self, ev: Event, **kwargs):
         assert self.world
         _notify_log().info("notify: %s entities=%s", ev, self.entities)
-        log.info("%s", self.calls_saver)
         async with dynamic.Behavior(self.calls_saver(), self.entities) as db:
             await db.notify(ev, say=self.say, session=self.session, **kwargs)
 
     async def find_crons(self):
         assert self.world
-        _notify_log().info("find-crons: entities=%s", self.entities)
+        _notify_log().debug("find-crons: entities=%s", self.entities)
         async with dynamic.Behavior(dynamic.ErrorOnDynamicCall(), self.entities) as db:
             return await db.find_crons()
 

@@ -36,9 +36,12 @@ async def servicing(domain: domains.Domain):
                         await session.save()
                     first = False
                 else:
-                    get_noise_logger().info(
-                        "servicing: schedule=%s now=%s", domain.scheduled, now
-                    )
+                    if domain.scheduled:
+                        get_noise_logger().info(
+                            "servicing: schedule=%s %s",
+                            domain.scheduled,
+                            domain.scheduled.when - now,
+                        )
             except:
                 log.exception("error", exc_info=True)
             await asyncio.sleep(1)
