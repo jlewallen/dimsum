@@ -72,10 +72,10 @@ set_entity_cleanup_handler(cleanup_everything)
 
 
 @hooks.all.observed.hook
-def hide_invisible_entities(resume, entity: Entity):
+async def hide_invisible_entities(resume, entity: Entity):
     if entity.make_and_discard(mechanics.Visibility).is_invisible:
         return []
-    return resume(entity)
+    return await resume(entity)
 
 
 async def _area_of(entity: Entity) -> Optional[Entity]:

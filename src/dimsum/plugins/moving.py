@@ -13,8 +13,8 @@ import plugins.looking as looking
 log = get_logger("dimsum")
 
 
-@hooks.all.enter.target
-def can_enter(person: Entity, area: Entity) -> bool:
+@hooks.all.enter.target()
+async def can_enter(person: Entity, area: Entity) -> bool:
     return True
 
 
@@ -73,7 +73,7 @@ class MovingAction(PersonAction):
         if destination is None:
             return Failure("Where?")
 
-        if not can_enter(person, destination):
+        if not await can_enter(person, destination):
             return Failure("Sorry, you can't go there.")
 
         with destination.make(occupyable.Occupyable) as entering:
@@ -81,7 +81,9 @@ class MovingAction(PersonAction):
                 await leaving.left(person)
                 await entering.entered(person)
 
-        return looking.AreaObservation(await find_entity_area(person), person)
+        return await looking.AreaObservation.create(
+            await find_entity_area(person), person
+        )
 
 
 class Go(MovingAction):

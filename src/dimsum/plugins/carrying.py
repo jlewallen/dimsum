@@ -41,23 +41,23 @@ class ItemsHeld(StandardEvent):
         }
 
 
-@hooks.all.hold.target
-def can_hold(person: Entity, entity: Entity) -> bool:
+@hooks.all.hold.target()
+async def can_hold(person: Entity, entity: Entity) -> bool:
     return True
 
 
-@hooks.all.drop.target
-def can_drop(person: Entity, entity: Entity) -> bool:
+@hooks.all.drop.target()
+async def can_drop(person: Entity, entity: Entity) -> bool:
     return True
 
 
-@hooks.all.open.target
-def can_open(person: Entity, entity: Entity) -> bool:
+@hooks.all.open.target()
+async def can_open(person: Entity, entity: Entity) -> bool:
     return True
 
 
-@hooks.all.close.target
-def can_close(person: Entity, entity: Entity) -> bool:
+@hooks.all.close.target()
+async def can_close(person: Entity, entity: Entity) -> bool:
     return True
 
 
@@ -82,13 +82,13 @@ class Drop(PersonAction):
             if not item:
                 return Failure("Drop what?")
 
-            if not can_drop(person, item):
+            if not await can_drop(person, item):
                 return Failure("Drop what?")
 
         area = await find_entity_area(person)
 
         with person.make(carryable.Containing) as contain:
-            dropped, failure = contain.drop_here(
+            dropped, failure = await contain.drop_here(
                 area,
                 item,
                 quantity=self.quantity,
@@ -133,7 +133,7 @@ class Hold(PersonAction):
         if not item:
             return Failure("Sorry, hold what?")
 
-        if not can_hold(person, item):
+        if not await can_hold(person, item):
             return Failure("Sorry, you can't hold that.")
 
         with person.make(carryable.Containing) as pockets:
@@ -189,7 +189,7 @@ class Open(PersonAction):
             if not contain.can_hold():
                 return Failure("You can't open that.")
 
-            if not can_open(person, item):
+            if not await can_open(person, item):
                 return Failure("Huh, won't open.")
 
             if not contain.open():
@@ -215,7 +215,7 @@ class Close(PersonAction):
             if not contain.can_hold():
                 return Failure("You can't open that.")
 
-            if not can_close(person, item):
+            if not await can_close(person, item):
                 return Failure("Huh, won't close.")
 
             if not contain.close():
@@ -364,7 +364,7 @@ class TakeOut(PersonAction):
             if not item:
                 return Failure("What?")
 
-            if not can_hold(person, item):
+            if not await can_hold(person, item):
                 return Failure("Sorry, you can't hold that.")
 
             if containing.take_out(item):

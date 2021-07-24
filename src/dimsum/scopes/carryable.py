@@ -1,4 +1,14 @@
-from typing import Dict, List, Optional, Sequence, Tuple, Union, Callable
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    Callable,
+    Coroutine,
+    Awaitable,
+)
 
 from loggers import get_logger
 from model import (
@@ -302,12 +312,12 @@ class Containing(Openable):
             item.touch()
         return item
 
-    def drop_all(
-        self, condition: Optional[Callable[[Entity], bool]] = None
+    async def drop_all(
+        self, condition: Optional[Callable[[Entity], Awaitable[bool]]] = None
     ) -> List[Entity]:
         dropped = []
         for item in self.holding:
-            if not condition or condition(item):
+            if not condition or await condition(item):
                 self.drop(item)
                 dropped.append(item)
         if len(dropped) > 0:
@@ -317,12 +327,12 @@ class Containing(Openable):
     def is_holding(self, item: Entity):
         return item in self.holding
 
-    def drop_here(
+    async def drop_here(
         self,
         area: Entity,
         item: Optional[Entity] = None,
         quantity: Optional[float] = None,
-        condition: Optional[Callable[[Entity], bool]] = None,
+        condition: Optional[Callable[[Entity], Awaitable[bool]]] = None,
         **kwargs,
     ):
         if len(self.holding) == 0:
@@ -349,7 +359,7 @@ class Containing(Openable):
                 dropped = self.drop(item)
                 assert dropped
             else:
-                dropped = self.drop_all(condition=condition)
+                dropped = await self.drop_all(condition=condition)
                 assert dropped
 
         for item in dropped:

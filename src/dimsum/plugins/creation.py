@@ -154,7 +154,7 @@ class Obliterate(PersonAction):
         area = await find_entity_area(person)
         items = None
         with person.make(carryable.Containing) as pockets:
-            items = pockets.drop_all()
+            items = await pockets.drop_all()
         if len(items) == 0:
             return Failure("You're not holding anything.")
 

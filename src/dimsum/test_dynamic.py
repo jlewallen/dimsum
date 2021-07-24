@@ -415,7 +415,7 @@ async def test_dynamic_hook_observed(caplog):
         "Keys",
         """
 @hooks.observed.hook
-def hide_everything(resume, entity):
+async def hide_everything(resume, entity):
     log.info("hiding %s", entity)
     return []
 """,
@@ -440,7 +440,7 @@ async def test_dynamic_hook_never_hold(caplog):
         "Keys",
         """
 @hooks.hold.hook
-def never_hold(resume, person, entity):
+async def never_hold(resume, person, entity):
     log.info("never-hold: %s", person)
     return False
 """,
@@ -464,7 +464,7 @@ async def test_dynamic_hook_never_enter(caplog):
         "Really Heavy Keys",
         """
 @hooks.enter.hook
-def never_enter(resume, person, area):
+async def never_enter(resume, person, area):
     log.info("never-enter: %s", person)
     return False
 """,
@@ -488,7 +488,7 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
         "Really Heavy Keys",
         """
 @hooks.enter.hook(condition=Held())
-def never_enter(resume, person, area, this):
+async def never_enter(resume, person, area, this):
     log.info("never-enter: %s keys=%s", person, this)
     return False
 """,

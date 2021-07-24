@@ -21,8 +21,8 @@ class ObservedEntity(Renderable):
         return {"entity": self.entity}
 
 
-@all.observed.target
-def observe_entity(entity: Entity) -> Sequence[ObservedEntity]:
+@all.observed.target()
+async def observe_entity(entity: Entity) -> Sequence[ObservedEntity]:
     return [ObservedEntity(entity)]
 
 

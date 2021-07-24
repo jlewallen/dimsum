@@ -37,24 +37,27 @@ class Hook:
     fn: Optional[Callable] = None
     hooks: List[RegisteredHook] = dataclasses.field(default_factory=lambda: [])
 
-    def target(self, fn):
-        log.debug("hook:target: %s", fn)
+    def target(self):
+        def wrapper(func):
+            log.info("hook:target: %s", func)
 
-        assert not self.fn
-        self.fn = fn
+            self.fn = func
 
-        def wrap(*args, **kwargs):
-            all_hooks = []
-            extended = live_hooks.get(None)
-            if extended:
-                all_hooks += extended._get_extra_hooks(self.name)
-            return self._invoke(
-                self.name, self.fn, self.hooks + all_hooks, args, kwargs
-            )
+            @functools.wraps(func)
+            async def wrapped(*args, **kwargs):
+                all_hooks = []
+                extended = live_hooks.get(None)
+                if extended:
+                    all_hooks += extended._get_extra_hooks(self.name)
+                return await self._invoke(
+                    self.name, self.fn, self.hooks + all_hooks, args, kwargs
+                )
 
-        return wrap
+            return wrapped
 
-    def _invoke(self, name, call, hooks, args, kwargs):
+        return wrapper
+
+    async def _invoke(self, name, call, hooks, args, kwargs):
         log.debug(
             "hook:call '%s' hooks=%s args=%s kwargs=%s", name, hooks, args, kwargs
         )
@@ -66,7 +69,7 @@ class Hook:
 
             call = functools.partial(registered.fn, call)
 
-        return call(*args, **kwargs)
+        return await call(*args, **kwargs)
 
     def hook(self, wrapped=None, condition: Optional[Condition] = None):
         if wrapped is None:

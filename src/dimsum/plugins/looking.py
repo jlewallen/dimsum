@@ -47,26 +47,30 @@ class DetailedObservation(Observation):
 class AreaObservation(Observation):
     area: Entity
     person: Entity
+    living: List[ObservedLiving]
+    items: List[ObservedEntity]
+    routes: List[movement.AreaRoute]
 
-    def __post_init__(self):
-        occupied = self.area.make(occupyable.Occupyable).occupied
+    @staticmethod
+    async def create(area: Entity, person: Entity) -> "AreaObservation":
+        occupied = area.make(occupyable.Occupyable).occupied
 
-        self.living: List[ObservedLiving] = flatten(
-            [observe_entity(e) for e in occupied if e != self.person]
+        living: List[ObservedLiving] = flatten(
+            [await observe_entity(e) for e in occupied if e != person]
         )
 
-        self.items: List[ObservedEntity] = flatten(
+        items: List[ObservedEntity] = flatten(
             [
-                observe_entity(e)
-                for e in self.area.make(carryable.Containing).holding
+                await observe_entity(e)
+                for e in area.make(carryable.Containing).holding
                 if not e.make(mechanics.Visibility).visible.hard_to_see
-                or self.person.make(mechanics.Visibility).can_see(e.identity)
+                or person.make(mechanics.Visibility).can_see(e.identity)
             ]
         )
 
-        self.routes: List[movement.AreaRoute] = self.area.make(
-            movement.Movement
-        ).available_routes
+        routes: List[movement.AreaRoute] = area.make(movement.Movement).available_routes
+
+        return AreaObservation(area, person, living, items, routes)
 
     def render_tree(self) -> Dict[str, Any]:
         def filter_items(predicate: Callable) -> List[ObservedEntity]:
@@ -196,7 +200,7 @@ class Look(PersonAction):
             return DetailedObservation(ObservedEntity(item))
 
         assert area
-        return AreaObservation(area, person)
+        return await AreaObservation.create(area, person)
 
 
 class Examine(PersonAction):
