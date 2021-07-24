@@ -1,5 +1,5 @@
 <template>
-    <div class="inline-editor" @keydown.esc="cancel">
+    <div class="inline-editor" @keydown.esc="handleEscape">
         <Tabs @close="cancel" ref="tabs">
             <Tab title="General">
                 <div class="inline-form">
@@ -32,11 +32,22 @@
             </Tab>
         </Tabs>
         <div class="alert alert-danger" v-if="error">
-            Oops, something has gone wrong. The most common cause of this is something in the world made changes to this object before you
-            could make yours. When this happens the backend refuses to overwrite those changes with the ones you're making now. I'm trying
-            to think up a good solution. See
-            <WikiLink word="OptimisticLocking" />
-            .
+            <span v-if="error.mystery">Honestly, no idea what just happened. You should probably report this.</span>
+            <span v-if="error.concurrency">
+                Oops, something has gone wrong. The most common cause of this is something in the world made changes to this object before
+                you could make yours. When this happens the backend refuses to overwrite those changes with the ones you're making now. See
+                <WikiLink word="OptimisticLocking" />
+                .
+            </span>
+            <div v-if="error.python">
+                <h5>An error occurred:</h5>
+
+                <h3>
+                    <span class="error-line-number">Line {{ error.python.location.line }}</span>
+                    {{ error.python.message }}
+                </h3>
+                <div v-show="false">{{ error.python.exception }}</div>
+            </div>
         </div>
         <div class="buttons">
             <button class="btn btn-primary" v-on:click="save" :disabled="busy">Save</button>
@@ -56,6 +67,16 @@ import Tab from "@/views/shared/Tab.vue";
 import { CommonComponents } from "@/views/shared";
 import { ignoringKey } from "@/ux";
 
+export interface ErrorInfo {
+    mystery?: boolean;
+    concurrency?: boolean;
+    python?: {
+        message: string;
+        location: { line: number; column: number } | null;
+        exception?: { context: Record<string, unknown>; stacktrace: string };
+    };
+}
+
 export default defineComponent({
     name: "InlineEditor",
     components: {
@@ -74,7 +95,17 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
+    data(): {
+        error: ErrorInfo | null;
+        busy: boolean;
+        logs: unknown[];
+        form: {
+            behavior: string;
+            pedia: string;
+            name: string;
+            desc: string;
+        };
+    } {
         const behavior = this.entity.scopes.behaviors.behaviors.map["b:default"];
         const pedia = (() => {
             if (this.entity.scopes.encyclopedia) {
@@ -84,7 +115,7 @@ export default defineComponent({
         })();
 
         return {
-            error: false,
+            error: null,
             busy: false,
             logs: _.reverse(behavior?.logs || []),
             form: {
@@ -144,15 +175,39 @@ export default defineComponent({
             console.log("updating entity", this.entity, changes);
             try {
                 this.busy = true;
-                this.error = false;
+                this.error = null;
                 await store.dispatch(new UpdateEntityAction(this.entity, changes));
                 this.$emit("dismiss");
             } catch (error) {
                 console.log("error", error);
-                this.error = true;
+                if (error.response) {
+                    if (error.response.errors && error.response.errors.length > 0) {
+                        const pythonError = error.response.errors[0];
+                        console.log("python", pythonError);
+                        this.error = {
+                            python: {
+                                message: pythonError.message,
+                                location: pythonError.locations[0] || null,
+                                exception: pythonError.extensions.exception,
+                            },
+                        };
+                    } else {
+                        console.log("mystery", error.response);
+                        this.error = {
+                            mystery: true,
+                        };
+                    }
+                } else {
+                    this.error = {
+                        mystery: true,
+                    };
+                }
             } finally {
                 this.busy = false;
             }
+        },
+        handleEscape(ev: KeyboardEvent) {
+            console.log("editor:escape", ev);
         },
         async cancel(e: Event): Promise<void> {
             this.$emit("dismiss");
@@ -195,5 +250,9 @@ export default defineComponent({
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+.error-line-number {
+    font-size: 70%;
+    color: #ffaaaa;
 }
 </style>
