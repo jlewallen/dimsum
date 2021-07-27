@@ -33,12 +33,16 @@ class DetailedObservation(Observation):
 
     def render_tree(self) -> Dict[str, Any]:
         owner = owning.get_owner(self.item.entity)
+        creator = self.item.entity.creator
+        assert creator
         return {
             "title": self.item.entity.props.described,
             "description": [
                 self.item.entity.props.desc,
                 "\n",
+                f"Key: {self.item.entity.key}",
                 f"Owner: {owner.props.described}",
+                f"Creator: {creator.props.described}",
             ],
         }
 
