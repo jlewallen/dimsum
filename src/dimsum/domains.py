@@ -466,7 +466,7 @@ class Session(MaterializeAndCreate):
                 del servicing.entities[key]
                 self.world.touch()
 
-        log.info("service crons loaded")
+        log.debug("service crons loaded")
 
     async def everywhere(self, ev: Event, **kwargs):
         assert self.world
@@ -573,6 +573,13 @@ class Domain:
     def session(self) -> "Session":
         log.info("session:new")
 
+        def different_crons(lh: FutureTask, rh: FutureTask) -> bool:
+            if isinstance(lh, WhenCron) and isinstance(rh, WhenCron):
+                lh_specs = [cs.key() for cs in lh.crons]
+                rh_specs = [cs.key() for cs in rh.crons]
+                return lh_specs != rh_specs
+            return False
+
         def schedule(value: FutureTask):
             logger = get_logger("dimsum.schedule")
 
@@ -582,14 +589,14 @@ class Domain:
                     and self.scheduled.when > datetime.now()
                 ):
                     if value.when == self.scheduled.when:
-                        logger.debug(
-                            "ignored: %s vs %s", value.when, self.scheduled.when
-                        )
+                        if not different_crons(value, self.scheduled):
+                            logger.debug(
+                                "ignored(crons): %s vs %s", value, self.scheduled
+                            )
+                            return
                     else:
-                        logger.info(
-                            "ignored: %s vs %s", value.when, self.scheduled.when
-                        )
-                    return
+                        logger.debug("ignored(later): %s vs %s", value, self.scheduled)
+                        return
             if self.scheduled != value:
                 logger.info("scheduled: %s", value)
             self.scheduled = value

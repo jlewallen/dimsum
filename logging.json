@@ -25,6 +25,11 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "dimsum.schedule": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "dimsum.model.registrar": {
             "level": "INFO",
             "handlers": ["console"],
