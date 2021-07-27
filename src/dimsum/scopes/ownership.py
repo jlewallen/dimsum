@@ -24,4 +24,6 @@ def get_owner_key(entity: Entity) -> str:
 
 def set_owner(entity: Entity, new_owner: Entity):
     with entity.make(Ownership) as owner:
-        owner.owner = new_owner
+        if owner.owner.key != new_owner.key:
+            owner.owner = new_owner
+            entity.touch()

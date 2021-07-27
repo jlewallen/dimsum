@@ -138,11 +138,11 @@ def _wrap_parser(custom: str) -> Lark:
         route:             find_route_by_gid | find_direction | named_route
 
         makeable_noun:     TEXT
-        contained_noun:    USEFUL_WORD+
-        unheld_noun:       USEFUL_WORD+
-        held_noun:         USEFUL_WORD+
-        consumable_noun:   USEFUL_WORD+
-        general_noun:      USEFUL_WORD+
+        contained_noun:    USEFUL_WORD
+        unheld_noun:       USEFUL_WORD
+        held_noun:         USEFUL_WORD
+        consumable_noun:   USEFUL_WORD
+        general_noun:      USEFUL_WORD
 
         makeable:          makeable_noun
         contained:         object_by_gid | contained_noun

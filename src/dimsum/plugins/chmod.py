@@ -9,7 +9,7 @@ from finders import *
 from plugins.actions import PersonAction
 import scopes.users as users
 
-log = get_logger("dimsum")
+log = get_logger("dimsum.plugins.chmod")
 
 
 class Chmod(PersonAction):
@@ -108,7 +108,7 @@ class ChmodGrammar(grammars.Grammar):
 
         acl:               permission identity
         permission:        ("write" | "read")
-        identity:          ("$owner" | "$everybody" | "$system" | /[^\\S]+/i)
+        identity:          ("owner" | "everybody" | "system" | /[^\\S]+/i)
 
-        PATH:              /[^\\S]+/i
+        PATH:              /[^" "]+/i
 """

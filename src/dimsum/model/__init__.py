@@ -80,6 +80,7 @@ from model.finders import (
     FindStaticItem,
     FindObjectByGid,
     FindCurrentArea,
+    FindCurrentPerson,
     ItemFactory,
 )
 from model.well_known import (
@@ -163,6 +164,7 @@ __all__: List[str] = [
     "FindObjectByGid",
     "ItemFactory",
     "FindCurrentArea",
+    "FindCurrentPerson",
     "Acls",
     "Permission",
     "SecurityContext",

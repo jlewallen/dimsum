@@ -43,3 +43,11 @@ class FindCurrentArea(ItemFinder):
 class ItemFactory:
     def create_item(self, **kwargs) -> Entity:
         raise NotImplementedError
+
+
+class FindCurrentPerson(ItemFinder):
+    async def find_item(
+        self, person: Optional[Entity] = None, **kwargs
+    ) -> Optional[Entity]:
+        assert person
+        return person

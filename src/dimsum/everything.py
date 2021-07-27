@@ -22,6 +22,7 @@ import scopes.mechanics as mechanics
 import plugins.helping  # noqa
 import plugins.admin  # noqa
 import plugins.chmod  # noqa
+import plugins.chown  # noqa
 import plugins.chatting  # noqa
 import plugins.creation  # noqa
 import plugins.digging  # noqa

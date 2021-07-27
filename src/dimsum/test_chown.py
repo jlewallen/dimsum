@@ -11,28 +11,31 @@ import test
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_chmod_nothing(snapshot):
+async def test_chown_nothing(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
-        await tw.failure("chmod box")
+        await tw.failure("chown box")
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_chmod_ls(snapshot):
+async def test_chown_box_self(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
-        await tw.success("create thing Box")
-        await tw.success("chmod box")
+        await tw.success("create thing box")
+        await tw.success("chown box")
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_chmod_entity(snapshot):
+async def test_chown_box_somebody(snapshot):
     with test.Deterministic():
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
+
         await tw.initialize()
-        await tw.success("create thing Box")
-        await tw.success("chmod box . write owner")
+        await tw.add_carla()
+
+        await tw.success("create thing box")
+        await tw.success("chown box carla")
