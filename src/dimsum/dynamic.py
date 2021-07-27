@@ -105,7 +105,7 @@ class Receive:
 
 
 @dataclasses.dataclass(frozen=True)
-class EntityKeyAndCronSpec:
+class CronKey:
     entity_key: str
     spec: str
 
@@ -116,8 +116,8 @@ class Cron:
     spec: str
     handler: Callable = dataclasses.field(repr=False)
 
-    def key(self) -> EntityKeyAndCronSpec:
-        return EntityKeyAndCronSpec(self.entity_key, self.spec)
+    def key(self) -> CronKey:
+        return CronKey(self.entity_key, self.spec)
 
 
 @dataclasses.dataclass(frozen=True)

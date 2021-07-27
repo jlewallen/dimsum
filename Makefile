@@ -57,6 +57,12 @@ graph:
 	dot -T png gen/$$n.dot > gen/$$n.png;                                      \
 	done
 
+prof:
+	python3 src/dimsum/test_perf.py
+
+prof-view:
+	pyprof2calltree -k -i gen/create_simple.prof
+
 container:
 	docker build -t jlewallen/dimsum .
 
@@ -64,4 +70,4 @@ container-run:
 	mkdir -p data
 	docker run --rm -it -p 8088:80 -v `pwd`/data:/app/data jlewallen/dimsum --database /app/data/world.sqlite3 --session-key asdfasdf
 
-.PHONY: web
+.PHONY: web prof

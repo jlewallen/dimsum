@@ -152,17 +152,17 @@ class SaveDynamicCalls(dynamic.DynamicCallsListener):
         session.rollback()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class FutureTask:
     when: datetime
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class WhenCron(FutureTask):
-    crons: List[dynamic.Cron]
+    crons: List[dynamic.CronKey]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class QueuedTask(FutureTask):
     entity_key: str
     message: str
@@ -186,7 +186,7 @@ class CronTab:
                 curr[1].append(cron)
             log.debug("%s iter=%s curr=%s", cron, when, curr)
         if curr:
-            return WhenCron(curr[0], curr[1])
+            return WhenCron(curr[0], [c.key() for c in curr[1]])
         return None
 
 
@@ -573,13 +573,6 @@ class Domain:
     def session(self) -> "Session":
         log.info("session:new")
 
-        def different_crons(lh: FutureTask, rh: FutureTask) -> bool:
-            if isinstance(lh, WhenCron) and isinstance(rh, WhenCron):
-                lh_specs = [cs.key() for cs in lh.crons]
-                rh_specs = [cs.key() for cs in rh.crons]
-                return lh_specs != rh_specs
-            return False
-
         def schedule(value: FutureTask):
             logger = get_logger("dimsum.schedule")
 
@@ -589,9 +582,9 @@ class Domain:
                     and self.scheduled.when > datetime.now()
                 ):
                     if value.when == self.scheduled.when:
-                        if not different_crons(value, self.scheduled):
+                        if value == self.scheduled:
                             logger.debug(
-                                "ignored(crons): %s vs %s", value, self.scheduled
+                                "ignored(same): %s vs %s", value, self.scheduled
                             )
                             return
                     else:
