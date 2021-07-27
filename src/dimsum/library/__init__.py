@@ -11,6 +11,8 @@ import scopes.mechanics as mechanics
 import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes as scopes
+import tools
+from .trains import TrainFactory, Defaults
 
 log = get_logger("dimsum.model")
 
@@ -75,7 +77,7 @@ class LargeMapleTree(Factory):
             behave.add_behavior(
                 world,
                 python="""
-@received(TickEvent)
+@ds.received(TickEvent)
 async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
@@ -102,7 +104,7 @@ class LargeOakTree(Factory):
             behave.add_behavior(
                 world,
                 python="""
-@received(TickEvent)
+@ds.received(TickEvent)
 async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
@@ -165,7 +167,7 @@ class LargeSteepCliff(Factory):
             behave.add_behavior(
                 world,
                 python="""
-@received(TickEvent)
+@ds.received(TickEvent)
 async def tick(this, ev, say, ctx):
   item = ctx.create_item(
     creator=this,
@@ -494,155 +496,21 @@ def example_world_factory(world: World) -> Callable:
 
         stops: List[str] = [ktown.wilshire_normandie.key, ktown.wilshire_western.key]
 
-        train = Train(
-            interior_name="Purple Line Car",
-            enter_name="Purple Line Train",
-            leave_name="Train Door",
-            stops=stops,
+        factory = TrainFactory(
+            defaults=Defaults(
+                interior_name="Purple Line Car",
+                enter_name="Purple Line Train",
+                leave_name="Train Door",
+                stops=stops,
+            )
         )
 
         session.register(generics.all)
+
         await session.add_area(area)
         await session.add_area(ktown.wilshire_western)
-        await train.create(session)
+
+        with session.ctx() as ctx:
+            train = await factory.create(world, ctx)
 
     return factory
-
-
-@dataclasses.dataclass
-class Train:
-    interior_name: str
-    enter_name: str
-    leave_name: str
-    stops: List[str] = dataclasses.field(default_factory=list)
-    enter: Optional[Entity] = None
-    leave: Optional[Entity] = None
-    interior: Optional[Entity] = None
-
-    def _behavior(self) -> str:
-        assert self.leave
-        assert self.interior
-        return """
-@dataclass
-class CloseDoors(PostMessage):
-    pass
-
-@dataclass
-class Arrive(PostMessage):
-    pass
-
-@dataclass
-class Depart(PostMessage):
-    pass
-
-class Train(Scope):
-    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, interior: t.Optional[str] = None, leaving = False, **kwargs):
-        super().__init__(**kwargs)
-        self.stops = stops if stops else ["{0}", "{1}"]
-        self.door = door if door else "{2}"
-        self.interior = interior if interior else "{3}"
-        self.leaving = leaving
-
-    async def get_interior(self, session):
-        return await session.materialize(key=self.interior)
-
-    async def at_stop(self):
-        area = tools.area_of(self.ourselves)
-        return area.key in self.stops.index
-
-    async def get_stop(self, session):
-        area = tools.area_of(self.ourselves)
-        index = 0
-        if area.key in self.stops:
-            index = self.stops.index(area.key)
-        assert index >= 0
-        new_stop = self.stops[(index + 1) % len(self.stops)]
-        return await session.materialize(key=new_stop)
-
-    async def leave_station(self, session, new_stop: Entity):
-        door = await session.materialize(key=self.door)
-        with door.make(Exit) as exiting:
-            exiting.area = new_stop
-            door.touch()
-        await tools.move_to_limbo(session.world, session, self.ourselves)
-
-    async def arrive_station(self, session):
-        door = await session.materialize(key=self.door)
-        with door.make_and_discard(Exit) as exiting:
-            await tools.move_from_limbo(session.world, self.ourselves, exiting.area)
-
-@received(TickEvent)
-async def move_train(this, ev, say, session, post):
-    log.info("move-train:scheduled")
-    say.nearby(this, "the train is going to leave!")
-    with this.make(Train) as train:
-        interior = await train.get_interior(session)
-        say.nearby(interior, "the doors are closing!")
-    await post.future(this, time() + 5, CloseDoors())
-
-
-@received(CloseDoors)
-async def close_doors(this, ev, say, session, post):
-    area = tools.area_of(this)
-    with this.make(Train) as train:
-        log.info("move-train: area=%s stops=%s", area, train.stops)
-        new_stop = await train.get_stop(session)
-        say.nearby(tools.area_of(this), "the train just left")
-        await train.leave_station(session, new_stop)
-        await post.future(this, time() + 5, Arrive())
-
-        interior = await train.get_interior(session)
-        say.nearby(interior, "the train has left the station, hold on!")
-
-@received(Arrive)
-async def arrive(this, ev, say, session, post):
-    area = tools.area_of(this)
-    with this.make(Train) as train:
-        log.info("move-train: area=%s stops=%s", area, train.stops)
-        await train.arrive_station(session)
-        arrived_at = tools.area_of(this)
-        say.nearby(arrived_at, "the train just arrived")
-        interior = await train.get_interior(session)
-        say.nearby(interior, "the train has arrived at {{0}}, get out".format(arrived_at.props.described))
-
-@hooks.enter.hook
-def only_when_doors_open(resume, person, area):
-    log.info("only-when-doors-open: %s", person)
-    return resume(person, area)
-""".format(
-            self.stops[0], self.stops[1], self.leave.key, self.interior.key
-        )
-
-    async def create(self, session: Session):
-        assert self.stops
-
-        first_stop_key = self.stops[0]
-        first_stop = await session.materialize(key=first_stop_key)
-        assert first_stop
-
-        world = await session.prepare()
-        self.interior = scopes.area(creator=world, props=Common(self.interior_name))
-        self.enter = scopes.exit(
-            creator=world,
-            props=Common(self.enter_name),
-            initialize={movement.Exit: dict(area=self.interior)},
-        )
-        self.leave = scopes.exit(
-            creator=world,
-            props=Common(self.leave_name),
-            initialize={movement.Exit: dict(area=first_stop)},
-        )
-
-        with self.enter.make(behavior.Behaviors) as behave:
-            behave.add_behavior(world, python=self._behavior())
-
-        with first_stop.make(carryable.Containing) as first_stop_ground:
-            first_stop_ground.hold(self.enter)
-            first_stop.touch()
-
-        with self.interior.make(carryable.Containing) as contains:
-            contains.hold(self.leave)
-
-        session.register(self.enter)
-        session.register(self.leave)
-        session.register(self.interior)

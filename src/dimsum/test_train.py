@@ -7,6 +7,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from model import *
+from loggers import get_logger
+from domains import WhenCron
 import scopes.movement as movement
 import scopes.carryable as carryable
 import scopes.behavior as behavior
@@ -16,32 +18,43 @@ import test
 import library
 from test_utils import *
 
+import library.trains as trains
+
+log = get_logger("dimsum.tests")
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_train(snapshot, caplog, deterministic):
+async def test_train_factory(snapshot, caplog, deterministic):
     tw = test.TestWorld()
     await tw.initialize()
+    assert tw.area_key
 
     with tw.domain.session() as session:
         world = await session.prepare()
-        destination = scopes.area(creator=world, props=Common("Wilshire/Western"))
-        session.register(destination)
 
-        assert tw.area_key
+        area = await session.materialize(key=tw.area_key)
+        assert area
 
-        stops: List[str] = [tw.area_key, destination.key]
+        stop = scopes.area(creator=world, props=Common("Wilshire/Western"))
+        session.register(stop)
 
-        train = library.Train(
-            interior_name="Train Car",
-            enter_name="Purple Line Train",
-            leave_name="Train Door",
-            stops=stops,
+        factory = trains.TrainFactory(
+            defaults=trains.Defaults(
+                interior_name="Train Interior",
+                enter_name="Metro Train",
+                leave_name="Train Platform",
+                stops=[area.key, stop.key],
+            )
         )
 
-        await train.create(session)
+        with session.ctx() as ctx:
+            train = await factory.create(world, ctx)
+            tools.hold(area, train)
 
         await session.save()
+
+    assert await tw.success("look")
 
     with freezegun.freeze_time() as frozen_datetime:
         snapshot.assert_match(await tw.to_json(), "1_created.json")
@@ -50,38 +63,35 @@ async def test_train(snapshot, caplog, deterministic):
 
         snapshot.assert_match(await tw.to_json(), "2_waiting.json")
 
+        scheduled = tw.domain.pop_scheduled()
         with tw.domain.session() as session:
+            scheduled = tw.domain.pop_scheduled()
             await session.prepare()
-            await session.everywhere(TickEvent())
+            await session.service(datetime.now(), scheduled=scheduled)
             await session.save()
-
-        for i in range(0, 10):
-            frozen_datetime.tick()
-            with tw.domain.session() as session:
-                await session.prepare()
-                await session.service(datetime.now())
-                await session.save()
 
         snapshot.assert_match(await tw.to_json(), "3_departed.json")
 
-        await tw.success("go door")
+        await tw.success("go platform")
 
         snapshot.assert_match(await tw.to_json(), "4_arrived.json")
 
-        with tw.domain.session() as session:
-            await session.prepare()
-            await session.everywhere(TickEvent())
-            await session.save()
-
         await tw.success("go train")
 
-        for i in range(0, 10):
-            frozen_datetime.tick()
-            with tw.domain.session() as session:
-                world = await session.prepare()
-                await session.service(datetime.now())
-                await session.save()
+        scheduled = tw.domain.pop_scheduled()
+        with tw.domain.session() as session:
+            scheduled = tw.domain.pop_scheduled()
+            await session.prepare()
+            await session.service(datetime.now(), scheduled=scheduled)
+            await session.save()
 
-        await tw.success("go door")
+        scheduled = tw.domain.pop_scheduled()
+        with tw.domain.session() as session:
+            scheduled = tw.domain.pop_scheduled()
+            await session.prepare()
+            await session.service(datetime.now(), scheduled=scheduled)
+            await session.save()
+
+        await tw.success("go platform")
 
         snapshot.assert_match(await tw.to_json(), "5_back.json")

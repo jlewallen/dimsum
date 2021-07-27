@@ -33,7 +33,7 @@ class Bank(Scope):
         super().__init__(**kwargs)
         self.gold = gold
 
-@received(ItemsDropped)
+@ds.received(ItemsDropped)
 async def dropped(this, ev, say):
     with ev.source.make(Bank) as bank:
         if bank.gold < 2:
@@ -77,11 +77,11 @@ async def test_wear_cape(caplog):
             behave.add_behavior(
                 world,
                 python="""
-@received(ItemsWorn)
+@ds.received(ItemsWorn)
 async def worn(this, ev, say):
     tools.hide(ev.source)
 
-@received(ItemsUnworn)
+@ds.received(ItemsUnworn)
 async def unworn(this, ev, say):
     tools.show(ev.source)
 """,
@@ -124,7 +124,7 @@ async def test_behavior_create_item(caplog):
             behave.add_behavior(
                 w,
                 python="""
-@language('start: "shake"')
+@ds.language('start: "shake"')
 async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
@@ -180,7 +180,7 @@ async def test_behavior_create_item_same_kind(caplog):
             behave.add_behavior(
                 w,
                 python="""
-@language('start: "shake"')
+@ds.language('start: "shake"')
 async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
@@ -237,7 +237,7 @@ async def test_behavior_create_quantified_item(caplog):
             behave.add_behavior(
                 world,
                 python="""
-@language('start: "shake"')
+@ds.language('start: "shake"')
 async def shake(this, person, say, ctx):
     item = ctx.create_item(
         creator=person,
@@ -300,7 +300,7 @@ async def test_behavior_time_passing(caplog):
             behave.add_behavior(
                 world,
                 python="""
-@received(TickEvent)
+@ds.received(TickEvent)
 async def tick(this, ev, say, ctx):
     item = ctx.create_item(
         creator=this,

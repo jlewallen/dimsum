@@ -401,7 +401,7 @@ async def resolve_language(obj, info, criteria):
                 ),
             )
 
-        log.info(
+        log.debug(
             "ariadne:language materialized=%d", len(session.registrar.entities.values())
         )
 

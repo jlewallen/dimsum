@@ -35,6 +35,11 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "dimsum.dynamic": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "dimsum.dynamic.calls": {
             "level": "INFO",
             "handlers": ["console"],

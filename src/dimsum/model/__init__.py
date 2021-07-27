@@ -1,3 +1,4 @@
+import abc
 from typing import List
 
 from model.inflection import infl
@@ -91,7 +92,15 @@ from model.well_known import (
 
 import model.hooks as hooks
 
+
+class EntityFactory:
+    @abc.abstractmethod
+    async def create(self, world: World, ctx: Ctx) -> Entity:
+        raise NotImplementedError
+
+
 __all__: List[str] = [
+    "EntityFactory",
     "Ctx",
     "MaterializeAndCreate",
     "get",

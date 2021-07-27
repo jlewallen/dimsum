@@ -23,12 +23,12 @@ async def test_multiple_simple_verbs(caplog):
     hammer_key = await tw.add_behaviored_thing(
         "Hammer",
         """
-@language('start: "wiggle"')
+@ds.language('start: "wiggle"')
 async def wiggle(this, person, say):
     log.info("wiggle: %s", this)
     return "hey there!"
 
-@language('start: "burp"')
+@ds.language('start: "burp"')
 async def burp(this, person, say):
     log.info("burp: %s", this)
     return "hey there!"
@@ -48,7 +48,7 @@ async def test_dynamic_applies_only_when_held(caplog):
     hammer_key = await tw.add_behaviored_thing(
         "Hammer",
         """
-@language('start: "wiggle"', condition=Held())
+@ds.language('start: "wiggle"', condition=Held())
 async def wiggle(this, person, say):
     log.info("wiggle: %s", this)
     return "hey there!"
@@ -69,7 +69,7 @@ async def test_dynamic_language_say_nearby(caplog):
     hammer_key = await tw.add_behaviored_thing(
         "Keys",
         """
-@language('start: "jingle"', condition=Held())
+@ds.language('start: "jingle"', condition=Held())
 async def jingle(this, person, say):
     log.info("jingle: %s", this)
     say.nearby(this, "you hear kings jingling")
@@ -105,7 +105,7 @@ class Smashed(Event):
     smasher: Entity
     smashed: Entity
 
-@received(Smashed)
+@ds.received(Smashed)
 async def smashed(this: Entity, ev: Smashed, say):
     log.info("smashed! %s", ev)
     say.nearby(this, "%s smashed me, a nail! %s" % (ev.smasher, ev.smashed))
@@ -119,7 +119,7 @@ class Smashed(Event):
     smasher: Entity
     smashed: Entity
 
-@language('start: "smash" noun', condition=Held())
+@ds.language('start: "smash" noun', condition=Held())
 async def smash(this, smashing, person, say, ctx):
     if smashing is None:
         return fail("smash what now?")
@@ -155,7 +155,7 @@ class Smashes(Scope):
     def increase(self):
         self.smashes += 1
 
-@received(Smashed)
+@ds.received(Smashed)
 async def smashed(this, ev, say):
     with this.make(Smashes) as smashes:
         smashes.increase()
@@ -171,7 +171,7 @@ class Smashed(Event):
     smasher: Entity
     smashed: Entity
 
-@language('start: "smash" noun', condition=Held())
+@ds.language('start: "smash" noun', condition=Held())
 async def smash(this, smashing, person, say, ctx):
     if smashing is None:
         return fail("smash what now?")
@@ -207,7 +207,7 @@ class Rusting(Scope):
     def increase(self):
         self.rust += 1
 
-@received(TickEvent)
+@ds.received(TickEvent)
 async def rusting(this, ev, say):
     with this.make(Rusting) as rust:
         rust.increase()
@@ -244,7 +244,7 @@ class Rusting(Scope):
     def increase(self):
         self.rust += 1
 
-@received(ItemsDropped)
+@ds.received(ItemsDropped)
 async def dropped(this, ev, say):
     with this.make(Rusting) as rust:
         rust.increase()
@@ -277,7 +277,7 @@ async def test_no_evaluators_understands_nothing(caplog):
     nail_key = await tw.add_behaviored_thing(
         "Nail",
         """
-evaluators = []
+ds.evaluators([])
 """,
     )
 
@@ -334,7 +334,7 @@ async def test_exception_in_event_handler(silence_dynamic_errors, caplog):
     nail_key = await tw.add_behaviored_thing(
         "Nail",
         """
-@received(TickEvent)
+@ds.received(TickEvent)
 def tick(this, ev, say):
     og.info("hello")
 """,
@@ -365,7 +365,7 @@ async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
     nail_key = await tw.add_behaviored_thing(
         "Nail",
         """
-@language('start: "break"')
+@ds.language('start: "break"')
 def break_nail(this, person, say):
     og.info("hello")
 """,
@@ -383,7 +383,7 @@ async def test_dynamic_inherited(caplog):
     jingles_base_key = await tw.add_behaviored_thing(
         "base:jingles",
         """
-@language('start: "jingle"', condition=Held())
+@ds.language('start: "jingle"', condition=Held())
 async def jingle(this, person, say):
     log.info("jingle: %s", this)
     say.nearby(this, "you hear kings jingling")
@@ -414,7 +414,7 @@ async def test_dynamic_hook_observed(caplog):
     await tw.add_behaviored_thing(
         "Keys",
         """
-@hooks.observed.hook
+@ds.hooks.observed.hook
 async def hide_everything(resume, entity):
     log.info("hiding %s", entity)
     return []
@@ -439,7 +439,7 @@ async def test_dynamic_hook_never_hold(caplog):
     await tw.add_behaviored_thing(
         "Keys",
         """
-@hooks.hold.hook
+@ds.hooks.hold.hook
 async def never_hold(resume, person, entity):
     log.info("never-hold: %s", person)
     return False
@@ -463,7 +463,7 @@ async def test_dynamic_hook_never_enter(caplog):
     await tw.add_behaviored_thing(
         "Really Heavy Keys",
         """
-@hooks.enter.hook
+@ds.hooks.enter.hook
 async def never_enter(resume, person, area):
     log.info("never-enter: %s", person)
     return False
@@ -487,7 +487,7 @@ async def test_dynamic_hook_never_enter_when_held_hook_conditional(caplog):
     await tw.add_behaviored_thing(
         "Really Heavy Keys",
         """
-@hooks.enter.hook(condition=Held())
+@ds.hooks.enter.hook(condition=Held())
 async def never_enter(resume, person, area, this):
     log.info("never-enter: %s keys=%s", person, this)
     return False
@@ -508,7 +508,7 @@ async def test_dynamic_received_say_nearby(caplog):
     await tw.add_behaviored_thing(
         "Keys",
         """
-@received(TickEvent)
+@ds.received(TickEvent)
 async def make_noise(this, say):
     say.nearby(this, "you hear an annoying buzzing sound")
     return ok()
@@ -540,7 +540,7 @@ async def test_dynamic_cron_5_minutes(caplog):
     await tw.add_behaviored_thing(
         "Keys",
         """
-@cron("*/5 * * * *")
+@ds.cron("*/5 * * * *")
 async def make_noise(this, say):
     say.nearby(this, "you hear an annoying buzzing sound")
     return ok()
@@ -564,10 +564,11 @@ async def make_noise(this, say):
     assert tw.domain.scheduled
 
     with freezegun.freeze_time() as frozen_datetime:
-        frozen_datetime.move_to(tw.domain.scheduled.when)
+        scheduled = tw.domain.pop_scheduled()
+        frozen_datetime.move_to(scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
+            await session.service(datetime.now(), scheduled=scheduled)
             await session.save()
 
     assert len(received) == 1
@@ -582,12 +583,12 @@ async def test_dynamic_cron_5_minutes_and_3_minutes(caplog):
     await tw.add_behaviored_thing(
         "Keys",
         """
-@cron("*/5 * * * *")
+@ds.cron("*/5 * * * *")
 async def every_5(this, say):
     say.nearby(this, "every 5")
     return ok()
 
-@cron("*/3 * * * *")
+@ds.cron("*/3 * * * *")
 async def every_3(this, say):
     say.nearby(this, "every 3")
     return ok()

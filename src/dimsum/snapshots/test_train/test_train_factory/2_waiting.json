@@ -31,7 +31,7 @@
             },
             "behaviorCollection": {
                 "entities": {
-                    "14": [
+                    "16": [
                         {
                             "py/object": "scopes.behavior.BehaviorMeta"
                         }
@@ -215,7 +215,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 3
+            "i": 4
         },
         "creator": {
             "py/object": "model.world.World",
@@ -260,23 +260,22 @@
                 "holding": [
                     {
                         "py/object": "model.entity.Entity",
-                        "key": 14,
+                        "key": 16,
                         "klass": "ExitClass",
-                        "name": "Purple Line Train"
+                        "name": "Metro Train"
+                    },
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 16,
+                        "klass": "ExitClass",
+                        "name": "Metro Train"
                     }
                 ],
                 "capacity": null,
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 6,
-                        "klass": "LivingClass",
-                        "name": "Jacob"
-                    }
-                ],
+                "occupied": [],
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -669,7 +668,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -730,9 +729,9 @@
             "occupying": {
                 "area": {
                     "py/object": "model.entity.Entity",
-                    "key": 4,
+                    "key": 12,
                     "klass": "AreaClass",
-                    "name": "Living room"
+                    "name": "Train Interior"
                 },
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -1163,7 +1162,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1191,9 +1190,18 @@
                                 "py/object": "model.permissions.Acls",
                                 "rules": []
                             },
-                            "python": "\n@dataclass\nclass CloseDoors(PostMessage):\n    pass\n\n@dataclass\nclass Arrive(PostMessage):\n    pass\n\n@dataclass\nclass Depart(PostMessage):\n    pass\n\nclass Train(Scope):\n    def __init__(self, stops: t.Optional[t.List[str]] = None, door: t.Optional[str] = None, interior: t.Optional[str] = None, leaving = False, **kwargs):\n        super().__init__(**kwargs)\n        self.stops = stops if stops else [\"4\", \"10\"]\n        self.door = door if door else \"16\"\n        self.interior = interior if interior else \"12\"\n        self.leaving = leaving\n\n    async def get_interior(self, session):\n        return await session.materialize(key=self.interior)\n\n    async def at_stop(self):\n        area = tools.area_of(self.ourselves)\n        return area.key in self.stops.index\n\n    async def get_stop(self, session):\n        area = tools.area_of(self.ourselves)\n        index = 0\n        if area.key in self.stops:\n            index = self.stops.index(area.key)\n        assert index >= 0\n        new_stop = self.stops[(index + 1) % len(self.stops)]\n        return await session.materialize(key=new_stop)\n\n    async def leave_station(self, session, new_stop: Entity):\n        door = await session.materialize(key=self.door)\n        with door.make(Exit) as exiting:\n            exiting.area = new_stop\n            door.touch()\n        await tools.move_to_limbo(session.world, session, self.ourselves)\n\n    async def arrive_station(self, session):\n        door = await session.materialize(key=self.door)\n        with door.make_and_discard(Exit) as exiting:\n            await tools.move_from_limbo(session.world, self.ourselves, exiting.area)\n\n@ds.received(TickEvent)\nasync def move_train(this, ev, say, session, post):\n    log.info(\"move-train:scheduled\")\n    say.nearby(this, \"the train is going to leave!\")\n    with this.make(Train) as train:\n        interior = await train.get_interior(session)\n        say.nearby(interior, \"the doors are closing!\")\n    await post.future(this, time() + 5, CloseDoors())\n\n\n@ds.received(CloseDoors)\nasync def close_doors(this, ev, say, session, post):\n    area = tools.area_of(this)\n    with this.make(Train) as train:\n        log.info(\"move-train: area=%s stops=%s\", area, train.stops)\n        new_stop = await train.get_stop(session)\n        say.nearby(tools.area_of(this), \"the train just left\")\n        await train.leave_station(session, new_stop)\n        await post.future(this, time() + 5, Arrive())\n\n        interior = await train.get_interior(session)\n        say.nearby(interior, \"the train has left the station, hold on!\")\n\n@ds.received(Arrive)\nasync def arrive(this, ev, say, session, post):\n    area = tools.area_of(this)\n    with this.make(Train) as train:\n        log.info(\"move-train: area=%s stops=%s\", area, train.stops)\n        await train.arrive_station(session)\n        arrived_at = tools.area_of(this)\n        say.nearby(arrived_at, \"the train just arrived\")\n        interior = await train.get_interior(session)\n        say.nearby(interior, \"the train has arrived at {0}, get out\".format(arrived_at.props.described))\n\n@ds.hooks.enter.hook\ndef only_when_doors_open(resume, person, area):\n    log.info(\"only-when-doors-open: %s\", person)\n    return resume(person, area)\n",
+                            "python": "\nfrom library.trains import *\n\nds.behaviors([ TrainBehavior() ])\n\nNone\n",
                             "executable": true,
-                            "logs": []
+                            "logs": [
+                                {
+                                    "context": {},
+                                    "logs": [],
+                                    "exceptions": null,
+                                    "success": true,
+                                    "time": 1569369600.0,
+                                    "elapsed": 0.0
+                                }
+                            ]
                         }
                     }
                 }
@@ -1215,9 +1223,18 @@
                     "py/object": "model.entity.Entity",
                     "key": 12,
                     "klass": "AreaClass",
-                    "name": "Train Car"
+                    "name": "Train Interior"
                 },
                 "unavailable": null
+            },
+            "train": {
+                "stops": [
+                    4,
+                    10
+                ],
+                "door": 14,
+                "interior": 12,
+                "leaving": false
             },
             "location": {
                 "acls": {
@@ -1238,6 +1255,19 @@
                     "klass": "AreaClass",
                     "name": "Living room"
                 }
+            },
+            "carryable": {
+                "kind": {
+                    "py/object": "model.kinds.Kind",
+                    "identity": {
+                        "py/object": "model.crypto.Identity",
+                        "public": 18,
+                        "signature": 18,
+                        "private": 18
+                    }
+                },
+                "quantity": 1,
+                "loose": false
             }
         },
         "klass": {
@@ -1245,11 +1275,11 @@
         },
         "identity": {
             "py/object": "model.crypto.Identity",
-            "public": 13,
-            "signature": 13,
-            "private": 13
+            "public": 15,
+            "signature": 15,
+            "private": 15
         },
-        "key": 14,
+        "key": 16,
         "props": {
             "py/object": "model.properties.Common",
             "map": {
@@ -1271,7 +1301,7 @@
                 },
                 "name": {
                     "py/object": "model.properties.Property",
-                    "value": "Purple Line Train",
+                    "value": "Metro Train",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1287,7 +1317,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "a Purple Line Train (#5)",
+                    "value": "a Metro Train (#5)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1303,7 +1333,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Purple Line Train",
+                    "value": "Metro Train",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1478,7 +1508,7 @@
                     "py/object": "model.entity.Entity",
                     "key": 12,
                     "klass": "AreaClass",
-                    "name": "Train Car"
+                    "name": "Train Interior"
                 }
             }
         },
@@ -1487,11 +1517,11 @@
         },
         "identity": {
             "py/object": "model.crypto.Identity",
-            "public": 15,
-            "signature": 15,
-            "private": 15
+            "public": 13,
+            "signature": 13,
+            "private": 13
         },
-        "key": 16,
+        "key": 14,
         "props": {
             "py/object": "model.properties.Common",
             "map": {
@@ -1513,7 +1543,7 @@
                 },
                 "name": {
                     "py/object": "model.properties.Property",
-                    "value": "Train Door",
+                    "value": "Train Platform",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1529,7 +1559,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "a Train Door (#6)",
+                    "value": "a Train Platform (#6)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1545,7 +1575,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Train Door",
+                    "value": "Train Platform",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1658,7 +1688,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 1
+            "i": 2
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1703,16 +1733,23 @@
                 "holding": [
                     {
                         "py/object": "model.entity.Entity",
-                        "key": 16,
+                        "key": 14,
                         "klass": "ExitClass",
-                        "name": "Train Door"
+                        "name": "Train Platform"
                     }
                 ],
                 "capacity": null,
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [],
+                "occupied": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 6,
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    }
+                ],
                 "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
@@ -1759,7 +1796,7 @@
                 },
                 "name": {
                     "py/object": "model.properties.Property",
-                    "value": "Train Car",
+                    "value": "Train Interior",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1775,7 +1812,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "Train Car (#7)",
+                    "value": "Train Interior (#7)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1791,7 +1828,7 @@
                 },
                 "desc": {
                     "py/object": "model.properties.Property",
-                    "value": "Train Car",
+                    "value": "Train Interior",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

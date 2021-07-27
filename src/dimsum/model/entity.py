@@ -290,15 +290,19 @@ class Entity:
 
         self.props: Common = props
 
-        if create_scopes:
-            for scope in create_scopes:
-                args = {}
-                if initialize and scope in initialize:
-                    args = initialize[scope]
+        def get_scope_classes():
+            return (create_scopes if create_scopes else []) + (
+                list(initialize.keys()) if initialize else []
+            )
 
-                self._log().debug("scope %s %s %s", scope, kwargs, args)
-                with self.make(scope, **args) as change:
-                    pass
+        for scope in get_scope_classes():
+            args = {}
+            if initialize and scope in initialize:
+                args = initialize[scope]
+
+            self._log().debug("scope %s %s %s", scope, kwargs, args)
+            with self.make(scope, **args) as change:
+                pass
 
         self.acls = acls if acls else Acls.owner_writes()
 

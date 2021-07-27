@@ -340,11 +340,14 @@ class Session(MaterializeAndCreate):
         self.register(self.world)
         return self.world
 
+    def ctx(self, **kwargs) -> "WorldCtx":  # TODO narrow, wide b/c of __enter__
+        return WorldCtx(session=self, calls_saver=self.calls_saver, **kwargs)
+
     async def execute(self, person: Entity, command: str):
         assert self.world
         log.info("executing: '%s'", command)
 
-        with WorldCtx(session=self, person=person, calls_saver=self.calls_saver) as ctx:
+        with self.ctx(person=person) as ctx:
             contributing = tools.get_contributing_entities(self.world, person)
             async with dynamic.Behavior(self.calls_saver(self), contributing) as db:
                 log.info("hooks: %s", db.dynamic_hooks)
@@ -375,9 +378,7 @@ class Session(MaterializeAndCreate):
 
         area = await find_entity_area_maybe(person) if person else None
 
-        with WorldCtx(
-            session=self, person=person, calls_saver=self.calls_saver, **kwargs
-        ) as ctx:
+        with self.ctx(person=person, **kwargs) as ctx:
             try:
                 reply = await action.perform(
                     world=world,
@@ -399,11 +400,7 @@ class Session(MaterializeAndCreate):
         with entity.make(behavior.Behaviors) as behave:
             if behave.get_default():
                 log.info("notifying: %s", entity)
-                with WorldCtx(
-                    session=self,
-                    calls_saver=self.calls_saver,
-                    entity=entity,
-                ) as ctx:
+                with self.ctx(entity=entity) as ctx:
                     await ctx.notify(
                         ev, area=tools.area_of(entity), post=await ctx.post(), **kwargs
                     )
@@ -414,8 +411,8 @@ class Session(MaterializeAndCreate):
 
         log.info("service now=%s", now)
         if scheduled:
-            log.info("scheduled: %s", scheduled)
-            if isinstance(scheduled, WhenCron):
+            log.info("handling: %s", scheduled)
+            if isinstance(scheduled, WhenCron):  # TODO remove
                 for cron in scheduled.crons:
                     event = dynamic.CronEvent(cron.entity_key, cron.spec)
                     await self._notify_entity(event.entity_key, event)
@@ -439,11 +436,7 @@ class Session(MaterializeAndCreate):
                 )  # NOTE refresh intentionally False
                 with entity.make(behavior.Behaviors) as behave:
                     if behave.get_default():
-                        with WorldCtx(
-                            session=self,
-                            calls_saver=self.calls_saver,
-                            entity=entity,
-                        ) as ctx:
+                        with self.ctx(entity=entity) as ctx:
                             crons = await ctx.find_crons()
                             assert crons is not None
                             return crons
@@ -569,6 +562,11 @@ class Domain:
         self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]
         self.scheduled: Optional[FutureTask] = None
+
+    def pop_scheduled(self):
+        scheduled = self.scheduled
+        self.scheduled = None
+        return scheduled
 
     def session(self) -> "Session":
         log.info("session:new")

@@ -66,13 +66,13 @@ async def test_inbox_schedule_local_dynamic(snapshot):
 class PingMessage(PostMessage):
     value: str
 
-@language('start: "swing"')
+@ds.language('start: "swing"')
 async def swing(this, person, post):
     log.info("swing: %s", this)
     await post.future(this, time() + 5, PingMessage("ping#1"))
     return "whoa, careful there!"
 
-@received(PingMessage)
+@ds.received(PingMessage)
 async def ping(this, ev):
     log.info("pong: %s", ev.value)
     log.info("pong: %s", this)

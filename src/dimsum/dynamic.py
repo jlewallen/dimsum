@@ -58,6 +58,60 @@ active_behavior: contextvars.ContextVar = contextvars.ContextVar(
 )
 
 
+class LibraryBehavior:
+    @abc.abstractmethod
+    async def create(self, ds: "Dynsum"):
+        raise NotImplementedError
+
+
+class Dynsum:
+    @abc.abstractmethod
+    def language(self, prose: str, condition=None):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def cron(self, spec: str):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def received(self, hook: Union[type, str], condition=None):
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def hooks(self) -> All:
+        return All()
+
+    @abc.abstractmethod
+    def behaviors(self, behaviors: List[LibraryBehavior]):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def evaluators(self, evaluators: List[grammars.CommandEvaluator]):
+        raise NotImplementedError
+
+
+class NoopDynsum(Dynsum):
+    def language(self, prose: str, condition=None):
+        pass
+
+    def cron(self, spec: str):
+        pass
+
+    def received(self, hook: Union[type, str], condition=None):
+        pass
+
+    def behaviors(self, behaviors: List[LibraryBehavior]):
+        pass
+
+    def evaluators(self, evaluators: List[grammars.CommandEvaluator]):
+        pass
+
+    @property
+    def hooks(self) -> All:
+        return All()
+
+
 @dataclasses.dataclass
 class DynamicCall:
     entity_key: str
@@ -210,13 +264,15 @@ class SimplifiedTransformer(transformers.Base):
 
 
 @dataclasses.dataclass
-class Simplified:
+class CompiledEntityBehavior(EntityBehavior, Dynsum):
     entity_key: str
+    entity_hooks: All
     wrapper_factory: Callable = dataclasses.field(repr=False)
-    hooks: "All"
     registered: List[Registered] = dataclasses.field(default_factory=list)
     receives: List[Receive] = dataclasses.field(default_factory=list)
-    crons: List[Cron] = dataclasses.field(default_factory=list)
+    scheduled_crons: List[Cron] = dataclasses.field(default_factory=list)
+    evaluator_override: Optional[grammars.CommandEvaluator] = None
+    declarations: Dict[str, Any] = dataclasses.field(default_factory=dict)
 
     def language(self, prose: str, condition=None):
         def wrap(fn):
@@ -233,7 +289,9 @@ class Simplified:
     def cron(self, spec: str):
         def wrap(fn):
             log.info("cron: '%s' %s", spec, fn)
-            self.crons.append(Cron(self.entity_key, spec, self.wrapper_factory(fn)))
+            self.scheduled_crons.append(
+                Cron(self.entity_key, spec, self.wrapper_factory(fn))
+            )
             return fn
 
         return wrap
@@ -254,11 +312,33 @@ class Simplified:
 
         return wrap
 
+    @property
+    def hooks(self) -> All:
+        return self.entity_hooks
+
+    @property
+    def crons(self) -> List[Cron]:
+        return self.scheduled_crons
+
+    def evaluators(self, evaluators: List[grammars.CommandEvaluator]):
+        self.evaluator_override = grammars.PrioritizedEvaluator(evaluators)
+
+    def behaviors(self, behaviors: List[LibraryBehavior]):
+        for b in behaviors:
+            b.create(self)
+
+    def conditions(self):
+        return dict(
+            Held=functools.partial(Held, self.entity_key),
+            Ground=functools.partial(Ground, self.entity_key),
+        )
+
     async def evaluate(
         self,
         command: str,
         world: Optional[World] = None,
         person: Optional[Entity] = None,
+        **kwargs,
     ) -> Optional[Action]:
         assert person
 
@@ -289,14 +369,37 @@ class Simplified:
             if action:
                 return action
 
+        if self.evaluator_override is not None:
+            action = await self.evaluator_override.evaluate(
+                command, world=world, person=person, **kwargs
+            )
+            if action:
+                return action
+            return Unknown()
+
         return None
+
+    def _get_declared_classes(self):
+        return [
+            value for value in self.declarations.values() if isinstance(value, type)
+        ]
 
     async def notify(self, ev: Event, **kwargs):
         entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
 
-        if isinstance(ev, CronEvent):
-            for cron in self.crons:
+        if isinstance(ev, DynamicPostMessage):
+            log.debug("notify: %s", ev)
+            log.debug("notify: %s", self.declarations)
+            log.info("notify: %s", self._get_declared_classes())
+            unpickler = jsonpickle.unpickler.Unpickler()
+            decoded = unpickler.restore(
+                ev.message, reset=True, classes=list(self._get_declared_classes())
+            )
+            log.info("notify: %s", decoded)
+            return await self.notify(decoded, **kwargs)
+        elif isinstance(ev, CronEvent):
+            for cron in self.scheduled_crons:
                 if ev.spec == cron.spec:
                     try:
                         await cron.handler(this=entity, ev=ev, **kwargs)
@@ -328,47 +431,6 @@ class NoopEntityBehavior(EntityBehavior):
         pass
 
 
-@dataclasses.dataclass(frozen=True)
-class CompiledEntityBehavior(EntityBehavior):
-    simplified: Simplified
-    assigned: Optional[grammars.CommandEvaluator]
-    frame: Dict[str, Any] = dataclasses.field(repr=False)
-
-    @property
-    def hooks(self):
-        return self.simplified.hooks
-
-    @property
-    def crons(self) -> List[Cron]:
-        return self.simplified.crons
-
-    async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
-        log.debug("%s evaluate '%s'", self, command)
-        action = await self.simplified.evaluate(command, **kwargs)
-        if action:
-            return action
-        if self.assigned is not None:
-            action = await self.assigned.evaluate(command, **kwargs)
-            if action:
-                return action
-            return Unknown()
-        return None
-
-    async def notify(self, ev: Event, **kwargs):
-        if isinstance(ev, DynamicPostMessage):
-            log.debug("notify: %s", ev)
-            log.debug("notify: %s", self.frame)
-            context = jsonpickle.unpickler.Unpickler()
-            decoded = context.restore(
-                ev.message, reset=True, classes=list(self.frame.values())
-            )
-            log.info("notify: %s", decoded)
-            return await self.simplified.notify(decoded, **kwargs)
-        else:
-            log.debug("notify: %s", ev)
-        return await self.simplified.notify(ev, **kwargs)
-
-
 def _get_default_globals():
     log = get_logger("dimsum.dynamic.user")
     log.setLevel(logging.INFO)  # affects tests, careful
@@ -379,10 +441,9 @@ def _get_default_globals():
     event_classes = {k.__name__: k for k in get_all_events()}
     return dict(
         log=log,
-        log_handler=handler,
         dataclass=dataclasses.dataclass,
-        Common=Common,
         tools=tools,
+        Common=Common,
         Entity=Entity,
         Event=StandardEvent,
         PostMessage=inbox.PostMessage,
@@ -393,6 +454,7 @@ def _get_default_globals():
         ok=Success,
         time=time.time,
         t=imported_typing,
+        log_handler=handler,  # private
         **event_classes,
     )
 
@@ -430,7 +492,7 @@ class CustomizeCallArguments(ArgumentTransformer):
                 return arg
             if args:
                 return args.pop(0)
-            raise DynamicParameterException("'%s'" % (name,))
+            raise DynamicParameterException("'%s' calling '%s'" % (name, fn))
 
         signature = inspect.signature(fn)
         return [_get_arg(p) for p in signature.parameters]
@@ -479,7 +541,7 @@ def log_dynamic_call(
 
 
 @functools.lru_cache
-def _compile(found: EntityAndBehavior) -> EntityBehavior:
+def _compile(found: EntityAndBehavior, compiled_name: str) -> EntityBehavior:
     frame = _get_default_globals()
     started = time.time()
 
@@ -585,43 +647,42 @@ async def __ex(t=thunk):
 
         return sync_thunk
 
-    def create_hooks() -> All:
-        return All(wrapper_factory=wrapper_factory)
-
-    simplified = Simplified(found.key, wrapper_factory, create_hooks())
-    eval_frame = dict(
-        language=simplified.language,
-        received=simplified.received,
-        cron=simplified.cron,
-        hooks=simplified.hooks,
-        Held=functools.partial(Held, found.key),
-        Ground=functools.partial(Ground, found.key),
-    )
-
     try:
-        # Wish we could use ChainMap here.
-        frame.update(eval_frame)
-
-        log.info("compiling %s", found)
-
+        # Start by compiling the code, if this fails we can bail right
+        # away before creating soem of the heavier objects.
+        log.info("compiling %s %s", compiled_name, found)
         tree = ast.parse(found.behavior)
+        compiled = compile(tree, filename=compiled_name, mode="exec")
 
-        # TODO improve filename value using the entity.
-        compiled = compile(tree, filename="<ast>", mode="exec")
+        # This is also assed to the script in the globals as `ds` and
+        # exposes the Dynsum interface.
+        compiled_behavior = CompiledEntityBehavior(
+            entity_key=found.key,
+            wrapper_factory=wrapper_factory,
+            entity_hooks=All(wrapper_factory=wrapper_factory),
+        )
+
+        # Wish we could use ChainMap here, instead update globals with
+        # the wrapper that's used to remember and direct dynamic
+        # calls and with conditonal partials.
+        frame.update(**dict(ds=compiled_behavior))
+
+        # Also provide partial ctors for a few conditions, local to
+        # this entity. This provides Held and Ground, for example.
+        frame.update(**compiled_behavior.conditions())
 
         # We squash any declarations left in locals into our
         # globals so they're available in future calls via a
         # rebinding in our thunk factory above. I'm pretty sure
         # this is the only way to get this to behave.
-        declarations: Dict[str, Any] = {}
-        eval(compiled, frame, declarations)
-        evaluator: Optional[grammars.CommandEvaluator] = None
-        EvaluatorsName = "evaluators"
-        if EvaluatorsName in declarations:
-            evaluator = grammars.PrioritizedEvaluator(declarations[EvaluatorsName])
-            del declarations[EvaluatorsName]
-        frame.update(**declarations)
-        return CompiledEntityBehavior(simplified, evaluator, declarations)
+        eval(compiled, frame, compiled_behavior.declarations)
+
+        # Merge local declarations into global frame. This will be all
+        # the useful classes and globals the user's module defines.
+        frame.update(**compiled_behavior.declarations)
+
+        # Return compiled behavior, declarations is used for deserializing.
+        return compiled_behavior
     except:
         errors_log.exception("dynamic:compile", exc_info=True)
         log_dynamic_call(found, ":compile:", started, frame=frame, exc_info=True)
@@ -652,9 +713,16 @@ class LogDynamicCalls(DynamicCallsListener):
         self._log_calls(calls)
 
 
+class FailedDynamicCallsException(Exception):
+    pass
+
+
 class ErrorOnDynamicCall(DynamicCallsListener):
     def __init__(self, *args):
         super().__init__()
+
+    async def save_dynamic_calls_after_failure(self, calls: List[DynamicCall]):
+        raise FailedDynamicCallsException()
 
 
 @dataclasses.dataclass
@@ -687,7 +755,7 @@ class Behavior:
         self, entity: Entity, found: EntityAndBehavior
     ) -> EntityBehavior:
         started = time.time()
-        return _compile(found)
+        return _compile(found, compiled_name=f"behavior[{entity}]")
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
