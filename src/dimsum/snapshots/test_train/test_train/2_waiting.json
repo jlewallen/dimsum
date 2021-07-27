@@ -1220,7 +1220,8 @@
                     "key": 12,
                     "klass": "AreaClass",
                     "name": "Train Car"
-                }
+                },
+                "unavailable": null
             },
             "location": {
                 "acls": {
@@ -1461,7 +1462,8 @@
                     "key": 4,
                     "klass": "AreaClass",
                     "name": "Living room"
-                }
+                },
+                "unavailable": null
             },
             "location": {
                 "acls": {

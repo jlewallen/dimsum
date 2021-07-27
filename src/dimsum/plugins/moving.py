@@ -68,6 +68,8 @@ class MovingAction(PersonAction):
             )
             if route:
                 routed = route.area
+                if route.unavailable:
+                    return Failure(route.unavailable.reason)
                 destination = routed
 
         if destination is None:

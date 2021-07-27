@@ -1254,7 +1254,8 @@
                     "key": 12,
                     "klass": "AreaClass",
                     "name": "Train Car"
-                }
+                },
+                "unavailable": null
             },
             "location": {
                 "acls": {
@@ -1504,7 +1505,8 @@
                     "key": 10,
                     "klass": "AreaClass",
                     "name": "Wilshire/Western"
-                }
+                },
+                "unavailable": null
             },
             "location": {
                 "acls": {

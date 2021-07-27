@@ -225,3 +225,30 @@ async def test_digging_with_return():
 def add_item(container: Entity, item: Entity):
     with container.make(carryable.Containing) as contain:
         contain.add_item(item)
+
+
+@pytest.mark.asyncio
+async def test_go_adjacent_unavailable():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        another_room = scopes.area(creator=session.world, props=Common("Another Room"))
+
+        exit = scopes.exit(
+            creator=session.world,
+            props=Common("Door"),
+            initialize={
+                movement.Exit: dict(
+                    area=another_room,
+                    unavailable=movement.Unavailable("You seem held to where you are."),
+                )
+            },
+        )
+        await tw.add_item_to_welcome_area(exit, session=session)
+        await session.add_area(another_room)
+        await session.save()
+
+    await tw.failure("go door")

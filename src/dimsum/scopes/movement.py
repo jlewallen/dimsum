@@ -1,4 +1,5 @@
 import enum
+import dataclasses
 from typing import List, Optional, Tuple
 
 from loggers import get_logger
@@ -27,11 +28,24 @@ class Direction(enum.Enum):
         return str(self).split(".")[1]
 
 
+@dataclasses.dataclass
+class Unavailable:
+    """Definitely going with the simplest thing that'll work right
+    now. I'm really curious about how this can be expanded. A key
+    thing to remember is this is just an object creatred when making
+    something unavailable. Reason should always be here."""
+
+    reason: str
+
+
 class AreaRoute:
-    def __init__(self, area: Optional[Entity] = None):
+    def __init__(
+        self, area: Optional[Entity] = None, unavailable: Optional[Unavailable] = None
+    ):
         super().__init__()
         assert area
         self.area = area
+        self.unavailable = unavailable
 
     def satisfies(self, **kwargs) -> bool:
         return False
@@ -88,10 +102,16 @@ class Movement(Scope):
 
 
 class Exit(Scope):
-    def __init__(self, area: Optional[Entity] = None, **kwargs):
+    def __init__(
+        self,
+        area: Optional[Entity] = None,
+        unavailable: Optional[Unavailable] = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self.acls = Acls.owner_writes()
         self.area = area if area else None
+        self.unavailable = unavailable if unavailable else None
 
 
 class FindsRoute:
@@ -112,9 +132,10 @@ class FindNamedRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                new_area = navigable.make(Exit).area
-                assert new_area
-                return AreaRoute(area=new_area)
+                with navigable.make_and_discard(Exit) as exiting:
+                    new_area = exiting.area
+                    assert new_area
+                    return AreaRoute(area=new_area, unavailable=exiting.unavailable)
         return None
 
 
@@ -130,9 +151,11 @@ class FindDirectionalRoute(FindsRoute):
             )
             if navigable:
                 log.debug("navigable={0}".format(navigable))
-                new_area = navigable.make(Exit).area
-                assert new_area
-                return AreaRoute(area=new_area)
+                with navigable.make_and_discard(Exit) as exiting:
+                    new_area = navigable.make(Exit).area
+                    new_area = exiting.area
+                    assert new_area
+                    return AreaRoute(area=new_area, unavailable=exiting.unavailable)
         return None
 
 

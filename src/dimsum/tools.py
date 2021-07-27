@@ -19,6 +19,7 @@ from model import (
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
+import scopes.movement as movement
 import scopes.occupyable as occupyable
 import scopes.behavior as behavior
 import scopes.users as users
@@ -229,3 +230,22 @@ async def move_from_limbo(world: World, moving: Entity, destination: Entity):
 
 def flatten(l):
     return [item for sl in l for item in sl]
+
+
+def set_exit(
+    exit: Entity, area: Optional[Entity] = None, unavailable: Optional[str] = None
+) -> Entity:
+    with exit.make(movement.Exit) as e:
+        if unavailable:
+            # TODO check for reason difference?
+            e.unavailable = movement.Unavailable(reason=unavailable)
+            exit.touch()
+        elif e.unavailable:
+            e.unavailable = None
+            exit.touch()
+
+        if area and area.key != e.area.key:
+            e.area = area
+            exit.touch()
+
+        return e.area

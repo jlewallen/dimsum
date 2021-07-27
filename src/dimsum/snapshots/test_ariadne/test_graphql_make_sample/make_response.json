@@ -2368,7 +2368,8 @@
                                     "key": "35",
                                     "klass": "AreaClass",
                                     "name": "Artist's Loft"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -2630,7 +2631,8 @@
                                     "key": "42",
                                     "klass": "AreaClass",
                                     "name": "Narrow Canyon"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -2892,7 +2894,8 @@
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -3154,7 +3157,8 @@
                                     "key": "174",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -3670,7 +3674,8 @@
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -4179,7 +4184,8 @@
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -4700,7 +4706,8 @@
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -5202,7 +5209,8 @@
                                     "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Dark Cavern"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -5464,7 +5472,8 @@
                                     "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -5980,7 +5989,8 @@
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -6495,7 +6505,8 @@
                                     "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -6744,7 +6755,8 @@
                                     "key": "74",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -7006,7 +7018,8 @@
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -7534,7 +7547,8 @@
                                     "key": "72",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -7783,7 +7797,8 @@
                                     "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -8045,7 +8060,8 @@
                                     "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -8567,7 +8583,8 @@
                                     "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -8816,7 +8833,8 @@
                                     "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -9344,7 +9362,8 @@
                                     "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -9593,7 +9612,8 @@
                                     "key": "84",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -9855,7 +9875,8 @@
                                     "key": "72",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -10389,7 +10410,8 @@
                                     "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -10638,7 +10660,8 @@
                                     "key": "74",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -10900,7 +10923,8 @@
                                     "key": "82",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -11162,7 +11186,8 @@
                                     "key": "70",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -11690,7 +11715,8 @@
                                     "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -11939,7 +11965,8 @@
                                     "key": "80",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -12201,7 +12228,8 @@
                                     "key": "68",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -12723,7 +12751,8 @@
                                     "key": "82",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -12972,7 +13001,8 @@
                                     "key": "74",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -13500,7 +13530,8 @@
                                     "key": "84",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -13749,7 +13780,8 @@
                                     "key": "80",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -14011,7 +14043,8 @@
                                     "key": "76",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -14533,7 +14566,8 @@
                                     "key": "82",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -14782,7 +14816,8 @@
                                     "key": "78",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -15305,7 +15340,8 @@
                                     "key": "176",
                                     "klass": "AreaClass",
                                     "name": "Outside the Bounty"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -15554,7 +15590,8 @@
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -16065,7 +16102,8 @@
                                     "key": "174",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
@@ -16320,7 +16358,8 @@
                                     "key": "189",
                                     "klass": "AreaClass",
                                     "name": "Purple Line Car"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "carryable": {
                                 "kind": {
@@ -16577,7 +16616,8 @@
                                     "key": "174",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
-                                }
+                                },
+                                "unavailable": null
                             },
                             "location": {
                                 "acls": {
