@@ -307,7 +307,7 @@ asdf;
     with tw.domain.session() as session:
         nail = await session.materialize(key=nail_key)
         with nail.make(behavior.Behaviors) as behave:
-            assert len(behave.get_default().logs) == 1
+            assert len(behave.get_default().logs) == 2
 
 
 @pytest.mark.asyncio

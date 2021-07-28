@@ -698,7 +698,7 @@ class WorldCtx(Ctx):
     async def find_crons(self):
         assert self.world
         _notify_log().debug("find-crons: entities=%s", self.entities)
-        async with dynamic.Behavior(dynamic.ErrorOnDynamicCall(), self.entities) as db:
+        async with dynamic.Behavior(self.calls_saver(), self.entities) as db:
             return await db.find_crons()
 
     async def complete(self):

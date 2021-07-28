@@ -502,10 +502,10 @@ def log_dynamic_call(
     found: EntityAndBehavior,
     name: str,
     started: float,
-    frame: Dict[str, Any] = dataclasses.field(default_factory=dict),
-    lokals: Dict[str, Any] = dataclasses.field(default_factory=dict),
-    fnargs: List[Any] = dataclasses.field(default_factory=list),
-    fnkw: Dict[str, Any] = dataclasses.field(default_factory=dict),
+    frame: Optional[Dict[str, Any]] = None,
+    lokals: Optional[Dict[str, Any]] = None,
+    fnargs: Optional[List[Any]] = None,
+    fnkw: Optional[Dict[str, Any]] = None,
     exc_info: Optional[bool] = False,
 ):
     ex: Optional[Dict[str, Any]] = None
@@ -518,7 +518,7 @@ def log_dynamic_call(
         )
 
     finished = time.time()
-    logs = _get_buffered_logs(frame)
+    logs = _get_buffered_logs(frame) if frame else []
     dc = DynamicCall(
         found.key,
         found.behavior_key,
@@ -590,9 +590,9 @@ def __ex(t=thunk):
 
                 try:
                     return lokals["__ex"]()
-                except Exception as e:
+                except:
                     log_dc(exc_info=True)
-                    raise e
+                    raise
 
             value = aexec()
 
@@ -632,9 +632,9 @@ async def __ex(t=thunk):
 
                 try:
                     return await lokals["__ex"]()
-                except Exception as e:
+                except:
                     log_dc(exc_info=True)
-                    raise e
+                    raise
 
             value = await aexec()
 
@@ -652,11 +652,11 @@ async def __ex(t=thunk):
         # away before creating soem of the heavier objects.
         log.info("compiling %s %s", compiled_name, found)
         tree = ast.parse(found.behavior)
-        compiled = compile(tree, filename=compiled_name, mode="exec")
+        evaluating = compile(tree, filename=compiled_name, mode="exec")
 
         # This is also assed to the script in the globals as `ds` and
         # exposes the Dynsum interface.
-        compiled_behavior = CompiledEntityBehavior(
+        compiled = CompiledEntityBehavior(
             entity_key=found.key,
             wrapper_factory=wrapper_factory,
             entity_hooks=All(wrapper_factory=wrapper_factory),
@@ -665,24 +665,24 @@ async def __ex(t=thunk):
         # Wish we could use ChainMap here, instead update globals with
         # the wrapper that's used to remember and direct dynamic
         # calls and with conditonal partials.
-        frame.update(**dict(ds=compiled_behavior))
+        frame.update(**dict(ds=compiled))
 
         # Also provide partial ctors for a few conditions, local to
         # this entity. This provides Held and Ground, for example.
-        frame.update(**compiled_behavior.conditions())
+        frame.update(**compiled.conditions())
 
         # We squash any declarations left in locals into our
         # globals so they're available in future calls via a
         # rebinding in our thunk factory above. I'm pretty sure
         # this is the only way to get this to behave.
-        eval(compiled, frame, compiled_behavior.declarations)
+        eval(evaluating, frame, compiled.declarations)
 
         # Merge local declarations into global frame. This will be all
         # the useful classes and globals the user's module defines.
-        frame.update(**compiled_behavior.declarations)
+        frame.update(**compiled.declarations)
 
         # Return compiled behavior, declarations is used for deserializing.
-        return compiled_behavior
+        return compiled
     except:
         errors_log.exception("dynamic:compile", exc_info=True)
         log_dynamic_call(found, ":compile:", started, frame=frame, exc_info=True)
@@ -711,18 +711,6 @@ class LogDynamicCalls(DynamicCallsListener):
 
     async def save_dynamic_calls_after_failure(self, calls: List[DynamicCall]):
         self._log_calls(calls)
-
-
-class FailedDynamicCallsException(Exception):
-    pass
-
-
-class ErrorOnDynamicCall(DynamicCallsListener):
-    def __init__(self, *args):
-        super().__init__()
-
-    async def save_dynamic_calls_after_failure(self, calls: List[DynamicCall]):
-        raise FailedDynamicCallsException()
 
 
 @dataclasses.dataclass
@@ -755,7 +743,11 @@ class Behavior:
         self, entity: Entity, found: EntityAndBehavior
     ) -> EntityBehavior:
         started = time.time()
-        return _compile(found, compiled_name=f"behavior[{entity}]")
+        try:
+            return _compile(found, compiled_name=f"behavior[{entity}]")
+        except:
+            log_dynamic_call(found, ":compile:", started, exc_info=True)
+            raise
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
@@ -799,14 +791,14 @@ class Behavior:
                 self.previous._record(dc)
         else:
             if type:
-                log.info("exiting: %s %s %s", type, value, traceback)
+                log.info("exiting: '%s' %s listener=%s", type, value, self.listener)
+                if not self.calls:
+                    log.warning("dynamic calls empty (exception)")
             if self.calls:
                 if type:
                     await self.listener.save_dynamic_calls_after_failure(self.calls)
                 else:
                     await self.listener.save_dynamic_calls_after_success(self.calls)
-            else:
-                log.debug("dynamic calls empty")
 
         active_behavior.set(self.previous)
         return False
