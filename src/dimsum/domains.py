@@ -14,7 +14,7 @@ import tools
 import proxying
 import saying
 import serializing
-import storage
+from storage import EntityStorage, SqliteStorage
 from loggers import get_logger
 from bus import EventBus, SubscriptionManager
 from model import (
@@ -192,7 +192,7 @@ class CronTab:
 
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
-    store: storage.EntityStorage
+    store: EntityStorage
     schedule: Callable[[FutureTask], None] = dataclasses.field(repr=False)
     calls_saver: Callable = dataclasses.field(repr=False)
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
@@ -552,12 +552,12 @@ class Session(MaterializeAndCreate):
 class Domain:
     def __init__(
         self,
-        store: Optional[storage.EntityStorage] = None,
+        store: Optional[EntityStorage] = None,
         subscriptions: Optional[SubscriptionManager] = None,
         **kwargs,
     ):
         super().__init__()
-        self.store = store if store else storage.SqliteStorage(":memory:")
+        self.store = store if store else SqliteStorage(":memory:")
         self.subscriptions = subscriptions if subscriptions else SubscriptionManager()
         self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]

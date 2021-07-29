@@ -5,7 +5,7 @@ import jsonpickle
 import wrapt
 from typing import Callable, Dict, List, Optional, Iterable
 
-import storage
+from storage import EntityStorage
 from loggers import get_logger
 from model import (
     Entity,
@@ -17,10 +17,9 @@ from model import (
     EntityRef,
     Permission,
     MissingEntityException,
+    CompiledJson,
 )
 import scopes.movement as movement
-
-from model.entity import CompiledJson
 
 log = get_logger("dimsum")
 
@@ -245,7 +244,7 @@ class Materialized:
 
 async def materialize(
     registrar: Optional[Registrar] = None,
-    store: Optional[storage.EntityStorage] = None,
+    store: Optional[EntityStorage] = None,
     key: Optional[str] = None,
     gid: Optional[int] = None,
     json: Optional[List[Serialized]] = None,
