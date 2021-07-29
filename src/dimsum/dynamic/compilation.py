@@ -5,7 +5,7 @@ import ast
 import jsonpickle
 import sys
 import inspect
-from collections import ChainMap
+from collections import ChainMap, abc
 from typing import List, Dict, Any, Optional, Callable, Union
 
 from loggers import get_logger
@@ -45,16 +45,58 @@ log = get_logger("dimsum.dynamic")
 errors_log = get_logger("dimsum.dynamic.errors")
 
 
+@dataclasses.dataclass
+class Logger:
+    log: Callable
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        if type:
+            self.log(ex=dict(exception=type, value=value, traceback=traceback))
+        else:
+            self.log()
+        return False
+
+
 @functools.lru_cache
 def _compile(sources: DynamicEntitySources, compiled_name: str) -> EntityBehavior:
     frame = _get_default_globals()
     started = time.time()
 
     def load_entity() -> Entity:
+        """
+        Loads the Entity owning the behavior as a parameter, aliased
+        to 'this'. Parameters that are callable end up called as part
+        of the resolution process. See CustomizeCallArguments
+        """
         return context.get().find_by_key(sources.entity_key)
 
-    # TODO dry up?
     def wrapper_factory(fn):
+        """
+        Creates a function call wrapper for functions declared in
+        an Entity's dynamic behavior. This is done to allow for
+        flexible call signatures and so that errors can be logged to
+        the proper place and with debugging context.
+
+        Synchronous and asynchronous functions are both supported, for
+        now. Synchronous is on the chopping block.
+        """
+
+        def create_logger(lokals, fnargs, fnkw) -> Logger:
+            log = functools.partial(
+                log_dynamic_call,
+                sources,
+                fn.__name__,
+                time.time(),
+                frame=frame,
+                lokals=lokals,
+                fnargs=fnargs,
+                fnkw=fnkw,
+            )
+            return Logger(log)
+
         def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
             assert context.get()
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
@@ -65,22 +107,10 @@ def _compile(sources: DynamicEntitySources, compiled_name: str) -> EntityBehavio
 
         def sync_thunk(*args, **kwargs):
             lokals = create_thunk_locals(args, kwargs)
-            log_dc = functools.partial(
-                log_dynamic_call,
-                sources,
-                fn.__name__,
-                time.time(),
-                frame=frame,
-                lokals=lokals,
-                fnargs=args,
-                fnkw=kwargs,
-            )
 
             def aexec():
                 exec(
                     """
-# This seems to be an easy clever trick for capturing the global
-# during the eval into the method?
 def __ex(t=thunk):
     __thunk_ex = None
     try:
@@ -92,37 +122,17 @@ def __ex(t=thunk):
                     frame,
                     lokals,
                 )
+                return lokals["__ex"]()
 
-                try:
-                    return lokals["__ex"]()
-                except:
-                    log_dc(exc_info=True)
-                    raise
-
-            value = aexec()
-
-            log_dc()
-
-            return value
+            with create_logger(lokals, args, kwargs):
+                return aexec()
 
         async def async_thunk(*args, **kwargs):
             lokals = create_thunk_locals(args, kwargs)
-            log_dc = functools.partial(
-                log_dynamic_call,
-                sources,
-                fn.__name__,
-                time.time(),
-                frame=frame,
-                lokals=lokals,
-                fnargs=args,
-                fnkw=kwargs,
-            )
 
             async def aexec():
                 exec(
                     """
-# This seems to be an easy clever trick for capturing the global
-# during the eval into the method?
 async def __ex(t=thunk):
     __thunk_ex = None
     try:
@@ -134,23 +144,12 @@ async def __ex(t=thunk):
                     frame,
                     lokals,
                 )
+                return await lokals["__ex"]()
 
-                try:
-                    return await lokals["__ex"]()
-                except:
-                    log_dc(exc_info=True)
-                    raise
+            with create_logger(lokals, args, kwargs):
+                return await aexec()
 
-            value = await aexec()
-
-            log_dc()
-
-            return value
-
-        if inspect.iscoroutinefunction(fn):
-            return async_thunk
-
-        return sync_thunk
+        return async_thunk if inspect.iscoroutinefunction(fn) else sync_thunk
 
     try:
         # Start by compiling the code, if this fails we can bail right
@@ -225,6 +224,13 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
             self.cron_handlers.append(
                 CronHandler(
                     entity_key=self.entity_key, spec=spec, fn=self.wrapper_factory(fn)
+                )
+            )
+            self.event_handlers.append(
+                EventHandler(
+                    name=spec,
+                    fn=self.wrapper_factory(fn),
+                    condition=AlwaysTrue(),
                 )
             )
             return fn
@@ -313,42 +319,36 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
 
         return None
 
+    @functools.singledispatchmethod
+    async def _notify(self, ev: Event, **kwargs):
+        entity = await context.get().try_materialize_key(self.entity_key)
+        assert entity
+
+        for handler in self.event_handlers:
+            if ev.name == handler.name:
+                await handler.fn(this=entity, ev=ev, **kwargs)
+
+    @_notify.register
+    async def _notify_post_message(self, ev: DynamicPostMessage, **kwargs):
+        log.info("notify: %s %s", ev, self._get_declared_classes())
+        unpickler = jsonpickle.unpickler.Unpickler()
+        decoded = unpickler.restore(
+            ev.message, reset=True, classes=list(self._get_declared_classes())
+        )
+        log.info("notify: %s", decoded)
+        return await self._notify(decoded, **kwargs)
+
+    async def notify(self, ev: Event, **kwargs):
+        try:
+            await self._notify(ev, **kwargs)
+        except:
+            errors_log.exception("notify:exception", exc_info=True)
+            raise
+
     def _get_declared_classes(self):
         return [
             value for value in self.declarations.values() if isinstance(value, type)
         ]
-
-    async def notify(self, ev: Event, **kwargs):
-        entity = await context.get().try_materialize_key(self.entity_key)
-        assert entity
-
-        # TODO remove all this ugly isinstance shit.
-        if isinstance(ev, DynamicPostMessage):
-            log.debug("notify: %s", ev)
-            log.debug("notify: %s", self.declarations)
-            log.info("notify: %s", self._get_declared_classes())
-            unpickler = jsonpickle.unpickler.Unpickler()
-            decoded = unpickler.restore(
-                ev.message, reset=True, classes=list(self._get_declared_classes())
-            )
-            log.info("notify: %s", decoded)
-            return await self.notify(decoded, **kwargs)
-        elif isinstance(ev, CronEvent):
-            for cron in self.cron_handlers:
-                if ev.spec == cron.spec:
-                    try:
-                        await cron.fn(this=entity, ev=ev, **kwargs)
-                    except:
-                        errors_log.exception("notify:exception", exc_info=True)
-                        raise
-        else:
-            for handler in self.event_handlers:
-                if ev.name == handler.name:
-                    try:
-                        await handler.fn(this=entity, ev=ev, **kwargs)
-                    except:
-                        errors_log.exception("notify:exception", exc_info=True)
-                        raise
 
 
 class DynamicParameterException(Exception):
@@ -359,17 +359,24 @@ class DynamicParameterException(Exception):
 class CustomizeCallArguments(ArgumentTransformer):
     extra: Dict[str, Any] = dataclasses.field(default_factory=dict)
 
+    @functools.singledispatchmethod
+    def transform_arg(self, arg: Any):
+        return arg
+
+    @transform_arg.register
+    def transform_post_service(self, arg: inbox.PostService):
+        return DynamicPostService(arg)
+
+    @transform_arg.register
+    def transform_callable(self, arg: abc.Callable):
+        return arg()
+
     def transform(self, fn: Callable, args: List[Any], kwargs: Dict[str, Any]):
         lookup: ChainMap = ChainMap(kwargs, self.extra)
 
         def _get_arg(name: str):
             if name in lookup:
-                arg = lookup[name]
-                if isinstance(arg, inbox.PostService):
-                    return DynamicPostService(arg)
-                if callable(arg):
-                    return arg()
-                return arg
+                return self.transform_arg(lookup[name])
             if args:
                 return args.pop(0)
             raise DynamicParameterException("'%s' calling '%s'" % (name, fn))

@@ -20,6 +20,10 @@ class CronEvent(Event):
     entity_key: str
     spec: str
 
+    @property
+    def name(self) -> str:
+        return self.spec
+
 
 @dataclasses.dataclass(frozen=True)
 class FutureTask:

@@ -320,9 +320,8 @@ class Session(MaterializeAndCreate):
 
         async def _get_crons(key: str):
             try:
-                entity = await self.materialize(
-                    key=key
-                )  # NOTE refresh intentionally False
+                # NOTE refresh intentionally False
+                entity = await self.materialize(key=key)
                 with entity.make(behavior.Behaviors) as behave:
                     if behave.get_default():
                         with self.ctx(entity=entity) as ctx:

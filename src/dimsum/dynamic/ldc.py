@@ -22,8 +22,8 @@ def log_dynamic_call(
     fnargs: Optional[List[Any]] = None,
     fnkw: Optional[Dict[str, Any]] = None,
     exc_info: Optional[bool] = False,
+    ex: Optional[Dict[str, Any]] = None,
 ):
-    ex: Optional[Dict[str, Any]] = None
     if exc_info:
         ex_type, ex_value, tb = sys.exc_info()
         ex = dict(
