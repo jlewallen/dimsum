@@ -1,6 +1,6 @@
 import dataclasses
 import abc
-from typing import List, Callable, Union, Optional
+from typing import List, Callable, Union, Tuple, Optional
 
 from model import Entity, Event, Condition, Action, All, context
 import grammars
@@ -23,6 +23,30 @@ class Cron:
         return CronKey(self.entity_key, self.spec)
 
 
+@dataclasses.dataclass(frozen=True)
+class CronEvent(Event):
+    entity_key: str
+    spec: str
+
+
+@dataclasses.dataclass(frozen=True)
+class BehaviorSources:
+    key: str
+    source: str
+
+
+@dataclasses.dataclass(frozen=True)
+class DynamicEntitySources:
+    entity_key: str
+    behaviors: Tuple[BehaviorSources]
+
+
+class LibraryBehavior:
+    @abc.abstractmethod
+    async def create(self, ds: "Dynsum"):
+        raise NotImplementedError
+
+
 class EntityBehavior(grammars.CommandEvaluator):
     @property
     def hooks(self):
@@ -36,25 +60,12 @@ class EntityBehavior(grammars.CommandEvaluator):
         raise NotImplementedError
 
 
-@dataclasses.dataclass(frozen=True)
-class EntityAndBehavior:
-    key: str
-    behavior_key: str
-    behavior: str
-
-
 class NoopEntityBehavior(EntityBehavior):
     async def evaluate(self, command: str, **kwargs) -> Optional[Action]:
         return None
 
     async def notify(self, ev: Event, **kwargs):
         pass
-
-
-class LibraryBehavior:
-    @abc.abstractmethod
-    async def create(self, ds: "Dynsum"):
-        raise NotImplementedError
 
 
 class Dynsum:
@@ -105,41 +116,15 @@ class NoopDynsum(Dynsum):
         return All()
 
 
-@dataclasses.dataclass
-class Held(Condition):
-    entity_key: str
-
-    def applies(self) -> bool:
-        entity = context.get().find_by_key(self.entity_key)
-        assert entity
-        return tools.in_pockets(entity)
-
-
-@dataclasses.dataclass
-class Ground(Condition):
-    entity_key: str
-
-    def applies(self) -> bool:
-        entity = context.get().find_by_key(self.entity_key)
-        assert entity
-        return tools.on_ground(entity)
-
-
 @dataclasses.dataclass(frozen=True)
-class Registered:
+class LanguageHandler:
     prose: str
-    handler: Callable = dataclasses.field(repr=False)
     condition: Condition
+    fn: Callable = dataclasses.field(repr=False)
 
 
 @dataclasses.dataclass(frozen=True)
-class Receive:
-    hook: str
-    handler: Callable = dataclasses.field(repr=False)
+class EventHandler:
+    name: str
     condition: Condition
-
-
-@dataclasses.dataclass(frozen=True)
-class CronEvent(Event):
-    entity_key: str
-    spec: str
+    fn: Callable = dataclasses.field(repr=False)

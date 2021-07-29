@@ -1,12 +1,10 @@
 import time
 import dataclasses
-import logging
 import functools
 import ast
 import jsonpickle
 import sys
 import inspect
-import typing as imported_typing
 from collections import ChainMap
 from typing import List, Dict, Any, Optional, Callable, Union
 
@@ -14,14 +12,8 @@ from loggers import get_logger
 from model import (
     Entity,
     World,
-    Scope,  # globals
-    StandardEvent,  # globals
     Event,
-    Common,  # globals
-    Success,  # globals
-    Failure,  # globals
     context,
-    get_all_events,  # globals
     All,
     Action,
     Unknown,
@@ -30,76 +22,43 @@ from model import (
 )
 import tools
 import grammars
+import scopes.inbox as inbox
 
 from .core import (
-    EntityAndBehavior,
+    DynamicEntitySources,
     EntityBehavior,
     Dynsum,
     Cron,
-    Held,
-    Ground,
     CronEvent,
     LibraryBehavior,
-    Registered,
-    Receive,
+    LanguageHandler,
+    EventHandler,
 )
 from .calls import DynamicCall
 from .dynpost import DynamicPostService, DynamicPostMessage
 from .language import SimplifiedTransformer
 from .ldc import log_dynamic_call
-
-# TODO globals
-import scopes.behavior as behavior
-import scopes.carryable as carryable
-import scopes.movement as movement
-import scopes.inbox as inbox
+from .conditions import bind_conditions
+from .frames import _get_default_globals
 
 log = get_logger("dimsum.dynamic")
 errors_log = get_logger("dimsum.dynamic.errors")
 
 
-def _get_default_globals():
-    log = get_logger("dimsum.dynamic.user")
-    log.setLevel(logging.INFO)  # affects tests, careful
-    handler = logging.handlers.MemoryHandler(1024, target=logging.NullHandler())
-    log.addHandler(handler)
-
-    # TODO Can we pass an exploded module here?
-    event_classes = {k.__name__: k for k in get_all_events()}
-    return dict(
-        log=log,
-        dataclass=dataclasses.dataclass,
-        tools=tools,
-        Common=Common,
-        Entity=Entity,
-        Event=StandardEvent,
-        PostMessage=inbox.PostMessage,
-        Scope=Scope,
-        Carryable=carryable.Carryable,
-        Exit=movement.Exit,
-        fail=Failure,
-        ok=Success,
-        time=time.time,
-        t=imported_typing,
-        log_handler=handler,  # private
-        **event_classes,
-    )
-
-
 @functools.lru_cache
-def _compile(found: EntityAndBehavior, compiled_name: str) -> EntityBehavior:
+def _compile(sources: DynamicEntitySources, compiled_name: str) -> EntityBehavior:
     frame = _get_default_globals()
     started = time.time()
 
-    def load_found() -> Entity:
-        return context.get().find_by_key(found.key)
+    def load_entity() -> Entity:
+        return context.get().find_by_key(sources.entity_key)
 
     # TODO dry up?
     def wrapper_factory(fn):
         def create_thunk_locals(args, kwargs) -> Dict[str, Any]:
             assert context.get()
             log.info("thunking: args=%s kwargs=%s", args, kwargs)
-            actual_args = CustomizeCallArguments(dict(this=load_found)).transform(
+            actual_args = CustomizeCallArguments(dict(this=load_entity)).transform(
                 fn, list(args), {**kwargs, **dict(ctx=context.get())}
             )
             return dict(thunk=(fn, actual_args, {}))
@@ -108,7 +67,7 @@ def _compile(found: EntityAndBehavior, compiled_name: str) -> EntityBehavior:
             lokals = create_thunk_locals(args, kwargs)
             log_dc = functools.partial(
                 log_dynamic_call,
-                found,
+                sources,
                 fn.__name__,
                 time.time(),
                 frame=frame,
@@ -150,7 +109,7 @@ def __ex(t=thunk):
             lokals = create_thunk_locals(args, kwargs)
             log_dc = functools.partial(
                 log_dynamic_call,
-                found,
+                sources,
                 fn.__name__,
                 time.time(),
                 frame=frame,
@@ -196,14 +155,14 @@ async def __ex(t=thunk):
     try:
         # Start by compiling the code, if this fails we can bail right
         # away before creating soem of the heavier objects.
-        log.info("compiling %s %s", compiled_name, found)
-        tree = ast.parse(found.behavior)
+        log.info("compiling %s %s", compiled_name, sources)
+        tree = ast.parse(sources.behaviors[0].source)
         evaluating = compile(tree, filename=compiled_name, mode="exec")
 
         # This is also assed to the script in the globals as `ds` and
         # exposes the Dynsum interface.
         compiled = CompiledEntityBehavior(
-            entity_key=found.key,
+            entity_key=sources.entity_key,
             wrapper_factory=wrapper_factory,
             entity_hooks=All(wrapper_factory=wrapper_factory),
         )
@@ -231,7 +190,7 @@ async def __ex(t=thunk):
         return compiled
     except:
         errors_log.exception("dynamic:compile", exc_info=True)
-        log_dynamic_call(found, ":compile:", started, frame=frame, exc_info=True)
+        log_dynamic_call(sources, ":compile:", started, frame=frame, exc_info=True)
         raise
 
 
@@ -240,8 +199,8 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
     entity_key: str
     entity_hooks: All
     wrapper_factory: Callable = dataclasses.field(repr=False)
-    registered: List[Registered] = dataclasses.field(default_factory=list)
-    receives: List[Receive] = dataclasses.field(default_factory=list)
+    prose_handlers: List[LanguageHandler] = dataclasses.field(default_factory=list)
+    event_handlers: List[EventHandler] = dataclasses.field(default_factory=list)
     scheduled_crons: List[Cron] = dataclasses.field(default_factory=list)
     evaluator_override: Optional[grammars.CommandEvaluator] = None
     declarations: Dict[str, Any] = dataclasses.field(default_factory=dict)
@@ -249,9 +208,11 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
     def language(self, prose: str, condition=None):
         def wrap(fn):
             log.info("prose: '%s' %s", prose, fn)
-            self.registered.append(
-                Registered(
-                    prose, self.wrapper_factory(fn), condition=condition or AlwaysTrue()
+            self.prose_handlers.append(
+                LanguageHandler(
+                    prose=prose,
+                    fn=self.wrapper_factory(fn),
+                    condition=condition or AlwaysTrue(),
                 )
             )
             return fn
@@ -275,9 +236,11 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
             else:
                 h = hook.__name__
             log.info("hook: '%s' %s", h, fn)
-            self.receives.append(
-                Receive(
-                    h, self.wrapper_factory(fn), condition=condition or AlwaysTrue()
+            self.event_handlers.append(
+                EventHandler(
+                    name=h,
+                    fn=self.wrapper_factory(fn),
+                    condition=condition or AlwaysTrue(),
                 )
             )
             return fn
@@ -300,10 +263,7 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
             b.create(self)
 
     def conditions(self):
-        return dict(
-            Held=functools.partial(Held, self.entity_key),
-            Ground=functools.partial(Ground, self.entity_key),
-        )
+        return bind_conditions(self.entity_key)
 
     async def evaluate(
         self,
@@ -319,7 +279,7 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
 
         log.debug("%s evaluate %s", self, entity)
 
-        for registered in [r for r in self.registered if r.condition.applies()]:
+        for registered in [r for r in self.prose_handlers if r.condition.applies()]:
 
             def transformer_factory(**kwargs):
                 assert world and person and entity
@@ -360,6 +320,7 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
         entity = await context.get().try_materialize_key(self.entity_key)
         assert entity
 
+        # TODO remove all this ugly isinstance shit.
         if isinstance(ev, DynamicPostMessage):
             log.debug("notify: %s", ev)
             log.debug("notify: %s", self.declarations)
@@ -379,10 +340,10 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
                         errors_log.exception("notify:exception", exc_info=True)
                         raise
         else:
-            for receive in self.receives:
-                if ev.name == receive.hook:
+            for handler in self.event_handlers:
+                if ev.name == handler.name:
                     try:
-                        await receive.handler(this=entity, ev=ev, **kwargs)
+                        await handler.fn(this=entity, ev=ev, **kwargs)
                     except:
                         errors_log.exception("notify:exception", exc_info=True)
                         raise

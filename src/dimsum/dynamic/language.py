@@ -15,7 +15,7 @@ from model import (
 from loggers import get_logger
 import transformers
 
-from .core import Registered
+from .core import LanguageHandler
 
 errors_log = get_logger("dimsum.dynamic.errors")
 
@@ -23,7 +23,7 @@ errors_log = get_logger("dimsum.dynamic.errors")
 @dataclasses.dataclass(frozen=True)
 class SimplifiedAction(Action):
     entity: Entity
-    registered: Registered
+    registered: LanguageHandler
     args: List[Any]
 
     def _transform_reply(self, r: Union[Reply, str]) -> Reply:
@@ -50,7 +50,7 @@ class SimplifiedAction(Action):
     ):
         try:
             args = await self._args(world, person, ctx)
-            reply = await self.registered.handler(
+            reply = await self.registered.fn(
                 *args,
                 this=self.entity,
                 person=person,
@@ -61,12 +61,12 @@ class SimplifiedAction(Action):
             return Failure("no reply from handler?")
         except Exception as e:
             errors_log.exception("handler:error", exc_info=True)
-            return DynamicFailure(str(e), str(self.registered.handler))
+            return DynamicFailure(str(e), str(self.registered.fn))
 
 
 @dataclasses.dataclass
 class SimplifiedTransformer(transformers.Base):
-    registered: Registered
+    registered: LanguageHandler
     entity: Entity
 
     def start(self, args):

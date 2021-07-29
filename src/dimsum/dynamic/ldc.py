@@ -5,7 +5,7 @@ import time
 import contextvars
 from typing import List, Dict, Optional, Any
 
-from .core import EntityAndBehavior
+from .core import DynamicEntitySources
 from .calls import DynamicCall
 
 active_behavior: contextvars.ContextVar = contextvars.ContextVar(
@@ -14,7 +14,7 @@ active_behavior: contextvars.ContextVar = contextvars.ContextVar(
 
 
 def log_dynamic_call(
-    found: EntityAndBehavior,
+    sources: DynamicEntitySources,
     name: str,
     started: float,
     frame: Optional[Dict[str, Any]] = None,
@@ -32,11 +32,13 @@ def log_dynamic_call(
             traceback=traceback.format_exc(),
         )
 
+    assert sources.behaviors
+
     finished = time.time()
     logs = _get_buffered_logs(frame) if frame else []
     dc = DynamicCall(
-        found.key,
-        found.behavior_key,
+        sources.entity_key,
+        sources.behaviors[0].key,
         name,
         started,
         finished - started,

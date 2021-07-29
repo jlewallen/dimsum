@@ -9,7 +9,7 @@ import scopes.behavior as behavior
 import grammars
 import tools
 
-from .core import EntityAndBehavior, EntityBehavior, Cron
+from .core import DynamicEntitySources, BehaviorSources, EntityBehavior, Cron
 from .calls import DynamicCall, DynamicCallsListener
 from .dynpost import DynamicPostMessage
 from .compilation import _compile
@@ -25,7 +25,7 @@ class Behavior:
     previous: Optional["Behavior"] = None
     calls: List[DynamicCall] = dataclasses.field(default_factory=list)
 
-    def _get_behaviors(self, e: Entity, c: Entity) -> List[EntityAndBehavior]:
+    def _get_behaviors(self, e: Entity, c: Entity) -> List[DynamicEntitySources]:
         inherited = self._get_behaviors(e, c.parent) if c.parent else []
         with c.make_and_discard(behavior.Behaviors) as behave:
             b = behave.get_default()
@@ -35,30 +35,34 @@ class Behavior:
                 log.warning("unexecutable: %s", ignoring)
 
             return (
-                [EntityAndBehavior(e.key, behavior.DefaultKey, b.python)]
+                [
+                    DynamicEntitySources(
+                        e.key, (BehaviorSources(behavior.DefaultKey, b.python),)
+                    )
+                ]
                 if b and b.executable and b.python
                 else []
             ) + inherited
 
     @functools.cached_property
-    def _behaviors(self) -> Dict[Entity, List[EntityAndBehavior]]:
+    def _behaviors(self) -> Dict[Entity, List[DynamicEntitySources]]:
         return {e: self._get_behaviors(e, e) for e in self.entities.all()}
 
     def _compile_behavior(
-        self, entity: Entity, found: EntityAndBehavior
+        self, entity: Entity, sources: DynamicEntitySources
     ) -> EntityBehavior:
         started = time.time()
         try:
-            return _compile(found, compiled_name=f"behavior[{entity}]")
+            return _compile(sources, compiled_name=f"behavior[{entity}]")
         except:
-            log_dynamic_call(found, ":compile:", started, exc_info=True)
+            log_dynamic_call(sources, ":compile:", started, exc_info=True)
             raise
 
     @functools.cached_property
     def _compiled(self) -> Sequence[EntityBehavior]:
         return flatten(
             [
-                [self._compile_behavior(entity, found) for found in all_for_entity]
+                [self._compile_behavior(entity, sources) for sources in all_for_entity]
                 for entity, all_for_entity in self._behaviors.items()
             ]
         )
