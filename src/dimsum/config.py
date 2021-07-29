@@ -33,9 +33,9 @@ class Persistence:
         if not self.read or not self.write:
             raise ConfigurationException("at least one read and write url is required")
         cache: Dict[str, EntityStorage] = {}
-        read = Prioritized(self.get_stores_from_url(self.read, cache))
-        write = All(self.get_stores_from_url(self.write, cache))
-        return Separated(read, write)
+        read = PrioritizedStorageChain(self.get_stores_from_url(self.read, cache))
+        write = AllStorageChain(self.get_stores_from_url(self.write, cache))
+        return SeparatedStorageChain(read, write)
 
 
 @dataclasses.dataclass

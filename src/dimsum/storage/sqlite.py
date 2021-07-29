@@ -1,16 +1,16 @@
 import dataclasses
+import sqlite3
 import json
 import copy
-import datetime
-import sqlite3
 import shutil
+import datetime
 import os.path
 from typing import Any, Dict, List, Optional, TextIO
-from gql import Client, gql
-from gql.transport.aiohttp import AIOHTTPTransport
 
 from loggers import get_logger
 from model import Entity, CompiledJson, Serialized
+
+from .core import EntityStorage
 
 log = get_logger("dimsum.storage")
 
@@ -40,121 +40,6 @@ class StorageFields:
             return StorageFields(key, gid, version, original, destroyed, cj, saved)
         except KeyError:
             raise Exception("malformed entity: {0}".format(cj.text))
-
-
-class EntityStorage:
-    async def number_of_entities(self) -> int:
-        raise NotImplementedError
-
-    async def update(self, updates: Dict[str, CompiledJson]) -> Dict[str, CompiledJson]:
-        raise NotImplementedError
-
-    async def load_by_gid(self, gid: int) -> List[Serialized]:
-        raise NotImplementedError
-
-    async def load_by_key(self, key: str) -> List[Serialized]:
-        raise NotImplementedError
-
-    async def load_all_keys(self) -> List[str]:
-        raise NotImplementedError
-
-
-class All(EntityStorage):
-    def __init__(self, children: List[EntityStorage]):
-        super().__init__()
-        self.children = children
-
-    async def number_of_entities(self) -> int:
-        return max([await child.number_of_entities() for child in self.children])
-
-    async def update(self, diffs: Dict[str, CompiledJson]):
-        for child in self.children:
-            returning = await child.update(diffs)
-        return returning
-
-    async def load_by_gid(self, gid: int) -> List[Serialized]:
-        for child in self.children:
-            maybe = await child.load_by_gid(gid)
-            if maybe:
-                return maybe
-        return []
-
-    async def load_by_key(self, key: str) -> List[Serialized]:
-        for child in self.children:
-            maybe = await child.load_by_key(key)
-            if maybe:
-                return maybe
-        return []
-
-    async def load_all_keys(self) -> List[str]:
-        return flatten([c.load_all_keys() for c in self.children])
-
-    def __str__(self):
-        return "All<{0}>".format(self.children)
-
-
-class Prioritized(EntityStorage):
-    def __init__(self, children: List[EntityStorage]):
-        super().__init__()
-        self.children = children
-
-    async def number_of_entities(self) -> int:
-        for child in self.children:
-            return await child.number_of_entities()
-        return 0
-
-    async def update(self, diffs: Dict[str, CompiledJson]):
-        for child in self.children:
-            return await child.update(diffs)
-
-    async def load_by_gid(self, gid: int) -> List[Serialized]:
-        for child in self.children:
-            maybe = await child.load_by_gid(gid)
-            if maybe:
-                return maybe
-        return []
-
-    async def load_by_key(self, key: str) -> List[Serialized]:
-        for child in self.children:
-            maybe = await child.load_by_key(key)
-            if maybe:
-                return maybe
-        return []
-
-    async def load_all_keys(self) -> List[str]:
-        for child in self.children:
-            maybe = await child.load_all_keys()
-            if maybe:
-                return maybe
-        return []
-
-    def __str__(self):
-        return "Prioritized<{0}>".format(self.children)
-
-
-class Separated(EntityStorage):
-    def __init__(self, read: EntityStorage, write: EntityStorage):
-        super().__init__()
-        self.read = read
-        self.write = write
-
-    async def number_of_entities(self) -> int:
-        return await self.read.number_of_entities()
-
-    async def update(self, diffs: Dict[str, CompiledJson]):
-        return await self.write.update(diffs)
-
-    async def load_by_gid(self, gid: int) -> List[Serialized]:
-        return await self.read.load_by_gid(gid)
-
-    async def load_by_key(self, key: str) -> List[Serialized]:
-        return await self.read.load_by_key(key)
-
-    async def load_all_keys(self) -> List[str]:
-        return await self.read.load_all_keys()
-
-    def __str__(self):
-        return "Separated<read={0}, write={1}>".format(self.read, self.write)
 
 
 class SqliteStorage(EntityStorage):
@@ -368,81 +253,3 @@ class SqliteStorage(EntityStorage):
 
     def __str__(self):
         return "Sqlite<%s>" % (self.path,)
-
-
-class HttpStorage(EntityStorage):
-    def __init__(self, url: str, token: Optional[str] = None):
-        super().__init__()
-        self.url = url
-        self.token = token
-
-    def _get_headers(self):
-        if self.token:
-            return {"Authorization": "Bearer %s" % (self.token,)}
-        return {}
-
-    def session(self):
-        return Client(
-            transport=AIOHTTPTransport(url=self.url, headers=self._get_headers()),
-            fetch_schema_from_transport=True,
-        )
-
-    async def number_of_entities(self):
-        async with self.session() as session:
-            query = gql("query { size }")
-            response = await session.execute(query)
-            return response["size"]
-
-    async def update(self, updates: Dict[str, CompiledJson]) -> Dict[str, CompiledJson]:
-        async with self.session() as session:
-            query = gql(
-                """
-        mutation Update($entities: [EntityDiff!]!) {
-            update(entities: $entities) {
-                affected { key serialized }
-            }
-        }
-    """
-            )
-            entities = [
-                {"key": key, "serialized": update.text}
-                for key, update in updates.items()
-            ]
-            response = await session.execute(
-                query, variable_values={"entities": entities}
-            )
-
-            affected = response["update"]["affected"]
-            return {row["key"]: row["serialized"] for row in affected}
-
-    async def load_by_gid(self, gid: int):
-        async with self.session() as session:
-            query = gql(
-                "query entityByGid($gid: Int!) { entitiesByGid(gid: $gid) { key serialized } }"
-            )
-            response = await session.execute(query, variable_values={"gid": gid})
-            serialized_entities = response["entitiesByGid"]
-            if len(serialized_entities) == 0:
-                return []
-            return [Serialized(**row) for row in serialized_entities]
-
-    async def load_by_key(self, key: str):
-        async with self.session() as session:
-            query = gql(
-                "query entityByKey($key: Key!) { entitiesByKey(key: $key) { key serialized }}"
-            )
-            response = await session.execute(query, variable_values={"key": key})
-            serialized_entities = response["entitiesByKey"]
-            if len(serialized_entities) == 0:
-                return []
-            return [Serialized(**row) for row in serialized_entities]
-
-    def __repr__(self):
-        return "Http<%s>" % (self.url,)
-
-    def __str__(self):
-        return "Http<%s>" % (self.url,)
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]
