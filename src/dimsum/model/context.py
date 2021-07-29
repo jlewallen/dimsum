@@ -1,6 +1,6 @@
 import abc
 import contextvars
-from typing import Any, Optional, List
+from typing import Any, Optional, List, Literal
 
 from loggers import get_logger
 
@@ -63,6 +63,14 @@ class Ctx(MaterializeAndCreate):
     async def apply_item_finder(
         self, person: Entity, finder, **kwargs
     ) -> Optional[Entity]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def __enter__(self) -> Any:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def __exit__(self, type, value, traceback) -> Literal[False]:
         raise NotImplementedError
 
 

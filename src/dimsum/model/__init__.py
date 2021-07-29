@@ -177,6 +177,7 @@ __all__: List[str] = [
     "Acls",
     "Permission",
     "SecurityContext",
+    "generate_security_check_from_json_diff",
     "find_all_acls",
     "SecurityMappings",
     "CompiledJson",

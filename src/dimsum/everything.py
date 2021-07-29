@@ -13,6 +13,7 @@ from model import (
 )
 
 import tools
+import proxying
 
 import scopes as scopes
 import scopes.behavior as behavior
@@ -35,6 +36,8 @@ import plugins.dining  # noqa
 import plugins.carrying  # noqa
 
 log = get_logger("dimsum")
+
+scopes.set_proxy_factory(proxying.create)  # TODO cleanup
 
 
 def describe_everything(entity: Entity) -> str:

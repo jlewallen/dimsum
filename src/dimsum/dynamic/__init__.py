@@ -18,7 +18,6 @@ from collections import ChainMap
 import grammars
 import transformers
 import saying
-import domains as session  # TODO circular
 import serializing
 import finders
 import tools
