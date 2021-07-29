@@ -7,6 +7,8 @@ from typing import Dict, List, Optional
 import domains
 from model import *
 from loggers import get_logger
+from dynamic import DynamicFailure
+from scheduling import WhenCron
 import scopes.behavior as behavior
 import scopes as scopes
 import test
@@ -612,7 +614,7 @@ async def every_3(this, say):
     assert len(received) == 0
 
     assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert isinstance(tw.domain.scheduled, WhenCron)
     assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
@@ -625,7 +627,7 @@ async def every_3(this, say):
     assert len(received) == 1
 
     assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert isinstance(tw.domain.scheduled, WhenCron)
     assert tw.domain.scheduled.crons[0].spec == "*/5 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
@@ -638,5 +640,5 @@ async def every_3(this, say):
     assert len(received) == 2
 
     assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, domains.WhenCron)
+    assert isinstance(tw.domain.scheduled, WhenCron)
     assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"

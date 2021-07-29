@@ -20,6 +20,7 @@ from model import (
     AlwaysTrue,
     ArgumentTransformer,
 )
+from scheduling import CronKey, CronEvent
 import tools
 import grammars
 import scopes.inbox as inbox
@@ -27,12 +28,11 @@ import scopes.inbox as inbox
 from .core import (
     DynamicEntitySources,
     EntityBehavior,
-    Dynsum,
-    Cron,
-    CronEvent,
     LibraryBehavior,
     LanguageHandler,
     EventHandler,
+    CronHandler,
+    Dynsum,
 )
 from .calls import DynamicCall
 from .dynpost import DynamicPostService, DynamicPostMessage
@@ -201,7 +201,7 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
     wrapper_factory: Callable = dataclasses.field(repr=False)
     prose_handlers: List[LanguageHandler] = dataclasses.field(default_factory=list)
     event_handlers: List[EventHandler] = dataclasses.field(default_factory=list)
-    scheduled_crons: List[Cron] = dataclasses.field(default_factory=list)
+    cron_handlers: List[CronHandler] = dataclasses.field(default_factory=list)
     evaluator_override: Optional[grammars.CommandEvaluator] = None
     declarations: Dict[str, Any] = dataclasses.field(default_factory=dict)
 
@@ -222,8 +222,10 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
     def cron(self, spec: str):
         def wrap(fn):
             log.info("cron: '%s' %s", spec, fn)
-            self.scheduled_crons.append(
-                Cron(self.entity_key, spec, self.wrapper_factory(fn))
+            self.cron_handlers.append(
+                CronHandler(
+                    entity_key=self.entity_key, spec=spec, fn=self.wrapper_factory(fn)
+                )
             )
             return fn
 
@@ -252,8 +254,8 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
         return self.entity_hooks
 
     @property
-    def crons(self) -> List[Cron]:
-        return self.scheduled_crons
+    def crons(self) -> List[CronKey]:
+        return [h.key() for h in self.cron_handlers]
 
     def evaluators(self, evaluators: List[grammars.CommandEvaluator]):
         self.evaluator_override = grammars.PrioritizedEvaluator(evaluators)
@@ -332,10 +334,10 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
             log.info("notify: %s", decoded)
             return await self.notify(decoded, **kwargs)
         elif isinstance(ev, CronEvent):
-            for cron in self.scheduled_crons:
+            for cron in self.cron_handlers:
                 if ev.spec == cron.spec:
                     try:
-                        await cron.handler(this=entity, ev=ev, **kwargs)
+                        await cron.fn(this=entity, ev=ev, **kwargs)
                     except:
                         errors_log.exception("notify:exception", exc_info=True)
                         raise

@@ -10,7 +10,6 @@ from model import (
     ItemFinder,
     Success,
     Failure,
-    DynamicFailure,  # TODO move here?
 )
 from loggers import get_logger
 import transformers
@@ -18,6 +17,12 @@ import transformers
 from .core import LanguageHandler
 
 errors_log = get_logger("dimsum.dynamic.errors")
+
+
+@dataclasses.dataclass
+class DynamicFailure:
+    exception: str
+    handler: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -58,7 +63,7 @@ class SimplifiedAction(Action):
             )
             if reply:
                 return self._transform_reply(reply)
-            return Failure("no reply from handler?")
+            return Failure("No reply from handler?")
         except Exception as e:
             errors_log.exception("handler:error", exc_info=True)
             return DynamicFailure(str(e), str(self.registered.fn))

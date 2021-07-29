@@ -14,11 +14,10 @@ from typing import (
 
 from loggers import get_logger
 from model import Entity, World, Event, Ctx, find_entity_area, cleanup_entity, context
+from scheduling import QueuedTask
 import scopes.inbox as inbox
 import tools
 import saying
-
-from .scheduling import QueuedTask
 
 from dynamic import DynamicCallsListener, Behavior
 

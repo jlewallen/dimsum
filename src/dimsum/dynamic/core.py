@@ -3,30 +3,9 @@ import abc
 from typing import List, Callable, Union, Tuple, Optional
 
 from model import Entity, Event, Condition, Action, All, context
+from scheduling import CronKey
 import grammars
 import tools
-
-
-@dataclasses.dataclass(frozen=True)
-class CronKey:
-    entity_key: str
-    spec: str
-
-
-@dataclasses.dataclass(frozen=True)
-class Cron:
-    entity_key: str
-    spec: str
-    handler: Callable = dataclasses.field(repr=False)
-
-    def key(self) -> CronKey:
-        return CronKey(self.entity_key, self.spec)
-
-
-@dataclasses.dataclass(frozen=True)
-class CronEvent(Event):
-    entity_key: str
-    spec: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -53,7 +32,7 @@ class EntityBehavior(grammars.CommandEvaluator):
         return All()  # empty hooks
 
     @property
-    def crons(self) -> List[Cron]:
+    def crons(self) -> List[CronKey]:
         return []
 
     async def notify(self, ev: Event, **kwargs):
@@ -128,3 +107,13 @@ class EventHandler:
     name: str
     condition: Condition
     fn: Callable = dataclasses.field(repr=False)
+
+
+@dataclasses.dataclass(frozen=True)
+class CronHandler:
+    entity_key: str
+    spec: str
+    fn: Callable = dataclasses.field(repr=False)
+
+    def key(self) -> CronKey:
+        return CronKey(self.entity_key, self.spec)

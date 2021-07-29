@@ -2,9 +2,10 @@ from typing import List, Dict, Any
 
 from model import Entity
 
-from .core import Dynsum, LibraryBehavior, Cron, CronKey, CronEvent
+from .core import Dynsum, LibraryBehavior
 from .calls import DynamicCallsListener, LogDynamicCalls, DynamicCall
 from .behavior import Behavior
+from .language import DynamicFailure
 
 import scopes.behavior as behavior
 
@@ -24,12 +25,10 @@ def log_behavior(entity: Entity, entry: Dict[str, Any], executable=True):
 __all__: List[str] = [
     "Dynsum",
     "LibraryBehavior",
-    "Cron",
-    "CronKey",
-    "CronEvent",
     "DynamicCallsListener",
     "LogDynamicCalls",
     "DynamicCall",  # TODO remove?
     "log_behavior",  # TODO remove
     "Behavior",
+    "DynamicFailure",
 ]

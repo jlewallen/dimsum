@@ -33,12 +33,6 @@ class Unknown(Action):
         return Failure("sorry, i don't understand")
 
 
-@dataclasses.dataclass
-class DynamicFailure:
-    exception: str
-    handler: str
-
-
 @dataclasses.dataclass(frozen=True)
 class SimpleReply(Reply):
     message: Optional[str] = None

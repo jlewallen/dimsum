@@ -44,9 +44,11 @@ from model import (
     ExtendHooks,
     Action,
 )
+from scheduling import FutureTask, WhenCron, CronTab, CronEvent
 from storage import EntityStorage
 from loggers import get_logger
 from bus import EventBus
+
 import scopes.occupyable as occupyable
 import scopes.movement as movement
 import scopes.carryable as carryable
@@ -54,8 +56,6 @@ import scopes.behavior as behavior
 import scopes.inbox as inbox
 import scopes
 import tools
-
-from .scheduling import FutureTask, WhenCron, CronTab
 
 import dynamic
 import grammars
@@ -303,7 +303,7 @@ class Session(MaterializeAndCreate):
             log.info("handling: %s", scheduled)
             if isinstance(scheduled, WhenCron):  # TODO remove
                 for cron in scheduled.crons:
-                    event = dynamic.CronEvent(cron.entity_key, cron.spec)
+                    event = CronEvent(cron.entity_key, cron.spec)
                     await self._notify_entity(event.entity_key, event)
 
         post_service = await inbox.create_post_service(self, self.world)

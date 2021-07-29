@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 
 from model import *
 from loggers import get_logger
-from domains import WhenCron
+from scheduling import WhenCron
 import scopes.movement as movement
 import scopes.carryable as carryable
 import scopes.behavior as behavior

@@ -4,9 +4,21 @@ from datetime import datetime
 from croniter import croniter
 
 from loggers import get_logger
-from dynamic import CronKey, Cron  # TODO move these and scheduling away?
+from model import Event
 
-log = get_logger("dimsum.domains")
+log = get_logger("dimsum.scheduling")
+
+
+@dataclasses.dataclass(frozen=True)
+class CronKey:
+    entity_key: str
+    spec: str
+
+
+@dataclasses.dataclass(frozen=True)
+class CronEvent(Event):
+    entity_key: str
+    spec: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -27,13 +39,13 @@ class QueuedTask(FutureTask):
 
 @dataclasses.dataclass
 class CronTab:
-    crons: List[Cron]
+    crons: List[CronKey]
 
     def get_future_task(self) -> Optional[WhenCron]:
         wc: Optional[WhenCron] = None
         base = datetime.now()
         log.debug("summarize: %s", base)
-        curr: Optional[Tuple[datetime, List[Cron]]] = None
+        curr: Optional[Tuple[datetime, List[CronKey]]] = None
         for cron in self.crons:
             iter = croniter(cron.spec, base)
             when = iter.get_next(datetime)
@@ -43,5 +55,5 @@ class CronTab:
                 curr[1].append(cron)
             log.debug("%s iter=%s curr=%s", cron, when, curr)
         if curr:
-            return WhenCron(curr[0], [c.key() for c in curr[1]])
+            return WhenCron(curr[0], curr[1])
         return None

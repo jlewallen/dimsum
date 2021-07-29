@@ -5,11 +5,12 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 from loggers import get_logger
 from model import Entity, Event, ManagedHooks
+from scheduling import CronKey
 import scopes.behavior as behavior
 import grammars
 import tools
 
-from .core import DynamicEntitySources, BehaviorSources, EntityBehavior, Cron
+from .core import DynamicEntitySources, BehaviorSources, EntityBehavior
 from .calls import DynamicCall, DynamicCallsListener
 from .dynpost import DynamicPostMessage
 from .compilation import _compile
@@ -79,7 +80,7 @@ class Behavior:
     def lazy_evaluator(self) -> grammars.CommandEvaluator:
         return grammars.LazyCommandEvaluator(lambda: self.evaluators)
 
-    async def find_crons(self) -> List[Cron]:
+    async def find_crons(self) -> List[CronKey]:
         return flatten([c.crons for c in self._compiled])
 
     async def notify(self, ev: Event, **kwargs):
