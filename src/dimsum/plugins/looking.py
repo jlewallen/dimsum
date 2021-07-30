@@ -35,14 +35,17 @@ class DetailedObservation(Observation):
         owner = owning.get_owner(self.item.entity)
         creator = self.item.entity.creator
         assert creator
+        parent = self.item.entity.parent
         return {
             "title": self.item.entity.props.described,
             "description": [
                 self.item.entity.props.desc,
                 "\n",
                 f"Key: {self.item.entity.key}",
+                f"{self.item.entity.klass} {self.item.entity.version}",
                 f"Owner: {owner.props.described}",
                 f"Creator: {creator.props.described}",
+                f"Parent: {parent.props.described}" if parent else f"",
             ],
         }
 
