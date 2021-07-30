@@ -2,8 +2,7 @@ import dataclasses
 import abc
 from typing import List, Callable, Union, Tuple, Optional
 
-from model import Entity, Event, Condition, Action, All, context
-from scheduling import CronKey
+from model import Entity, Event, Condition, Action, All, CronKey, context
 import grammars
 import tools
 

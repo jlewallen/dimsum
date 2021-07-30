@@ -1,4 +1,5 @@
 import abc
+import dataclasses
 from typing import List
 
 from model.inflection import infl
@@ -98,7 +99,25 @@ class EntityFactory:
         raise NotImplementedError
 
 
+@dataclasses.dataclass(frozen=True)
+class CronKey:
+    entity_key: str
+    spec: str
+
+
+@dataclasses.dataclass(frozen=True)
+class CronEvent(Event):
+    entity_key: str
+    spec: str
+
+    @property
+    def name(self) -> str:
+        return self.spec
+
+
 __all__: List[str] = [
+    "CronKey",
+    "CronEvent",
     "EntityFactory",
     "Ctx",
     "MaterializeAndCreate",

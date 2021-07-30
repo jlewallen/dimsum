@@ -19,8 +19,9 @@ from model import (
     Unknown,
     AlwaysTrue,
     ArgumentTransformer,
+    CronKey,
+    CronEvent,
 )
-from scheduling import CronKey, CronEvent
 import tools
 import grammars
 import scopes.inbox as inbox
