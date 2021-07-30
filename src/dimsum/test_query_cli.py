@@ -19,7 +19,7 @@ async def test_routing_process_target_query_fail_no_query(snapshot):
     router = routing.Router(
         targets=[
             routing.ProcessTarget(
-                command=["src/dimsum/cli.py", "query", "--database", "test.sqlite3"]
+                command=["src/dimsum/ds.py", "query", "--database", "test.sqlite3"]
             )
         ]
     )
@@ -38,7 +38,7 @@ async def test_routing_process_target_query_entity(snapshot):
     router = routing.Router(
         targets=[
             routing.ProcessTarget(
-                command=["src/dimsum/cli.py", "query", "--database", "test.sqlite3"]
+                command=["src/dimsum/ds.py", "query", "--database", "test.sqlite3"]
             )
         ]
     )

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-env/bin/python3 src/dimsum/cli.py $@
+env/bin/python3 src/dimsum/ds.py $@

@@ -52,8 +52,8 @@ graph:
 	mkdir -p gen
 	for m in *.sqlite3; do                                                     \
 	n=`basename $$m .sqlite3`;                                                 \
-	env/bin/python3 src/dimsum/cli.py export --path $$m | jq . > gen/$$n.json; \
-	env/bin/python3 src/dimsum/cli.py graph --path $$m --output gen/$$n.dot;   \
+	env/bin/python3 src/dimsum/ds.py export --path $$m | jq . > gen/$$n.json;  \
+	env/bin/python3 src/dimsum/ds.py graph --path $$m --output gen/$$n.dot;    \
 	dot -T png gen/$$n.dot > gen/$$n.png;                                      \
 	done
 
