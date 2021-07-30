@@ -955,7 +955,7 @@
                                 "py/object": "model.permissions.Acls",
                                 "rules": []
                             },
-                            "python": "\n@dataclass\nclass PingMessage(PostMessage):\n    value: str\n\n@ds.language('start: \"swing\"')\nasync def swing(this, person, post):\n    log.info(\"swing: %s\", this)\n    await post.future(this, time() + 5, PingMessage(\"ping#1\"))\n    return \"whoa, careful there!\"\n\n@ds.received(PingMessage)\nasync def ping(this, ev):\n    log.info(\"pong: %s\", ev.value)\n    log.info(\"pong: %s\", this)\n    log.info(\"pong: %s\", this.props)\n    log.info(\"pong: %s\", type(this.props))\n    this.props.set('gold', 10)\n",
+                            "python": "\n@dataclass\nclass PingMessage(Event):\n    value: str\n\n@ds.language('start: \"swing\"')\nasync def swing(this, person, post):\n    log.info(\"swing: %s\", this)\n    await post.future(time() + 5, this, PingMessage(\"ping#1\"))\n    return \"whoa, careful there!\"\n\n@ds.received(PingMessage)\nasync def ping(this, ev):\n    log.info(\"pong: %s\", ev.value)\n    log.info(\"pong: %s\", this)\n    log.info(\"pong: %s\", this.props)\n    log.info(\"pong: %s\", type(this.props))\n    this.props.set('gold', 10)\n",
                             "executable": true,
                             "logs": [
                                 {

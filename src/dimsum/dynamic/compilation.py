@@ -20,7 +20,6 @@ from model import (
     AlwaysTrue,
     ArgumentTransformer,
     CronKey,
-    CronEvent,
 )
 import tools
 import grammars
@@ -36,7 +35,7 @@ from .core import (
     Dynsum,
 )
 from .calls import DynamicCall
-from .dynpost import DynamicPostService, DynamicPostMessage
+from .dynpost import DynamicPostService
 from .language import SimplifiedTransformer
 from .ldc import log_dynamic_call
 from .conditions import bind_conditions
@@ -330,11 +329,11 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
                 await handler.fn(this=entity, ev=ev, **kwargs)
 
     @_notify.register
-    async def _notify_post_message(self, ev: DynamicPostMessage, **kwargs):
+    async def _notify_dict(self, ev: dict, **kwargs):
         log.info("notify: %s %s", ev, self._get_declared_classes())
         unpickler = jsonpickle.unpickler.Unpickler()
         decoded = unpickler.restore(
-            ev.message, reset=True, classes=list(self._get_declared_classes())
+            ev, reset=True, classes=list(self._get_declared_classes())
         )
         log.info("notify: %s", decoded)
         return await self._notify(decoded, **kwargs)

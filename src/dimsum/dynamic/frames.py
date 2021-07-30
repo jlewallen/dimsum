@@ -6,6 +6,7 @@ from loggers import get_logger
 from model import (
     Entity,
     Scope,
+    Event,
     StandardEvent,
     Common,
     Success,
@@ -35,8 +36,7 @@ def _get_default_globals():
         tools=tools,
         Common=Common,
         Entity=Entity,
-        Event=StandardEvent,
-        PostMessage=inbox.PostMessage,
+        Event=Event,
         Scope=Scope,
         Carryable=carryable.Carryable,
         Exit=movement.Exit,

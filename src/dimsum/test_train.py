@@ -7,8 +7,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from model import *
+from scheduling import Scheduler
 from loggers import get_logger
-from scheduling import WhenCron
 import scopes.movement as movement
 import scopes.carryable as carryable
 import scopes.behavior as behavior
@@ -56,6 +56,12 @@ async def test_train_factory(snapshot, caplog, deterministic):
 
     assert await tw.success("look")
 
+    with tw.domain.session() as session:
+        await session.prepare()
+        scheduler = Scheduler(session)
+        await scheduler.service(datetime.now())
+        await session.save()
+
     with freezegun.freeze_time() as frozen_datetime:
         snapshot.assert_match(await tw.to_json(), "1_created.json")
 
@@ -63,11 +69,13 @@ async def test_train_factory(snapshot, caplog, deterministic):
 
         snapshot.assert_match(await tw.to_json(), "2_waiting.json")
 
-        scheduled = tw.domain.pop_scheduled()
         with tw.domain.session() as session:
-            scheduled = tw.domain.pop_scheduled()
             await session.prepare()
-            await session.service(datetime.now(), scheduled=scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "3_departed.json")
@@ -78,18 +86,22 @@ async def test_train_factory(snapshot, caplog, deterministic):
 
         await tw.success("go train")
 
-        scheduled = tw.domain.pop_scheduled()
         with tw.domain.session() as session:
-            scheduled = tw.domain.pop_scheduled()
             await session.prepare()
-            await session.service(datetime.now(), scheduled=scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
-        scheduled = tw.domain.pop_scheduled()
         with tw.domain.session() as session:
-            scheduled = tw.domain.pop_scheduled()
             await session.prepare()
-            await session.service(datetime.now(), scheduled=scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
         await tw.success("go platform")

@@ -44,7 +44,6 @@ from model import (
     ExtendHooks,
     Action,
 )
-from scheduling import FutureTask, WhenCron, CronTab, CronEvent
 from storage import EntityStorage
 from loggers import get_logger
 from bus import EventBus
@@ -81,7 +80,6 @@ def default_reach(entity: Entity, depth: int):
 @dataclasses.dataclass
 class Session(MaterializeAndCreate):
     store: EntityStorage
-    schedule: Callable[[FutureTask], None] = dataclasses.field(repr=False)
     calls_saver: Callable = dataclasses.field(repr=False)
     ctx_factory: Callable = dataclasses.field(repr=False)
     handlers: List[Any] = dataclasses.field(default_factory=list, repr=False)
@@ -295,60 +293,6 @@ class Session(MaterializeAndCreate):
                     )
                     await ctx.complete()
 
-    async def service(self, now: datetime, scheduled: Optional[FutureTask] = None):
-        assert self.world
-
-        log.info("service now=%s", now)
-        if scheduled:
-            log.info("handling: %s", scheduled)
-            if isinstance(scheduled, WhenCron):  # TODO remove
-                for cron in scheduled.crons:
-                    event = CronEvent(cron.entity_key, cron.spec)
-                    await self._notify_entity(event.entity_key, event)
-
-        post_service = await inbox.create_post_service(self, self.world)
-        queued = await post_service.service(now)
-        for qm in queued:
-            try:
-                await self._notify_entity(qm.entity_key, qm.message)
-            except MissingEntityException as e:
-                log.exception("missing entity", exc_info=True)
-
-        log.info("service loading crons")
-
-        removing: List[str] = []
-
-        async def _get_crons(key: str):
-            try:
-                # NOTE refresh intentionally False
-                entity = await self.materialize(key=key)
-                with entity.make(behavior.Behaviors) as behave:
-                    if behave.get_default():
-                        with self.ctx(entity=entity) as ctx:
-                            crons = await ctx.find_crons()
-                            assert crons is not None
-                            return crons
-            except MissingEntityException as e:
-                log.exception("missing entity", exc_info=True)
-                removing.append(key)
-                return []
-
-        with self.world.make(behavior.BehaviorCollection) as servicing:
-            everything = servicing.entities.keys()
-            crons = flatten([await _get_crons(key) for key in everything])
-
-            tab = CronTab(crons)
-            future_task = tab.get_future_task()
-            if future_task:
-                log.info("crons: %s", future_task)
-                self.schedule(future_task)
-            for key in removing:
-                log.warning("removing %s from world behaviors", key)
-                del servicing.entities[key]
-                self.world.touch()
-
-        log.debug("service crons loaded")
-
     async def everywhere(self, ev: Event, **kwargs):
         assert self.world
 
@@ -455,7 +399,3 @@ SecurityException:
 """.format(
             pprint.pformat(self.diff), self.sce, self.entity
         )
-
-
-def flatten(l):
-    return [item for sl in l for item in sl]

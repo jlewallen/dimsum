@@ -467,7 +467,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 3
         },
         "creator": {
             "py/object": "model.world.World",
@@ -492,7 +492,26 @@
                 }
             },
             "post": {
-                "queue": []
+                "queue": [
+                    {
+                        "py/object": "scopes.inbox.QueuedMessage",
+                        "when": {
+                            "py/object": "datetime.datetime",
+                            "__reduce__": [
+                                {
+                                    "py/type": "datetime.datetime"
+                                },
+                                [
+                                    "B+MJGQABBQAAAA=="
+                                ]
+                            ]
+                        },
+                        "entity_key": 16,
+                        "message": {
+                            "py/object": "library.trains.CloseDoors"
+                        }
+                    }
+                ]
             }
         },
         "klass": {
@@ -542,7 +561,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "PostService",
+                    "value": "a PostService (#2)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -590,7 +609,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0,
+                    "value": 1569369660.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
@@ -1165,7 +1184,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 3
         },
         "creator": {
             "py/object": "model.world.World",
@@ -1202,6 +1221,14 @@
                                     "exceptions": null,
                                     "success": true,
                                     "time": 1569369600.0,
+                                    "elapsed": 0.0
+                                },
+                                {
+                                    "context": {},
+                                    "logs": [],
+                                    "exceptions": null,
+                                    "success": true,
+                                    "time": 1569369660.0,
                                     "elapsed": 0.0
                                 }
                             ]
@@ -1368,7 +1395,7 @@
                 },
                 "touched": {
                     "py/object": "model.properties.Property",
-                    "value": 1569369600.0,
+                    "value": 1569369660.0,
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [

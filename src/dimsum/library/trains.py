@@ -20,7 +20,6 @@ from model import (
 from model.events import *
 from dynamic import Dynsum, LibraryBehavior
 
-from scopes.inbox import PostMessage
 from scopes.carryable import Carryable, Containing
 from scopes.behavior import Behaviors
 from scopes.movement import Exit
@@ -36,17 +35,17 @@ fail = Failure
 
 
 @dataclass
-class CloseDoors(PostMessage):
+class CloseDoors(Event):
     pass
 
 
 @dataclass
-class Arrive(PostMessage):
+class Arrive(Event):
     pass
 
 
 @dataclass
-class Depart(PostMessage):
+class Depart(Event):
     pass
 
 
@@ -109,7 +108,7 @@ class TrainBehavior(LibraryBehavior):
                     return
                 interior = await train.get_interior(ctx)
                 say.nearby(interior, f"{this.props.described} doors are closing!")
-            await post.future(this, time() + 5, CloseDoors())
+            await post.future(time() + 5, this, CloseDoors())
 
         @ds.received(CloseDoors)
         async def close_doors(this, ev, say, ctx, post):
@@ -121,7 +120,7 @@ class TrainBehavior(LibraryBehavior):
                     tools.area_of(this), f"{this.props.described} train just left"
                 )
                 await train.leave_station(ctx, new_stop)
-                await post.future(this, time() + 5, Arrive())
+                await post.future(time() + 5, this, Arrive())
 
                 interior = await train.get_interior(ctx)
                 say.nearby(

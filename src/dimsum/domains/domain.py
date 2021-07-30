@@ -5,7 +5,6 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Union
 from loggers import get_logger
 from model import Comms
 from storage import EntityStorage, SqliteStorage
-from scheduling import FutureTask
 from bus import SubscriptionManager
 
 import handlers
@@ -29,41 +28,13 @@ class Domain:
         self.subscriptions = subscriptions if subscriptions else SubscriptionManager()
         self.comms: Comms = self.subscriptions
         self.handlers = [handlers.create(self.subscriptions)]
-        self.scheduled: Optional[FutureTask] = None
-
-    def pop_scheduled(self):
-        scheduled = self.scheduled
-        self.scheduled = None
-        return scheduled
 
     def session(self) -> Session:
         log.info("session:new")
 
-        def schedule(value: FutureTask):
-            logger = get_logger("dimsum.schedule")
-
-            if value and self.scheduled:
-                if (
-                    value.when >= self.scheduled.when
-                    and self.scheduled.when > datetime.now()
-                ):
-                    if value.when == self.scheduled.when:
-                        if value == self.scheduled:
-                            logger.debug(
-                                "ignored(same): %s vs %s", value, self.scheduled
-                            )
-                            return
-                    else:
-                        logger.debug("ignored(later): %s vs %s", value, self.scheduled)
-                        return
-            if self.scheduled != value:
-                logger.info("scheduled: %s", value)
-            self.scheduled = value
-
         return Session(
             store=self.store,
             handlers=self.handlers,
-            schedule=schedule,
             ctx_factory=self.create_ctx,
             calls_saver=self.create_calls_saver,
         )

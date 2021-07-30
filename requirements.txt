@@ -82,6 +82,7 @@ sniffio==1.2.0
 starlette==0.14.2
 stringcase==1.2.0
 toml==0.10.2
+types-croniter==0.1.4
 types-cryptography==3.3.2
 types-enum34==0.1.5
 types-freezegun==0.1.3

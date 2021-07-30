@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 
 import domains
 from model import *
+from scheduling import Scheduler
 from loggers import get_logger
 from dynamic import DynamicFailure
 from scheduling import WhenCron
@@ -103,7 +104,7 @@ async def test_dynamic_smash(caplog):
         "Nail",
         """
 @dataclass(frozen=True)
-class Smashed(Event):
+class Smashed(StandardEvent):
     smasher: Entity
     smashed: Entity
 
@@ -117,7 +118,7 @@ async def smashed(this: Entity, ev: Smashed, say):
         "Hammer",
         """
 @dataclass(frozen=True)
-class Smashed(Event):
+class Smashed(StandardEvent):
     smasher: Entity
     smashed: Entity
 
@@ -145,7 +146,7 @@ async def test_dynamic_maintains_scope(caplog):
         "Nail",
         """
 @dataclass(frozen=True)
-class Smashed(Event):
+class Smashed(StandardEvent):
     shmasher: Entity
     smashed: Entity
 
@@ -169,7 +170,7 @@ async def smashed(this, ev, say):
         "Hammer",
         """
 @dataclass(frozen=True)
-class Smashed(Event):
+class Smashed(StandardEvent):
     smasher: Entity
     smashed: Entity
 
@@ -560,17 +561,18 @@ async def make_noise(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.service(datetime.now())
+        scheduler = Scheduler(session)
+        await scheduler.service(datetime.now())
         await session.save()
 
-    assert tw.domain.scheduled
-
     with freezegun.freeze_time() as frozen_datetime:
-        scheduled = tw.domain.pop_scheduled()
-        frozen_datetime.move_to(scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(datetime.now(), scheduled=scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
     assert len(received) == 1
@@ -608,37 +610,43 @@ async def every_3(this, say):
 
     with tw.domain.session() as session:
         await session.prepare()
-        await session.service(datetime.now())
+        scheduler = Scheduler(session)
+        await scheduler.service(datetime.now())
         await session.save()
 
     assert len(received) == 0
 
-    assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, WhenCron)
-    assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
+    # assert isinstance(tw.domain.scheduled, WhenCron)
+    # assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
-        frozen_datetime.move_to(tw.domain.scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
     assert len(received) == 1
 
-    assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, WhenCron)
-    assert tw.domain.scheduled.crons[0].spec == "*/5 * * * *"
+    # assert tw.domain.scheduled
+    # assert isinstance(tw.domain.scheduled, WhenCron)
+    # assert tw.domain.scheduled.crons[0].spec == "*/5 * * * *"
 
     with freezegun.freeze_time() as frozen_datetime:
-        frozen_datetime.move_to(tw.domain.scheduled.when)
         with tw.domain.session() as session:
             await session.prepare()
-            await session.service(datetime.now(), scheduled=tw.domain.scheduled)
+            scheduler = Scheduler(session)
+            future = await scheduler.peek(datetime.max)
+            assert future
+            frozen_datetime.move_to(future[0].when)
+            await scheduler.service(datetime.now())
             await session.save()
 
     assert len(received) == 2
 
-    assert tw.domain.scheduled
-    assert isinstance(tw.domain.scheduled, WhenCron)
-    assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
+    # assert tw.domain.scheduled
+    # assert isinstance(tw.domain.scheduled, WhenCron)
+    # assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"

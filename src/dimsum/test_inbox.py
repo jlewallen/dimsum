@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from model import *
+from scheduling import Scheduler
 import scopes.behavior as behavior
 import scopes.inbox as inbox
 import scopes as scopes
@@ -14,7 +15,7 @@ from test_utils import *
 
 
 @dataclasses.dataclass
-class PingMessage(inbox.PostMessage):
+class PingMessage(Event):
     """Only used in these tests. Must be top level for easier use with
     jsonpickle below."""
 
@@ -36,17 +37,20 @@ async def test_inbox_schedule_local_service(snapshot):
             post_service = await inbox.create_post_service(session, world)
 
             await post_service.future(
-                hammer, datetime.now() + timedelta(seconds=5), PingMessage()
+                datetime.now() + timedelta(seconds=5), hammer, PingMessage()
             )
 
             await session.save()
 
+        snapshot.assert_match(await tw.to_json(), "world_scheduled.json")
+
         with tw.domain.session() as session:
             world = await session.prepare()
+            scheduler = Scheduler(session)
             with freezegun.freeze_time() as frozen_datetime:
                 for i in range(0, 6):
                     frozen_datetime.tick()
-                    await session.service(datetime.now())
+                    await scheduler.service(datetime.now())
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "world.json")
@@ -63,13 +67,13 @@ async def test_inbox_schedule_local_dynamic(snapshot):
             "Hammer",
             """
 @dataclass
-class PingMessage(PostMessage):
+class PingMessage(Event):
     value: str
 
 @ds.language('start: "swing"')
 async def swing(this, person, post):
     log.info("swing: %s", this)
-    await post.future(this, time() + 5, PingMessage("ping#1"))
+    await post.future(time() + 5, this, PingMessage("ping#1"))
     return "whoa, careful there!"
 
 @ds.received(PingMessage)
@@ -85,14 +89,17 @@ async def ping(this, ev):
         await tw.success("hold Hammer")
         await tw.success("swing")
 
+        snapshot.assert_match(await tw.to_json(), "world_scheduled.json")
+
         with tw.domain.session() as session:
             world = await session.prepare()
+            scheduler = Scheduler(session)
             with freezegun.freeze_time() as frozen_datetime:
                 for i in range(0, 4):
                     frozen_datetime.tick()
-                    await session.service(datetime.now())
+                    await scheduler.service(datetime.now())
                 frozen_datetime.tick()
-                await session.service(datetime.now())
+                await scheduler.service(datetime.now())
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "world.json")

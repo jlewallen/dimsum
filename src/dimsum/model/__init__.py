@@ -105,7 +105,7 @@ class CronKey:
     spec: str
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class CronEvent(Event):
     entity_key: str
     spec: str

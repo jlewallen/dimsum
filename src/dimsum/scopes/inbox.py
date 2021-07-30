@@ -4,6 +4,7 @@ import functools
 import bisect
 import json
 import jsonpickle
+import heapq
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple, Union, Any
 
@@ -23,15 +24,11 @@ import scopes
 log = get_logger("dimsum.scopes")
 
 
-class PostMessage(Event):
-    pass
-
-
 @dataclasses.dataclass
 @functools.total_ordering
 class QueuedMessage:
-    entity_key: str
     when: datetime
+    entity_key: str
     message: str
 
     def _is_valid_operand(self, other):
@@ -47,9 +44,16 @@ class QueuedMessage:
             return NotImplemented
         return self.when < other.when
 
+    @staticmethod
+    def create(when: datetime, entity_key: str, message: Event) -> "QueuedMessage":
+        serialized_message = serializing.serialize(message)
+        assert serialized_message
+        return QueuedMessage(when, entity_key, serialized_message)
 
-@dataclasses.dataclass
+
+@dataclasses.dataclass(frozen=True)
 class DequeuedMessage:
+    when: datetime
     entity_key: str
     message: Any
 
@@ -62,12 +66,30 @@ class Post(Scope):
     def enqueue(self, entity_key: str, when: Union[datetime, float], message: str):
         if isinstance(when, float):
             when = datetime.fromtimestamp(when)
-        qm = QueuedMessage(entity_key, when, message)
+        qm = QueuedMessage(when, entity_key, message)
         bisect.insort(self.queue, qm)
         self.parent.touch()
 
+    def schedule(self, qm: QueuedMessage):
+        if len(self.queue) == 0:
+            bisect.insort(self.queue, qm)
+            self.parent.touch()
+            return True
+
+        for item in self.queue:
+            if item == qm:
+                log.info("schedule(return): %s == %s", item, qm)
+                return
+            if item.when > qm.when:
+                bisect.insort(self.queue, qm)
+                self.parent.touch()
+                return True
+
+        return False
+
     def dequeue(self, now: datetime) -> List[QueuedMessage]:
         if len(self.queue) == 0:
+            log.debug("dequeue empty")
             return []
 
         def _slice(i: int):
@@ -90,24 +112,29 @@ class Post(Scope):
 class PostService:
     entity: Entity
 
-    async def future(self, receiver: Entity, when: datetime, message: PostMessage):
+    async def future(self, when: datetime, receiver: Entity, message: Event):
         with self.entity.make(Post) as post:
             serialized_message = serializing.serialize(message)
             post.enqueue(receiver.key, when, serialized_message)
 
-    async def service(self, now: datetime) -> List[DequeuedMessage]:
+    async def schedule(self, qm: QueuedMessage):
+        with self.entity.make(Post) as post:
+            post.schedule(qm)
+
+    async def service(self, when: datetime) -> List[DequeuedMessage]:
         with self.entity.make(Post) as post:
             return [
-                DequeuedMessage(qm.entity_key, jsonpickle.decode(qm.message))
-                for qm in post.dequeue(now)
+                DequeuedMessage(qm.when, qm.entity_key, jsonpickle.decode(qm.message))
+                for qm in post.dequeue(when)
             ]
 
-    async def peek(self) -> Optional[Tuple[datetime, str, str]]:
+    async def peek(self, when: datetime) -> List[DequeuedMessage]:
+        # We discard here so we can easily just use dequeue and ignore the side effects.
         with self.entity.make_and_discard(Post) as post:
-            if post.queue:
-                first = post.queue[0]
-                return (first.when, first.entity_key, first.message)
-            return None
+            return [
+                DequeuedMessage(qm.when, qm.entity_key, jsonpickle.decode(qm.message))
+                for qm in post.dequeue(when)
+            ]
 
 
 PostServiceKey = "postService"

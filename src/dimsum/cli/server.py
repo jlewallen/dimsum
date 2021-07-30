@@ -4,12 +4,13 @@ import time
 import shortuuid
 import asyncclick as click
 import ariadne.asgi
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
 from loggers import get_logger, get_noise_logger, setup_logging_queue
+from scheduling import Scheduler
 import config
 import domains
 import sshd
@@ -24,54 +25,24 @@ log = get_logger("dimsum.cli")
 
 
 async def servicing(domain: domains.Domain):
-    first = True
+    alarm: Optional[datetime] = None
     while True:
         try:
-            sleeping = 1.0
             try:
                 now = datetime.now()
-                triggered = False
-                if domain.scheduled:
-                    if now >= domain.scheduled.when:
-                        triggered = True
-                    else:
-                        sleeping = min(
-                            1.0, (domain.scheduled.when - now).total_seconds()
-                        )
-                if first or triggered:
+                if alarm is None or now >= alarm:
                     with domain.session() as session:
-                        scheduled = domain.scheduled
-                        domain.scheduled = None
                         await session.prepare()
-                        await session.service(now, scheduled=scheduled)
+                        scheduler = Scheduler(session)
+                        if upcoming := await scheduler.service(now):
+                            alarm = upcoming
+                        else:
+                            alarm = now + timedelta(seconds=60)
+                        log.info("servicing alarm=%s", alarm - now)
                         await session.save()
-                    first = False
-                else:
-                    if domain.scheduled:
-                        get_noise_logger().info(
-                            "servicing: schedule=%s %s",
-                            domain.scheduled,
-                            domain.scheduled.when - now,
-                        )
             except:
                 log.exception("error", exc_info=True)
-            log.debug("sleeping: %s", sleeping)
-            await asyncio.sleep(sleeping)
-        except asyncio.exceptions.CancelledError:
-            return
-
-
-async def ticks(domain: domains.Domain):
-    while True:
-        try:
-            await asyncio.sleep(60)
-            try:
-                with domain.session() as session:
-                    await session.prepare()
-                    await session.service(datetime.now())
-                    await session.save()
-            except:
-                log.exception("error", exc_info=True)
+            await asyncio.sleep(1)
         except asyncio.exceptions.CancelledError:
             return
 
@@ -191,14 +162,10 @@ async def server(
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
-    tick_task = loop.create_task(ticks(domain))
     servicing_task = loop.create_task(servicing(domain))
     await asyncio.gather(sshd_task, gql_task)
-
-    tick_task.cancel()
     servicing_task.cancel()
-
-    await asyncio.gather(tick_task, servicing_task)
+    await asyncio.gather(servicing_task)
 
 
 # with proxy.start(

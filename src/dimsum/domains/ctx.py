@@ -14,7 +14,6 @@ from typing import (
 
 from loggers import get_logger
 from model import Entity, World, Event, Ctx, find_entity_area, cleanup_entity, context
-from scheduling import QueuedTask
 import scopes.inbox as inbox
 import tools
 import saying
@@ -107,6 +106,7 @@ class WorldCtx(Ctx):
             assert self.person
             area = await find_entity_area(self.person)
             a = (self.person, area, []) + args
+            log.warning("PUBLISH: %s %s %s", klass, a, kwargs)
             await self.publish(klass(*a, **kwargs))
 
     async def notify(self, ev: Event, **kwargs):
@@ -122,10 +122,6 @@ class WorldCtx(Ctx):
             return await db.find_crons()
 
     async def complete(self):
-        post = await self.post()
-        pending = await post.peek()
-        if pending:
-            self.session.schedule(QueuedTask(*pending))
         assert self.reference
         await self.say.publish(self.reference)
 

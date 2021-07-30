@@ -11,7 +11,6 @@ import tools
 
 from .core import DynamicEntitySources, BehaviorSources, EntityBehavior
 from .calls import DynamicCall, DynamicCallsListener
-from .dynpost import DynamicPostMessage
 from .compilation import _compile
 from .ldc import log_dynamic_call, active_behavior
 
