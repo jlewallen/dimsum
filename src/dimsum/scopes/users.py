@@ -2,6 +2,7 @@ import base64
 import hashlib
 import os
 import jwt
+from dataclasses import dataclass, field
 from typing import List, Optional, Tuple, Dict
 
 from loggers import get_logger
@@ -12,11 +13,10 @@ log = get_logger("dimsum.scopes")
 invite_session_key = base64.b64encode(os.urandom(32)).decode("utf-8")
 
 
+@dataclass
 class Usernames(Scope):
-    def __init__(self, users: Optional[Dict[str, str]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.system_writes()
-        self.users = users if users else {}
+    acls: Acls = field(default_factory=Acls.system_writes)
+    users: Dict[str, str] = field(default_factory=dict)
 
 
 async def register_username(entity: Entity, username: str, key: str):
@@ -50,11 +50,10 @@ def try_password(secured: Tuple[str, str], password: str) -> bool:
     return actual_key == key
 
 
+@dataclass
 class Auth(Scope):
-    def __init__(self, password: Optional[Tuple[str, str]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.system_writes()
-        self.password = password if password else None
+    acls: Acls = field(default_factory=Acls.system_writes)
+    password: Optional[Tuple[str, str]] = None
 
     def change(self, password: str):
         self.password = secure_password(password)
@@ -74,8 +73,7 @@ class Auth(Scope):
         return url, invite_token
 
 
+@dataclass
 class Groups(Scope):
-    def __init__(self, memberships: Optional[List[str]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.system_writes()
-        self.memberships = memberships if memberships else []
+    acls: Acls = field(default_factory=Acls.system_writes)
+    memberships: List[str] = field(default_factory=list)

@@ -1,5 +1,5 @@
 import copy
-import dataclasses
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Type
 
 import grammars
@@ -15,7 +15,7 @@ from plugins.actions import PersonAction
 log = get_logger("dimsum")
 
 
-@dataclasses.dataclass
+@dataclass
 class Help(Reply):
     body: str
 
@@ -37,11 +37,10 @@ class EncyclopediaClass(scopes.ItemClass):
     pass
 
 
+@dataclass
 class Encyclopedia(Scope):
-    def __init__(self, body: Optional[str] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls: Acls = Acls.owner_writes()
-        self.body: str = body if body else ""
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    body: str = ""
 
 
 class WriteHelp(PersonAction):
@@ -122,7 +121,7 @@ class ReadHelp(PersonAction):
 
 
 @event
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class EditingEntityHelp(StandardEvent):
     entity: Entity
     interactive: bool = True

@@ -565,15 +565,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "6",
-                                        "klass": "LivingClass",
-                                        "name": "Jacob"
-                                    }
-                                ],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -585,7 +576,16 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "6",
+                                        "klass": "LivingClass",
+                                        "name": "Jacob"
+                                    }
+                                ],
+                                "occupancy": 100
                             }
                         },
                         "klass": {

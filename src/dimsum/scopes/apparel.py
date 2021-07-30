@@ -1,12 +1,12 @@
+from dataclasses import dataclass, field
 from typing import List
 
 from model import Entity, Scope
 
 
+@dataclass
 class Apparel(Scope):
-    def __init__(self, wearing=None, **kwargs):
-        super().__init__(**kwargs)
-        self.wearing: List[Entity] = wearing if wearing else []
+    wearing: List[Entity] = field(default_factory=list)
 
     def is_wearing(self, item: Entity) -> bool:
         return item in self.wearing

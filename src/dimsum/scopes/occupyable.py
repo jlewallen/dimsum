@@ -1,4 +1,4 @@
-import dataclasses
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 
 from loggers import get_logger
@@ -9,36 +9,34 @@ log = get_logger("dimsum.scopes")
 
 
 @event
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class LivingEnteredArea(StandardEvent):
     def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} arrived from {self.area}"}
 
 
 @event
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class LivingLeftArea(StandardEvent):
     def render_tree(self) -> Dict[str, Any]:
         return {"text": f"{self.source.props.name} went to {self.area}"}
 
 
+@dataclass
 class Occupying(Scope):
-    def __init__(self, area: Optional[Entity] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.area = area
-        self.acls = Acls.owner_writes()
+    area: Optional[Entity] = None
+    acls: Acls = field(default_factory=Acls.owner_writes)
 
     def update(self, area: Entity):
         self.area = area
         self.ourselves.touch()
 
 
+@dataclass
 class Occupyable(Scope):
-    def __init__(self, occupied=None, **kwargs):
-        super().__init__(**kwargs)
-        self.occupied: List[Entity] = occupied if occupied else []
-        self.occupancy: int = 100
-        self.acls = Acls.owner_writes()
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    occupied: List[Entity] = field(default_factory=list)
+    occupancy: int = 100
 
     def add_living(self, living: Entity) -> Entity:
         assert isinstance(living, Entity)

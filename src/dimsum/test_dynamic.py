@@ -150,10 +150,9 @@ class Smashed(StandardEvent):
     shmasher: Entity
     smashed: Entity
 
+@dataclass
 class Smashes(Scope):
-    def __init__(self, smashes: int = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.smashes = smashes
+    smashes: int = 0
 
     def increase(self):
         self.smashes += 1
@@ -202,10 +201,9 @@ async def test_dynamic_receive_tick(caplog):
     nail_key = await tw.add_behaviored_thing(
         "Nail",
         """
+@dataclass
 class Rusting(Scope):
-    def __init__(self, rust: int = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.rust = rust
+    rust: int = 0
 
     def increase(self):
         self.rust += 1
@@ -239,10 +237,9 @@ async def test_dynamic_receive_drop_hook(caplog):
     nail_key = await tw.add_behaviored_thing(
         "Nail",
         """
+@dataclass
 class Rusting(Scope):
-    def __init__(self, rust: int = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.rust = rust
+    rust: int = 0
 
     def increase(self):
         self.rust += 1

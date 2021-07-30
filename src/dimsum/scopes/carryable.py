@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import (
     Dict,
     List,
@@ -25,22 +26,20 @@ from model import (
 log = get_logger("dimsum.scopes")
 
 
+@dataclass
 class Key(Scope):
-    def __init__(self, patterns: Optional[Dict[str, Identity]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.owner_writes()
-        self.patterns = patterns if patterns else {}
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    patterns: Dict[str, Identity] = field(default_factory=dict)
 
     def has_pattern(self, pattern: Identity):
         return pattern.public in self.patterns
 
 
+@dataclass
 class Lockable(Scope):
-    def __init__(self, pattern: Optional[Identity] = None, locked=None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.owner_writes()
-        self.pattern = pattern if pattern else None
-        self.locked = locked if locked else False
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    pattern: Optional[Identity] = None
+    locked: bool = False
 
     def is_locked(self) -> bool:
         return self.locked
@@ -164,18 +163,13 @@ class Openable(Lockable):
         return False
 
 
+@dataclass
 class Carryable(Scope):
-    def __init__(
-        self,
-        kind: Optional[Kind] = None,
-        quantity: Optional[float] = None,
-        loose: bool = False,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.kind = kind if kind else Kind(identity=generate_entity_identity())
-        self.quantity = quantity if quantity else 1
-        self.loose = loose
+    kind: Kind = field(
+        default_factory=lambda: Kind(identity=generate_entity_identity())
+    )
+    quantity: float = 1
+    loose: bool = False
 
     def increase_quantity(self, q: float):
         self.quantity += q
@@ -211,11 +205,10 @@ class Producer:
         raise NotImplementedError
 
 
+@dataclass
 class Location(Scope):
-    def __init__(self, container: Optional[Entity] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.owner_writes()
-        self.container = container
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    container: Optional[Entity] = None
 
 
 class Containing(Openable):

@@ -275,15 +275,6 @@
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 6,
-                        "klass": "LivingClass",
-                        "name": "Jacob"
-                    }
-                ],
-                "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -295,7 +286,16 @@
                             ]
                         }
                     ]
-                }
+                },
+                "occupied": [
+                    {
+                        "py/object": "model.entity.Entity",
+                        "key": 6,
+                        "klass": "LivingClass",
+                        "name": "Jacob"
+                    }
+                ],
+                "occupancy": 100
             }
         },
         "klass": {
@@ -1004,8 +1004,6 @@
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [],
-                "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -1017,7 +1015,9 @@
                             ]
                         }
                     ]
-                }
+                },
+                "occupied": [],
+                "occupancy": 100
             }
         },
         "klass": {
@@ -1232,6 +1232,13 @@
                 }
             },
             "exit": {
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 12,
+                    "klass": "AreaClass",
+                    "name": "Train Interior"
+                },
+                "unavailable": null,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -1243,14 +1250,7 @@
                             ]
                         }
                     ]
-                },
-                "area": {
-                    "py/object": "model.entity.Entity",
-                    "key": 12,
-                    "klass": "AreaClass",
-                    "name": "Train Interior"
-                },
-                "unavailable": null
+                }
             },
             "train": {
                 "stops": [
@@ -1496,6 +1496,13 @@
                 }
             },
             "exit": {
+                "area": {
+                    "py/object": "model.entity.Entity",
+                    "key": 4,
+                    "klass": "AreaClass",
+                    "name": "Living room"
+                },
+                "unavailable": null,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -1507,14 +1514,7 @@
                             ]
                         }
                     ]
-                },
-                "area": {
-                    "py/object": "model.entity.Entity",
-                    "key": 4,
-                    "klass": "AreaClass",
-                    "name": "Living room"
-                },
-                "unavailable": null
+                }
             },
             "location": {
                 "acls": {
@@ -1767,8 +1767,6 @@
                 "produces": {}
             },
             "occupyable": {
-                "occupied": [],
-                "occupancy": 100,
                 "acls": {
                     "py/object": "model.permissions.Acls",
                     "rules": [
@@ -1780,7 +1778,9 @@
                             ]
                         }
                     ]
-                }
+                },
+                "occupied": [],
+                "occupancy": 100
             }
         },
         "klass": {

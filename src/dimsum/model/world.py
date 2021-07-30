@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Dict, List, Optional, Sequence, Type, Any
 
 from loggers import get_logger
@@ -16,11 +17,10 @@ WelcomeAreaKey = "welcomeArea"
 log = get_logger("dimsum.model")
 
 
+@dataclasses.dataclass
 class Identifiers(Scope):
-    def __init__(self, gid: int = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.gid = gid
-        self.acls = Acls.everybody_writes()
+    gid: int = 0
+    acls: Acls = dataclasses.field(default_factory=Acls.everybody_writes)
 
 
 def get_current_gid(entity: Entity) -> int:

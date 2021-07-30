@@ -1,5 +1,5 @@
 import enum
-import dataclasses
+from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 from loggers import get_logger
@@ -28,7 +28,7 @@ class Direction(enum.Enum):
         return str(self).split(".")[1]
 
 
-@dataclasses.dataclass
+@dataclass
 class Unavailable:
     """Definitely going with the simplest thing that'll work right
     now. I'm really curious about how this can be expanded. A key
@@ -67,10 +67,9 @@ class DirectionalRoute(AreaRoute):
         return self.direction.exiting
 
 
+@dataclass
 class Movement(Scope):
-    def __init__(self, routes=None, **kwargs):
-        super().__init__(**kwargs)
-        self.routes: List[AreaRoute] = routes if routes else []
+    routes: List[AreaRoute] = field(default_factory=list)
 
     @property
     def available_routes(self) -> List[AreaRoute]:
@@ -101,17 +100,11 @@ class Movement(Scope):
         return areas + [r.area for r in self.routes]
 
 
+@dataclass
 class Exit(Scope):
-    def __init__(
-        self,
-        area: Optional[Entity] = None,
-        unavailable: Optional[Unavailable] = None,
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.acls = Acls.owner_writes()
-        self.area = area if area else None
-        self.unavailable = unavailable if unavailable else None
+    area: Optional[Entity] = None
+    unavailable: Optional[Unavailable] = None
+    acls: Acls = field(default_factory=Acls.owner_writes)
 
 
 class FindsRoute:

@@ -1,6 +1,7 @@
 import abc
 import datetime
 import enum
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from loggers import get_logger
@@ -9,10 +10,9 @@ from model import Entity, Scope, Identity, Worn, Eaten, Drank, Acls
 log = get_logger("dimsum.scopes")
 
 
+@dataclass
 class Interactable(Scope):
-    def __init__(self, interactions: Optional[Dict[str, bool]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.interactions = interactions if interactions else {}
+    interactions: Dict[str, bool] = field(default_factory=dict)
 
     def link_activity(self, name: str, activity=True):
         self.interactions[name] = activity
@@ -87,11 +87,10 @@ class Visible:
         return obs[-1].memorable()
 
 
+@dataclass
 class Visibility(Scope):
-    def __init__(self, visible: Optional[Visible] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.acls = Acls.owner_writes()
-        self.visible: Visible = visible if visible else Visible()
+    acls: Acls = field(default_factory=Acls.owner_writes)
+    visible: Visible = field(default_factory=Visible)
 
     def make_visible(self):
         if self.visible.hidden:
@@ -131,10 +130,9 @@ class Physics:
         self.mass = mass
 
 
+@dataclass
 class Memory(Scope):
-    def __init__(self, memory: Optional[Dict[str, Entity]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.memory = memory if memory else {}
+    memory: Dict[str, Entity] = field(default_factory=dict)
 
     def memorize(self, q: str, thing: Entity):
         self.memory[q] = thing

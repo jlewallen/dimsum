@@ -360,15 +360,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [
-                                    {
-                                        "py/object": "model.entity.Entity",
-                                        "key": "33",
-                                        "klass": "LivingClass",
-                                        "name": "Tomorrow"
-                                    }
-                                ],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -380,7 +371,16 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [
+                                    {
+                                        "py/object": "model.entity.Entity",
+                                        "key": "33",
+                                        "klass": "LivingClass",
+                                        "name": "Tomorrow"
+                                    }
+                                ],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -2351,6 +2351,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "35",
+                                    "klass": "AreaClass",
+                                    "name": "Artist's Loft"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -2362,14 +2369,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "35",
-                                    "klass": "AreaClass",
-                                    "name": "Artist's Loft"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -2614,6 +2614,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "42",
+                                    "klass": "AreaClass",
+                                    "name": "Narrow Canyon"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -2625,14 +2632,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "42",
-                                    "klass": "AreaClass",
-                                    "name": "Narrow Canyon"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -2877,6 +2877,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "49",
+                                    "klass": "AreaClass",
+                                    "name": "A small clearing."
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -2888,14 +2895,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "49",
-                                    "klass": "AreaClass",
-                                    "name": "A small clearing."
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -3140,6 +3140,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "174",
+                                    "klass": "AreaClass",
+                                    "name": "Wilshire/Normandie"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -3151,14 +3158,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "174",
-                                    "klass": "AreaClass",
-                                    "name": "Wilshire/Normandie"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -3432,8 +3432,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -3445,7 +3443,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -3657,6 +3657,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "13",
+                                    "klass": "AreaClass",
+                                    "name": "Town Courtyard"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -3668,14 +3675,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "13",
-                                    "klass": "AreaClass",
-                                    "name": "Town Courtyard"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -3936,8 +3936,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -3949,7 +3947,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             },
                             "weather": {
                                 "wind": {
@@ -4167,6 +4167,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "13",
+                                    "klass": "AreaClass",
+                                    "name": "Town Courtyard"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -4178,14 +4185,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "13",
-                                    "klass": "AreaClass",
-                                    "name": "Town Courtyard"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -4464,8 +4464,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -4477,7 +4475,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -4689,6 +4689,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "13",
+                                    "klass": "AreaClass",
+                                    "name": "Town Courtyard"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -4700,14 +4707,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "13",
-                                    "klass": "AreaClass",
-                                    "name": "Town Courtyard"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -5192,6 +5192,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "60",
+                                    "klass": "AreaClass",
+                                    "name": "Dark Cavern"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -5203,14 +5210,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "60",
-                                    "klass": "AreaClass",
-                                    "name": "Dark Cavern"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -5455,6 +5455,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "68",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -5466,14 +5473,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "68",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -5747,8 +5747,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -5760,7 +5758,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -5972,6 +5972,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "49",
+                                    "klass": "AreaClass",
+                                    "name": "A small clearing."
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -5983,14 +5990,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "49",
-                                    "klass": "AreaClass",
-                                    "name": "A small clearing."
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -6263,8 +6263,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -6276,7 +6274,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -6488,6 +6488,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "70",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -6499,14 +6506,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "70",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -6738,6 +6738,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -6749,14 +6756,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "74",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -7001,6 +7001,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "49",
+                                    "klass": "AreaClass",
+                                    "name": "A small clearing."
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -7012,14 +7019,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "49",
-                                    "klass": "AreaClass",
-                                    "name": "A small clearing."
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -7305,8 +7305,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -7318,7 +7316,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -7530,6 +7530,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "72",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -7541,14 +7548,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "72",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -7780,6 +7780,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "68",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -7791,14 +7798,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "68",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -8043,6 +8043,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -8054,14 +8061,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "76",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -8341,8 +8341,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -8354,7 +8352,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -8566,6 +8566,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "70",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -8577,14 +8584,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "70",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -8816,6 +8816,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "78",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -8827,14 +8834,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "78",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -9120,8 +9120,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -9133,7 +9131,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -9345,6 +9345,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -9356,14 +9363,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "76",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -9595,6 +9595,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "84",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -9606,14 +9613,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "84",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -9858,6 +9858,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "72",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -9869,14 +9876,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "72",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -10168,8 +10168,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -10181,7 +10179,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -10393,6 +10393,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "78",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -10404,14 +10411,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "78",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -10643,6 +10643,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -10654,14 +10661,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "74",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -10906,6 +10906,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -10917,14 +10924,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "82",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -11169,6 +11169,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "70",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -11180,14 +11187,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "70",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -11473,8 +11473,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -11486,7 +11484,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -11698,6 +11698,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -11709,14 +11716,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "76",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -11948,6 +11948,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "80",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -11959,14 +11966,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "80",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -12211,6 +12211,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "68",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 0 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -12222,14 +12229,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "68",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 0 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -12509,8 +12509,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -12522,7 +12520,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -12734,6 +12734,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -12745,14 +12752,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "82",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -12984,6 +12984,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "74",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -12995,14 +13002,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "74",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -13288,8 +13288,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -13301,7 +13299,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -13513,6 +13513,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "84",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -13524,14 +13531,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "84",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -13763,6 +13763,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "80",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 0"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -13774,14 +13781,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "80",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 0"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -14026,6 +14026,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "76",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -14037,14 +14044,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "76",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -14324,8 +14324,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -14337,7 +14335,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -14549,6 +14549,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "82",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 2 x 1"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -14560,14 +14567,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "82",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 2 x 1"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -14799,6 +14799,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "78",
+                                    "klass": "AreaClass",
+                                    "name": "Grid Room 1 x 2"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -14810,14 +14817,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "78",
-                                    "klass": "AreaClass",
-                                    "name": "Grid Room 1 x 2"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -15098,8 +15098,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -15111,7 +15109,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -15323,6 +15323,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "176",
+                                    "klass": "AreaClass",
+                                    "name": "Outside the Bounty"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -15334,14 +15341,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "176",
-                                    "klass": "AreaClass",
-                                    "name": "Outside the Bounty"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -15573,6 +15573,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "13",
+                                    "klass": "AreaClass",
+                                    "name": "Town Courtyard"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -15584,14 +15591,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "13",
-                                    "klass": "AreaClass",
-                                    "name": "Town Courtyard"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "carryable": {
                                 "kind": {
@@ -15860,8 +15860,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -15873,7 +15871,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {
@@ -16085,6 +16085,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "174",
+                                    "klass": "AreaClass",
+                                    "name": "Wilshire/Normandie"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -16096,14 +16103,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "174",
-                                    "klass": "AreaClass",
-                                    "name": "Wilshire/Normandie"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -16341,6 +16341,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "189",
+                                    "klass": "AreaClass",
+                                    "name": "Purple Line Car"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -16352,14 +16359,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "189",
-                                    "klass": "AreaClass",
-                                    "name": "Purple Line Car"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "train": {
                                 "stops": [
@@ -16608,6 +16608,13 @@
                                 }
                             },
                             "exit": {
+                                "area": {
+                                    "py/object": "model.entity.Entity",
+                                    "key": "174",
+                                    "klass": "AreaClass",
+                                    "name": "Wilshire/Normandie"
+                                },
+                                "unavailable": null,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -16619,14 +16626,7 @@
                                             ]
                                         }
                                     ]
-                                },
-                                "area": {
-                                    "py/object": "model.entity.Entity",
-                                    "key": "174",
-                                    "klass": "AreaClass",
-                                    "name": "Wilshire/Normandie"
-                                },
-                                "unavailable": null
+                                }
                             },
                             "location": {
                                 "acls": {
@@ -16882,8 +16882,6 @@
                                 "produces": {}
                             },
                             "occupyable": {
-                                "occupied": [],
-                                "occupancy": 100,
                                 "acls": {
                                     "py/object": "model.permissions.Acls",
                                     "rules": [
@@ -16895,7 +16893,9 @@
                                             ]
                                         }
                                     ]
-                                }
+                                },
+                                "occupied": [],
+                                "occupancy": 100
                             }
                         },
                         "klass": {

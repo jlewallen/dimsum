@@ -1,3 +1,4 @@
+import dataclasses
 import pytest
 from typing import Optional, List
 
@@ -6,25 +7,22 @@ from model import *
 import scopes.ownership as ownership
 
 
+@dataclasses.dataclass
 class SimpleCore(Scope):
-    def __init__(self, name: Optional[str] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.name = name
+    name: Optional[str] = None
 
 
+@dataclasses.dataclass
 class SimpleHolding(Scope):
-    def __init__(self, holding=None, **kwargs):
-        super().__init__(**kwargs)
-        self.holding = holding if holding else []
+    holding: List[Entity] = dataclasses.field(default_factory=list)
 
     def add_item(self, entity: Entity):
         self.holding.append(entity)
 
 
+@dataclasses.dataclass
 class Remembering(Scope):
-    def __init__(self, entities: Optional[List[Entity]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.entities = entities if entities else []
+    entities: List[Entity] = dataclasses.field(default_factory=list)
 
 
 def remember(world: World, e: Entity):

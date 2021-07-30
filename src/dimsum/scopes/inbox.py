@@ -1,10 +1,10 @@
-import dataclasses
 import time
 import functools
 import bisect
 import json
 import jsonpickle
 import heapq
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple, Union, Any
 
@@ -24,7 +24,7 @@ import scopes
 log = get_logger("dimsum.scopes")
 
 
-@dataclasses.dataclass
+@dataclass
 @functools.total_ordering
 class QueuedMessage:
     when: datetime
@@ -51,17 +51,16 @@ class QueuedMessage:
         return QueuedMessage(when, entity_key, serialized_message)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class DequeuedMessage:
     when: datetime
     entity_key: str
     message: Any
 
 
+@dataclass
 class Post(Scope):
-    def __init__(self, queue: Optional[List[QueuedMessage]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.queue: List[QueuedMessage] = queue if queue else []
+    queue: List[QueuedMessage] = field(default_factory=list)
 
     def enqueue(self, entity_key: str, when: Union[datetime, float], message: str):
         if isinstance(when, float):
@@ -108,7 +107,7 @@ class Post(Scope):
         return _slice(len(self.queue))
 
 
-@dataclasses.dataclass
+@dataclass
 class PostService:
     entity: Entity
 

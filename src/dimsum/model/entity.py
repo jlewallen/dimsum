@@ -211,14 +211,19 @@ class Version:
         return "Version<{0}>".format(self.i)
 
 
+def scope(wrapped=None):
+    log = get_logger("dimsum.model.scopes")
+
+    if wrapped is None:
+        return functools.partial(scope)
+
+    return wrapped
+
+
+@dataclasses.dataclass
 class Scope:
-    def __init__(
-        self, parent: Optional["Entity"] = None, discarding: bool = False, **kwargs
-    ):
-        super().__init__()
-        assert parent
-        self.parent = parent
-        self.discarding = discarding
+    parent: "Entity"
+    discarding: bool = False
 
     @property
     def scope_key(self) -> str:
@@ -409,7 +414,7 @@ class Entity:
 
         self._log().debug("%s splitting scopes: %s %s", self.key, key, chargs)
         try:
-            child = ctor(parent=self, discarding=discarding, **chargs)
+            child = ctor(parent=self, discarding=discarding, **chargs)  # type: ignore
         except:
             self._log().exception(f"error creating scope {ctor}", exc_info=True)
             raise

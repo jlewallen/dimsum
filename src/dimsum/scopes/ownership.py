@@ -1,15 +1,19 @@
+from dataclasses import dataclass, field
 from typing import Optional
 
 from model import Entity, Scope
 
 
+@dataclass
 class Ownership(Scope):
-    def __init__(self, owner: Optional[Entity] = None, **kwargs):
-        super().__init__(**kwargs)
-        default_creator = (
+    owner: Optional[Entity] = None
+
+    def __post_init__(self):
+        if self.owner:
+            return
+        self.owner = (
             self.ourselves.creator if self.ourselves.creator else self.ourselves
         )
-        self.owner = owner if owner else default_creator
 
 
 def get_owner(entity: Entity) -> Entity:

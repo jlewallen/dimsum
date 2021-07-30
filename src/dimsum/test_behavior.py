@@ -28,10 +28,9 @@ async def test_drop_hammer_funny_gold(caplog):
             behave.add_behavior(
                 None,
                 python="""
+@dataclass
 class Bank(Scope):
-    def __init__(self, gold: int = 0, **kwargs):
-        super().__init__(**kwargs)
-        self.gold = gold
+    gold: int = 0
 
 @ds.received(ItemsDropped)
 async def dropped(this, ev, say):

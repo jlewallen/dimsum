@@ -36,6 +36,7 @@ from model.properties import (
 )  # TODO Deprecated
 from model.entity import (
     Scope,
+    scope,
     Entity,
     EntityClass,
     RootEntityClass,
@@ -138,6 +139,7 @@ __all__: List[str] = [
     "EntityClass",
     "RootEntityClass",
     "Scope",
+    "scope",
     "Registrar",
     "World",
     "WorldKey",

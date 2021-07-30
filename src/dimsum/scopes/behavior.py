@@ -1,6 +1,6 @@
 import ast
-import dataclasses
 import functools
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 
 from loggers import get_logger
@@ -10,12 +10,12 @@ DefaultKey = "b:default"
 log = get_logger("dimsum.scopes")
 
 
-@dataclasses.dataclass
+@dataclass
 class Behavior:
-    acls: Acls = dataclasses.field(default_factory=functools.partial(Acls))
+    acls: Acls = field(default_factory=functools.partial(Acls))
     python: Optional[str] = None
     executable: bool = True
-    logs: List[Dict[str, Any]] = dataclasses.field(default_factory=list)
+    logs: List[Dict[str, Any]] = field(default_factory=list)
 
     # TODO remove eventually
     def __post_init__(self):
@@ -46,21 +46,19 @@ class BehaviorMap(Map):
         return self.map.items()
 
 
-@dataclasses.dataclass
+@dataclass
 class BehaviorMeta:
     pass
 
 
+@dataclass
 class BehaviorCollection(Scope):
-    def __init__(self, entities=None, **kwargs):
-        super().__init__(**kwargs)
-        self.entities: Dict[str, List[BehaviorMeta]] = entities if entities else {}
+    entities: Dict[str, List[BehaviorMeta]] = field(default_factory=dict)
 
 
+@dataclass
 class Behaviors(Scope):
-    def __init__(self, behaviors: Optional[BehaviorMap] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.behaviors = behaviors if behaviors else BehaviorMap()
+    behaviors: BehaviorMap = field(default_factory=BehaviorMap)
 
     def get_default(self) -> Optional[Behavior]:
         return self.behaviors.get(DefaultKey)

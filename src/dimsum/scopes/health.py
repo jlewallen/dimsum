@@ -1,4 +1,4 @@
-import dataclasses
+from dataclasses import dataclass, field
 from typing import Optional
 
 from loggers import get_logger
@@ -65,22 +65,18 @@ class Medical:
         self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
 
 
+@dataclass
 class Edible(Scope):
-    def __init__(
-        self, nutrition: Optional[Nutrition] = None, servings: int = 1, **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.nutrition: Nutrition = nutrition if nutrition else Nutrition()
-        self.servings: int = servings
+    nutrition: Nutrition = field(default_factory=Nutrition)
+    servings: int = 1
 
     def modify_servings(self, s: int):
         self.servings = s
 
 
+@dataclass
 class Health(Scope):
-    def __init__(self, medical=None, **kwargs):
-        super().__init__(**kwargs)
-        self.medical = medical if medical else Medical()
+    medical: Medical = field(default_factory=Medical)
 
     async def consume(self, edible: Entity, drink=True, area=None, ctx=None, **kwargs):
         with edible.make(Edible) as eating:
@@ -100,14 +96,14 @@ class Health(Scope):
             await ctx.publish(ItemEaten(living=self.ourselves, area=area, item=edible))
 
 
-@dataclasses.dataclass
+@dataclass
 class ItemEaten(Event):
     living: Entity
     area: Entity
     item: Entity
 
 
-@dataclasses.dataclass
+@dataclass
 class ItemDrank(Event):
     living: Entity
     area: Entity
