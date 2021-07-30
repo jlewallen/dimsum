@@ -58,4 +58,4 @@ if __name__ == "__main__":
     for g in sources:
         for n, c in g.commands.items():
             command_line.add_command(c)
-    command_line()  # type: ignore
+    command_line()
