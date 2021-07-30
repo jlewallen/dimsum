@@ -47,6 +47,9 @@ web: src/web/node_modules src/web/src/config
 wiki:
 	./ds load-wiki --directory docs  --user jlewallen --database world.sqlite3
 
+docs:
+	sphinx-build docs _build
+
 graph:
 	rm -rf gen
 	mkdir -p gen
@@ -70,4 +73,4 @@ container-run:
 	mkdir -p data
 	docker run --rm -it -p 8088:80 -v `pwd`/data:/app/data jlewallen/dimsum --database /app/data/world.sqlite3 --session-key asdfasdf
 
-.PHONY: web prof
+.PHONY: web prof docs
