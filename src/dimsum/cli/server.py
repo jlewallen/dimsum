@@ -154,6 +154,7 @@ async def server(
         await temp.initialize(user, key=lambda username: shortuuid.uuid(name=username))
 
     loop = asyncio.get_event_loop()
+    loop.set_debug(True)
     gql_config = (
         uvicorn.Config(app=app, loop=loop, uds=unix_socket)
         if unix_socket
