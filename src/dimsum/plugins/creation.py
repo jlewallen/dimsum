@@ -76,14 +76,19 @@ class Create(PersonAction):
             props=Common(name=self.name, desc=self.name),
         )
         with person.make(carryable.Containing) as contain:
-            after_hold = contain.hold(created)
-            # We do this after because we may consolidate this Item and
-            # this keeps us from having to unregister the item.
-            ctx.register(after_hold)
+            final_entity = created
+            if self.klass in [scopes.ItemClass, scopes.LivingClass, scopes.ExitClass]:
+                final_entity = contain.hold(created)
+                # We do this after because we may consolidate this Item and
+                # this keeps us from having to unregister the item.
+
+            ctx.register(final_entity)
+            final_entity.touch()
+
             return EntityCreated(
                 source=person,
                 area=area,
-                entity=after_hold,
+                entity=final_entity,
                 heard=default_heard_for(area, excepted=[person]),
             )
 

@@ -653,7 +653,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 2
+            "i": 1
         },
         "creator": {
             "py/object": "model.world.World",
@@ -695,14 +695,7 @@
                 "openable": {
                     "py/object": "scopes.carryable.UnknownOpenClose"
                 },
-                "holding": [
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 10,
-                        "klass": "AreaClass",
-                        "name": "Treehouse"
-                    }
-                ],
+                "holding": [],
                 "capacity": null,
                 "produces": {}
             },
@@ -976,26 +969,6 @@
                 },
                 "occupied": [],
                 "occupancy": 100
-            },
-            "location": {
-                "acls": {
-                    "py/object": "model.permissions.Acls",
-                    "rules": [
-                        {
-                            "py/object": "model.permissions.Acl",
-                            "perm": "write",
-                            "keys": [
-                                "$owner"
-                            ]
-                        }
-                    ]
-                },
-                "container": {
-                    "py/object": "model.entity.Entity",
-                    "key": 6,
-                    "klass": "LivingClass",
-                    "name": "Jacob"
-                }
             }
         },
         "klass": {
