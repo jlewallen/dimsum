@@ -8,7 +8,7 @@ import pytest
 import freezegun
 import ariadne.asgi
 import jwt
-from typing import Optional
+from typing import Optional, List
 from multiprocessing import Process
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -70,7 +70,7 @@ def server():
         kwargs={
             "host": "127.0.0.1",
             "port": 45600,
-            "log_level": "info",
+            "log_level": "critical",
             "factory": True,
         },
         daemon=True,
@@ -129,42 +129,54 @@ def deterministic():
 async def test_storage_update_one_entity(
     snapshot, server, silence_aihttp, deterministic
 ):
-    w = Entity(creator=World(), props=Common(name="Fake Entity"))
-    serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
+    key = shortuuid.uuid(name="example-1")
+    e = Entity(key=key, creator=World(), props=Common(name="Fake Entity"))
+    serialized = serializing.serialize(e, identities=serializing.Identities.PRIVATE)
     assert serialized
 
     store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
-    key = shortuuid.uuid(name="example-1")
 
     updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "before.json")
 
-    w.version.increase()
-    serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
+    e.version.increase()
+    serialized = serializing.serialize(e, identities=serializing.Identities.PRIVATE)
     assert serialized
 
     updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "after.json")
+
+    loaded: List[Serialized] = await store.load_by_key(key)
+    snapshot.assert_match(
+        test.pretty_json({v.key: v.serialized for v in loaded}, deterministic=True),
+        "queried.json",
+    )
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_storage_delete_one_entity(
-    snapshot, server, silence_aihttp, deterministic
+    snapshot, server, silence_aihttp, deterministic, caplog
 ):
-    w = Entity(creator=World(), props=Common(name="Fake Entity"))
-    serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
+    key = shortuuid.uuid(name="example-2")
+    e = Entity(key=key, creator=World(), props=Common(name="Fake Entity"))
+    serialized = serializing.serialize(e, identities=serializing.Identities.PRIVATE)
     assert serialized
 
     store = storage.HttpStorage("http://127.0.0.1:45600", get_token("jlewallen"))
-    key = shortuuid.uuid(name="example-2")
     updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "before.json")
 
-    w.version.increase()
-    w.destroy()
-    serialized = serializing.serialize(w, identities=serializing.Identities.PRIVATE)
+    e.version.increase()
+    e.destroy()
+    serialized = serializing.serialize(e, identities=serializing.Identities.PRIVATE)
     assert serialized
 
     updated = await store.update({key: CompiledJson.compile(serialized)})
     snapshot.assert_match(test.pretty_json(updated, deterministic=True), "after.json")
+
+    with pytest.raises(Exception) as ex:
+        with caplog.at_level(logging.CRITICAL):
+            await store.load_by_key(key)
+
+    assert "MissingEntityException" in str(ex)

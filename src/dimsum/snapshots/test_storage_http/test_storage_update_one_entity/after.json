@@ -235,7 +235,7 @@
             ]
         }
     },
-    "4": {
+    "D#7": {
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
@@ -296,7 +296,7 @@
                 },
                 "described": {
                     "py/object": "model.properties.Property",
-                    "value": "Fake Entity",
+                    "value": "a Fake Entity (#71)",
                     "acls": {
                         "py/object": "model.permissions.Acls",
                         "rules": [
