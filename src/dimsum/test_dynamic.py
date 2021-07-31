@@ -11,6 +11,7 @@ from loggers import get_logger
 from dynamic import DynamicFailure
 from scheduling import WhenCron
 import scopes.behavior as behavior
+import scopes.carryable as carryable
 import scopes as scopes
 import test
 from test_utils import *
@@ -647,3 +648,32 @@ async def every_3(this, say):
     # assert tw.domain.scheduled
     # assert isinstance(tw.domain.scheduled, WhenCron)
     # assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_dynamic_orphan(caplog):
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.add_behaviored_thing(
+        "Keys",
+        """
+@ds.language('start: ".orphan"')
+async def orphan(this, person, say):
+    log.info("orphan: %s", this)
+    with person.make(Containing) as c:
+        for e in c.holding:
+            log.info("holding: %s", e)
+            tools.orphan(e)
+        pass
+    return "done!"
+""",
+    )
+
+    assert await tw.success("create thing Box")
+    reply = await tw.success("look")
+    assert len(reply.holding) == 1
+    assert await tw.success(".orphan")
+    reply = await tw.success("look")
+    assert len(reply.holding) == 0

@@ -56,6 +56,7 @@ class AreaObservation(Observation):
     person: Entity
     living: List[ObservedLiving]
     items: List[ObservedEntity]
+    holding: List[ObservedEntity]
     routes: List[movement.AreaRoute]
 
     @staticmethod
@@ -77,7 +78,9 @@ class AreaObservation(Observation):
 
         routes: List[movement.AreaRoute] = area.make(movement.Movement).available_routes
 
-        return AreaObservation(area, person, living, items, routes)
+        holding = flatten([await observe_entity(e) for e in tools.get_holding(person)])
+
+        return AreaObservation(area, person, living, items, holding, routes)
 
     def render_tree(self) -> Dict[str, Any]:
         def filter_items(predicate: Callable) -> List[ObservedEntity]:
@@ -107,9 +110,11 @@ class AreaObservation(Observation):
                 + infl.join([x.entity.describe() for x in distinct_items])
             ]
 
-        holding = tools.get_holding(self.person)
-        if len(holding) > 0:
-            emd += ["You're holding " + infl.join([x.describe() for x in holding])]
+        if len(self.holding) > 0:
+            emd += [
+                "You're holding "
+                + infl.join([x.entity.describe() for x in self.holding])
+            ]
 
         return {"title": self.area.props.name, "description": emd}
 
