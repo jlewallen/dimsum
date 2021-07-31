@@ -2,6 +2,7 @@
     <div class="repl" v-if="connected">
         <form v-on:submit.prevent="send">
             <div class="form-group">
+                <div class="terminal"></div>
                 <input class="form-control" type="text" v-model="command" id="repl-command" autocomplete="off" />
             </div>
         </form>
@@ -36,6 +37,8 @@ export default defineComponent({
 <style scoped>
 .form-group {
     margin: 0em;
+    display: flex;
+    align-items: center;
 }
 
 .repl {
@@ -51,5 +54,12 @@ export default defineComponent({
     font-family: "Monaco";
     font-weight: bold;
     color: #8f8f8f;
+}
+
+.terminal {
+    width: 50px;
+    height: 50px;
+    background: url("/images/prompt-100s-126px-gray.png");
+    background-size: contain;
 }
 </style>
