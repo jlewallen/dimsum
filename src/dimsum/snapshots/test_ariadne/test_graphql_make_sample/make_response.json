@@ -40,7 +40,7 @@
                                             "py/object": "scopes.behavior.BehaviorMeta"
                                         }
                                     ],
-                                    "193": [
+                                    "184": [
                                         {
                                             "py/object": "scopes.behavior.BehaviorMeta"
                                         }
@@ -351,7 +351,7 @@
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "182",
+                                        "key": "173",
                                         "klass": "ExitClass",
                                         "name": "Torn-up Sidewak"
                                     }
@@ -3105,7 +3105,7 @@
                     }
                 },
                 {
-                    "key": 182,
+                    "key": 173,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -3142,7 +3142,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 },
@@ -3203,7 +3203,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "182",
+                        "key": "173",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -4455,7 +4455,7 @@
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "164",
+                                        "key": "157",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -5420,7 +5420,7 @@
                     }
                 },
                 {
-                    "key": 164,
+                    "key": 157,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -5457,7 +5457,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 },
@@ -5518,7 +5518,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "164",
+                        "key": "157",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -5738,7 +5738,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "66",
+                                        "key": "65",
                                         "klass": "ExitClass",
                                         "name": "Small Crevice"
                                     }
@@ -5937,7 +5937,7 @@
                     }
                 },
                 {
-                    "key": 66,
+                    "key": 65,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6022,7 +6022,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "66",
+                        "key": "65",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6187,7 +6187,7 @@
                     }
                 },
                 {
-                    "key": 68,
+                    "key": 67,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6242,19 +6242,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "86",
+                                        "key": "85",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "88",
+                                        "key": "87",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "168",
+                                        "key": "160",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
                                     }
@@ -6288,7 +6288,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "68",
+                        "key": "67",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6453,7 +6453,7 @@
                     }
                 },
                 {
-                    "key": 86,
+                    "key": 85,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6490,7 +6490,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 },
@@ -6523,7 +6523,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -6538,7 +6538,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "86",
+                        "key": "85",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6703,7 +6703,7 @@
                     }
                 },
                 {
-                    "key": 88,
+                    "key": 87,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -6740,7 +6740,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 },
@@ -6786,7 +6786,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -6801,7 +6801,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "88",
+                        "key": "87",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -6966,7 +6966,7 @@
                     }
                 },
                 {
-                    "key": 168,
+                    "key": 160,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -7049,7 +7049,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 }
@@ -7064,7 +7064,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "168",
+                        "key": "160",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -7229,7 +7229,7 @@
                     }
                 },
                 {
-                    "key": 70,
+                    "key": 69,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -7284,19 +7284,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "92",
+                                        "key": "91",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "94",
+                                        "key": "93",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "98",
+                                        "key": "97",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     }
@@ -7330,7 +7330,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "70",
+                        "key": "69",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -7495,7 +7495,7 @@
                     }
                 },
                 {
-                    "key": 92,
+                    "key": 91,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -7532,7 +7532,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "72",
+                                    "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 },
@@ -7565,7 +7565,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -7580,7 +7580,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "92",
+                        "key": "91",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -7745,7 +7745,7 @@
                     }
                 },
                 {
-                    "key": 94,
+                    "key": 93,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -7782,7 +7782,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 },
@@ -7828,7 +7828,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -7843,7 +7843,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "94",
+                        "key": "93",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -8008,7 +8008,7 @@
                     }
                 },
                 {
-                    "key": 98,
+                    "key": 97,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -8045,7 +8045,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 },
@@ -8091,7 +8091,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 }
@@ -8106,7 +8106,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "98",
+                        "key": "97",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -8271,7 +8271,7 @@
                     }
                 },
                 {
-                    "key": 72,
+                    "key": 71,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -8326,13 +8326,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "102",
+                                        "key": "100",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "104",
+                                        "key": "102",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     }
@@ -8366,7 +8366,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "72",
+                        "key": "71",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -8531,7 +8531,7 @@
                     }
                 },
                 {
-                    "key": 102,
+                    "key": 100,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -8568,7 +8568,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 },
@@ -8601,7 +8601,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "72",
+                                    "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -8616,7 +8616,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "102",
+                        "key": "100",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -8781,7 +8781,7 @@
                     }
                 },
                 {
-                    "key": 104,
+                    "key": 102,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -8818,7 +8818,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 },
@@ -8864,7 +8864,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "72",
+                                    "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 }
@@ -8879,7 +8879,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "104",
+                        "key": "102",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -9044,7 +9044,7 @@
                     }
                 },
                 {
-                    "key": 78,
+                    "key": 77,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -9099,19 +9099,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "132",
+                                        "key": "127",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "134",
+                                        "key": "129",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "138",
+                                        "key": "133",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -9145,7 +9145,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "78",
+                        "key": "77",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -9310,7 +9310,7 @@
                     }
                 },
                 {
-                    "key": 132,
+                    "key": 127,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -9347,7 +9347,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 },
@@ -9380,7 +9380,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -9395,7 +9395,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "132",
+                        "key": "127",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -9560,7 +9560,7 @@
                     }
                 },
                 {
-                    "key": 134,
+                    "key": 129,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -9597,7 +9597,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "84",
+                                    "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 },
@@ -9643,7 +9643,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -9658,7 +9658,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "134",
+                        "key": "129",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -9823,7 +9823,7 @@
                     }
                 },
                 {
-                    "key": 138,
+                    "key": 133,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -9860,7 +9860,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "72",
+                                    "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
                                 },
@@ -9906,7 +9906,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 }
@@ -9921,7 +9921,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "138",
+                        "key": "133",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -10086,7 +10086,7 @@
                     }
                 },
                 {
-                    "key": 76,
+                    "key": 75,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -10141,25 +10141,25 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "118",
+                                        "key": "115",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "120",
+                                        "key": "117",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "124",
+                                        "key": "121",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "128",
+                                        "key": "124",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -10193,7 +10193,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "76",
+                        "key": "75",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -10358,7 +10358,7 @@
                     }
                 },
                 {
-                    "key": 118,
+                    "key": 115,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -10395,7 +10395,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 },
@@ -10428,7 +10428,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -10443,7 +10443,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "118",
+                        "key": "115",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -10608,7 +10608,7 @@
                     }
                 },
                 {
-                    "key": 120,
+                    "key": 117,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -10645,7 +10645,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 },
@@ -10691,7 +10691,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -10706,7 +10706,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "120",
+                        "key": "117",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -10871,7 +10871,7 @@
                     }
                 },
                 {
-                    "key": 124,
+                    "key": 121,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -10908,7 +10908,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 },
@@ -10954,7 +10954,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -10969,7 +10969,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "124",
+                        "key": "121",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -11134,7 +11134,7 @@
                     }
                 },
                 {
-                    "key": 128,
+                    "key": 124,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -11171,7 +11171,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "70",
+                                    "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
                                 },
@@ -11217,7 +11217,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 }
@@ -11232,7 +11232,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "128",
+                        "key": "124",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -11397,7 +11397,7 @@
                     }
                 },
                 {
-                    "key": 74,
+                    "key": 73,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -11452,19 +11452,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "108",
+                                        "key": "106",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "110",
+                                        "key": "108",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "114",
+                                        "key": "112",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -11498,7 +11498,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "74",
+                        "key": "73",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -11663,7 +11663,7 @@
                     }
                 },
                 {
-                    "key": 108,
+                    "key": 106,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -11700,7 +11700,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 },
@@ -11733,7 +11733,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -11748,7 +11748,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "108",
+                        "key": "106",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -11913,7 +11913,7 @@
                     }
                 },
                 {
-                    "key": 110,
+                    "key": 108,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -11950,7 +11950,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "80",
+                                    "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 },
@@ -11996,7 +11996,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -12011,7 +12011,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "110",
+                        "key": "108",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -12176,7 +12176,7 @@
                     }
                 },
                 {
-                    "key": 114,
+                    "key": 112,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -12213,7 +12213,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "68",
+                                    "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
                                 },
@@ -12259,7 +12259,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 }
@@ -12274,7 +12274,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "114",
+                        "key": "112",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -12439,7 +12439,7 @@
                     }
                 },
                 {
-                    "key": 80,
+                    "key": 79,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -12494,13 +12494,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "142",
+                                        "key": "136",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "144",
+                                        "key": "138",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -12534,7 +12534,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "80",
+                        "key": "79",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -12699,7 +12699,7 @@
                     }
                 },
                 {
-                    "key": 142,
+                    "key": 136,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -12736,7 +12736,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 },
@@ -12769,7 +12769,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "80",
+                                    "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -12784,7 +12784,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "142",
+                        "key": "136",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -12949,7 +12949,7 @@
                     }
                 },
                 {
-                    "key": 144,
+                    "key": 138,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -12986,7 +12986,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "74",
+                                    "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
                                 },
@@ -13032,7 +13032,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "80",
+                                    "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 }
@@ -13047,7 +13047,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "144",
+                        "key": "138",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -13212,7 +13212,7 @@
                     }
                 },
                 {
-                    "key": 82,
+                    "key": 81,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -13267,19 +13267,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "148",
+                                        "key": "142",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "150",
+                                        "key": "144",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "154",
+                                        "key": "148",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -13313,7 +13313,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "82",
+                        "key": "81",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -13478,7 +13478,7 @@
                     }
                 },
                 {
-                    "key": 148,
+                    "key": 142,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -13515,7 +13515,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "84",
+                                    "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 },
@@ -13548,7 +13548,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -13563,7 +13563,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "148",
+                        "key": "142",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -13728,7 +13728,7 @@
                     }
                 },
                 {
-                    "key": 150,
+                    "key": 144,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -13765,7 +13765,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "80",
+                                    "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
                                 },
@@ -13811,7 +13811,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -13826,7 +13826,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "150",
+                        "key": "144",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -13991,7 +13991,7 @@
                     }
                 },
                 {
-                    "key": 154,
+                    "key": 148,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -14028,7 +14028,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "76",
+                                    "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
                                 },
@@ -14074,7 +14074,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 }
@@ -14089,7 +14089,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "154",
+                        "key": "148",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -14254,7 +14254,7 @@
                     }
                 },
                 {
-                    "key": 84,
+                    "key": 83,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -14309,13 +14309,13 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "158",
+                                        "key": "151",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "160",
+                                        "key": "153",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
                                     }
@@ -14349,7 +14349,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "84",
+                        "key": "83",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -14514,7 +14514,7 @@
                     }
                 },
                 {
-                    "key": 158,
+                    "key": 151,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -14551,7 +14551,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "82",
+                                    "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
                                 },
@@ -14584,7 +14584,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "84",
+                                    "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -14599,7 +14599,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "158",
+                        "key": "151",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -14764,7 +14764,7 @@
                     }
                 },
                 {
-                    "key": 160,
+                    "key": 153,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -14801,7 +14801,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "78",
+                                    "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
                                 },
@@ -14847,7 +14847,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "84",
+                                    "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
                                 }
@@ -14862,7 +14862,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "160",
+                        "key": "153",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -15027,7 +15027,7 @@
                     }
                 },
                 {
-                    "key": 174,
+                    "key": 165,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -15077,19 +15077,19 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "180",
+                                        "key": "171",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "185",
+                                        "key": "176",
                                         "klass": "ExitClass",
                                         "name": "Torn-up Sidewak"
                                     },
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "193",
+                                        "key": "184",
                                         "klass": "ExitClass",
                                         "name": "Purple Line Train"
                                     }
@@ -15123,7 +15123,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "174",
+                        "key": "165",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -15288,7 +15288,7 @@
                     }
                 },
                 {
-                    "key": 180,
+                    "key": 171,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -15325,7 +15325,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "176",
+                                    "key": "167",
                                     "klass": "AreaClass",
                                     "name": "Outside the Bounty"
                                 },
@@ -15358,7 +15358,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 }
@@ -15373,7 +15373,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "180",
+                        "key": "171",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -15538,7 +15538,7 @@
                     }
                 },
                 {
-                    "key": 185,
+                    "key": 176,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -15621,7 +15621,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 }
@@ -15636,7 +15636,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "185",
+                        "key": "176",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -15801,7 +15801,7 @@
                     }
                 },
                 {
-                    "key": 176,
+                    "key": 167,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -15851,7 +15851,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "178",
+                                        "key": "169",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     }
@@ -15885,7 +15885,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "176",
+                        "key": "167",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -16050,7 +16050,7 @@
                     }
                 },
                 {
-                    "key": 178,
+                    "key": 169,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -16087,7 +16087,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 },
@@ -16120,7 +16120,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "176",
+                                    "key": "167",
                                     "klass": "AreaClass",
                                     "name": "Outside the Bounty"
                                 }
@@ -16135,7 +16135,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "178",
+                        "key": "169",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -16300,7 +16300,7 @@
                     }
                 },
                 {
-                    "key": 193,
+                    "key": 184,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -16343,7 +16343,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "189",
+                                    "key": "180",
                                     "klass": "AreaClass",
                                     "name": "Purple Line Car"
                                 },
@@ -16363,11 +16363,11 @@
                             },
                             "train": {
                                 "stops": [
-                                    "174",
-                                    "172"
+                                    "165",
+                                    "163"
                                 ],
-                                "door": "191",
-                                "interior": "189",
+                                "door": "182",
+                                "interior": "180",
                                 "leaving": false
                             },
                             "carryable": {
@@ -16398,7 +16398,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 }
@@ -16413,7 +16413,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "193",
+                        "key": "184",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -16578,7 +16578,7 @@
                     }
                 },
                 {
-                    "key": 191,
+                    "key": 182,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -16610,7 +16610,7 @@
                             "exit": {
                                 "area": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "174",
+                                    "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
                                 },
@@ -16643,7 +16643,7 @@
                                 },
                                 "container": {
                                     "py/object": "model.entity.Entity",
-                                    "key": "189",
+                                    "key": "180",
                                     "klass": "AreaClass",
                                     "name": "Purple Line Car"
                                 }
@@ -16658,7 +16658,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "191",
+                        "key": "182",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {
@@ -16823,7 +16823,7 @@
                     }
                 },
                 {
-                    "key": 189,
+                    "key": 180,
                     "serialized": {
                         "py/object": "serializing.RootEntity",
                         "version": {
@@ -16873,7 +16873,7 @@
                                 "holding": [
                                     {
                                         "py/object": "model.entity.Entity",
-                                        "key": "191",
+                                        "key": "182",
                                         "klass": "ExitClass",
                                         "name": "Train Door"
                                     }
@@ -16907,7 +16907,7 @@
                             "signature": "<signature>",
                             "private": "<private>"
                         },
-                        "key": "189",
+                        "key": "180",
                         "props": {
                             "py/object": "model.properties.Common",
                             "map": {

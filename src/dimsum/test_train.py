@@ -50,7 +50,6 @@ async def test_train_factory(snapshot, caplog, deterministic):
 
         with session.ctx() as ctx:
             train = await factory.create(world, ctx)
-            tools.hold(area, train)
 
         await session.save()
 

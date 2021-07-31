@@ -204,6 +204,8 @@ None
 
         if first_stop:
             with first_stop.make(Containing) as first_stop_ground:
+                if first_stop_ground.contains(enter):
+                    return first_stop_ground.discard()
                 first_stop_ground.hold(enter)
                 first_stop.touch()
 

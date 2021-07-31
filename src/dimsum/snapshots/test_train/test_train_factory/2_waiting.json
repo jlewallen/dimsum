@@ -263,12 +263,6 @@
                         "key": 16,
                         "klass": "ExitClass",
                         "name": "Metro Train"
-                    },
-                    {
-                        "py/object": "model.entity.Entity",
-                        "key": 16,
-                        "klass": "ExitClass",
-                        "name": "Metro Train"
                     }
                 ],
                 "capacity": null,
@@ -1282,19 +1276,6 @@
                     "klass": "AreaClass",
                     "name": "Living room"
                 }
-            },
-            "carryable": {
-                "kind": {
-                    "py/object": "model.kinds.Kind",
-                    "identity": {
-                        "py/object": "model.crypto.Identity",
-                        "public": 18,
-                        "signature": 18,
-                        "private": 18
-                    }
-                },
-                "quantity": 1,
-                "loose": false
             }
         },
         "klass": {

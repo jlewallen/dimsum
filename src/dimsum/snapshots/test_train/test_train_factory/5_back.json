@@ -12,7 +12,7 @@
                 "entities": {
                     "welcomeArea": 4,
                     "postService": 8,
-                    "limbo": 20
+                    "limbo": 18
                 }
             },
             "identifiers": {
@@ -1316,19 +1316,6 @@
                     "klass": "AreaClass",
                     "name": "Wilshire/Western"
                 }
-            },
-            "carryable": {
-                "kind": {
-                    "py/object": "model.kinds.Kind",
-                    "identity": {
-                        "py/object": "model.crypto.Identity",
-                        "public": 18,
-                        "signature": 18,
-                        "private": 18
-                    }
-                },
-                "quantity": 1,
-                "loose": false
             }
         },
         "klass": {
@@ -2063,11 +2050,11 @@
         },
         "identity": {
             "py/object": "model.crypto.Identity",
-            "public": 19,
-            "signature": 19,
-            "private": 19
+            "public": 17,
+            "signature": 17,
+            "private": 17
         },
-        "key": 20,
+        "key": 18,
         "props": {
             "py/object": "model.properties.Common",
             "map": {
