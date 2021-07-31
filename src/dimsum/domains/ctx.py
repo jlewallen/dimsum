@@ -106,7 +106,6 @@ class WorldCtx(Ctx):
             assert self.person
             area = await find_entity_area(self.person)
             a = (self.person, area, []) + args
-            log.warning("PUBLISH: %s %s %s", klass, a, kwargs)
             await self.publish(klass(*a, **kwargs))
 
     async def notify(self, ev: Event, **kwargs):

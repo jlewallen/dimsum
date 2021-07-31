@@ -4,6 +4,7 @@ import enum
 import jsonpickle
 import wrapt
 import json
+from datetime import datetime
 from typing import Callable, Dict, List, Optional, Iterable
 
 from storage import EntityStorage
@@ -159,13 +160,14 @@ class EntityHandler(jsonpickle.handlers.BaseHandler):
         return data
 
 
-# @jsonpickle.handlers.register(Permission)
-class JsonEnumHandler(jsonpickle.handlers.BaseHandler):
+@jsonpickle.handlers.register(datetime, base=True)
+class DateTimeHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        pass
+        return datetime.fromisoformat(obj["time"])
 
-    def flatten(self, obj: enum.Enum, data):
-        return obj.name
+    def flatten(self, obj: datetime, data):
+        data["time"] = obj.isoformat()
+        return data
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):
