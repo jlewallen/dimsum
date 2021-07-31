@@ -37,7 +37,7 @@ class Invite(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        with person.make(users.Auth) as auth:
+        with person.make_and_discard(users.Auth) as auth:
             url, token = auth.invite(self.password)
             return Universal(
                 "All good to go! The new URL is %(url)s", url=url, token=token
