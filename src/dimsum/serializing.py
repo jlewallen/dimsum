@@ -3,6 +3,7 @@ import copy
 import enum
 import jsonpickle
 import wrapt
+import json
 from typing import Callable, Dict, List, Optional, Iterable
 
 from storage import EntityStorage
@@ -208,17 +209,22 @@ def serialize(
 
     prepared = _prepare(value) if full else value
 
-    return jsonpickle.encode(
-        prepared,
-        indent=indent,
-        unpicklable=unpicklable,
-        make_refs=False,
-        context=SecurePickler(
+    try:
+        pickler = SecurePickler(
             unpicklable=unpicklable,
-            identities=identities,
             make_refs=False,
-        ),
-    )
+            identities=identities,
+        )
+        flattened = pickler.flatten(prepared)
+        if isinstance(flattened, dict):
+            for key in list(flattened.keys()):
+                if key.startswith("_"):
+                    del flattened[key]
+        return json.dumps(flattened, indent=indent)
+    except ScopeNotSerializableException as e:
+        log.error("open entity scope value=%s", value)
+        log.error("open entity scope scopes=%s", value.scopes)
+        raise e
 
 
 def _deserialize(compiled: CompiledJson, lookup):
