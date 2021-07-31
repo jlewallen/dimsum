@@ -9,6 +9,7 @@ from finders import *
 from plugins.actions import PersonAction
 import scopes.mechanics as mechanics
 import scopes.health as health
+import tools
 
 log = get_logger("dimsum")
 
@@ -95,6 +96,10 @@ class ModifyField(PersonAction):
                 i.nutrition.properties[self.field] = self.value
         else:
             item.props.set(self.field, self.value)
+            # Fix untouched save of container, as references contain
+            # names and this will trigger the untouched save detector.
+            if self.field == "name":  # HACK
+                tools.container(item).touch()
 
         item.touch()
 

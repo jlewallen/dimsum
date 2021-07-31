@@ -249,3 +249,14 @@ def set_exit(
             exit.touch()
 
         return e.area
+
+
+class NoContainerException(Exception):
+    pass
+
+
+def container(entity: Entity) -> Entity:
+    with entity.make_and_discard(carryable.Location) as location:
+        if location.container:
+            return location.container
+    raise NoContainerException()
