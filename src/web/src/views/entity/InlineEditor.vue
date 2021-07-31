@@ -199,7 +199,7 @@ export default defineComponent({
                             python: {
                                 message: pythonError.message,
                                 location: pythonError.locations[0] || null,
-                                exception: pythonError.extensions.exception,
+                                // exception: pythonError.extensions.exception,
                             },
                         };
                     } else {
