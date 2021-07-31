@@ -10,7 +10,22 @@ from test_utils import *
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
-async def test_library(deterministic, caplog, snapshot):
+async def test_library_make(deterministic, caplog, snapshot):
+    tw = test.TestWorld()
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+
+        factory = library.example_world_factory(world)
+        await factory(session)
+
+        await session.save()
+        assert len(session.registrar.entities) == 70
+
+
+@pytest.mark.asyncio
+@freezegun.freeze_time("2019-09-25")
+async def test_library_evolve(deterministic, caplog, snapshot):
     tw = test.TestWorld()
 
     with tw.domain.session() as session:
