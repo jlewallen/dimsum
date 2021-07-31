@@ -58,5 +58,7 @@ def run_perf_case(fn, prof_path: str, use_yappi: bool = True):
 
 
 if __name__ == "__main__":
+    run_perf_case(create_simple, "gen/create_simple.prof", use_yappi=False)
     run_perf_case(create_simple, "gen/create_simple.prof", use_yappi=True)
+    run_perf_case(create_library, "gen/create_library.prof", use_yappi=False)
     run_perf_case(create_library, "gen/create_library.prof", use_yappi=True)
