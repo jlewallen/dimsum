@@ -610,18 +610,19 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
 """,
     }
 
-    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
-        ok, actual = await ariadne.graphql(
-            schema,
-            data,
-            debug=True,
-            context_value=get_test_context(domain),
-            logger="ariadne.errors.hidden",
-        )
-        assert ok
-        snapshot.assert_match(
-            test.pretty_json(actual, deterministic=True), "response.json"
-        )
+    with caplog.at_level(logging.CRITICAL, logger="dimsum"):
+        with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+            ok, actual = await ariadne.graphql(
+                schema,
+                data,
+                debug=True,
+                context_value=get_test_context(domain),
+                logger="ariadne.errors.hidden",
+            )
+            assert ok
+            snapshot.assert_match(
+                test.pretty_json(actual, deterministic=True), "response.json"
+            )
 
 
 @pytest.mark.asyncio
@@ -758,14 +759,15 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
 """,
     }
 
-    with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
-        ok, actual = await ariadne.graphql(
-            schema,
-            data,
-            context_value=get_test_context(domain),
-            logger="ariadne.errors.hidden",
-        )
-        assert ok
-        snapshot.assert_match(
-            test.pretty_json(actual, deterministic=True), "response.json"
-        )
+    with caplog.at_level(logging.CRITICAL, logger="dimsum.dynamic.errors"):
+        with caplog.at_level(logging.CRITICAL, logger="ariadne.errors.hidden"):
+            ok, actual = await ariadne.graphql(
+                schema,
+                data,
+                context_value=get_test_context(domain),
+                logger="ariadne.errors.hidden",
+            )
+            assert ok
+            snapshot.assert_match(
+                test.pretty_json(actual, deterministic=True), "response.json"
+            )
