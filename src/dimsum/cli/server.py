@@ -97,6 +97,10 @@ def commands():
     "--unix-socket",
     help="Bind to a UNIX soket.",
 )
+@click.option(
+    "--debug",
+    help="Debugging.",
+)
 async def server(
     database: str,
     session_key: Optional[str],
@@ -107,6 +111,7 @@ async def server(
     ssh_port: int,
     user: List[str],
     unix_socket: Optional[str],
+    debug: bool = False,
 ):
     """
     Serve a database.
@@ -136,7 +141,7 @@ async def server(
         schema,
         context_value=schema_factory.context(cfg, domain),
         extensions=[ApolloTracingExtension],
-        debug=True,
+        debug=debug,
     )
 
     app = CORSMiddleware(
@@ -154,7 +159,8 @@ async def server(
         await temp.initialize(user, key=lambda username: shortuuid.uuid(name=username))
 
     loop = asyncio.get_event_loop()
-    loop.set_debug(True)
+    if debug:
+        loop.set_debug(True)
     gql_config = (
         uvicorn.Config(app=app, loop=loop, uds=unix_socket)
         if unix_socket
