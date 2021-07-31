@@ -3,6 +3,7 @@ import dataclasses
 import functools
 import ast
 import jsonpickle
+import traceback
 import sys
 import inspect
 from collections import ChainMap, abc
@@ -52,9 +53,15 @@ class Logger:
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type, value, tb):
         if type:
-            self.log(ex=dict(exception=type, value=value, traceback=traceback))
+            self.log(
+                ex=dict(
+                    exception=str(type),
+                    value=str(value),
+                    traceback=traceback.format_exception(type, value, tb),
+                )
+            )
         else:
             self.log()
         return False

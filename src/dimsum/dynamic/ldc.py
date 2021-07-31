@@ -27,8 +27,8 @@ def log_dynamic_call(
     if exc_info:
         ex_type, ex_value, tb = sys.exc_info()
         ex = dict(
-            exception=ex_type,
-            value=ex_value,
+            exception=str(ex_type),
+            value=str(ex_value),
             traceback=traceback.format_exc(),
         )
 
