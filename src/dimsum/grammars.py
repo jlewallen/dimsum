@@ -149,13 +149,14 @@ def _wrap_parser(custom: str) -> Lark:
         consumable:        object_by_gid | consumable_noun
         unheld:            object_by_gid | unheld_noun
         held:              object_by_gid | held_noun
-        noun:              object_by_gid | general_noun
+        noun:              object_by_gid | myself | general_noun
 
         object_by_gid:     "#"NUMBER
 
         here:              "here"
         this:              "this"
         that:              "that"
+        myself:            "myself"
 
         USEFUL_WORD:      /(?!(on|from|in|under|with|over|within|inside)\b)[a-zA-Z][a-zA-Z0-9]*/i
 

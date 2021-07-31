@@ -1,7 +1,7 @@
 import dataclasses
 import lark
 
-from model import Entity, World, FindObjectByGid, FindCurrentArea
+from model import Entity, World, FindObjectByGid, FindCurrentArea, FindCurrentPerson
 import finders as finders
 import scopes.movement as movement
 
@@ -94,3 +94,6 @@ class Base(lark.Transformer):
 
     def here(self, args):
         return FindCurrentArea()
+
+    def myself(self, args):
+        return FindCurrentPerson()
