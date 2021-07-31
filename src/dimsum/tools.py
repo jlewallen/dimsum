@@ -260,3 +260,12 @@ def container(entity: Entity) -> Entity:
         if location.container:
             return location.container
     raise NoContainerException()
+
+
+def orphan(entity: Entity):
+    with entity.make(carryable.Location) as location:
+        if location.container:
+            with location.container.make(carryable.Containing) as container:
+                assert container.unhold(entity)
+            location.container = None
+            entity.touch()

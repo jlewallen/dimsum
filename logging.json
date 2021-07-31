@@ -30,6 +30,11 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "dimsum.security": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "dimsum.model.registrar": {
             "level": "INFO",
             "handlers": ["console"],

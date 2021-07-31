@@ -400,7 +400,7 @@ class DiffSecurityException(Exception):
 
     def __str__(self):
         return """
-Entity: '{2}'
+Entity: {2}
 
 Diff:
 {0}
