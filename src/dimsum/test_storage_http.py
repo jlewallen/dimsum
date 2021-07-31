@@ -54,10 +54,12 @@ def app():
     cfg = config.symmetrical(":memory:", session_key=session_key)
     schema = schema_factory.create()
     domain = cfg.make_domain()
+    get_logger("ariadne.silenced").setLevel(logging.CRITICAL)
     return ariadne.asgi.GraphQL(
         schema,
         context_value=schema_factory.context(cfg, domain),
         debug=True,
+        logger="ariadne.silenced",
     )
 
 
