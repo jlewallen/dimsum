@@ -614,9 +614,6 @@ async def every_3(this, say):
 
     assert len(received) == 0
 
-    # assert isinstance(tw.domain.scheduled, WhenCron)
-    # assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
-
     with freezegun.freeze_time() as frozen_datetime:
         with tw.domain.session() as session:
             await session.prepare()
@@ -628,10 +625,7 @@ async def every_3(this, say):
             await session.save()
 
     assert len(received) == 1
-
-    # assert tw.domain.scheduled
-    # assert isinstance(tw.domain.scheduled, WhenCron)
-    # assert tw.domain.scheduled.crons[0].spec == "*/5 * * * *"
+    assert "every 3" in str(received)
 
     with freezegun.freeze_time() as frozen_datetime:
         with tw.domain.session() as session:
@@ -644,10 +638,7 @@ async def every_3(this, say):
             await session.save()
 
     assert len(received) == 2
-
-    # assert tw.domain.scheduled
-    # assert isinstance(tw.domain.scheduled, WhenCron)
-    # assert tw.domain.scheduled.crons[0].spec == "*/3 * * * *"
+    assert "every 5" in str(received)
 
 
 @pytest.mark.asyncio
