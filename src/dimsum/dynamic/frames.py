@@ -39,6 +39,7 @@ def _get_default_globals():
         Event=Event,
         Scope=Scope,
         Carryable=carryable.Carryable,
+        Containing=carryable.Containing,
         Exit=movement.Exit,
         fail=Failure,
         ok=Success,
