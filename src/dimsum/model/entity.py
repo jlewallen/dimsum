@@ -6,7 +6,18 @@ import jsondiff
 import shortuuid
 import functools
 import stringcase
-from typing import Awaitable, Any, Callable, Dict, List, Optional, Type, Union, TypeVar
+from typing import (
+    Awaitable,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Type,
+    Union,
+    TypeVar,
+    cast,
+)
 
 from loggers import get_logger
 
@@ -221,31 +232,56 @@ def scope(wrapped=None):
 
 
 @dataclasses.dataclass
-class Scope:
+class ScopeAttributes:
     parent: "Entity"
-    discarding: bool = False
+    discarding: bool
+    depth: int = 0
+
+
+@dataclasses.dataclass
+class Scope:
+    _scope_attrs: ScopeAttributes
 
     @property
-    def scope_key(self) -> str:
+    def _scope_key(self) -> str:
         return _get_instance_key(self)
 
     @property
+    def parent(self):
+        return self._scope_attrs.parent
+
+    @property
     def ourselves(self):
-        return self.parent
+        return self._scope_attrs.parent
 
     def __enter__(self):
+        attrs = self._scope_attrs
+        if attrs.discarding:
+            return self
+        if attrs.depth >= 0:
+            attrs.depth += 1
         return self
 
     def __exit__(self, type, value, traceback):
-        self.save()
+        attrs = self._scope_attrs
+        if attrs.discarding:
+            return
+        if attrs.depth > 0:
+            attrs.depth -= 1
+            if attrs.depth == 0:
+                self._save()
 
     def discard(self):
-        self.discarding = True
+        attrs = self._scope_attrs
+        attrs.discarding = True
+        if attrs.depth > 0:
+            attrs.parent.discard(self)
 
-    def save(self):
-        if self.discarding:
+    def _save(self):
+        attrs = self._scope_attrs
+        if attrs.discarding:
             return
-        self.parent.update(self)
+        attrs.parent.update(self)
 
 
 MakeT = TypeVar("MakeT", bound=Scope)
@@ -278,6 +314,7 @@ class Entity:
         self.parent: Optional["Entity"] = parent
         self.scopes = scopes if scopes else {}
         self.klass: Type[EntityClass] = klass if klass else UnknownClass
+        self._live: Dict[str, Scope] = {}
 
         if identity:
             self.identity = identity
@@ -328,6 +365,9 @@ class Entity:
             pass
         else:
             assert self.creator
+
+        for key, value in self.scopes.items():
+            assert not isinstance(value, Scope)
 
     def registered(self, gid: int) -> int:
         """
@@ -405,6 +445,9 @@ class Entity:
     def make(self, ctor: Type[MakeT], discarding=False, **kwargs) -> MakeT:
         key = _get_ctor_key(ctor)
 
+        if key in self._live:
+            return cast(MakeT, self._live[key])
+
         chargs = {}
         if key in self.scopes:
             chargs = self.scopes[key]
@@ -414,19 +457,27 @@ class Entity:
 
         self._log().debug("%s splitting scopes: %s %s", self.key, key, chargs)
         try:
-            child = ctor(parent=self, discarding=discarding, **chargs)  # type: ignore
+            child = ctor(  # type:ignore
+                _scope_attrs=ScopeAttributes(parent=self, discarding=discarding),
+                **chargs,
+            )
+            if not discarding:
+                self._live[key] = child
+            return child
         except:
             self._log().exception(f"error creating scope {ctor}", exc_info=True)
             raise
-        return child
+
+    def discard(self, child):
+        pass
 
     def update(self, child):
-        key = child.scope_key
+        key = child._scope_key
         data = child.__dict__
-        del data["parent"]
-        del data["discarding"]
-        self._log().debug("%s updating scopes: %s %s", self.key, key, data)
+        del data["_scope_attrs"]
         self.scopes[key] = data
+        del self._live[key]
+        self._log().debug("%s updating scopes: %s %s", self.key, key, data)
 
     def __repr__(self):
         return "'{0} (#{1})'".format(self.props.name, self.props.gid)

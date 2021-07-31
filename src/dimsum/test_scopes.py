@@ -8,7 +8,7 @@ import scopes.ownership as ownership
 
 
 @dataclasses.dataclass
-class SimpleCore(Scope):
+class SimpleName(Scope):
     name: Optional[str] = None
 
 
@@ -39,19 +39,19 @@ async def test_scoped_entities_serialize(caplog):
         universe = await session.prepare()
 
         jacob = Entity(
-            creator=universe, props=Common(name="Jacob"), create_scopes=[SimpleCore]
+            creator=universe, props=Common(name="Jacob"), create_scopes=[SimpleName]
         )
         session.register(jacob)
         remember(universe, jacob)
 
         toy = Entity(
-            creator=universe, props=Common(name="Toy"), create_scopes=[SimpleCore]
+            creator=universe, props=Common(name="Toy"), create_scopes=[SimpleName]
         )
         session.register(toy)
         remember(universe, toy)
 
         with jacob.make(SimpleHolding) as holding:
-            with jacob.make(SimpleCore) as core:
+            with jacob.make(SimpleName) as core:
                 pass
             holding.add_item(toy)
 
@@ -65,11 +65,11 @@ async def test_scoped_entities_serialize(caplog):
 def make_person(
     props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
 ):
-    person = Entity(props=props, creator=creator, create_scopes=[SimpleCore], **kwargs)
+    person = Entity(props=props, creator=creator, create_scopes=[SimpleName], **kwargs)
 
     assert props
 
-    with person.make(SimpleCore) as core:
+    with person.make(SimpleName) as core:
         core.name = props.name
 
     with person.make(SimpleHolding) as holding:
@@ -90,7 +90,7 @@ def make_thing(
     with thing.make(ownership.Ownership) as change:
         change.owner = creator
 
-    with thing.make(SimpleCore) as core:
+    with thing.make(SimpleName) as core:
         core.name = props.name
 
     with thing.make(SimpleHolding) as holding:
@@ -119,3 +119,29 @@ async def test_specialization_classes(caplog):
     after = await domain.reload()
 
     assert await after.store.number_of_entities() == 3
+
+
+@pytest.mark.asyncio
+async def test_nested_scoped_entities_serialize(caplog):
+    domain = domains.Domain()
+
+    with domain.session() as session:
+        universe = await session.prepare()
+
+        jacob = Entity(
+            creator=universe, props=Common(name="Jacob"), create_scopes=[SimpleName]
+        )
+        session.register(jacob)
+
+        with jacob.make(SimpleName) as name1:
+            name1.name = "Not Jacob"
+            with jacob.make(SimpleName) as name2:
+                assert name2.name == "Not Jacob"
+                name2.name = "Definitely Not Jacob"
+            assert name1.name == "Definitely Not Jacob"
+
+        await session.save()
+
+    after = await domain.reload()
+
+    assert await after.store.number_of_entities() == 2

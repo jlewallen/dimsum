@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Type, Any
 
 from loggers import get_logger
@@ -6,10 +7,9 @@ from .entity import Entity, Scope, RootEntityClass, find_entity_area
 from .context import MaterializeAndCreate
 
 
+@dataclass
 class WellKnown(Scope):
-    def __init__(self, entities: Optional[Dict[str, str]] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.entities = entities if entities else {}
+    entities: Dict[str, str] = field(default_factory=dict)
 
     def get(self, local_key: str) -> Optional[str]:
         return self.entities[local_key] if local_key in self.entities else None
