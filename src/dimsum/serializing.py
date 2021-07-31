@@ -166,6 +166,7 @@ class DateTimeHandler(jsonpickle.handlers.BaseHandler):
         return datetime.fromisoformat(obj["time"])
 
     def flatten(self, obj: datetime, data):
+        data["py/object"] = "datetime.datetime"
         data["time"] = obj.isoformat()
         return data
 

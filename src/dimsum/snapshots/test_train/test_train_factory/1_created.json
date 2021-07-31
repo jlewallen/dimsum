@@ -497,7 +497,7 @@
                     {
                         "py/object": "scopes.inbox.QueuedMessage",
                         "when": {
-                            "py/object": "freezegun.api.FakeDatetime",
+                            "py/object": "datetime.datetime",
                             "time": "2019-09-25T00:01:00"
                         },
                         "entity_key": 16,

@@ -455,7 +455,7 @@
         "py/object": "serializing.RootEntity",
         "version": {
             "py/object": "model.entity.Version",
-            "i": 6
+            "i": 5
         },
         "creator": {
             "py/object": "model.world.World",
@@ -484,7 +484,7 @@
                     {
                         "py/object": "scopes.inbox.QueuedMessage",
                         "when": {
-                            "py/object": "freezegun.api.FakeDatetime",
+                            "py/object": "datetime.datetime",
                             "time": "2019-09-25T00:02:00"
                         },
                         "entity_key": 16,
