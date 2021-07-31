@@ -153,6 +153,17 @@ class Session(MaterializeAndCreate):
         # Update the entities and return their new state, which should
         # only be different by the updated version number.
         updated = await self.store.update(updating)
+
+        # Patch versions in loaded entities to reflect reality. This
+        # isn't the prettiest code by any means but it does work and
+        # it's much faster than reloading completely from the store or
+        # fully unpickling the entity.
+        for key, cu in updated.items():
+            new_version = cu.compiled["version"]["i"]  # UGLY
+            loaded = self.registrar.find_by_key(key)
+            assert loaded
+            loaded.version.i = new_version
+
         return [key for key, _ in updated.items()]
 
     def __enter__(self) -> "Session":

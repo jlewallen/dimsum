@@ -115,3 +115,31 @@ async def test_storage_update_fails_and_rolls_back(caplog):
         assert area_1
         area_1.touch()
         await session.save()
+
+
+@pytest.mark.asyncio
+async def test_storage_multiple_saves(caplog):
+    store = storage.SqliteStorage(":memory:")
+    domain = domains.Domain(store=store)
+
+    area_1_key = shortuuid.uuid()
+    area_2_key = shortuuid.uuid()
+    with domain.session() as session:
+        world = await session.prepare()
+        await session.add_area(
+            scopes.area(key=area_1_key, creator=world, props=Common("Area One"))
+        )
+        await session.add_area(
+            scopes.area(key=area_2_key, creator=world, props=Common("Area Two"))
+        )
+        await session.save()
+
+    with domain.session() as session:
+        world = await session.prepare()
+        area_2 = await session.materialize(key=area_2_key)
+        assert area_2
+        area_2.touch()
+        await session.save()
+
+        area_2.touch()
+        await session.save()

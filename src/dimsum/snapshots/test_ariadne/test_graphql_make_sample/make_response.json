@@ -8,7 +8,7 @@
                         "py/object": "serializing.RootWorld",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": null,
                         "parent": null,
@@ -247,7 +247,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -562,7 +562,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -825,7 +825,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -1067,7 +1067,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -1320,7 +1320,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -1562,7 +1562,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -1815,7 +1815,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -2068,7 +2068,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -2321,7 +2321,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -2584,7 +2584,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -2847,7 +2847,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -3110,7 +3110,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -3373,7 +3373,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -3627,7 +3627,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -3877,7 +3877,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -4137,7 +4137,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -4387,7 +4387,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -4659,7 +4659,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -4909,7 +4909,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -5162,7 +5162,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -5425,7 +5425,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -5688,7 +5688,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -5942,7 +5942,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -6192,7 +6192,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -6458,7 +6458,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -6708,7 +6708,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -6971,7 +6971,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -7234,7 +7234,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -7500,7 +7500,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -7750,7 +7750,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -8013,7 +8013,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -8276,7 +8276,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -8536,7 +8536,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -8786,7 +8786,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -9049,7 +9049,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -9315,7 +9315,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -9565,7 +9565,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -9828,7 +9828,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -10091,7 +10091,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -10363,7 +10363,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -10613,7 +10613,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -10876,7 +10876,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -11139,7 +11139,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -11402,7 +11402,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -11668,7 +11668,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -11918,7 +11918,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -12181,7 +12181,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -12444,7 +12444,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -12704,7 +12704,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -12954,7 +12954,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -13217,7 +13217,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -13483,7 +13483,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -13733,7 +13733,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -13996,7 +13996,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -14259,7 +14259,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -14519,7 +14519,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -14769,7 +14769,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -15032,7 +15032,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -15293,7 +15293,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -15543,7 +15543,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -15806,7 +15806,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -16055,7 +16055,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -16305,7 +16305,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -16583,7 +16583,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",
@@ -16828,7 +16828,7 @@
                         "py/object": "serializing.RootEntity",
                         "version": {
                             "py/object": "model.entity.Version",
-                            "i": 0
+                            "i": 1
                         },
                         "creator": {
                             "py/object": "model.world.World",

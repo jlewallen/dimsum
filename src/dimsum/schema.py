@@ -385,9 +385,6 @@ async def resolve_language(obj, info, criteria):
         modified_keys = await session.save(
             functools.partial(get_security_context, player)
         )
-        for key in modified_keys:
-            log.warning("hacked reload: %s", key)
-            await session.materialize(key=key, refresh=True)
 
         async def send_entities(entities: List[EntityResolver]):
             subscriptions = info.context.domain.subscriptions
@@ -543,10 +540,8 @@ async def update(obj, info, entities):
         log.info("update: incoming=%s", incoming)
 
         modified_keys = await session.save()
-        for key in modified_keys:
-            log.warning("update: hacked reload: %s", key)
         affected = [
-            EntityResolver(session, await session.materialize(key=key, refresh=True))
+            EntityResolver(session, await session.materialize(key=key))
             for key in modified_keys
         ]
 
@@ -667,10 +662,8 @@ async def compare_and_swap(obj, info, entities):
 
         # Save all our changes and return the affected entities.
         modified_keys = await session.save()
-        for key in modified_keys:
-            log.warning("update: hacked reload: %s", key)
         affected = [
-            EntityResolver(session, await session.materialize(key=key, refresh=True))
+            EntityResolver(session, await session.materialize(key=key))
             for key in modified_keys
         ]
 
