@@ -10,6 +10,7 @@ from loggers import get_logger
 from model import (
     Entity,
     World,
+    Scope,
     Version,
     Registrar,
     Serialized,
@@ -69,6 +70,16 @@ class EntityProxy(wrapt.ObjectProxy):
     def __str__(self) -> str:
         assert self.__wrapped__
         return str(self.__wrapped__)
+
+
+class ScopeNotSerializableException(Exception):
+    pass
+
+
+@jsonpickle.handlers.register(Scope, base=True)
+class ScopeHandler(jsonpickle.handlers.BaseHandler):
+    def flatten(self, obj, data):
+        raise ScopeNotSerializableException()
 
 
 @jsonpickle.handlers.register(Version, base=True)
