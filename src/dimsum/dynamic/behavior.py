@@ -31,7 +31,7 @@ class Behavior:
 
             ignoring = flatten([[b] if b and not b.executable else []])
             if len(ignoring):
-                log.warning("unexecutable: %s", ignoring)
+                log.info("unexecutable: %s", ignoring)
 
             return (
                 [
