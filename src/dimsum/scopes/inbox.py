@@ -1,8 +1,6 @@
 import time
 import functools
 import bisect
-import json
-import jsonpickle
 import heapq
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -123,7 +121,11 @@ class PostService:
     async def service(self, when: datetime) -> List[DequeuedMessage]:
         with self.entity.make(Post) as post:
             return [
-                DequeuedMessage(qm.when, qm.entity_key, jsonpickle.decode(qm.message))
+                DequeuedMessage(
+                    qm.when,
+                    qm.entity_key,
+                    serializing.deserialize_non_entity(qm.message),
+                )
                 for qm in post.dequeue(when)
             ]
 
@@ -131,7 +133,11 @@ class PostService:
         # We discard here so we can easily just use dequeue and ignore the side effects.
         with self.entity.make_and_discard(Post) as post:
             return [
-                DequeuedMessage(qm.when, qm.entity_key, jsonpickle.decode(qm.message))
+                DequeuedMessage(
+                    qm.when,
+                    qm.entity_key,
+                    serializing.deserialize_non_entity(qm.message),
+                )
                 for qm in post.dequeue(when)
             ]
 

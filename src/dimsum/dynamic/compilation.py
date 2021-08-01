@@ -2,7 +2,6 @@ import time
 import dataclasses
 import functools
 import ast
-import jsonpickle
 import traceback
 import sys
 import inspect
@@ -24,6 +23,7 @@ from model import (
 )
 import tools
 import grammars
+import serializing
 import scopes.inbox as inbox
 
 from .core import (
@@ -337,12 +337,15 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
 
     @_notify.register
     async def _notify_dict(self, ev: dict, **kwargs):
-        log.info("notify: %s %s", ev, self._get_declared_classes())
-        unpickler = jsonpickle.unpickler.Unpickler()
-        decoded = unpickler.restore(
-            ev, reset=True, classes=list(self._get_declared_classes())
+        decoded = serializing.deserialize_non_entity(
+            ev, classes=list(self._get_declared_classes())
         )
-        log.info("notify: %s", decoded)
+        if not decoded:
+            log.error(
+                "deserialize-failed: %s declared=%s", ev, self._get_declared_classes()
+            )
+            raise DeserializationFailedException()
+        log.debug("notify: %s declared=%s", decoded, self._get_declared_classes())
         return await self._notify(decoded, **kwargs)
 
     async def notify(self, ev: Event, **kwargs):
@@ -356,6 +359,10 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
         return [
             value for value in self.declarations.values() if isinstance(value, type)
         ]
+
+
+class DeserializationFailedException(Exception):
+    pass
 
 
 class DynamicParameterException(Exception):

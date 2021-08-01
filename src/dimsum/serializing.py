@@ -10,7 +10,7 @@ import traceback
 import jsondiff
 import json
 from datetime import datetime
-from typing import Callable, Dict, List, Optional, Iterable, Any, Type, TypeVar
+from typing import Callable, Union, Dict, List, Optional, Iterable, Any, Type, TypeVar
 
 from storage import EntityStorage
 from loggers import get_logger
@@ -32,7 +32,8 @@ from model import (
 import scopes.movement as movement
 
 log = get_logger("dimsum")
-
+PyRefKey = "py/ref"
+PyObjectKey = "py/object"
 entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 
 
@@ -40,15 +41,6 @@ entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 def _fullname(klass):
     module = klass.__module__
     return module + "." + klass.__qualname__
-
-
-def _derive_from(klass):
-    name = klass.__name__
-    return type("Root" + name, (klass,), {})
-
-
-classes = {k: _derive_from(k) for k in entity_types.values()}
-inverted = {v: k for k, v in classes.items()}
 
 
 class Identities(enum.Enum):
@@ -330,15 +322,6 @@ class MigrateContext:
         return MigrateContext(depth=self.depth + 1)
 
 
-_object_names = {
-    "serializing.RootEntity": "model.entity.Entity",
-    "serializing.RootWorld": "model.world.World",
-}
-
-PyRefKey = "py/ref"
-PyObjectKey = "py/object"
-
-
 @functools.singledispatch
 def _migrate(incoming: Any, ctx: MigrateContext) -> Dict[str, Any]:
     return incoming
@@ -347,6 +330,12 @@ def _migrate(incoming: Any, ctx: MigrateContext) -> Dict[str, Any]:
 @_migrate.register
 def _migrate_list(value: list, ctx: MigrateContext):
     return [_migrate(v, ctx) for v in value]
+
+
+_object_names = {
+    "serializing.RootEntity": "model.entity.Entity",
+    "serializing.RootWorld": "model.world.World",
+}
 
 
 @_migrate.register
@@ -368,15 +357,20 @@ def _migrate_dict(value: dict, ctx: MigrateContext):
 def _deserialize(compiled: CompiledJson, lookup):
     migrated = _migrate(compiled.compiled, MigrateContext())
     context = CustomUnpickler(lookup)
-    decoded = context.restore(
+    return context.restore(
         migrated,
         reset=True,
-        classes=list(classes.values()) + [Entity, World],
+        classes=[Entity, World],
     )
-    if type(decoded) in inverted:
-        original = inverted[type(decoded)]
-        return original(**decoded.__dict__)
-    return decoded
+
+
+def deserialize_non_entity(
+    value: Union[str, Dict[str, Any]], classes: Optional[List[TypeVar]] = None
+):
+    if isinstance(value, str):
+        return jsonpickle.decode(value, classes=classes)
+    unpickler = jsonpickle.unpickler.Unpickler()
+    return unpickler.restore(value, classes=classes)
 
 
 @dataclasses.dataclass()

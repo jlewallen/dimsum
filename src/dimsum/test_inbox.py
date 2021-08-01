@@ -16,8 +16,8 @@ from test_utils import *
 
 @dataclasses.dataclass
 class PingMessage(Event):
-    """Only used in these tests. Must be top level for easier use with
-    jsonpickle below."""
+    """Only used in these tests. Must be top level for easier use the
+    serializer below."""
 
 
 @pytest.mark.asyncio
