@@ -3,7 +3,7 @@
         "world": {
             "key": "world",
             "serialized": {
-                "py/object": "serializing.RootWorld",
+                "py/object": "model.world.World",
                 "version": {
                     "py/object": "model.entity.Version",
                     "i": 1

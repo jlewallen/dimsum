@@ -5,7 +5,7 @@
                 {
                     "key": "a",
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
@@ -15,7 +15,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "a",
                                     "klass": "ItemClass",
                                     "name": "Thing A"
@@ -60,7 +61,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "b",
                                         "klass": "ItemClass",
                                         "name": "Thing B"
@@ -246,7 +248,7 @@
                 {
                     "key": "b",
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
@@ -256,7 +258,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "b",
                                     "klass": "ItemClass",
                                     "name": "Thing B"
@@ -295,7 +298,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "a",
                                     "klass": "ItemClass",
                                     "name": "Thing A"

@@ -1,12 +1,13 @@
 {
     "D#1": {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 2
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "<deterministic>",
             "klass": "RootEntityClass",
             "name": "World"

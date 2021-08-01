@@ -1,6 +1,6 @@
 {
     "world": {
-        "py/object": "serializing.RootWorld",
+        "py/object": "model.world.World",
         "version": {
             "py/object": "model.entity.Version",
             "i": 4
@@ -236,13 +236,14 @@
         }
     },
     "D#7": {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 1
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "<deterministic>",
             "klass": "RootEntityClass",
             "name": "World"

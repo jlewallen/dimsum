@@ -1,6 +1,6 @@
 [
     {
-        "py/object": "serializing.RootWorld",
+        "py/object": "model.world.World",
         "version": {
             "py/object": "model.entity.Version",
             "i": 3
@@ -212,13 +212,14 @@
         }
     },
     {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 4
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "world",
             "klass": "RootEntityClass",
             "name": "World"
@@ -227,7 +228,8 @@
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.world.World",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.world.World",
                     "key": "world",
                     "klass": "RootEntityClass",
                     "name": "World"
@@ -276,7 +278,8 @@
                 },
                 "occupied": [
                     {
-                        "py/object": "model.entity.Entity",
+                        "py/object": "model.entity.EntityRef",
+                        "py/ref": "model.entity.Entity",
                         "key": 6,
                         "klass": "LivingClass",
                         "name": "Jacob"
@@ -458,13 +461,14 @@
         }
     },
     {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 3
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "world",
             "klass": "RootEntityClass",
             "name": "World"
@@ -473,7 +477,8 @@
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.world.World",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.world.World",
                     "key": "world",
                     "klass": "RootEntityClass",
                     "name": "World"
@@ -662,13 +667,14 @@
         }
     },
     {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 2
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "world",
             "klass": "RootEntityClass",
             "name": "World"
@@ -677,7 +683,8 @@
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.entity.Entity",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.entity.Entity",
                     "key": 6,
                     "klass": "LivingClass",
                     "name": "Jacob"
@@ -709,7 +716,8 @@
                 },
                 "holding": [
                     {
-                        "py/object": "model.entity.Entity",
+                        "py/object": "model.entity.EntityRef",
+                        "py/ref": "model.entity.Entity",
                         "key": 10,
                         "klass": "ItemClass",
                         "name": "Hammer"
@@ -732,7 +740,8 @@
             },
             "occupying": {
                 "area": {
-                    "py/object": "model.entity.Entity",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.entity.Entity",
                     "key": 4,
                     "klass": "AreaClass",
                     "name": "Living room"
@@ -924,13 +933,14 @@
         }
     },
     {
-        "py/object": "serializing.RootEntity",
+        "py/object": "model.entity.Entity",
         "version": {
             "py/object": "model.entity.Version",
             "i": 5
         },
         "creator": {
-            "py/object": "model.world.World",
+            "py/object": "model.entity.EntityRef",
+            "py/ref": "model.world.World",
             "key": "world",
             "klass": "RootEntityClass",
             "name": "World"
@@ -939,7 +949,8 @@
         "scopes": {
             "ownership": {
                 "owner": {
-                    "py/object": "model.world.World",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.world.World",
                     "key": "world",
                     "klass": "RootEntityClass",
                     "name": "World"
@@ -1013,7 +1024,8 @@
                     ]
                 },
                 "container": {
-                    "py/object": "model.entity.Entity",
+                    "py/object": "model.entity.EntityRef",
+                    "py/ref": "model.entity.Entity",
                     "key": 6,
                     "klass": "LivingClass",
                     "name": "Jacob"

@@ -5,7 +5,7 @@
                 {
                     "key": "world",
                     "serialized": {
-                        "py/object": "serializing.RootWorld",
+                        "py/object": "model.world.World",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
@@ -244,19 +244,21 @@
                 {
                     "key": 13,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -264,7 +266,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -296,61 +299,71 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "15",
                                         "klass": "ItemClass",
                                         "name": "Beer Keg"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "18",
                                         "klass": "ItemClass",
                                         "name": "Large Oak Tree"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "21",
                                         "klass": "ItemClass",
                                         "name": "Hammer"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "24",
                                         "klass": "ItemClass",
                                         "name": "Mysterious Box"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "27",
                                         "klass": "ItemClass",
                                         "name": "Acoustic Guitar"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "30",
                                         "klass": "ItemClass",
                                         "name": "Large Steep Cliff"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "37",
                                         "klass": "ExitClass",
                                         "name": "Wooden Ladder"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "44",
                                         "klass": "ExitClass",
                                         "name": "Rocky Path"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "51",
                                         "klass": "ExitClass",
                                         "name": "Worn Path"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "173",
                                         "klass": "ExitClass",
                                         "name": "Torn-up Sidewak"
@@ -374,7 +387,8 @@
                                 },
                                 "occupied": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "33",
                                         "klass": "LivingClass",
                                         "name": "Tomorrow"
@@ -559,19 +573,21 @@
                 {
                     "key": 33,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -579,7 +595,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -627,7 +644,8 @@
                             },
                             "occupying": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -822,19 +840,21 @@
                 {
                     "key": 15,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -842,7 +862,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -881,7 +902,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -1064,19 +1086,21 @@
                 {
                     "key": 18,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -1084,7 +1108,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -1134,7 +1159,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -1317,19 +1343,21 @@
                 {
                     "key": 21,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -1337,7 +1365,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -1376,7 +1405,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -1559,19 +1589,21 @@
                 {
                     "key": 24,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -1579,7 +1611,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -1629,7 +1662,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -1812,19 +1846,21 @@
                 {
                     "key": 27,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -1832,7 +1868,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -1882,7 +1919,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -2065,19 +2103,21 @@
                 {
                     "key": 30,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -2085,7 +2125,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -2135,7 +2176,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -2318,19 +2360,21 @@
                 {
                     "key": 37,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -2338,7 +2382,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -2352,7 +2397,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "35",
                                     "klass": "AreaClass",
                                     "name": "Artist's Loft"
@@ -2398,7 +2444,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -2581,19 +2628,21 @@
                 {
                     "key": 44,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -2601,7 +2650,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -2615,7 +2665,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "42",
                                     "klass": "AreaClass",
                                     "name": "Narrow Canyon"
@@ -2661,7 +2712,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -2844,19 +2896,21 @@
                 {
                     "key": 51,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -2864,7 +2918,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -2878,7 +2933,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -2924,7 +2980,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -3107,19 +3164,21 @@
                 {
                     "key": 173,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -3127,7 +3186,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -3141,7 +3201,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -3187,7 +3248,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -3370,19 +3432,21 @@
                 {
                     "key": 35,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -3390,7 +3454,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -3422,7 +3487,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "40",
                                         "klass": "ExitClass",
                                         "name": "Wooden Ladder"
@@ -3624,19 +3690,21 @@
                 {
                     "key": 40,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -3644,7 +3712,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -3658,7 +3727,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -3691,7 +3761,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "35",
                                     "klass": "AreaClass",
                                     "name": "Artist's Loft"
@@ -3874,19 +3945,21 @@
                 {
                     "key": 42,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -3894,7 +3967,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -3926,7 +4000,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "47",
                                         "klass": "ExitClass",
                                         "name": "Rocky Path"
@@ -4134,19 +4209,21 @@
                 {
                     "key": 47,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -4154,7 +4231,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -4168,7 +4246,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -4201,7 +4280,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "42",
                                     "klass": "AreaClass",
                                     "name": "Narrow Canyon"
@@ -4384,19 +4464,21 @@
                 {
                     "key": 49,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -4404,7 +4486,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -4436,25 +4519,29 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "54",
                                         "klass": "ExitClass",
                                         "name": "Worn Path"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "56",
                                         "klass": "ItemClass",
                                         "name": "Large Maple Tree"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "62",
                                         "klass": "ExitClass",
                                         "name": "Entrance to a Dark Cavern"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "157",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
@@ -4656,19 +4743,21 @@
                 {
                     "key": 54,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -4676,7 +4765,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -4690,7 +4780,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -4723,7 +4814,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -4906,19 +4998,21 @@
                 {
                     "key": 56,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -4926,7 +5020,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -4976,7 +5071,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -5159,19 +5255,21 @@
                 {
                     "key": 62,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -5179,7 +5277,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -5193,7 +5292,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Dark Cavern"
@@ -5239,7 +5339,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -5422,19 +5523,21 @@
                 {
                     "key": 157,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -5442,7 +5545,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -5456,7 +5560,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -5502,7 +5607,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -5685,19 +5791,21 @@
                 {
                     "key": 60,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -5705,7 +5813,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -5737,7 +5846,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "65",
                                         "klass": "ExitClass",
                                         "name": "Small Crevice"
@@ -5939,19 +6049,21 @@
                 {
                     "key": 65,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -5959,7 +6071,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -5973,7 +6086,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -6006,7 +6120,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "60",
                                     "klass": "AreaClass",
                                     "name": "Dark Cavern"
@@ -6189,19 +6304,21 @@
                 {
                     "key": 67,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -6209,7 +6326,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -6241,19 +6359,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "85",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "87",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "160",
                                         "klass": "ExitClass",
                                         "name": "Marble Steps"
@@ -6455,19 +6576,21 @@
                 {
                     "key": 85,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -6475,7 +6598,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -6489,7 +6613,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -6522,7 +6647,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -6705,19 +6831,21 @@
                 {
                     "key": 87,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -6725,7 +6853,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -6739,7 +6868,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -6785,7 +6915,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -6968,19 +7099,21 @@
                 {
                     "key": 160,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -6988,7 +7121,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -7002,7 +7136,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "49",
                                     "klass": "AreaClass",
                                     "name": "A small clearing."
@@ -7048,7 +7183,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -7231,19 +7367,21 @@
                 {
                     "key": 69,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -7251,7 +7389,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -7283,19 +7422,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "91",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "93",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "97",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
@@ -7497,19 +7639,21 @@
                 {
                     "key": 91,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -7517,7 +7661,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -7531,7 +7676,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
@@ -7564,7 +7710,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -7747,19 +7894,21 @@
                 {
                     "key": 93,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -7767,7 +7916,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -7781,7 +7931,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -7827,7 +7978,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -8010,19 +8162,21 @@
                 {
                     "key": 97,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -8030,7 +8184,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -8044,7 +8199,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -8090,7 +8246,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -8273,19 +8430,21 @@
                 {
                     "key": 71,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -8293,7 +8452,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -8325,13 +8485,15 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "100",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "102",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
@@ -8533,19 +8695,21 @@
                 {
                     "key": 100,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -8553,7 +8717,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -8567,7 +8732,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -8600,7 +8766,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
@@ -8783,19 +8950,21 @@
                 {
                     "key": 102,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -8803,7 +8972,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -8817,7 +8987,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -8863,7 +9034,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
@@ -9046,19 +9218,21 @@
                 {
                     "key": 77,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -9066,7 +9240,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -9098,19 +9273,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "127",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "129",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "133",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -9312,19 +9490,21 @@
                 {
                     "key": 127,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -9332,7 +9512,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -9346,7 +9527,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -9379,7 +9561,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -9562,19 +9745,21 @@
                 {
                     "key": 129,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -9582,7 +9767,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -9596,7 +9782,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
@@ -9642,7 +9829,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -9825,19 +10013,21 @@
                 {
                     "key": 133,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -9845,7 +10035,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -9859,7 +10050,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "71",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 2"
@@ -9905,7 +10097,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -10088,19 +10281,21 @@
                 {
                     "key": 75,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -10108,7 +10303,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -10140,25 +10336,29 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "115",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "117",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "121",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "124",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -10360,19 +10560,21 @@
                 {
                     "key": 115,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -10380,7 +10582,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -10394,7 +10597,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -10427,7 +10631,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -10610,19 +10815,21 @@
                 {
                     "key": 117,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -10630,7 +10837,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -10644,7 +10852,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -10690,7 +10899,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -10873,19 +11083,21 @@
                 {
                     "key": 121,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -10893,7 +11105,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -10907,7 +11120,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -10953,7 +11167,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -11136,19 +11351,21 @@
                 {
                     "key": 124,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -11156,7 +11373,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -11170,7 +11388,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "69",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 1"
@@ -11216,7 +11435,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -11399,19 +11619,21 @@
                 {
                     "key": 73,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -11419,7 +11641,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -11451,19 +11674,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "106",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "108",
                                         "klass": "ExitClass",
                                         "name": "East Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "112",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -11665,19 +11891,21 @@
                 {
                     "key": 106,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -11685,7 +11913,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -11699,7 +11928,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -11732,7 +11962,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -11915,19 +12146,21 @@
                 {
                     "key": 108,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -11935,7 +12168,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -11949,7 +12183,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
@@ -11995,7 +12230,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -12178,19 +12414,21 @@
                 {
                     "key": 112,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -12198,7 +12436,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -12212,7 +12451,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "67",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 0 x 0"
@@ -12258,7 +12498,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -12441,19 +12682,21 @@
                 {
                     "key": 79,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -12461,7 +12704,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -12493,13 +12737,15 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "136",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "138",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -12701,19 +12947,21 @@
                 {
                     "key": 136,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -12721,7 +12969,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -12735,7 +12984,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -12768,7 +13018,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
@@ -12951,19 +13202,21 @@
                 {
                     "key": 138,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -12971,7 +13224,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -12985,7 +13239,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "73",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 0"
@@ -13031,7 +13286,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
@@ -13214,19 +13470,21 @@
                 {
                     "key": 81,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -13234,7 +13492,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -13266,19 +13525,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "142",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "144",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "148",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -13480,19 +13742,21 @@
                 {
                     "key": 142,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -13500,7 +13764,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -13514,7 +13779,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
@@ -13547,7 +13813,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -13730,19 +13997,21 @@
                 {
                     "key": 144,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -13750,7 +14019,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -13764,7 +14034,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "79",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 0"
@@ -13810,7 +14081,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -13993,19 +14265,21 @@
                 {
                     "key": 148,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -14013,7 +14287,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -14027,7 +14302,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "75",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 1"
@@ -14073,7 +14349,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -14256,19 +14533,21 @@
                 {
                     "key": 83,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "9",
                             "klass": "AreaClass",
                             "name": "generic area"
@@ -14276,7 +14555,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -14308,13 +14588,15 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "151",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "153",
                                         "klass": "ExitClass",
                                         "name": "West Exit"
@@ -14516,19 +14798,21 @@
                 {
                     "key": 151,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -14536,7 +14820,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -14550,7 +14835,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "81",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 1"
@@ -14583,7 +14869,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
@@ -14766,19 +15053,21 @@
                 {
                     "key": 153,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -14786,7 +15075,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -14800,7 +15090,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "77",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 1 x 2"
@@ -14846,7 +15137,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "83",
                                     "klass": "AreaClass",
                                     "name": "Grid Room 2 x 2"
@@ -15029,13 +15321,14 @@
                 {
                     "key": 165,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
@@ -15044,7 +15337,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -15076,19 +15370,22 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "171",
                                         "klass": "ExitClass",
                                         "name": "South Exit"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "176",
                                         "klass": "ExitClass",
                                         "name": "Torn-up Sidewak"
                                     },
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "184",
                                         "klass": "ExitClass",
                                         "name": "Purple Line Train"
@@ -15290,19 +15587,21 @@
                 {
                     "key": 171,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -15310,7 +15609,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -15324,7 +15624,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "167",
                                     "klass": "AreaClass",
                                     "name": "Outside the Bounty"
@@ -15357,7 +15658,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -15540,19 +15842,21 @@
                 {
                     "key": 176,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -15560,7 +15864,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -15574,7 +15879,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "13",
                                     "klass": "AreaClass",
                                     "name": "Town Courtyard"
@@ -15620,7 +15926,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -15803,13 +16110,14 @@
                 {
                     "key": 167,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
@@ -15818,7 +16126,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -15850,7 +16159,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "169",
                                         "klass": "ExitClass",
                                         "name": "North Exit"
@@ -16052,19 +16362,21 @@
                 {
                     "key": 169,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
                         },
                         "parent": {
-                            "py/object": "model.entity.Entity",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.entity.Entity",
                             "key": "6",
                             "klass": "ItemClass",
                             "name": "generic thing"
@@ -16072,7 +16384,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -16086,7 +16399,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -16119,7 +16433,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "167",
                                     "klass": "AreaClass",
                                     "name": "Outside the Bounty"
@@ -16302,13 +16617,14 @@
                 {
                     "key": 184,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
@@ -16317,7 +16633,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -16342,7 +16659,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "180",
                                     "klass": "AreaClass",
                                     "name": "Purple Line Car"
@@ -16397,7 +16715,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -16580,13 +16899,14 @@
                 {
                     "key": 182,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
@@ -16595,7 +16915,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -16609,7 +16930,8 @@
                             },
                             "exit": {
                                 "area": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "165",
                                     "klass": "AreaClass",
                                     "name": "Wilshire/Normandie"
@@ -16642,7 +16964,8 @@
                                     ]
                                 },
                                 "container": {
-                                    "py/object": "model.entity.Entity",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.entity.Entity",
                                     "key": "180",
                                     "klass": "AreaClass",
                                     "name": "Purple Line Car"
@@ -16825,13 +17148,14 @@
                 {
                     "key": 180,
                     "serialized": {
-                        "py/object": "serializing.RootEntity",
+                        "py/object": "model.entity.Entity",
                         "version": {
                             "py/object": "model.entity.Version",
                             "i": 1
                         },
                         "creator": {
-                            "py/object": "model.world.World",
+                            "py/object": "model.entity.EntityRef",
+                            "py/ref": "model.world.World",
                             "key": "world",
                             "klass": "RootEntityClass",
                             "name": "World"
@@ -16840,7 +17164,8 @@
                         "scopes": {
                             "ownership": {
                                 "owner": {
-                                    "py/object": "model.world.World",
+                                    "py/object": "model.entity.EntityRef",
+                                    "py/ref": "model.world.World",
                                     "key": "world",
                                     "klass": "RootEntityClass",
                                     "name": "World"
@@ -16872,7 +17197,8 @@
                                 },
                                 "holding": [
                                     {
-                                        "py/object": "model.entity.Entity",
+                                        "py/object": "model.entity.EntityRef",
+                                        "py/ref": "model.entity.Entity",
                                         "key": "182",
                                         "klass": "ExitClass",
                                         "name": "Train Door"

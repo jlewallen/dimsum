@@ -1,6 +1,6 @@
 {
     "world": {
-        "py/object": "serializing.RootWorld",
+        "py/object": "model.world.World",
         "version": {
             "py/object": "model.entity.Version",
             "i": 5

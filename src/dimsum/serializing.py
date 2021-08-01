@@ -2,15 +2,19 @@ import dataclasses
 import copy
 import enum
 import jsonpickle
+import functools
 import wrapt
+import traceback
+import jsondiff
 import json
 from datetime import datetime
-from typing import Callable, Dict, List, Optional, Iterable
+from typing import Callable, Dict, List, Optional, Iterable, Any, Type, TypeVar
 
 from storage import EntityStorage
 from loggers import get_logger
 from model import (
     Entity,
+    EntityClass,
     World,
     Scope,
     Version,
@@ -21,6 +25,7 @@ from model import (
     Permission,
     MissingEntityException,
     CompiledJson,
+    Common,
 )
 import scopes.movement as movement
 
@@ -32,8 +37,6 @@ entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 # From stackoverflow
 def _fullname(klass):
     module = klass.__module__
-    if module == "builtins":
-        return klass.__qualname__  # avoid outputs like 'builtins.str'
     return module + "." + klass.__qualname__
 
 
@@ -74,24 +77,10 @@ class EntityProxy(wrapt.ObjectProxy):
         return str(self.__wrapped__)
 
 
-class ScopeNotSerializableException(Exception):
-    pass
-
-
-@jsonpickle.handlers.register(Scope, base=True)
-class ScopeHandler(jsonpickle.handlers.BaseHandler):
-    def flatten(self, obj, data):
-        raise ScopeNotSerializableException()
-
-
 @jsonpickle.handlers.register(Version, base=True)
 class VersionHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return Version(i=obj["i"])
-
-    def flatten(self, obj, data):
-        data["i"] = obj.i
-        return data
 
 
 @jsonpickle.handlers.register(Identity, base=True)
@@ -100,19 +89,6 @@ class IdentityHandler(jsonpickle.handlers.BaseHandler):
         return Identity(
             public=obj["public"], private=obj["private"], signature=obj["signature"]
         )
-
-    def flatten(self, obj, data):
-        if self.context.identities == Identities.HIDDEN:
-            data["public"] = "<public>"
-            data["signature"] = "<signature>"
-            data["private"] = "<private>"
-            return data
-
-        data["public"] = obj.public
-        data["signature"] = obj.signature
-        if self.context.identities == Identities.PRIVATE:
-            data["private"] = obj.private
-        return data
 
 
 @jsonpickle.handlers.register(movement.Direction)
@@ -125,50 +101,20 @@ class DirectionHandler(jsonpickle.handlers.BaseHandler):
                     return d
         return None
 
-    def flatten(self, obj, data):
-        data["compass"] = obj.name
-        return data
-
 
 @jsonpickle.handlers.register(EntityRef)
 class EntityRefHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
-        raise NotImplementedError
-
-    def flatten(self, obj, data):
-        assert obj.pyObject
-        data["py/object"] = _fullname(obj.pyObject)
-        data["key"] = obj.key
-        data["klass"] = obj.klass
-        data["name"] = obj.name
-        return data
-
-
-@jsonpickle.handlers.register(Entity)
-@jsonpickle.handlers.register(World)
-class EntityHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        pyObject = entity_types[obj["py/object"]]
+        pyObject = obj["py/ref"]
         ref = EntityRef.new(pyObject=pyObject, **obj)
         log.debug("entity-handler: %s", ref)
         return self.context.lookup(ref)
-
-    def flatten(self, obj, data):
-        data["key"] = obj.key
-        data["klass"] = obj.klass.__name__
-        data["name"] = obj.props.name
-        return data
 
 
 @jsonpickle.handlers.register(datetime, base=True)
 class DateTimeHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return datetime.fromisoformat(obj["time"])
-
-    def flatten(self, obj: datetime, data):
-        data["py/object"] = "datetime.datetime"
-        data["time"] = obj.isoformat()
-        return data
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):
@@ -187,53 +133,201 @@ class SerializationException(Exception):
     pass
 
 
-def _prepare(value, depth=0):
-    if isinstance(value, list):
-        value = [_prepare(item, depth=depth + 1) for item in value]
+@dataclasses.dataclass(frozen=True)
+class FlattenContext:
+    identities: Identities = Identities.PUBLIC
+    depth: int = 1
 
-    if isinstance(value, dict):
-        value = {key: _prepare(value, depth=depth + 1) for key, value in value.items()}
+    def decrease(self) -> "FlattenContext":
+        assert self.depth > 0
+        return FlattenContext(identities=self.identities, depth=self.depth - 1)
 
-    if value.__class__ in classes:
-        log.debug(
-            "swap class: %s -> %s (%s)", type(value), classes[value.__class__], value
-        )
-        attrs = copy.copy(value.__dict__)
-        klass = classes[value.__class__]
-        return klass(**attrs)
+
+class NoFlattenerException(Exception):
+    pass
+
+
+@functools.singledispatch
+def _flatten_value(value, ctx: FlattenContext) -> Any:
+    raise NoFlattenerException(f"no flattener: {value}")
+
+
+def _include_key(key: str) -> bool:
+    return not key.startswith("_")
+
+
+@_flatten_value.register
+def _flatten_value_dict(value: dict, ctx: FlattenContext) -> Any:
+    return {
+        key: _flatten_value(v, ctx) for key, v in value.items() if _include_key(key)
+    }
+
+
+def _py_object(obj: Any, **kwargs) -> Dict[str, Any]:
+    return {
+        **{"py/object": _fullname(obj.__class__)},
+        **kwargs,
+    }
+
+
+@_flatten_value.register
+def _flatten_value_string(value: str, ctx: FlattenContext) -> Any:
     return value
 
 
+@_flatten_value.register
+def _flatten_value_integer(value: int, ctx: FlattenContext) -> Any:
+    return value
+
+
+@_flatten_value.register
+def _flatten_value_float(value: float, ctx: FlattenContext) -> Any:
+    return value
+
+
+@_flatten_value.register
+def _flatten_value_list(value: list, ctx: FlattenContext) -> Any:
+    return [_flatten_value(v, ctx) for v in value]
+
+
+@_flatten_value.register
+def _flatten_value_tuple(value: tuple, ctx: FlattenContext) -> Any:
+    return [_flatten_value(v, ctx) for v in value]
+
+
+@_flatten_value.register
+def _flatten_value_none(value: None, ctx: FlattenContext) -> Any:
+    return None
+
+
+@_flatten_value.register
+def _flatten_value_datetime(value: datetime, ctx: FlattenContext) -> Any:
+    return {
+        "py/object": "datetime.datetime",
+        "time": value.isoformat(),
+    }
+
+
+@_flatten_value.register
+def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
+    # I wish there was a way to get singledisapatch to respect this,
+    # but there's simply no way that I can tell.
+    if isinstance(value, type):
+        # log.warning("value(type): full-name=%s", _fullname(value))
+        return {"py/type": _fullname(value)}
+    return _py_object(value, **_flatten_value_dict(value.__dict__, ctx))
+
+
+@_flatten_value.register
+def _flatten_value_entity(value: Entity, ctx: FlattenContext) -> Any:
+    if ctx.depth > 0:
+        # log.warning("value(d): type=%s", type(value))
+        return _py_object(value, **_flatten_value_dict(value.__dict__, ctx.decrease()))
+    else:
+        # log.warning("value(s): type=%s %s %s", type(value), value.klass, type(value.klass))
+        ref = EntityRef(
+            key=value.key,
+            klass=value.klass.__name__,
+            name=value.props.name,
+            pyObject=_fullname(value.__class__),
+        )
+        return _flatten_value(ref, ctx)
+
+
+@_flatten_value.register
+def _flatten_value_entity_ref(value: EntityRef, ctx: FlattenContext) -> Any:
+    return {
+        "py/object": _fullname(EntityRef),
+        "py/ref": value.pyObject,
+        "key": value.key,
+        "klass": value.klass,
+        "name": value.name,
+    }
+
+
+@_flatten_value.register
+def _flatten_value_version(value: Version, ctx: FlattenContext) -> Any:
+    return _py_object(value, i=value.i)
+
+
+@_flatten_value.register
+def _flatten_value_identity(value: Identity, ctx: FlattenContext) -> Any:
+    if ctx.identities == Identities.HIDDEN:
+        return _py_object(
+            value,
+            **{
+                "public": "<public>",
+                "signature": "<signature>",
+                "private": "<private>",
+            },
+        )
+
+    if ctx.identities == Identities.PRIVATE:
+        return _py_object(
+            value,
+            **{
+                "public": value.public,
+                "signature": value.signature,
+                "private": value.private,
+            },
+        )
+
+    return _py_object(
+        value,
+        **{
+            "public": value.public,
+            "signature": value.signature,
+        },
+    )
+
+
+@_flatten_value.register
+def _flatten_value_direction(value: movement.Direction, ctx: FlattenContext) -> Any:
+    return _py_object(value, compass=value.name)
+
+
+class ScopeNotSerializableException(Exception):
+    pass
+
+
+@_flatten_value.register
+def _flatten_value_scope(value: Scope, ctx: FlattenContext) -> Any:
+    raise ScopeNotSerializableException()
+
+
+def _flatten(value, unpicklable=True, identities=Identities.PUBLIC):
+    return _flatten_value(value, FlattenContext(identities=identities))
+
+
 def serialize(
-    value, indent=None, unpicklable=True, identities=Identities.PUBLIC, full=True
+    value, indent=None, unpicklable=True, identities=Identities.PUBLIC
 ) -> Optional[str]:
     if value is None:
         return value
 
-    prepared = _prepare(value) if full else value
-
     try:
-        pickler = SecurePickler(
-            unpicklable=unpicklable,
-            make_refs=False,
-            identities=identities,
-        )
-        flattened = pickler.flatten(prepared)
-        if isinstance(flattened, dict):
-            for key in list(flattened.keys()):
-                if key.startswith("_"):
-                    del flattened[key]
-        return json.dumps(flattened, indent=indent)
+        flattened = _flatten(value, unpicklable=unpicklable, identities=identities)
+        try:
+            return json.dumps(flattened, indent=indent)
+        except:
+            log.error("flattened: %s", flattened)
+            raise
     except ScopeNotSerializableException as e:
         log.error("open entity scope value=%s", value)
         log.error("open entity scope scopes=%s", value.scopes)
         raise e
 
 
+restores: int = 0
+
+
 def _deserialize(compiled: CompiledJson, lookup):
+    global restores
     context = CustomUnpickler(lookup)
+    # log.warning("%d restoring: %s", restores, compiled.compiled)
+    restores += 1
     decoded = context.restore(
-        compiled.compiled, reset=True, classes=list(classes.values())
+        compiled.compiled, reset=True, classes=list(classes.values()) + [Entity, World]
     )
     if type(decoded) in inverted:
         original = inverted[type(decoded)]
@@ -345,6 +439,8 @@ async def materialize(
                 choice,
                 depths[loaded.key],
             )
+
+    loaded.__post_init__()
 
     registrar.register(loaded, compiled=compiled, depth=depth + choice)
 

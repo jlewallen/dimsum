@@ -155,7 +155,7 @@ class EntityRef:
     key: str
     klass: str
     name: str
-    pyObject: Any
+    pyObject: str
 
     @staticmethod
     def new(key=None, klass=None, name=None, pyObject=None, **kwargs):
@@ -353,6 +353,9 @@ class Entity:
                 self.key, self.version, self.props.name, creator, id(self), self.props
             )
         )
+
+    def __post_init__(self):
+        self._live = {}
 
     def _log(self):
         return get_logger("dimsum.model.entity")
