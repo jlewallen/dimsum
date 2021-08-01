@@ -1,7 +1,7 @@
 import copy
 import re
 import time
-from typing import Dict, Optional, Optional
+from typing import Dict, Optional, Optional, Any
 
 from loggers import get_logger
 
@@ -31,12 +31,16 @@ EverybodyWrites = [Touched]
 
 
 class Property:
-    def __init__(self, value=None, name=None):
+    def __init__(
+        self, value: Any = None, name: Optional[str] = None, acls: Optional[Acls] = None
+    ):
         self.value = value
-        if name in EverybodyWrites:
-            self.acls = Acls.everybody_writes()
-        else:
-            self.acls = Acls.owner_writes()
+        self.acls = acls
+        if not self.acls:
+            if name in EverybodyWrites:
+                self.acls = Acls.everybody_writes()
+            else:
+                self.acls = Acls.owner_writes()
 
     def set(self, value):
         self.value = value
