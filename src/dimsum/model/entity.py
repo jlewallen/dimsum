@@ -483,7 +483,9 @@ class Entity:
         self._log().debug("%s updating scopes: %s %s", self.key, key, data)
 
     def __repr__(self):
-        return "'{0} (#{1})'".format(self.props.name, self.props.gid)
+        if hasattr(self, "props"):
+            return f"'{self.props.name} (#{self.props.gid})'"
+        return f"PartialEntity<{self.key}>"
 
     def __hash__(self):
         return hash(self.key)

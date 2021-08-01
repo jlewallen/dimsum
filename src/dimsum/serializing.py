@@ -2,7 +2,9 @@ import dataclasses
 import copy
 import enum
 import jsonpickle
+import copy
 import functools
+import pprint
 import wrapt
 import traceback
 import jsondiff
@@ -142,6 +144,9 @@ class FlattenContext:
         assert self.depth > 0
         return FlattenContext(identities=self.identities, depth=self.depth - 1)
 
+    def path(self, key: str) -> "FlattenContext":
+        return self
+
 
 class NoFlattenerException(Exception):
     pass
@@ -159,7 +164,9 @@ def _include_key(key: str) -> bool:
 @_flatten_value.register
 def _flatten_value_dict(value: dict, ctx: FlattenContext) -> Any:
     return {
-        key: _flatten_value(v, ctx) for key, v in value.items() if _include_key(key)
+        key: _flatten_value(v, ctx.path(key))
+        for key, v in value.items()
+        if _include_key(key)
     }
 
 
@@ -213,7 +220,6 @@ def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
     # I wish there was a way to get singledisapatch to respect this,
     # but there's simply no way that I can tell.
     if isinstance(value, type):
-        # log.warning("value(type): full-name=%s", _fullname(value))
         return {"py/type": _fullname(value)}
     return _py_object(value, **_flatten_value_dict(value.__dict__, ctx))
 
@@ -221,10 +227,8 @@ def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
 @_flatten_value.register
 def _flatten_value_entity(value: Entity, ctx: FlattenContext) -> Any:
     if ctx.depth > 0:
-        # log.warning("value(d): type=%s", type(value))
         return _py_object(value, **_flatten_value_dict(value.__dict__, ctx.decrease()))
     else:
-        # log.warning("value(s): type=%s %s %s", type(value), value.klass, type(value.klass))
         ref = EntityRef(
             key=value.key,
             klass=value.klass.__name__,
@@ -318,16 +322,56 @@ def serialize(
         raise e
 
 
-restores: int = 0
+@dataclasses.dataclass(frozen=True)
+class MigrateContext:
+    depth: int = 0
+
+    def increase(self) -> "MigrateContext":
+        return MigrateContext(depth=self.depth + 1)
+
+
+_object_names = {
+    "serializing.RootEntity": "model.entity.Entity",
+    "serializing.RootWorld": "model.world.World",
+}
+
+PyRefKey = "py/ref"
+PyObjectKey = "py/object"
+
+
+@functools.singledispatch
+def _migrate(incoming: Any, ctx: MigrateContext) -> Dict[str, Any]:
+    return incoming
+
+
+@_migrate.register
+def _migrate_list(value: list, ctx: MigrateContext):
+    return [_migrate(v, ctx) for v in value]
+
+
+@_migrate.register
+def _migrate_dict(value: dict, ctx: MigrateContext):
+    migrated = copy.copy(value)
+    if PyObjectKey in value:
+        pyObject = value[PyObjectKey]
+        if pyObject in _object_names and "scopes" in value:
+            migrated[PyObjectKey] = _object_names[pyObject]
+        if "name" in value and "klass" in value and "key" in value:
+            if PyRefKey in migrated:
+                pass
+            else:
+                migrated[PyRefKey] = pyObject
+                migrated[PyObjectKey] = _fullname(EntityRef)
+    return {key: _migrate(v, ctx) for key, v in migrated.items()}
 
 
 def _deserialize(compiled: CompiledJson, lookup):
-    global restores
+    migrated = _migrate(compiled.compiled, MigrateContext())
     context = CustomUnpickler(lookup)
-    # log.warning("%d restoring: %s", restores, compiled.compiled)
-    restores += 1
     decoded = context.restore(
-        compiled.compiled, reset=True, classes=list(classes.values()) + [Entity, World]
+        migrated,
+        reset=True,
+        classes=list(classes.values()) + [Entity, World],
     )
     if type(decoded) in inverted:
         original = inverted[type(decoded)]
