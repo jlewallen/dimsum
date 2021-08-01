@@ -126,7 +126,7 @@ def _get_instance_key(instance) -> str:
 
 @dataclasses.dataclass(frozen=True)
 class CompiledJson:
-    text: str
+    text: str = dataclasses.field(repr=False)
     compiled: Dict[str, Any]
 
     @staticmethod

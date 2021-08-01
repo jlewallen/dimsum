@@ -195,6 +195,7 @@ class Session(MaterializeAndCreate):
         json: Optional[List[Serialized]] = None,
         reach=None,
         refresh=None,
+        migrate=None,
     ) -> serializing.Materialized:
         materialized = await serializing.materialize(
             registrar=self.registrar,
@@ -205,6 +206,7 @@ class Session(MaterializeAndCreate):
             reach=reach if reach else default_reach,
             proxy_factory=proxying.create,
             refresh=refresh,
+            migrate=migrate,
         )
 
         for updated_world in [e for e in materialized.all() if e.key == WorldKey]:

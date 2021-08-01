@@ -11,7 +11,18 @@ import jsondiff
 import json
 from datetime import datetime
 from collections import ChainMap
-from typing import Callable, Union, Dict, List, Optional, Iterable, Any, Type, TypeVar
+from typing import (
+    Callable,
+    Union,
+    Dict,
+    List,
+    Optional,
+    Iterable,
+    Any,
+    Type,
+    TypeVar,
+    Tuple,
+)
 
 from storage import EntityStorage
 from loggers import get_logger
@@ -39,7 +50,7 @@ PyTypeKey = "py/type"
 
 
 # From stackoverflow
-def _fullname(klass):
+def full_class_name(klass):
     module = klass.__module__
     return module + "." + klass.__qualname__
 
@@ -277,7 +288,7 @@ def _flatten_value_dict(value: dict, ctx: FlattenContext) -> Any:
 
 def _py_object(obj: Any, **kwargs) -> Dict[str, Any]:
     return {
-        **{"py/object": _fullname(obj.__class__)},
+        **{"py/object": full_class_name(obj.__class__)},
         **kwargs,
     }
 
@@ -317,7 +328,7 @@ def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
     # I wish there was a way to get singledisapatch to respect this,
     # but there's simply no way that I can tell.
     if isinstance(value, type):
-        return {"py/type": _fullname(value)}
+        return {"py/type": full_class_name(value)}
     return _py_object(value, **_flatten_value_dict(value.__dict__, ctx))
 
 
@@ -345,7 +356,7 @@ def _flatten_value_entity(value: Entity, ctx: FlattenContext) -> Any:
             key=value.key,
             klass=value.klass.__name__,
             name=value.props.name,
-            pyObject=_fullname(value.__class__),
+            pyObject=full_class_name(value.__class__),
         )
         return _flatten_value(ref, ctx)
 
@@ -353,7 +364,7 @@ def _flatten_value_entity(value: Entity, ctx: FlattenContext) -> Any:
 @_flatten_value.register
 def _flatten_value_entity_ref(value: EntityRef, ctx: FlattenContext) -> Any:
     return {
-        "py/object": _fullname(EntityRef),
+        "py/object": full_class_name(EntityRef),
         "py/ref": value.pyObject,
         "key": value.key,
         "klass": value.klass,
@@ -434,50 +445,9 @@ def serialize(
         raise e
 
 
-@dataclasses.dataclass(frozen=True)
-class MigrateContext:
-    depth: int = 0
-
-    def increase(self) -> "MigrateContext":
-        return MigrateContext(depth=self.depth + 1)
-
-
-@functools.singledispatch
-def _migrate(incoming: Any, ctx: MigrateContext) -> Dict[str, Any]:
-    return incoming
-
-
-@_migrate.register
-def _migrate_list(value: list, ctx: MigrateContext):
-    return [_migrate(v, ctx) for v in value]
-
-
-_object_names = {
-    "serializing.RootEntity": "model.entity.Entity",
-    "serializing.RootWorld": "model.world.World",
-}
-
-
-@_migrate.register
-def _migrate_dict(value: dict, ctx: MigrateContext):
-    migrated = copy.copy(value)
-    if PyObjectKey in value:
-        pyObject = value[PyObjectKey]
-        if pyObject in _object_names and "scopes" in value:
-            migrated[PyObjectKey] = _object_names[pyObject]
-        if "name" in value and "klass" in value and "key" in value:
-            if PyRefKey in migrated:
-                pass
-            else:
-                migrated[PyRefKey] = pyObject
-                migrated[PyObjectKey] = _fullname(EntityRef)
-    return {key: _migrate(v, ctx) for key, v in migrated.items()}
-
-
 def _deserialize(compiled: CompiledJson, lookup):
-    migrated = _migrate(compiled.compiled, MigrateContext())
     return _restore_value(
-        migrated, RestoreContext(classes=[Entity, World], add_reference=lookup)
+        compiled.compiled, RestoreContext(classes=[Entity, World], add_reference=lookup)
     )
 
 
@@ -521,10 +491,15 @@ async def materialize(
     cache: Optional[Dict[str, List[Serialized]]] = None,
     proxy_factory: Optional[Callable] = None,
     refresh: bool = False,
+    migrate: Optional[Callable] = None,
 ) -> Materialized:
     assert registrar
     assert store
 
+    def _noop_migration(v):
+        return False, v
+
+    migrate = migrate or _noop_migration
     single_entity = json is None
     cache = cache or {}
     found = None
@@ -573,7 +548,8 @@ async def materialize(
 
     serialized = json[0].serialized  # TODO why not all json?
     compiled = CompiledJson.compile(serialized)
-    deserialized = _deserialize(compiled, reference)
+    migrated, after_migration = migrate(compiled)
+    deserialized = _deserialize(after_migration, reference)
     proxied = proxy_factory(deserialized) if proxy_factory else deserialized
     loaded = proxied
 
@@ -609,10 +585,14 @@ async def materialize(
                 depth=depths[referenced_key] + choice,
                 proxy_factory=proxy_factory,
                 cache=cache,
+                migrate=migrate,
             )
             proxy.__wrapped__ = linked.one()
 
     loaded.validate()
+
+    if migrated:
+        loaded.touch()
 
     if single_entity:
         return Materialized([loaded])
