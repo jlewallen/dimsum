@@ -1,6 +1,7 @@
 import dataclasses
 import copy
 import enum
+import sys
 import jsonpickle
 import copy
 import functools
@@ -10,6 +11,7 @@ import traceback
 import jsondiff
 import json
 from datetime import datetime
+from collections import ChainMap
 from typing import Callable, Union, Dict, List, Optional, Iterable, Any, Type, TypeVar
 
 from storage import EntityStorage
@@ -34,6 +36,7 @@ import scopes.movement as movement
 log = get_logger("dimsum")
 PyRefKey = "py/ref"
 PyObjectKey = "py/object"
+PyTypeKey = "py/type"
 entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 
 
@@ -109,6 +112,16 @@ class EntityRefHandler(jsonpickle.handlers.BaseHandler):
 class DateTimeHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         return datetime.fromisoformat(obj["time"])
+
+
+@jsonpickle.handlers.register(enum.Enum, base=True)
+class EnumHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        pyObject = obj["py/object"]
+        fake = RestoreContext()
+        cls = fake.load_class(pyObject)
+        assert cls
+        return cls.get(obj["value"])
 
 
 class SecurePickler(jsonpickle.pickler.Pickler):
