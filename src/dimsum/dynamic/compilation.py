@@ -340,7 +340,7 @@ class CompiledEntityBehavior(EntityBehavior, Dynsum):
         decoded = serializing.deserialize_non_entity(
             ev, classes=list(self._get_declared_classes())
         )
-        if not decoded:
+        if not decoded or isinstance(decoded, dict):
             log.error(
                 "deserialize-failed: %s declared=%s", ev, self._get_declared_classes()
             )

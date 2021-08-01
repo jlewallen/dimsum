@@ -15,9 +15,8 @@ from test_utils import *
 
 
 @dataclasses.dataclass
-class PingMessage(Event):
-    """Only used in these tests. Must be top level for easier use the
-    serializer below."""
+class LocalPingMessage(Event):
+    pass
 
 
 @pytest.mark.asyncio
@@ -37,7 +36,7 @@ async def test_inbox_schedule_local_service(snapshot):
             post_service = await inbox.create_post_service(session, world)
 
             await post_service.future(
-                datetime.now() + timedelta(seconds=5), hammer, PingMessage()
+                datetime.now() + timedelta(seconds=5), hammer, LocalPingMessage()
             )
 
             await session.save()

@@ -2,7 +2,6 @@ import dataclasses
 import copy
 import enum
 import sys
-import jsonpickle
 import copy
 import functools
 import pprint
@@ -37,7 +36,6 @@ log = get_logger("dimsum")
 PyRefKey = "py/ref"
 PyObjectKey = "py/object"
 PyTypeKey = "py/type"
-entity_types = {"model.entity.Entity": Entity, "model.world.World": World}
 
 
 # From stackoverflow
@@ -74,70 +72,172 @@ class EntityProxy(wrapt.ObjectProxy):
         return str(self.__wrapped__)
 
 
-@jsonpickle.handlers.register(Version, base=True)
-class VersionHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        return Version(i=obj["i"])
-
-
-@jsonpickle.handlers.register(Identity, base=True)
-class IdentityHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        return Identity(
-            public=obj["public"], private=obj["private"], signature=obj["signature"]
-        )
-
-
-@jsonpickle.handlers.register(movement.Direction)
-class DirectionHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        if "compass" in obj:
-            name = obj["compass"].lower()
-            for d in movement.Direction:
-                if name == d.name.lower():
-                    return d
-        return None
-
-
-@jsonpickle.handlers.register(EntityRef)
-class EntityRefHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        pyObject = obj["py/ref"]
-        ref = EntityRef.new(pyObject=pyObject, **obj)
-        log.debug("entity-handler: %s", ref)
-        return self.context.lookup(ref)
-
-
-@jsonpickle.handlers.register(datetime, base=True)
-class DateTimeHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        return datetime.fromisoformat(obj["time"])
-
-
-@jsonpickle.handlers.register(enum.Enum, base=True)
-class EnumHandler(jsonpickle.handlers.BaseHandler):
-    def restore(self, obj):
-        pyObject = obj["py/object"]
-        fake = RestoreContext()
-        cls = fake.load_class(pyObject)
-        assert cls
-        return cls.get(obj["value"])
-
-
-class SecurePickler(jsonpickle.pickler.Pickler):
-    def __init__(self, identities=Identities.PRIVATE, **kwargs):
-        super().__init__(**kwargs)
-        self.identities = identities
-
-
-class CustomUnpickler(jsonpickle.unpickler.Unpickler):
-    def __init__(self, lookup, **kwargs):
-        super().__init__()
-        self.lookup = lookup
-
-
 class SerializationException(Exception):
     pass
+
+
+@dataclasses.dataclass(frozen=True)
+class RestoreContext:
+    classes: List[Type] = dataclasses.field(default_factory=list)
+    lookup: Dict[str, Type] = dataclasses.field(default_factory=dict)
+    add_reference: Optional[Callable] = None
+    depth: int = 0
+
+    @functools.cached_property
+    def classes_map(self):
+        return {self._importable_name(c): c for c in self.classes or []}
+
+    def increase(self) -> "RestoreContext":
+        return RestoreContext(
+            classes=self.classes, lookup=self.lookup, depth=self.depth + 1
+        )
+
+    def load_class(self, module_and_name: str):
+        """
+        Loads the module and returns the class.
+        >>> cls = loadclass('datetime.datetime')
+        >>> cls.__name__
+        'datetime'
+        >>> loadclass('does.not.exist')
+        >>> loadclass('builtins.int')()
+        0
+
+        This is copied from jsonpickle.
+        """
+        # Check if the class exists in a caller-provided scope
+        if self.classes_map:
+            try:
+                return self.classes_map[module_and_name]
+            except KeyError:
+                pass
+        # Otherwise, load classes from globally-accessible imports
+        names = module_and_name.split(".")
+        # First assume that everything up to the last dot is the module name,
+        # then try other splits to handle classes that are defined within
+        # classes
+        for up_to in range(len(names) - 1, 0, -1):
+            module = ".".join(names[:up_to])
+            try:
+                __import__(module)
+                obj = sys.modules[module]
+                for class_name in names[up_to:]:
+                    obj = getattr(obj, class_name)
+                return obj
+            except (AttributeError, ImportError, ValueError):
+                continue
+        return None
+
+    def _importable_name(self, cls):
+        """
+        >>> class Example(object):
+        ...     pass
+        >>> ex = Example()
+        >>> importable_name(ex.__class__) == 'jsonpickle.util.Example'
+        True
+        >>> importable_name(type(25)) == 'builtins.int'
+        True
+        >>> importable_name(None.__class__) == 'builtins.NoneType'
+        True
+        >>> importable_name(False.__class__) == 'builtins.bool'
+        True
+        >>> importable_name(AttributeError) == 'builtins.AttributeError'
+        True
+        """
+        # Use the fully-qualified name if available (Python >= 3.3)
+        name = getattr(cls, "__qualname__", cls.__name__)
+        return "{}.{}".format(cls.__module__, name)
+
+
+@functools.singledispatch
+def _restore_value(value, ctx: RestoreContext) -> Any:
+    return value
+
+
+@_restore_value.register
+def _restore_value_list(value: list, ctx: RestoreContext) -> Any:
+    return [_restore_value(v, ctx) for v in value]
+
+
+def _restore_value_obj_version(value: dict, ctx: RestoreContext):
+    return Version(i=value["i"])
+
+
+def _restore_value_obj_entity_ref(value: dict, ctx: RestoreContext):
+    try:
+        pyObject = value[PyRefKey]
+        del value[PyRefKey]
+        ref = EntityRef.new(pyObject=pyObject, **value)
+        assert ctx.add_reference
+        return ctx.add_reference(ref)
+    except:
+        log.exception("error:entity-ref value=%s", value, exc_info=True)
+        raise
+
+
+def _restore_value_obj_datetime(value: dict, ctx: RestoreContext):
+    return datetime.fromisoformat(value["time"])
+
+
+_handlers = {
+    "model.entity.Version": _restore_value_obj_version,
+    "model.entity.EntityRef": _restore_value_obj_entity_ref,
+    "datetime.datetime": _restore_value_obj_datetime,
+}
+
+
+@_restore_value.register
+def _restore_value_dict(value: dict, ctx: RestoreContext) -> Any:
+    def restore_all():
+        try:
+            return {key: _restore_value(v, ctx) for key, v in value.items()}
+        except:
+            log.error("error:restore-all value=%s", value)
+            raise
+
+    def restore_children():
+        try:
+            return {
+                key: _restore_value(v, ctx)
+                for key, v in value.items()
+                if key not in [PyObjectKey]
+            }
+        except:
+            log.error("error:restore-children value=%s", value)
+            raise
+
+    if PyObjectKey in value:
+        try:
+            class_name = value[PyObjectKey]
+            if class_name in _handlers:
+                try:
+                    return _handlers[class_name](restore_children(), ctx)
+                except:
+                    log.error(
+                        "error:handler class-name=%s handler=%s",
+                        class_name,
+                        _handlers[class_name],
+                    )
+                    raise
+            ctor = ctx.load_class(class_name)
+            if ctor:
+                restored = restore_children()
+                try:
+                    return ctor(**restored)
+                except:
+                    log.error(
+                        "error: class-name=%s ctor=%s restored=%s",
+                        class_name,
+                        ctor,
+                        restored,
+                        exc_info=True,
+                    )
+                    raise
+        except:
+            log.error("error:object value=%s", value)
+            raise
+    if PyTypeKey in value:
+        return ctx.load_class(value[PyTypeKey])
+    return restore_all()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -213,14 +313,6 @@ def _flatten_value_none(value: None, ctx: FlattenContext) -> Any:
 
 
 @_flatten_value.register
-def _flatten_value_datetime(value: datetime, ctx: FlattenContext) -> Any:
-    return {
-        "py/object": "datetime.datetime",
-        "time": value.isoformat(),
-    }
-
-
-@_flatten_value.register
 def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
     # I wish there was a way to get singledisapatch to respect this,
     # but there's simply no way that I can tell.
@@ -230,10 +322,25 @@ def _flatten_value_object(value: object, ctx: FlattenContext) -> Any:
 
 
 @_flatten_value.register
+def _flatten_value_enum(value: enum.Enum, ctx: FlattenContext) -> Any:
+    return _py_object(value, value=str(value))
+
+
+@_flatten_value.register
+def _flatten_value_datetime(value: datetime, ctx: FlattenContext) -> Any:
+    return {
+        "py/object": "datetime.datetime",
+        "time": value.isoformat(),
+    }
+
+
+@_flatten_value.register
 def _flatten_value_entity(value: Entity, ctx: FlattenContext) -> Any:
     if ctx.depth > 0:
         return _py_object(value, **_flatten_value_dict(value.__dict__, ctx.decrease()))
     else:
+        assert isinstance(value, Entity)
+        assert value.props.name
         ref = EntityRef(
             key=value.key,
             klass=value.klass.__name__,
@@ -369,21 +476,17 @@ def _migrate_dict(value: dict, ctx: MigrateContext):
 
 def _deserialize(compiled: CompiledJson, lookup):
     migrated = _migrate(compiled.compiled, MigrateContext())
-    context = CustomUnpickler(lookup)
-    return context.restore(
-        migrated,
-        reset=True,
-        classes=[Entity, World],
+    return _restore_value(
+        migrated, RestoreContext(classes=[Entity, World], add_reference=lookup)
     )
 
 
 def deserialize_non_entity(
-    value: Union[str, Dict[str, Any]], classes: Optional[List[TypeVar]] = None
+    value: Union[str, Dict[str, Any]], classes: Optional[List[Type]] = None
 ):
     if isinstance(value, str):
-        return jsonpickle.decode(value, classes=classes)
-    unpickler = jsonpickle.unpickler.Unpickler()
-    return unpickler.restore(value, classes=classes)
+        value = json.loads(value)
+    return _restore_value(value, RestoreContext(classes=classes or []))
 
 
 @dataclasses.dataclass()

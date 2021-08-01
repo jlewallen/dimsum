@@ -103,18 +103,22 @@ class Common(Map):
         name: Optional[str] = None,
         desc: Optional[str] = None,
         described: Optional[str] = None,
+        map: Optional[Dict[str, Property]] = None,
         **kwargs
     ):
-        super().__init__(kwargs)
-        self.set(GlobalId, -1)
-        self.set(Name, name)
-        self.set(Described, described or name)
-        self.set(Desc, desc if desc else name)
-        self.set(Created, time.time())
-        self.set(Touched, time.time())
-        self.set(Frozen, None)
-        self.set(Destroyed, None)
-        self.set(Related, {})
+        super().__init__(map=map)
+        if self.map:
+            pass
+        else:
+            self.set(GlobalId, -1)
+            self.set(Name, name)
+            self.set(Described, described or name)
+            self.set(Desc, desc if desc else name)
+            self.set(Created, time.time())
+            self.set(Touched, time.time())
+            self.set(Frozen, None)
+            self.set(Destroyed, None)
+            self.set(Related, {})
 
     @property
     def gid(self) -> int:

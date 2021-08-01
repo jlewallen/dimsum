@@ -508,7 +508,7 @@
                         },
                         "entity_key": 10,
                         "message": {
-                            "py/object": "test_inbox.PingMessage"
+                            "py/object": "test_inbox.LocalPingMessage"
                         }
                     }
                 ]

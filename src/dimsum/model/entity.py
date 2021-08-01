@@ -485,7 +485,9 @@ class Entity:
     def __repr__(self):
         if hasattr(self, "props"):
             return f"'{self.props.name} (#{self.props.gid})'"
-        return f"PartialEntity<{self.key}>"
+        if hasattr(self, "key"):
+            return f"PartialEntity<{self.key}>"
+        return f"PartialEntity!"
 
     def __hash__(self):
         return hash(self.key)
