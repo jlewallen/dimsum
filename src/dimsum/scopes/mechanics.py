@@ -50,10 +50,14 @@ class Observer:
         raise NotImplementedError
 
 
-class Presence(enum.Enum):
-    DISTINCT = dict(distinct=True)
-    INLINE_SHORT = dict(inline="short")
-    INLINE_LONG = dict(inline="long")
+@dataclass
+class Presence:
+    distinct: bool = False
+    inline: Optional[str] = None
+
+    Distinct = lambda: Presence(distinct=True)
+    InlineShort = lambda: Presence(inline="short")
+    InlineLong = lambda: Presence(inline="long")
 
 
 class Visible:
@@ -68,7 +72,7 @@ class Visible:
         super().__init__()
         self.hidden = hidden
         self.hard_to_see = hard_to_see
-        self.presence = presence if presence else Presence.DISTINCT
+        self.presence = presence if presence else Presence.Distinct()
         self.observations = observations if observations else {}
 
     def add_observation(self, identity: Identity):

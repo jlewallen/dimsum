@@ -270,13 +270,13 @@ class Transformer(transformers.Base):
         return Examine(item=args[0])
 
     def presence_distinct(self, args):
-        return ModifyPresence(args[0], mechanics.Presence.DISTINCT)
+        return ModifyPresence(args[0], mechanics.Presence.Distinct())
 
     def presence_inline_short(self, args):
-        return ModifyPresence(args[0], mechanics.Presence.INLINE_SHORT)
+        return ModifyPresence(args[0], mechanics.Presence.InlineShort())
 
     def presence_inline_long(self, args):
-        return ModifyPresence(args[0], mechanics.Presence.INLINE_LONG)
+        return ModifyPresence(args[0], mechanics.Presence.InlineLong())
 
 
 @grammars.grammar()

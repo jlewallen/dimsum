@@ -133,9 +133,9 @@ def set_presence(e: Entity, p: mechanics.Presence):
 
 def presence(e: Entity, short=False, long=False):
     if short:
-        set_presence(e, mechanics.Presence.INLINE_SHORT)
+        set_presence(e, mechanics.Presence.InlineShort())
     elif long:
-        set_presence(e, mechanics.Presence.INLINE_LONG)
+        set_presence(e, mechanics.Presence.InlineLong())
 
 
 def is_presence(e: Entity, p: mechanics.Presence):
@@ -144,15 +144,15 @@ def is_presence(e: Entity, p: mechanics.Presence):
 
 
 def is_presence_distinct(e: Entity) -> bool:
-    return is_presence(e, mechanics.Presence.DISTINCT)
+    return is_presence(e, mechanics.Presence.Distinct())
 
 
 def is_presence_inline_short(e: Entity) -> bool:
-    return is_presence(e, mechanics.Presence.INLINE_SHORT)
+    return is_presence(e, mechanics.Presence.InlineShort())
 
 
 def is_presence_inline_long(e: Entity) -> bool:
-    return is_presence(e, mechanics.Presence.INLINE_LONG)
+    return is_presence(e, mechanics.Presence.InlineLong())
 
 
 def hold(c: Entity, e: Entity):

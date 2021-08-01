@@ -140,34 +140,40 @@ def get_first_item_on_ground(
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_changing_presence_to_inline_short(snapshot):
-    tw = test.TestWorld()
-    await tw.initialize()
-    await tw.add_carla()
-    await tw.success("make Box")
-    await tw.success("drop")
+    with test.Deterministic():
+        tw = test.TestWorld()
+        await tw.initialize()
+        await tw.add_carla()
+        await tw.success("make Box")
+        await tw.success("drop")
 
-    await tw.success("modify presence box inline short")
+        await tw.success("modify presence box inline short")
 
-    r = await tw.success("look")
+        snapshot.assert_match(await tw.to_json(), "world.json")
 
-    snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
+        r = await tw.success("look")
 
-    assert len(r.items) == 1
+        snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
+
+        assert len(r.items) == 1
 
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
 async def test_changing_presence_to_inline_long(snapshot):
-    tw = test.TestWorld()
-    await tw.initialize()
-    await tw.add_carla()
-    await tw.success("make Box")
-    await tw.success("drop")
+    with test.Deterministic():
+        tw = test.TestWorld()
+        await tw.initialize()
+        await tw.add_carla()
+        await tw.success("make Box")
+        await tw.success("drop")
 
-    await tw.success("modify presence box inline long")
+        await tw.success("modify presence box inline long")
 
-    r = await tw.success("look")
+        snapshot.assert_match(await tw.to_json(), "world.json")
 
-    snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
+        r = await tw.success("look")
 
-    assert len(r.items) == 1
+        snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
+
+        assert len(r.items) == 1
