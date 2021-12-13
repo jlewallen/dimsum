@@ -106,3 +106,5 @@ async def test_train_factory(snapshot, caplog, deterministic):
         await tw.success("go platform")
 
         snapshot.assert_match(await tw.to_json(), "5_back.json")
+
+        await tw.close()

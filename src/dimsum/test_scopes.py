@@ -61,6 +61,8 @@ async def test_scoped_entities_serialize(caplog):
 
     assert await after.store.number_of_entities() == 3
 
+    await after.close()
+
 
 def make_person(
     props: Optional[Common] = None, creator: Optional[Entity] = None, **kwargs
@@ -120,6 +122,8 @@ async def test_specialization_classes(caplog):
 
     assert await after.store.number_of_entities() == 3
 
+    await after.close()
+
 
 @pytest.mark.asyncio
 async def test_nested_scoped_entities_serialize(caplog):
@@ -145,3 +149,5 @@ async def test_nested_scoped_entities_serialize(caplog):
     after = await domain.reload()
 
     assert await after.store.number_of_entities() == 2
+
+    await after.close()

@@ -199,6 +199,9 @@ class TestWorld:
             await session.save()
             return thing_key
 
+    async def close(self):
+        await self.domain.close()
+
 
 async def make_simple_domain(
     password: Optional[str] = None, store=None

@@ -57,6 +57,8 @@ async def dropped(this, ev, say):
         jacob = await session.materialize(key=tw.jacob_key)
         assert jacob.scopes["bank"]["gold"] == 2
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_wear_cape(caplog):
@@ -105,6 +107,8 @@ async def unworn(this, ev, say):
         assert not jacob.make(mechanics.Visibility).is_invisible
 
     await tw.success("drop")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -161,6 +165,8 @@ async def shake(this, person, say, ctx):
         assert jacob.make(carryable.Containing).holding[1].creator == jacob
 
     await tw.success("look")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -219,6 +225,8 @@ async def shake(this, person, say, ctx):
         assert jacob.make(carryable.Containing).holding[1].creator == jacob
 
     await tw.success("look")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -282,6 +290,8 @@ async def shake(this, person, say, ctx):
 
     await tw.success("look")
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_behavior_time_passing(caplog):
@@ -323,3 +333,5 @@ async def tick(this, ev, say, ctx):
         await session.everywhere(TickEvent())
         assert len(area.make(carryable.Containing).holding) == 3
         assert len(session.registrar.entities) == 7
+
+    await tw.close()

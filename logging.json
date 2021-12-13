@@ -65,6 +65,11 @@
             "handlers": ["console"],
             "propagate": false
         },
+        "aiosqlite": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": false
+        },
         "uvicorn": {
             "level": "INFO",
             "handlers": ["console"],

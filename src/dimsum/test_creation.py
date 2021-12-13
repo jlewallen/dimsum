@@ -17,6 +17,7 @@ async def test_create_thing(snapshot):
         await tw.initialize()
         await tw.success("create thing Box")
         snapshot.assert_match(await tw.to_json(), "world.json")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -27,6 +28,7 @@ async def test_create_area(snapshot):
         await tw.initialize()
         await tw.success("create area Treehouse")
         snapshot.assert_match(await tw.to_json(), "world.json")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -37,6 +39,7 @@ async def test_create_area_quoted(snapshot):
         await tw.initialize()
         await tw.success('create area "Wilshire/Western"')
         snapshot.assert_match(await tw.to_json(), "world.json")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -47,6 +50,7 @@ async def test_create_exit(snapshot):
         await tw.initialize()
         await tw.success("create exit Window")
         snapshot.assert_match(await tw.to_json(), "world.json")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -68,6 +72,8 @@ async def test_obliterate():
         jacob = await session.materialize(key=tw.jacob_key)
         with jacob.make(carryable.Containing) as pockets:
             assert len(pockets.holding) == 0
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -101,3 +107,5 @@ async def test_obliterate_thing_with_behavior():
             assert len(pockets.holding) == 0
 
     await tw.success("look")
+
+    await tw.close()

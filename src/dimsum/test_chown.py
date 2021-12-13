@@ -16,6 +16,7 @@ async def test_chown_nothing(snapshot):
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.failure("chown box")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -26,6 +27,7 @@ async def test_chown_box_self(snapshot):
         await tw.initialize()
         await tw.success("create thing box")
         await tw.success("chown box")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -39,3 +41,5 @@ async def test_chown_box_somebody(snapshot):
 
         await tw.success("create thing box")
         await tw.success("chown box carla")
+
+        await tw.close()

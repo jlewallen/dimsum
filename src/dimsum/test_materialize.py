@@ -41,6 +41,8 @@ async def test_materialize_infinite_reach(caplog):
 
         assert len(session.registrar.entities) == 73
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_materialize_reach_1(caplog):
@@ -62,6 +64,8 @@ async def test_materialize_reach_1(caplog):
             return 1
 
         world = await session.prepare(reach=reach)
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -88,3 +92,5 @@ async def test_materialize_reach_by_area_3(caplog):
             return 0
 
         world = await session.prepare(reach=reach)
+
+    await tw.close()

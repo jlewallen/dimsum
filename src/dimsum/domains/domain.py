@@ -48,6 +48,9 @@ class Domain:
     async def reload(self):
         return Domain(empty=True, store=self.store)
 
+    async def close(self):
+        await self.store.close()
+
 
 @dataclasses.dataclass
 class SaveDynamicCalls(dynamic.DynamicCallsListener):

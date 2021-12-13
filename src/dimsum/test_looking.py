@@ -16,6 +16,7 @@ async def test_look_for_no_such_thing():
     tw = test.TestWorld()
     await tw.initialize()
     await tw.failure("look for keys")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -27,6 +28,7 @@ async def test_look_empty():
     assert len(r.items) == 0
     assert len(r.living) == 0
     assert len(r.routes) == 0
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -39,6 +41,7 @@ async def test_look_items():
     assert isinstance(r, AreaObservation)
     assert len(r.items) == 1
     assert len(r.living) == 0
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -52,6 +55,7 @@ async def test_look_living():
     r = await tw.success("look")
     assert len(r.items) == 0
     assert len(r.living) == 1
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -71,6 +75,7 @@ async def test_look_people_invisible():
     assert isinstance(r, AreaObservation)
     assert len(r.items) == 0
     assert len(r.living) == 1
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -130,6 +135,8 @@ async def test_making_item_hard_to_see():
 
         assert len(r.items) == 1
 
+    await tw.close()
+
 
 def get_first_item_on_ground(
     key: Optional[str] = None, session: Optional[Session] = None
@@ -157,6 +164,8 @@ async def test_changing_presence_to_inline_short(snapshot):
 
         assert len(r.items) == 1
 
+        await tw.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -177,3 +186,5 @@ async def test_changing_presence_to_inline_long(snapshot):
         snapshot.assert_match(test.pretty_json(r.render_tree()), "tree.json")
 
         assert len(r.items) == 1
+
+        await tw.close()

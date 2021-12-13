@@ -16,6 +16,7 @@ async def test_chmod_nothing(snapshot):
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.failure("chmod box")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -26,6 +27,7 @@ async def test_chmod_ls(snapshot):
         await tw.initialize()
         await tw.success("create thing Box")
         await tw.success("chmod box")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -36,3 +38,4 @@ async def test_chmod_entity(snapshot):
         await tw.initialize()
         await tw.success("create thing Box")
         await tw.success("chmod box . write owner")
+        await tw.close()

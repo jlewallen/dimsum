@@ -18,6 +18,8 @@ async def test_hold_missing_item():
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 0
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_make_hold_drop():
@@ -43,6 +45,8 @@ async def test_make_hold_drop():
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -70,6 +74,8 @@ async def test_make_hold_drop_specific():
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 2
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -130,6 +136,8 @@ async def test_put_coin_inside_box_and_then_take_out(caplog):
         )
         assert len(jacob.make(carryable.Containing).holding) == 2
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_put_coin_inside_box_and_then_look_inside(caplog):
@@ -160,6 +168,8 @@ async def test_put_coin_inside_box_and_then_look_inside(caplog):
     r = await tw.execute("look in box")
     assert isinstance(r, EntitiesObservation)
     assert "Coin" in r.entities[0].props.name
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -198,6 +208,8 @@ async def test_lock_with_new_key(caplog):
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 2
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_try_unlock_wrong_key(caplog):
@@ -222,6 +234,7 @@ async def test_try_unlock_wrong_key(caplog):
     await tw.success("lock chest")
     await tw.success("drop chest")
     await tw.failure("unlock box with key")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -234,6 +247,7 @@ async def test_make_and_open_container(caplog):
     await tw.success("close box")
     await tw.success("open box")
     await tw.success("close box")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -259,6 +273,7 @@ async def test_loose_item_factory_pour_ipa_from_keg(caplog):
     with tw.domain.session() as session:
         await session.prepare()
         assert await session.materialize(key=r.entities[0].key)
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -277,3 +292,4 @@ async def test_unable_to_hold_loose_item(caplog):
     await tw.success("pour from Keg")
     await tw.failure("take Alai out of keg")
     await tw.success("drink Alai")
+    await tw.close()

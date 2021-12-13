@@ -94,6 +94,8 @@ async def test_quantified_drop_partial_and_hold():
         )
         assert len(session.registrar.undestroyed) == 5
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_quantified_hold_number():
@@ -118,6 +120,8 @@ async def test_quantified_hold_number():
         area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -155,6 +159,8 @@ async def test_quantified_drop_all():
         )
         assert len(session.registrar.undestroyed) == 4
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_quantified_drop_inflected():
@@ -186,6 +192,8 @@ async def test_quantified_drop_inflected():
         area = await find_entity_area(jacob)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(area.make(carryable.Containing).holding) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -224,6 +232,8 @@ async def test_quantified_from_recipe_holding_template(caplog):
             .quantity
             == 5
         )
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -288,3 +298,5 @@ async def test_quantified_from_recipe(caplog):
             .quantity
             == 40
         )
+
+    await tw.close()

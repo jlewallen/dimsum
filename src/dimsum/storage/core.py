@@ -19,6 +19,9 @@ class EntityStorage:
     async def load_all_keys(self) -> List[str]:
         raise NotImplementedError
 
+    async def close(self):
+        raise NotImplementedError
+
 
 class AllStorageChain(EntityStorage):
     def __init__(self, children: List[EntityStorage]):
@@ -49,6 +52,9 @@ class AllStorageChain(EntityStorage):
 
     async def load_all_keys(self) -> List[str]:
         return flatten([c.load_all_keys() for c in self.children])
+
+    async def close(self):
+        return [await c.close() for c in self.children]
 
     def __str__(self):
         return "All<{0}>".format(self.children)
@@ -89,6 +95,9 @@ class PrioritizedStorageChain(EntityStorage):
                 return maybe
         return []
 
+    async def close(self):
+        return [await c.close() for c in self.children]
+
     def __str__(self):
         return "Prioritized<{0}>".format(self.children)
 
@@ -113,6 +122,9 @@ class SeparatedStorageChain(EntityStorage):
 
     async def load_all_keys(self) -> List[str]:
         return await self.read.load_all_keys()
+
+    async def close(self):
+        return [await self.read.close(), await self.write.close()]
 
     def __str__(self):
         return "Separated<read={0}, write={1}>".format(self.read, self.write)

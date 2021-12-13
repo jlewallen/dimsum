@@ -18,6 +18,8 @@ async def test_admin_auth_change():
         jacob = await session.materialize(key=tw.jacob_key)
         assert jacob.make(users.Auth).password
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_admin_auth_before():
@@ -38,6 +40,8 @@ async def test_admin_auth_before():
         auth_after = jacob.make(users.Auth).password
         assert auth_before != auth_after
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_admin_invite():
@@ -46,6 +50,8 @@ async def test_admin_invite():
 
     r = await tw.execute("invite foobar")
     assert r.kwargs
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -63,3 +69,5 @@ async def test_admin_save_groups():
     with tw.domain.session() as session:
         jacob = await session.materialize(key=tw.jacob_key)
         assert jacob.make(users.Groups).memberships == ["ktown"]
+
+    await tw.close()

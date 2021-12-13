@@ -42,6 +42,7 @@ async def burp(this, person, say):
     await tw.success("hold Hammer")
     await tw.success("wiggle")
     await tw.success("burp")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -62,6 +63,7 @@ async def wiggle(this, person, say):
     await tw.failure("wiggle")
     await tw.success("hold Hammer")
     await tw.success("wiggle")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -94,6 +96,8 @@ async def jingle(this, person, say):
 
     await tw.success("jingle")
     assert len(received) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -136,6 +140,7 @@ async def smash(this, smashing, person, say, ctx):
     await tw.success("hold Hammer")
     await tw.failure("smash snail")
     await tw.success("smash nail")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -193,6 +198,8 @@ async def smash(this, smashing, person, say, ctx):
         nail = await session.materialize(key=nail_key)
         assert nail.scopes["smashes"]["smashes"] == 3
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_dynamic_receive_tick(caplog):
@@ -228,6 +235,8 @@ async def rusting(this, ev, say):
         nail = await session.materialize(key=nail_key)
         assert nail
         assert nail.scopes["rusting"]["rust"] == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -269,6 +278,8 @@ async def dropped(this, ev, say):
         assert nail
         assert nail.scopes["rusting"]["rust"] == 1
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_no_evaluators_understands_nothing(caplog):
@@ -283,6 +294,7 @@ ds.evaluators([])
     )
 
     await tw.failure("hold Nail")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -310,6 +322,8 @@ asdf;
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 2
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_exception_in_compile(silence_dynamic_errors, caplog):
@@ -325,6 +339,8 @@ og.info("hello")
 
     with pytest.raises(NameError):
         await tw.success("hold Nail")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -357,6 +373,8 @@ def tick(this, ev, say):
         with nail.make(behavior.Behaviors) as behave:
             assert len(behave.get_default().logs) == 1
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_exception_in_language_handler(silence_dynamic_errors, caplog):
@@ -374,6 +392,8 @@ def break_nail(this, person, say):
 
     reply = await tw.success("break")
     assert isinstance(reply, DynamicFailure)
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -404,6 +424,7 @@ async def jingle(this, person, say):
 
     await tw.success("hold Keys")
     await tw.success("jingle")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -431,6 +452,8 @@ async def hide_everything(resume, entity):
     r = await tw.success("look")
     assert len(r.items) == 1
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_dynamic_hook_never_hold(caplog):
@@ -448,6 +471,8 @@ async def never_hold(resume, person, entity):
     )
 
     await tw.failure("hold Keys")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -472,6 +497,8 @@ async def never_enter(resume, person, area):
     )
 
     await tw.failure("go north")
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -499,6 +526,7 @@ async def never_enter(resume, person, area, this):
     await tw.success("go south")
     await tw.success("hold keys")
     await tw.failure("go north")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -531,6 +559,8 @@ async def make_noise(this, say):
         await session.save()
 
     assert len(received) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -574,6 +604,8 @@ async def make_noise(this, say):
             await session.save()
 
     assert len(received) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -640,6 +672,8 @@ async def every_3(this, say):
     assert len(received) == 2
     assert "every 5" in str(received)
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -668,3 +702,5 @@ async def orphan(this, person, say):
     assert await tw.success(".orphan")
     reply = await tw.success("look")
     assert len(reply.holding) == 0
+
+    await tw.close()

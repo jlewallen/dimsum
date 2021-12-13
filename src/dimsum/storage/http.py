@@ -78,6 +78,9 @@ class HttpStorage(EntityStorage):
                 return []
             return [Serialized(**row) for row in serialized_entities]
 
+    async def close(self):
+        pass
+
     def __repr__(self):
         return "Http<%s>" % (self.url,)
 

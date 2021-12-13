@@ -78,6 +78,7 @@ async def test_graphql_size(deterministic, snapshot):
     )
     assert ok
     assert actual == {"data": {"size": 1}}
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -94,6 +95,7 @@ async def test_graphql_world_directly(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "world.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -113,6 +115,7 @@ async def test_graphql_world_by_key(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "world.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -134,6 +137,7 @@ async def test_graphql_world_by_gid(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "world.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -176,6 +180,7 @@ mutation {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "entities.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -189,6 +194,7 @@ async def test_graphql_entities_areas(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "areas.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -202,6 +208,7 @@ async def test_graphql_entities_people(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "people.json")
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -218,6 +225,7 @@ async def test_graphql_login_good(deterministic):
     )
     assert ok
     assert actual["data"]["login"]
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -239,6 +247,8 @@ async def test_graphql_login_failed(deterministic, snapshot, caplog):
         )
         assert ok
         assert "schema.UsernamePasswordError" in json.dumps(actual, indent=4)
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -269,6 +279,8 @@ mutation UpdateEntities($entities: [EntityDiff!]!) {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -304,6 +316,8 @@ mutation UpdateEntities($entities: [EntityDiff!]!) {
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "world.json")
 
+    await domain.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -330,6 +344,8 @@ async def test_graphql_make_sample(deterministic, snapshot):
         schema, data, context_value=get_test_context(domain)
     )
     assert ok
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -364,6 +380,8 @@ mutation UpdateEntities($entities: [EntityDiff!]!) {
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
 
+    await domain.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -383,6 +401,8 @@ async def test_graphql_entities(deterministic, snapshot):
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "world.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -414,6 +434,8 @@ mutation CreateThing($key: String!, $name: String!) {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -450,6 +472,8 @@ mutation CreateThing($entities: [EntityTemplate!]) {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -493,6 +517,8 @@ mutation CreateThing($entities: [EntityTemplate!]) {
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "response.json")
 
+    await domain.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -514,6 +540,8 @@ async def test_graphql_redeem_invite(deterministic):
     )
     assert ok
     assert actual["data"]["login"]
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -542,6 +570,8 @@ async def test_graphql_redeem_invite_bad_secret(deterministic, caplog):
         )
         assert ok
         assert "schema.UsernamePasswordError" in json.dumps(actual, indent=4)
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -574,6 +604,8 @@ mutation {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual), "entities.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -624,6 +656,8 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
                 test.pretty_json(actual, deterministic=True), "response.json"
             )
 
+    await domain.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -663,6 +697,8 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
     assert ok
     snapshot.assert_match(test.pretty_json(actual, deterministic=True), "response.json")
 
+    await domain.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -701,6 +737,8 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
     )
     assert ok
     snapshot.assert_match(test.pretty_json(actual, deterministic=True), "response.json")
+
+    await domain.close()
 
 
 @pytest.mark.asyncio
@@ -771,3 +809,5 @@ mutation CompareAndSwap($entities: [EntityCompareAndSwap!]!) {
             snapshot.assert_match(
                 test.pretty_json(actual, deterministic=True), "response.json"
             )
+
+    await domain.close()

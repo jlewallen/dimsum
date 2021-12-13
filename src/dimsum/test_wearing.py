@@ -17,6 +17,8 @@ async def test_wearing_when_unwearable():
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(jacob.make(apparel.Apparel).wearing) == 0
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_simple_wear_and_remove():
@@ -37,3 +39,5 @@ async def test_simple_wear_and_remove():
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 1
         assert len(jacob.make(apparel.Apparel).wearing) == 0
+
+    await tw.close()

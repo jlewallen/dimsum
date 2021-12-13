@@ -27,6 +27,8 @@ async def test_go_unknown():
         area_after = (await find_entity_area(jacob)).key
         assert area_before == area_after
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_go_adjacent():
@@ -61,6 +63,8 @@ async def test_go_adjacent():
         area_after = (await find_entity_area(jacob)).key
         assert area_after != area_before
         assert area_after == another_room.key
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -97,6 +101,8 @@ async def test_go_adjacent_two_words():
         assert area_after != area_before
         assert area_after == another_room.key
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_directional_moving_nowhere():
@@ -116,6 +122,8 @@ async def test_directional_moving_nowhere():
         jacob = await session.materialize(key=tw.jacob_key)
         area_after = (await find_entity_area(jacob)).key
         assert area_before == area_after
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -155,6 +163,8 @@ async def test_directional_moving():
         assert area_after != area_before
         assert area_after == park.key
 
+    await tw.close()
+
 
 class Bidirectional:
     def __init__(
@@ -193,6 +203,8 @@ async def test_programmatic_basic_entrances_and_exits():
 
         await session.add_area(asteroid)
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_digging_basic():
@@ -211,6 +223,8 @@ async def test_digging_basic():
 
     await tw.success("go #{0}".format(gid))
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_digging_with_return():
@@ -220,6 +234,8 @@ async def test_digging_with_return():
     await tw.success("dig north|south to 'Kitchen'")
     await tw.success("go north")
     await tw.success("go south")
+
+    await tw.close()
 
 
 def add_item(container: Entity, item: Entity):
@@ -252,3 +268,5 @@ async def test_go_adjacent_unavailable():
         await session.save()
 
     await tw.failure("go door")
+
+    await tw.close()

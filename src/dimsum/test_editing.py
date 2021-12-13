@@ -11,6 +11,7 @@ async def test_edit_thing_missing():
     tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
     await tw.initialize()
     await tw.failure("edit box")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -18,6 +19,7 @@ async def test_edit_here():
     tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
     await tw.initialize()
     await tw.success("edit here")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -26,6 +28,7 @@ async def test_edit_item():
     await tw.initialize()
     await tw.success("create thing Box")
     await tw.success("edit box")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -54,3 +57,5 @@ og.info("hello")
     with tw.domain.session() as session:
         box = await session.materialize(key=box_key)
         assert box.version.i == 3
+
+    await tw.close()

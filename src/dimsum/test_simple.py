@@ -49,6 +49,8 @@ async def test_recipe_simple():
         with jacob.make(carryable.Containing) as pockets:
             assert len(pockets.holding) == 1
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_freezing_simple():
@@ -67,6 +69,7 @@ async def test_freezing_simple():
     await tw.failure("modify name Ignored Box")
     await tw.success("unfreeze box")
     await tw.success("modify name New Box")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -88,6 +91,7 @@ async def test_freezing_others_unable_unfreeze():
     await tw.success("hold box", person=tw.carla_key)
     await tw.failure("modify name Ignored Box")
     await tw.failure("unfreeze box")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -97,3 +101,4 @@ async def test_lookup_by_object_number():
     await tw.failure("freeze #4")
     await tw.success("make Box")
     await tw.success("freeze #4")
+    await tw.close()

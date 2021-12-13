@@ -28,6 +28,8 @@ async def test_storage_materialize_world():
         )
         assert after.one()
 
+    await store.close()
+
 
 @pytest.mark.asyncio
 async def test_storage_materialize_reference():
@@ -46,6 +48,8 @@ async def test_storage_materialize_reference():
             registrar=session.registrar, store=store, key=WorldKey
         )
         assert session.registrar.number_of_entities() == 1
+
+    await store.close()
 
 
 @pytest.mark.asyncio
@@ -69,6 +73,8 @@ async def test_storage_only_save_modified_super_simple():
         store.freeze()
 
         await session.save()
+
+    await store.close()
 
 
 @pytest.mark.asyncio
@@ -116,6 +122,8 @@ async def test_storage_update_fails_and_rolls_back(caplog):
         area_1.touch()
         await session.save()
 
+    await store.close()
+
 
 @pytest.mark.asyncio
 async def test_storage_multiple_saves(caplog):
@@ -143,3 +151,5 @@ async def test_storage_multiple_saves(caplog):
 
         area_2.touch()
         await session.save()
+
+    await store.close()

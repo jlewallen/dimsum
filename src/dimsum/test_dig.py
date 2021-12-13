@@ -10,6 +10,7 @@ async def test_dig_north_no_quotes():
     await tw.initialize()
     await tw.success("dig north to Canada")
     await tw.success("go north")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -18,6 +19,7 @@ async def test_dig_north_single_quotes():
     await tw.initialize()
     await tw.success("dig north to 'Canada'")
     await tw.success("go north")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -26,6 +28,7 @@ async def test_dig_northeast_single_quotes():
     await tw.initialize()
     await tw.success("dig northeast to 'Canada'")
     await tw.success("go northeast")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -34,6 +37,7 @@ async def test_dig_north_double_quotes():
     await tw.initialize()
     await tw.success('dig north to "Canada"')
     await tw.success("go north")
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -71,6 +75,8 @@ async def test_dig_door_and_go_and_get_the_fuck_back():
 
     assert area_after == area_before
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 @pytest.mark.skip(reason="custom movement verb 'climb'")
@@ -107,3 +113,5 @@ async def test_dig_wall_and_climb_wall(caplog):
         area_after = world.find_person_area(jacob).key
 
     assert area_after == area_before
+
+    await tw.close()

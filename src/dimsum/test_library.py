@@ -22,6 +22,8 @@ async def test_library_make(deterministic, caplog, snapshot):
         await session.save()
         assert len(session.registrar.entities) == 70
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -64,3 +66,5 @@ async def test_library_evolve(deterministic, caplog, snapshot):
         await session.save()
 
         assert len(session.registrar.entities) == 73
+
+    await tw.close()

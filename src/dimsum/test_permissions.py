@@ -132,6 +132,8 @@ async def test_permissions_basics():
         Permission.READ, SecurityContext(owner_key, {SecurityMappings.Owner: owner_key})
     )
 
+    await tw.close()
+
 
 def get_test_security_context(person: Entity, entity: Entity):
     return tools.get_entity_security_context(
@@ -152,6 +154,8 @@ async def test_permissions_save_create_thing_hands_hold():
 
         await session.save(functools.partial(get_test_security_context, jacob))
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_permissions_save_create_thing_hands_drop_jacob():
@@ -166,6 +170,8 @@ async def test_permissions_save_create_thing_hands_drop_jacob():
         assert await session.execute(jacob, "drop Box")
 
         await session.save(functools.partial(get_test_security_context, jacob))
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -182,3 +188,5 @@ async def test_permissions_save_create_thing_hands_drop_carla():
         assert await session.execute(carla, "drop Box")
 
         await session.save(functools.partial(get_test_security_context, carla))
+
+    await tw.close()

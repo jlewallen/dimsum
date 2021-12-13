@@ -58,6 +58,8 @@ async def query(config: str, database: str):
     if s:
         sys.stdout.write(s)
 
+    await domain.close()
+
 
 def make_error(message: str):
     return {"errors": [{"message": message}]}

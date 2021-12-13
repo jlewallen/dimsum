@@ -22,3 +22,5 @@ async def test_area_weather_blows_small_items():
     with tw.domain.session() as session:
         await session.prepare()
         await session.everywhere(TickEvent())
+
+    await tw.close()

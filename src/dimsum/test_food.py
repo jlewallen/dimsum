@@ -21,6 +21,8 @@ async def test_make_food():
         with jacob.make(health.Health) as player:
             assert player.medical.nutrition.properties["protein"] == 100
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_make_drinks():
@@ -38,6 +40,8 @@ async def test_make_drinks():
         with jacob.make(health.Health) as player:
             assert player.medical.nutrition.properties["alcohol"] == 100
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_try_eat():
@@ -51,6 +55,8 @@ async def test_try_eat():
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 1
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_try_drink():
@@ -63,6 +69,8 @@ async def test_try_drink():
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 1
+
+    await tw.close()
 
 
 @pytest.mark.asyncio
@@ -86,6 +94,8 @@ async def test_taking_multiple_bites():
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 0
 
+    await tw.close()
+
 
 @pytest.mark.asyncio
 async def test_taking_multiple_sips():
@@ -108,3 +118,5 @@ async def test_taking_multiple_sips():
         world = await session.prepare()
         jacob = await session.materialize(key=tw.jacob_key)
         assert len(jacob.make(carryable.Containing).holding) == 0
+
+    await tw.close()

@@ -17,6 +17,7 @@ async def test_help(snapshot):
         tw = test.TestWorld(handlers=[handlers.create(NoopComms())])
         await tw.initialize()
         await tw.success("help")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -30,6 +31,7 @@ async def test_help_create_page(snapshot):
         await tw.success("help CreatingThings")
         await tw.success("help CreatingThings create")
         await tw.success("help CreatingThings")
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -40,6 +42,7 @@ async def test_help_edit_help_root(snapshot):
         await tw.initialize()
         r = await tw.success("edit help")
         assert r.source.version.i == 1
+        await tw.close()
 
 
 @pytest.mark.asyncio
@@ -50,3 +53,4 @@ async def test_help_edit_help_page(snapshot):
         await tw.initialize()
         await tw.success("edit help CreatingThings")
         await tw.success("help CreatingThings")
+        await tw.close()

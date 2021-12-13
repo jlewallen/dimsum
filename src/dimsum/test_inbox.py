@@ -54,6 +54,8 @@ async def test_inbox_schedule_local_service(snapshot):
 
         snapshot.assert_match(await tw.to_json(), "world.json")
 
+        await tw.close()
+
 
 @pytest.mark.asyncio
 @freezegun.freeze_time("2019-09-25")
@@ -102,3 +104,5 @@ async def ping(this, ev):
             await session.save()
 
         snapshot.assert_match(await tw.to_json(), "world.json")
+
+        await tw.close()
