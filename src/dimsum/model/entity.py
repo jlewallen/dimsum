@@ -460,7 +460,7 @@ class Entity:
 
         self._log().debug("%s splitting scopes: %s %s", self.key, key, chargs)
         try:
-            child = ctor(  # type:ignore
+            child = ctor(
                 _scope_attrs=ScopeAttributes(parent=self, discarding=discarding),
                 **chargs,
             )

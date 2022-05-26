@@ -2,7 +2,7 @@ import abc
 import dataclasses
 import functools
 from typing import Callable, List, Optional, Sequence, Type
-from lark import exceptions, Lark, Transformer
+from lark import exceptions, Lark, Transformer  # type: ignore
 
 from loggers import get_logger
 from model import Action

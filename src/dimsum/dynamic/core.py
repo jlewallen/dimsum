@@ -21,7 +21,7 @@ class DynamicEntitySources:
 
 class LibraryBehavior:
     @abc.abstractmethod
-    async def create(self, ds: "Dynsum"):
+    def create(self, ds: "Dynsum"):
         raise NotImplementedError
 
 

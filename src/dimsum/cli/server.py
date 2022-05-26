@@ -1,6 +1,5 @@
 import asyncio
 import uvicorn
-import time
 import shortuuid
 import asyncclick as click
 import ariadne.asgi
@@ -9,7 +8,7 @@ from typing import List, Optional
 from starlette.middleware.cors import CORSMiddleware
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
 
-from loggers import get_logger, get_noise_logger, setup_logging_queue
+from loggers import get_logger, setup_logging_queue
 from scheduling import Scheduler
 import config
 import domains

@@ -80,8 +80,9 @@ def server():
     proc.start()
     time.sleep(0.5)
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(initialize("http://127.0.0.1:45600"))
+    asyncio.run(initialize("http://127.0.0.1:45600"))
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete()
 
     yield
 

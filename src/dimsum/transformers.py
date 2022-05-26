@@ -1,5 +1,5 @@
+from lark import Transformer  # type: ignore
 import dataclasses
-import lark
 
 from model import Entity, World, FindObjectByGid, FindCurrentArea, FindCurrentPerson
 import finders as finders
@@ -7,7 +7,7 @@ import scopes.movement as movement
 
 
 @dataclasses.dataclass
-class Base(lark.Transformer):
+class Base(Transformer):
     world: World
     person: Entity
 
