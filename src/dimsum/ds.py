@@ -1,12 +1,29 @@
 #!env/bin/python3
 
-import json
+import json, warnings
 import logging.config
 import asyncclick as click
 from rich.logging import RichHandler
 from rich.console import Console
 
 from loggers import get_logger
+
+warnings.filterwarnings(
+    action="ignore",
+    category=UserWarning,
+    message="Blowfish has been deprecated",
+)
+warnings.filterwarnings(
+    action="ignore",
+    category=UserWarning,
+    message="CAST5 has been deprecated",
+)
+warnings.filterwarnings(
+    action="ignore",
+    category=UserWarning,
+    message="SEED has been deprecated",
+)
+
 import cli.broker
 import cli.dummy
 import cli.export
