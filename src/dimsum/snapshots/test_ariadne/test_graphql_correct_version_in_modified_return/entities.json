@@ -568,7 +568,7 @@
                                         }
                                     ]
                                 },
-                                "body": "\nf'# WelcomePage'\n\nThis is your brand new help page that you can edit by using `edit help`.\n\nEnjoy!\n"
+                                "body": "\n# WelcomePage\n\nThis is your brand new help page that you can edit by using `edit help`.\n\nEnjoy!\n"
                             }
                         },
                         "klass": {
@@ -1747,7 +1747,7 @@
                                         }
                                     ]
                                 },
-                                "body": "\nf'# WelcomePage'\n\nThis is your brand new help page that you can edit by using `edit help`.\n\nEnjoy!\n"
+                                "body": "\n# WelcomePage\n\nThis is your brand new help page that you can edit by using `edit help`.\n\nEnjoy!\n"
                             }
                         },
                         "klass": {

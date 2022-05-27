@@ -30,7 +30,7 @@ class Action:
 
 class Unknown(Action):
     async def perform(self, **kwargs):
-        return Failure("sorry, i don't understand")
+        return Failure("Sorry?")
 
 
 @dataclasses.dataclass(frozen=True)
