@@ -25,7 +25,11 @@ type ActionParameters = ActionContext<RootState, RootState>;
 const disabledRefresh = true;
 
 export default createStore<RootState>({
-    plugins: [createLogger()],
+    plugins: [
+        /*
+        createLogger({}),
+        */
+    ],
     state: new RootState(),
     mutations: {
         [MutationTypes.INIT]: (state: RootState) => {
