@@ -31,6 +31,31 @@ async def test_go_unknown():
 
 
 @pytest.mark.asyncio
+async def test_go_non_exit():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    await tw.success("make Hammer")
+    await tw.success("drop hammer")
+
+    area_before: Optional[Entity] = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = (await find_entity_area(jacob)).key
+
+    await tw.failure("go hammer")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = (await find_entity_area(jacob)).key
+        assert area_before == area_after
+
+    await tw.close()
+
+
+@pytest.mark.asyncio
 async def test_go_adjacent():
     tw = test.TestWorld()
     await tw.initialize()

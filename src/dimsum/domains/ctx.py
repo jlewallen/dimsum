@@ -164,7 +164,7 @@ class WorldCtx(Ctx):
                 continue
 
             if scopes:
-                has = [e.has(scope) for scope in scopes]
+                has = [scope for scope in scopes if e.has(scope)]
                 if len(has) == 0:
                     continue
 
