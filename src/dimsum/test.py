@@ -286,7 +286,11 @@ def make_deterministic(obj: Dict[str, Any]) -> Dict[str, Any]:
                     return "<deterministic>"
                 if keys[-1] == "session" and keys[-2] == "context":
                     return "<deterministic>"
-            return value
+            return re.sub(
+                r"/.+\.py",
+                "peepadeep.py",
+                re.sub(r"/.+/site-packages", "/site-packages", value),
+            )
         if isinstance(value, float):
             if keys:
                 if keys[-2] == "created":
