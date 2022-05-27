@@ -159,6 +159,7 @@ async def server(
         if unix_socket
         else uvicorn.Config(app=app, loop=loop, port=web_port)
     )
+
     gql_server = uvicorn.Server(gql_config)
     gql_task = loop.create_task(gql_server.serve())
     sshd_task = loop.create_task(sshd.start_server(ssh_port, create_ssh_session))
@@ -166,6 +167,9 @@ async def server(
     await asyncio.gather(sshd_task, gql_task)
     servicing_task.cancel()
     await asyncio.gather(servicing_task)
+
+    # Closes the database, we'll hang otherwise Ctrl-C
+    await domain.close()
 
 
 # with proxy.start(
