@@ -25,7 +25,7 @@ EncyclopediaKey = "encyclopedia"
 
 def _get_default_body(name: Optional[str]):
     return f"""
-f'# {name or "WelcomePage"}'
+# {name or "WelcomePage"}
 
 This is your brand new help page that you can edit by using `edit help`.
 
