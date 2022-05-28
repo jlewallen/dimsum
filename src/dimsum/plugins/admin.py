@@ -2,10 +2,12 @@ from typing import Type, Optional
 
 import grammars
 import transformers
+import tools
 from loggers import get_logger
 from model import *
 from finders import *
 from plugins.actions import PersonAction
+from datetime import datetime
 import scopes.users as users
 
 register_username = users.register_username
@@ -88,11 +90,15 @@ class Unfreeze(PersonAction):
         return Success("Unfrozen!")
 
 
-class SystemTick(PersonAction):
+class SystemBackup(PersonAction):
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
-        return Success("Done!")
+        # Easier to just violate norms and ask for forgiveness than come up with
+        # an over-engineered solution to this one.
+        now = datetime.now()
+        info = tools.flatten(await ctx.session.store.backup(now))  # type:ignore
+        return Success(f"Done: {info}")
 
 
 class Transformer(transformers.Base):
@@ -108,8 +114,8 @@ class Transformer(transformers.Base):
     def unfreeze(self, args):
         return Unfreeze(item=args[0])
 
-    def system_tick(self):
-        return SystemTick()
+    def system_backup(self, args):
+        return SystemBackup()
 
 
 @grammars.grammar()
@@ -121,11 +127,11 @@ class AdminGrammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:             auth | invite | freeze | unfreeze
+        start:             auth | invite | freeze | unfreeze | sys_backup
 
         auth:              "auth" TEXT
         invite:            "invite" TEXT
         freeze:            "freeze" held                           -> freeze
         unfreeze:          "unfreeze" held                         -> unfreeze
-        system_tick:       "sys" "tick"                            -> system_tick
+        sys_backup:        "sys" "backup"                          -> system_backup
 """

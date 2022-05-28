@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, TextIO
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 
+from datetime import datetime
 from loggers import get_logger
 from model import Entity, CompiledJson, Serialized
 
@@ -79,6 +80,9 @@ class HttpStorage(EntityStorage):
             return [Serialized(**row) for row in serialized_entities]
 
     async def close(self):
+        pass
+
+    async def backup(self, now: datetime) -> Optional[List[str]]:
         pass
 
     def __repr__(self):

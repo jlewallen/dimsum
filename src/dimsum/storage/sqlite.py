@@ -42,6 +42,21 @@ class StorageFields:
             raise Exception("malformed entity: {0}".format(cj.text))
 
 
+def backup(now: datetime.datetime, path: str) -> Optional[str]:
+    if not os.path.isfile(path):
+        return None
+    suffix = now.strftime("%Y%m%d_%H%M%S")
+    inside_dir = os.path.dirname(path)
+    file_name = os.path.basename(path)
+    backups_dir = os.path.join(inside_dir, ".backups")
+    backup_file = os.path.join(backups_dir, f"{file_name}.{suffix}")
+    if os.path.isfile(backup_file):
+        return None
+    os.makedirs(backups_dir, exist_ok=True)
+    shutil.copyfile(path, backup_file)
+    return backup_file
+
+
 class SqliteStorage(EntityStorage):
     def __init__(self, path: str, read_only=False):
         super().__init__()
@@ -50,21 +65,13 @@ class SqliteStorage(EntityStorage):
         self.db: Optional[aiosqlite.Connection] = None
         self.saves = 0
         self.frozen = False
+        self.last_backup: Optional[str] = None
 
     async def open_if_necessary(self):
         if self.db:
             return
 
-        if not self.read_only:
-            if os.path.isfile(self.path):
-                now = datetime.datetime.now()
-                suffix = now.strftime("%Y%m%d_%H%M%S")
-                inside_dir = os.path.dirname(self.path)
-                file_name = os.path.basename(self.path)
-                backups_dir = os.path.join(inside_dir, ".backups")
-                os.makedirs(backups_dir, exist_ok=True)
-                backup_file = os.path.join(backups_dir, f"{file_name}.{suffix}")
-                shutil.copyfile(self.path, backup_file)
+        await self.backup(datetime.datetime.now())
 
         if self.path == ":memory:" or not self.read_only:
             log.debug(f"db:opening {self.path}")
@@ -269,6 +276,13 @@ class SqliteStorage(EntityStorage):
         if self.db:
             await self.db.close()
             self.db = None
+
+    async def backup(self, now: datetime.datetime) -> Optional[List[str]]:
+        if not self.read_only:
+            file = backup(now, self.path)
+            if file:
+                return [file]
+        return []
 
     def __str__(self):
         return f"Sqlite<{self.path}>"
