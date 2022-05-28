@@ -20,7 +20,7 @@ from model import (
 from model.events import *
 from dynamic import Dynsum, LibraryBehavior
 
-from scopes.carryable import Carryable, Containing
+from scopes.carryable import Containing
 from scopes.behavior import Behaviors
 from scopes.movement import Exit
 import scopes

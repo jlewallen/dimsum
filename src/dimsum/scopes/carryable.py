@@ -280,22 +280,23 @@ class Containing(Openable):
 
     def add_item(self, item: Entity, **kwargs) -> Entity:
         for already in self.holding:
-            with already.make(Carryable) as additional:
-                with item.make(Carryable) as coming:
-                    if additional.kind.same(coming.kind):
-                        additional.quantity += coming.quantity
+            if already.has(Carryable) and item.has(Carryable):
+                with already.make(Carryable) as additional:
+                    with item.make(Carryable) as coming:
+                        if additional.kind.same(coming.kind):
+                            additional.quantity += coming.quantity
 
-                        already.touch()
+                            already.touch()
 
-                        # We return, which skips the append to holding below,
-                        # and that has the effect of obliterating the item we
-                        # picked up, merging with the one in our hands.
-                        return already
+                            # We return, which skips the append to holding below,
+                            # and that has the effect of obliterating the item we
+                            # picked up, merging with the one in our hands.
+                            return already
 
-                # It's possible this item wasn't Carryable and we just
-                # added that scope, so discard if we ended up ignoring
-                # the item.
-                additional.discard()
+                    # It's possible this item wasn't Carryable and we just
+                    # added that scope, so discard if we ended up ignoring
+                    # the item.
+                    additional.discard()
 
         self.ourselves.touch()
         self.holding.append(item)
