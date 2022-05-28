@@ -59,7 +59,7 @@ export default defineComponent({
 .terminal {
     width: 50px;
     height: 50px;
-    background: url("/images/prompt-100s-126px-gray.png");
+    background: url("@/images/prompt-100s-126px-gray.png");
     background-size: contain;
 }
 </style>

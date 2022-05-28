@@ -47,7 +47,7 @@ export default defineComponent({
     },
     computed: {
         token(): string | null {
-            return this.$route.query?.token || null;
+            return String(this.$route.query?.token) || null;
         },
     },
     methods: {
@@ -55,7 +55,7 @@ export default defineComponent({
             try {
                 this.invalidCredentials = false;
                 this.busy = true;
-                await store.dispatch(new LoginAction(this.form.name, this.form.password, this.token));
+                await store.dispatch(new LoginAction(this.form.name, this.form.password, "no-secret", this.token));
                 await this.$router.push("/explore");
             } catch (error) {
                 this.invalidCredentials = true;

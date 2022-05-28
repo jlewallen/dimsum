@@ -61,7 +61,7 @@ import _ from "lodash";
 import { defineComponent } from "vue";
 import { Entity } from "@/http";
 import store, { UpdateEntityAction, EntityChange } from "@/store";
-import { VCodeMirror } from "@/views/shared/VCodeMirror.ts";
+import { VCodeMirror } from "@/views/shared/VCodeMirror";
 import Tabs from "@/views/shared/Tabs.vue";
 import Tab from "@/views/shared/Tab.vue";
 import { CommonComponents } from "@/views/shared";
@@ -211,9 +211,10 @@ export default defineComponent({
                 this.$emit("dismiss");
             } catch (error) {
                 console.log("error", error);
-                if (error.response) {
-                    if (error.response.errors && error.response.errors.length > 0) {
-                        const pythonError = error.response.errors[0];
+                const berror = error as { response?: { errors: { message: string; locations: { line: number; column: number }[] }[] } };
+                if (berror.response) {
+                    if (berror.response.errors && berror.response.errors.length > 0) {
+                        const pythonError = berror.response.errors[0];
                         console.log("python", pythonError);
                         this.error = {
                             python: {
@@ -223,7 +224,7 @@ export default defineComponent({
                             },
                         };
                     } else {
-                        console.log("mystery", error.response);
+                        console.log("mystery", berror.response);
                         this.error = {
                             mystery: true,
                         };

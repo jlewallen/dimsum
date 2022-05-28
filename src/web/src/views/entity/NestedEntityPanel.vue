@@ -20,9 +20,6 @@ export default defineComponent({
     },
     computed: {
         inner(): EntityRef | null {
-            if (this.entity.area) {
-                return this.entity.area;
-            }
             return null;
         },
     },
