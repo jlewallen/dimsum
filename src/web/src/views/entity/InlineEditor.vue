@@ -1,6 +1,6 @@
 <template>
     <div class="inline-editor" @keydown.esc="handleEscape">
-        <Tabs @close="cancel" ref="tabs">
+        <Tabs :initiallySelected="initiallySelectedTab()" @changed="tabChanged" @close="cancel" ref="tabs">
             <Tab title="General">
                 <div class="inline-form">
                     <div class="label">Name</div>
@@ -13,14 +13,14 @@
                     </keep-alive>
                 </div>
             </Tab>
-            <Tab title="Help">
-                <keep-alive>
-                    <VCodeMirror v-model="form.pedia" :autoFocus="true" :mode="{ name: 'markdown' }" />
-                </keep-alive>
-            </Tab>
             <Tab title="Behavior">
                 <keep-alive>
                     <VCodeMirror v-model="form.behavior" :autoFocus="true" />
+                </keep-alive>
+            </Tab>
+            <Tab title="Help">
+                <keep-alive>
+                    <VCodeMirror v-model="form.pedia" :autoFocus="true" :mode="{ name: 'markdown' }" />
                 </keep-alive>
             </Tab>
             <Tab title="Logs">
@@ -92,7 +92,7 @@ export default defineComponent({
         },
         help: {
             type: Boolean,
-            required: true,
+            default: false,
         },
     },
     data(): {
@@ -127,37 +127,61 @@ export default defineComponent({
         };
     },
     mounted() {
+        console.log("editor:mounted");
+
         window.addEventListener("keyup", this.keyUp);
+        window.addEventListener("keydown", this.keyDown);
+
         if (this.form.behavior == "" && this.form.pedia == "") {
             (this.$refs.name as HTMLInputElement).focus();
         }
     },
     unmounted() {
-        window.removeEventListener("keyup", this.keyUp);
-
         console.log("editor:unmounted");
+
+        window.removeEventListener("keyup", this.keyUp);
+        window.removeEventListener("keydown", this.keyDown);
     },
     methods: {
+        initiallySelectedTab(): number {
+            const lastTab = Number(window.localStorage["dimsum:editor:tab"] || 0);
+            return this.help ? 2 : lastTab;
+        },
+        keyDown(data: KeyboardEvent) {
+            // console.log("key-down", data, data.keyCode);
+            this.keyUp(data);
+        },
         keyUp(data: KeyboardEvent) {
             if (ignoringKey(data)) {
+                // console.log("ignoring");
+                // return;
+            }
+            if (data.ctrlKey && data.keyCode == 71) {
+                // Ctrl-g
+                console.log("show-general");
+                (this.$refs.tabs as typeof Tabs).selectTab(0);
+                data.preventDefault();
                 return;
             }
-            if (data.altKey && data.keyCode == 66) {
-                // Alt-b
+            if (data.ctrlKey && data.keyCode == 66) {
+                // Ctrl-b
                 console.log("show-behavior");
-                (this.$refs.tabs as typeof Tabs).selectTab(2);
-                return;
-            }
-            if (data.altKey && data.keyCode == 72) {
-                // Alt-h
-                console.log("show-help");
                 (this.$refs.tabs as typeof Tabs).selectTab(1);
+                data.preventDefault();
                 return;
             }
-            if (data.altKey && data.keyCode == 76) {
-                // Alt-l
+            if (data.ctrlKey && data.keyCode == 72) {
+                // Ctrl-h
+                console.log("show-help");
+                (this.$refs.tabs as typeof Tabs).selectTab(2);
+                data.preventDefault();
+                return;
+            }
+            if (data.ctrlKey && data.keyCode == 76) {
+                // Ctrl-l
                 console.log("show-logs");
                 (this.$refs.tabs as typeof Tabs).selectTab(3);
+                data.preventDefault();
                 return;
             }
         },
@@ -219,11 +243,19 @@ export default defineComponent({
         },
         handleEscape(ev: KeyboardEvent) {
             console.log("editor:escape", ev);
-        },
-        async cancel(e: Event): Promise<void> {
             this.$emit("dismiss");
-            if (e) {
-                e.preventDefault();
+        },
+        async tabChanged(selected: number) {
+            console.log("editor:tab", selected);
+            if (!this.help) {
+                window.localStorage["dimsum:editor:tab"] = selected;
+            }
+        },
+        async cancel(ev: Event): Promise<void> {
+            console.log("editor:cancel", ev);
+            this.$emit("dismiss");
+            if (ev) {
+                ev.preventDefault();
             }
         },
     },

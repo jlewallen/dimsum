@@ -4,7 +4,7 @@
             <li v-for="(tab, index) in tabs" :key="tab.title" @click="selectTab(index)" :class="{ tab__selected: index == selected }">
                 {{ tab.title }}
             </li>
-            <li @click="closed" class="close">Close</li>
+            <li @click="closed" class="close" v-if="false">Close</li>
         </ul>
         <slot></slot>
     </div>
@@ -16,17 +16,23 @@ import Tab from "./Tab.vue";
 
 export default defineComponent({
     name: "Tabs",
+    props: {
+        initiallySelected: {
+            type: Number,
+            default: 0,
+        },
+    },
     data(): {
         selected: number;
         tabs: typeof Tab[];
     } {
         return {
-            selected: 0,
+            selected: this.initiallySelected,
             tabs: [],
         };
     },
     mounted(): void {
-        this.selectTab(0);
+        this.selectTab(this.selected);
     },
     methods: {
         selectTab(i: number): void {
@@ -34,6 +40,7 @@ export default defineComponent({
             this.tabs.forEach((tab, index) => {
                 tab.isActive = index === i;
             });
+            this.$emit("changed", this.selected);
         },
         closed(): void {
             this.$emit("close");

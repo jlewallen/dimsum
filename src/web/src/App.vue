@@ -1,6 +1,6 @@
 <template>
     <div id="hack">
-        <div id="upper" :class="{ obscured: isObscured }">
+        <div id="upper" :class="{ obscured: isObscured }" @click="resumeRepl()">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <a class="navbar-brand" href="#">Mudsum</a>
 
@@ -63,6 +63,10 @@ export default defineComponent({
         },
     },
     created() {
+        window.onfocus = () => {
+            console.log("window:focus");
+            this.resumeRepl();
+        };
         window.addEventListener("keyup", (data) => {
             if (ignoringKey(data)) {
                 return;

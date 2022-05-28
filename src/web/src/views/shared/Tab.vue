@@ -17,7 +17,7 @@ export default defineComponent({
     },
     data(): { isActive: boolean } {
         return {
-            isActive: true,
+            isActive: false,
         };
     },
     created(): void {

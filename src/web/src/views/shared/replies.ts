@@ -75,7 +75,13 @@ const EditingEntityBehavior = defineComponent({
         ...CommonComponents,
         InlineEditor,
     },
-    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :help="false" :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
+    template: `
+        <div class="response editor">
+            <WithEntity :entityKey="reply.entity.key" v-slot="withEntity">
+                <InlineEditor :entity="withEntity.entity" @dismiss="$emit('dismiss')" />
+            </WithEntity>
+        </div>
+    `,
 });
 
 const EditingEntityHelp = defineComponent({
@@ -85,7 +91,13 @@ const EditingEntityHelp = defineComponent({
         ...CommonComponents,
         InlineEditor,
     },
-    template: `<div class="response editor"><WithEntity :entityKey="reply.entity.key" v-slot="withEntity"><InlineEditor :help="true" :entity="withEntity.entity" @dismiss="$emit('dismiss')" /></WithEntity></div>`,
+    template: `
+        <div class="response editor">
+            <WithEntity :entityKey="reply.entity.key" v-slot="withEntity">
+                <InlineEditor :help="true" :entity="withEntity.entity" @dismiss="$emit('dismiss')" />
+            </WithEntity>
+        </div>
+    `,
 });
 
 const ScreenCleared = defineComponent({
@@ -97,7 +109,9 @@ const ScreenCleared = defineComponent({
 const DynamicMessage = defineComponent({
     name: "DynamicMessage",
     props: CommonProps,
-    template: `<div class="response dynamic">{{ reply.message.message }}<span v-if="false">{{ reply.source.name }}</span></div>`,
+    template: `
+        <div class="response dynamic">{{ reply.message.message }}<span v-if="false">{{ reply.source.name }}</span></div>
+    `,
 });
 
 const UniversalString = defineComponent({
