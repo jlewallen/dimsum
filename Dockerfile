@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS python-venv-image
+FROM python:3.10-slim AS python-venv-image
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends build-essential gcc
@@ -15,7 +15,7 @@ COPY src/web /app/src/web/
 COPY src/web/src/config.ts.prod /app/src/web/src/config.ts
 RUN cd src/web && yarn install && npx browserslist@latest --update-db && yarn run build
 
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends nginx && apt-get clean
 
