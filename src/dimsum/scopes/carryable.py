@@ -329,16 +329,16 @@ class Containing(Openable):
         **kwargs,
     ):
         if len(self.holding) == 0:
-            return None, "nothing to drop"
+            return None, "Nothing to drop."
 
         dropped: List[Entity] = []
         if quantity:
             if not item:
-                return None, "of what, though?"
+                return None, "Of what, though?"
 
             with item.make(Carryable) as dropping:
                 if quantity > dropping.quantity or quantity < 1:
-                    return None, "you should check how many you have"
+                    return None, "You should check how many you have."
 
                 dropped = dropping.separate(quantity, **kwargs)
                 log.info("separated: %s (%d)", dropped, quantity)
