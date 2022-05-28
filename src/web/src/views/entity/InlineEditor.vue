@@ -131,10 +131,6 @@ export default defineComponent({
 
         window.addEventListener("keyup", this.keyUp);
         window.addEventListener("keydown", this.keyDown);
-
-        if (this.form.behavior == "" && this.form.pedia == "") {
-            (this.$refs.name as HTMLInputElement).focus();
-        }
     },
     unmounted() {
         console.log("editor:unmounted");
