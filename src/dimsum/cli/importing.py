@@ -31,3 +31,5 @@ async def load(path: str):
     }
     log.info("updating storage %d entities", len(incoming))
     await domain.store.update(compiled)
+
+    await domain.close()

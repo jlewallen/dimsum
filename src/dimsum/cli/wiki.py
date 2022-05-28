@@ -66,3 +66,5 @@ async def load_wiki(
                         await session.perform(WriteHelp(name, body), person=player)
 
         await session.save()
+
+    await domain.close()

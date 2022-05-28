@@ -24,3 +24,5 @@ async def export(path: str):
     """Exporting entities from a database."""
     domain = await utils.open_domain(path)
     await domain.store.write(sys.stdout)  # type:ignore
+
+    await domain.close()

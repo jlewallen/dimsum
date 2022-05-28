@@ -57,3 +57,5 @@ async def graph(path: str, output: str):
                 )
             )
             file.write("\n\n")
+
+    await domain.close()
