@@ -1,4 +1,3 @@
-// import _ from "lodash";
 import { createLogger, createStore, ActionContext } from "vuex";
 import {
     RootState,
@@ -23,13 +22,10 @@ export * from "./types";
 type ActionParameters = ActionContext<RootState, RootState>;
 
 const disabledRefresh = true;
+const enableLogging = false;
 
 export default createStore<RootState>({
-    plugins: [
-        /*
-        createLogger({}),
-        */
-    ],
+    plugins: enableLogging ? [createLogger()] : [],
     state: new RootState(),
     mutations: {
         [MutationTypes.INIT]: (state: RootState) => {

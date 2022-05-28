@@ -13,6 +13,7 @@
         "@types/codemirror": "^5.60.1",
         "@types/markdown-it": "^12.2.3",
         "browserslist": "^4.16.6",
+        "caniuse-lite": "^1.0.30001344",
         "codemirror": "^5.62.0",
         "core-js": "^3.6.5",
         "graphql": "16.5.0",
