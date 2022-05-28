@@ -471,6 +471,12 @@ class Entity:
             self._log().exception(f"error creating scope {ctor}", exc_info=True)
             raise
 
+    def drop_scope(self, ctor: Type) -> bool:
+        if self.has(ctor):
+            del self.scopes[_get_ctor_key(ctor)]
+            return True
+        return False
+
     def discard(self, child):
         pass
 

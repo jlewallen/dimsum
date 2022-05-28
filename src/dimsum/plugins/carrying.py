@@ -4,10 +4,10 @@ from typing import Type, Optional, List, Dict, Any
 
 import grammars
 import transformers
+import tools
 from loggers import get_logger
 from model import *
 from finders import *
-from tools import *
 from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
 import scopes.carryable as carryable
@@ -103,7 +103,7 @@ class Drop(PersonAction):
                     ItemsDropped(
                         source=person,
                         area=area,
-                        heard=default_heard_for(area=area, excepted=[person]),
+                        heard=tools.default_heard_for(area=area, excepted=[person]),
                         items=dropped,
                     )
                 )
@@ -141,6 +141,9 @@ class Hold(PersonAction):
             if pockets.is_holding(item):
                 return Failure("You're already holding that.")
 
+            if not item.has(carryable.Carryable):
+                return Failure("You can't carry that.")
+
             area = await find_entity_area(person)
             with area.make(carryable.Containing) as ground:
                 if self.quantity:
@@ -162,7 +165,7 @@ class Hold(PersonAction):
                     ItemsHeld(
                         source=person,
                         area=area,
-                        heard=default_heard_for(area=area, excepted=[person]),
+                        heard=tools.default_heard_for(area=area, excepted=[person]),
                         items=[after_hold],
                     )
                 )
@@ -480,12 +483,36 @@ class ModifyCapacity(PersonAction):
         item = await ctx.apply_item_finder(person, self.item)
         if not item:
             return Failure("Modify what?")
+
         item.try_modify()
+
         with item.make(carryable.Containing) as contain:
             if contain.adjust_capacity(self.capacity):
                 return Success("Done.")
 
         return Failure("No way.")
+
+
+class RenderUnholdable(PersonAction):
+    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
+        super().__init__(**kwargs)
+        assert item
+        self.item = item
+
+    async def perform(
+        self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
+    ):
+        item = await ctx.apply_item_finder(person, self.item)
+        if not item:
+            return Failure("Render what?")
+
+        item.try_modify()
+
+        await Drop(item=self.item).perform(world, area, person, ctx, **kwargs)
+
+        item.drop_scope(carryable.Carryable)
+
+        return Success("Done.")
 
 
 class Transformer(transformers.Base):
@@ -543,6 +570,9 @@ class Transformer(transformers.Base):
     def when_opened(self, args):
         return ModifyActivity(item=AnyHeldItem(), activity=Opened, value=True)
 
+    def render_unholdable(self, args):
+        return RenderUnholdable(item=args[0])
+
 
 @grammars.grammar()
 class CarryingGrammar(grammars.Grammar):
@@ -555,7 +585,7 @@ class CarryingGrammar(grammars.Grammar):
         return """
         start:             verbs
 
-        verbs:             drop | hold | put | take | lock | unlock | give | open | close | pour | modify
+        verbs:             drop | hold | put | take | lock | unlock | give | open | close | pour | modify | unholdable
 
         give:              "give"
 
@@ -589,4 +619,6 @@ class CarryingGrammar(grammars.Grammar):
                          | "modify" "pours" makeable_noun          -> when_pours
                          | "modify" "when" "opened"                -> when_opened
                          | "modify" "when" "closed"                -> when_closed
+
+        unholdable:        "render" held "unholdable"              -> render_unholdable
 """
