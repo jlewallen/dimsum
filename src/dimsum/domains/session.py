@@ -42,6 +42,7 @@ from model import (
     SecurityCheckException,
     Serialized,
     ExtendHooks,
+    Unknown,
     Action,
 )
 from storage import EntityStorage
@@ -259,7 +260,7 @@ class Session(MaterializeAndCreate):
                     action = await evaluator.evaluate(
                         command, world=self.world, person=person
                     )
-                    assert action
+                    action = action or Unknown()
                     assert isinstance(action, Action)
                     roles = action.gather_roles()
                     return await self.perform(action, person)
