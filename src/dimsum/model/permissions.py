@@ -224,7 +224,7 @@ def generate_security_check_from_json_diff(
         for key, child in acls.items():
             if key and node.startswith(key + ".") or not key and node.startswith(key):
                 matched[key] = child
-        log.info("security('%s'): %s", node, matched)
+        log.debug("security('%s'): %s", node, matched)
     return SecurityCheck(matched)
 
 
