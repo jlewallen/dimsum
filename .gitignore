@@ -4,6 +4,7 @@ __pycache__
 .log
 .coverage
 *.sqlite3*
+*.swp
 
 ssh_host_key
 ssh_host_key.pub
