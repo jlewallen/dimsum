@@ -2,7 +2,7 @@ import copy
 import dataclasses
 from typing import Dict, List, Optional, Type, Any
 
-import grammars, transformers, tools
+import grammars, transformers, tools, logging
 from loggers import get_logger
 from model import *
 from finders import *
@@ -144,9 +144,10 @@ class Make(PersonAction):
 
 
 class DuplicateItem(PersonAction):
-    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
+    def __init__(self, item: Optional[ItemFinder] = None, fork: bool = False, **kwargs):
         assert item
         self.item = item
+        self.fork = fork
         super().__init__(**kwargs)
 
     async def perform(
@@ -162,9 +163,9 @@ class DuplicateItem(PersonAction):
         if not item:
             return Failure("Duplicate what?")
 
-        duplicate = tools.duplicate(item)
-        with person.make(carryable.Containing) as contain:
-            after_hold = contain.hold(duplicate)
+        duplicate = tools.duplicate(item, fork=self.fork)
+        with person.make(carryable.Containing) as hands:
+            after_hold = hands.hold(duplicate)
             # We do this after because we may consolidate this Item and
             # this keeps us from having to unregister the item.
             ctx.register(after_hold)
@@ -293,6 +294,7 @@ class Grammar(grammars.Grammar):
         obliterate_item:        "obliterate" noun                       -> obliterate_item
 
         duplicate_item:         "duplicate" noun                        -> duplicate_item
+                              | "duplicate" "~fork" noun                -> duplicate_fork_item
 
         make:                   "make" makeable                         -> make
                               | "make" number makeable                  -> make_quantified
@@ -339,4 +341,7 @@ class Transformer(transformers.Base):
         return ObliterateItem(args[0])
 
     def duplicate_item(self, args):
-        return DuplicateItem(args[0])
+        return DuplicateItem(args[0], fork=False)
+
+    def duplicate_fork_item(self, args):
+        return DuplicateItem(args[0], fork=True)

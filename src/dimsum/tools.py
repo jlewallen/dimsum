@@ -1,5 +1,5 @@
 import dataclasses
-import enum
+import enum, copy
 from typing import Dict, List, Optional, Sequence
 
 from loggers import get_logger
@@ -11,8 +11,11 @@ from model import (
     SecurityMappings,
     context,
     MaterializeAndCreate,
+    Kind,
+    generate_entity_identity,
     materialize_well_known_entity,
 )
+from model.crypto import generate_identity
 import scopes.apparel as apparel
 import scopes.carryable as carryable
 import scopes.mechanics as mechanics
@@ -268,7 +271,14 @@ def orphan(entity: Entity):
             entity.touch()
 
 
-def duplicate(entity: Entity) -> Entity:
-    return scopes.create_klass(
-        entity.klass, creator=entity.creator, props=entity.props, scopes=entity.scopes
+def duplicate(entity: Entity, fork: bool = False) -> Entity:
+    dupe = scopes.create_klass(
+        entity.klass,
+        creator=entity.creator,
+        props=entity.props.clone(),
+        scopes=copy.deepcopy(entity.scopes),
     )
+    if fork and entity.has(carryable.Carryable):
+        with dupe.make(carryable.Carryable) as c:
+            c.kind = Kind(identity=generate_identity())
+    return dupe

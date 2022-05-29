@@ -77,6 +77,53 @@ async def test_obliterate():
 
 
 @pytest.mark.asyncio
+async def test_duplicate_normal():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Hammer")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        with jacob.make(carryable.Containing) as pockets:
+            assert len(pockets.holding) == 1
+
+    await tw.success("duplicate hammer")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        with jacob.make(carryable.Containing) as pockets:
+            assert len(pockets.holding) == 1
+            assert pockets.holding[0].make(carryable.Carryable).quantity == 2
+
+    await tw.close()
+
+
+@pytest.mark.asyncio
+async def test_duplicate_fork():
+    tw = test.TestWorld()
+    await tw.initialize()
+    await tw.success("make Hammer")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        with jacob.make(carryable.Containing) as pockets:
+            assert len(pockets.holding) == 1
+
+    await tw.success("duplicate ~fork hammer")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        with jacob.make(carryable.Containing) as pockets:
+            assert len(pockets.holding) == 2
+
+    await tw.close()
+
+
+@pytest.mark.asyncio
 async def test_obliterate_thing_with_behavior():
     tw = test.TestWorld()
     await tw.initialize()
