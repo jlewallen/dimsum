@@ -106,11 +106,25 @@ class SqliteStorage(EntityStorage):
 
         return [Serialized(key, serialized) for key, serialized in rows.items()]
 
-    async def write(self, stream: TextIO):
+    async def _get_entities_to_write(
+        self, gid: Optional[int] = None, key: Optional[str] = None
+    ):
+        assert self.db
+        if gid:
+            return await self.db.execute(
+                "SELECT key, serialized FROM entities WHERE gid = $1", [gid]
+            )
+        if key:
+            return await self.db.execute(
+                "SELECT key, serialized FROM entities WHERE key = $1", [key]
+            )
+        return await self.db.execute("SELECT key, serialized FROM entities")
+
+    async def write(self, stream: TextIO, **kwargs):
         await self.open_if_necessary()
         assert self.db
 
-        dbc = await self.db.execute("SELECT key, serialized FROM entities")
+        dbc = await self._get_entities_to_write(**kwargs)
         stream.write("[\n")
         prefix = ""
         for row in await dbc.fetchall():
