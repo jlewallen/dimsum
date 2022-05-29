@@ -2,13 +2,12 @@ import copy
 import dataclasses
 from typing import Dict, List, Optional, Type, Any
 
-import grammars
-import transformers
+import grammars, transformers, tools
 from loggers import get_logger
 from model import *
 from finders import *
-from tools import *
 import scopes
+import scopes.behavior as behavior
 from plugins.actions import PersonAction
 
 log = get_logger("dimsum")
@@ -89,7 +88,7 @@ class Create(PersonAction):
                 source=person,
                 area=area,
                 entity=final_entity,
-                heard=default_heard_for(area, excepted=[person]),
+                heard=tools.default_heard_for(area, excepted=[person]),
             )
 
 
@@ -135,7 +134,7 @@ class Make(PersonAction):
         im = ItemsMade(
             source=person,
             area=area,
-            heard=default_heard_for(area=area, excepted=[person]),
+            heard=tools.default_heard_for(area=area, excepted=[person]),
             items=[after_hold],
         )
 
@@ -144,8 +143,10 @@ class Make(PersonAction):
         return im
 
 
-class Obliterate(PersonAction):
-    def __init__(self, **kwargs):
+class DuplicateItem(PersonAction):
+    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
+        assert item
+        self.item = item
         super().__init__(**kwargs)
 
     async def perform(
@@ -157,20 +158,58 @@ class Obliterate(PersonAction):
         **kwargs,
     ):
         area = await find_entity_area(person)
-        items = None
-        with person.make(carryable.Containing) as pockets:
-            items = await pockets.drop_all()
-        if len(items) == 0:
-            return Failure("You're not holding anything.")
+        item = await ctx.apply_item_finder(person, self.item)
+        if not item:
+            return Failure("Duplicate what?")
 
-        for item in items:
-            ctx.unregister(item)
+        duplicate = tools.duplicate(item)
+        with person.make(carryable.Containing) as contain:
+            after_hold = contain.hold(duplicate)
+            # We do this after because we may consolidate this Item and
+            # this keeps us from having to unregister the item.
+            ctx.register(after_hold)
+
+        area = await find_entity_area(person)
+
+        im = ItemsMade(
+            source=person,
+            area=area,
+            heard=tools.default_heard_for(area=area, excepted=[person]),
+            items=[after_hold],
+        )
+
+        await ctx.publish(im)
+
+
+class ObliterateItem(PersonAction):
+    def __init__(self, item: Optional[ItemFinder] = None, **kwargs):
+        assert item
+        self.item = item
+        super().__init__(**kwargs)
+
+    async def perform(
+        self,
+        world: World,
+        area: Entity,
+        person: Entity,
+        ctx: Ctx,
+        **kwargs,
+    ):
+        area = await find_entity_area(person)
+        item = await ctx.apply_item_finder(person, self.item)
+        if not item:
+            return Failure("Obliterate what?")
+
+        with person.make(carryable.Containing) as pockets:
+            for item in [item]:
+                pockets.drop(item)
+                ctx.unregister(item)
 
         io = ItemsObliterated(
             source=person,
             area=area,
-            heard=default_heard_for(area=area, excepted=[person]),
-            items=items,
+            heard=tools.default_heard_for(area=area, excepted=[person]),
+            items=[item],
         )
 
         await ctx.publish(io)
@@ -249,9 +288,12 @@ class Grammar(grammars.Grammar):
     @property
     def lark(self) -> str:
         return """
-        start:                  create | obliterate | make | call
+        start:                  create | obliterate_item | duplicate_item | make | call
 
-        obliterate:             "obliterate"
+        obliterate_item:        "obliterate" noun                       -> obliterate_item
+
+        duplicate_item:         "duplicate" noun                        -> duplicate_item
+
         make:                   "make" makeable                         -> make
                               | "make" number makeable                  -> make_quantified
 
@@ -293,5 +335,8 @@ class Transformer(transformers.Base):
     def call(self, args):
         return CallThis(item=args[0], name=str(args[1]))
 
-    def obliterate(self, args):
-        return Obliterate()
+    def obliterate_item(self, args):
+        return ObliterateItem(args[0])
+
+    def duplicate_item(self, args):
+        return DuplicateItem(args[0])

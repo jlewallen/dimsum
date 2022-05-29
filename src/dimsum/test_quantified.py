@@ -254,7 +254,7 @@ async def test_quantified_from_recipe(caplog):
         coins = brain.memory["r:cash"]
         assert coins.make(finders.Recipe).template
 
-    await tw.success("obliterate")
+    await tw.success("obliterate Gold")
 
     with tw.domain.session() as session:
         jacob = await session.materialize(key=tw.jacob_key)

@@ -447,7 +447,7 @@ async def hide_everything(resume, entity):
     assert len(r.items) == 0
 
     await tw.success("hold Keys")
-    await tw.success("obliterate")
+    await tw.success("obliterate keys")
 
     r = await tw.success("look")
     assert len(r.items) == 1

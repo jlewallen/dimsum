@@ -65,7 +65,7 @@ async def test_obliterate():
         with jacob.make(carryable.Containing) as pockets:
             assert len(pockets.holding) == 1
 
-    await tw.success("obliterate")
+    await tw.success("obliterate hammer")
 
     with tw.domain.session() as session:
         world = await session.prepare()
@@ -98,7 +98,7 @@ async def test_obliterate_thing_with_behavior():
         await session.save()
 
     await tw.success("hold hammer")
-    await tw.success("obliterate")
+    await tw.success("obliterate hammer")
 
     with tw.domain.session() as session:
         world = await session.prepare()

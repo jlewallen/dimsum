@@ -266,3 +266,9 @@ def orphan(entity: Entity):
                 assert container.unhold(entity)
             location.container = None
             entity.touch()
+
+
+def duplicate(entity: Entity) -> Entity:
+    return scopes.create_klass(
+        entity.klass, creator=entity.creator, props=entity.props, scopes=entity.scopes
+    )
