@@ -1,11 +1,9 @@
 import dataclasses
 from typing import Type, Optional, List, Dict, Any
 
-import grammars
-import transformers
+import grammars, transformers, tools
 from loggers import get_logger
 from model import *
-from tools import *
 from finders import *
 from plugins.actions import PersonAction
 from plugins.editing import ModifyActivity
@@ -68,7 +66,7 @@ class Wear(PersonAction):
             ItemsWorn(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area, excepted=[person]),
+                heard=tools.default_heard_for(area=area, excepted=[person]),
                 items=[item],
             )
         )
@@ -102,7 +100,7 @@ class Remove(PersonAction):
             ItemsUnworn(
                 source=person,
                 area=area,
-                heard=default_heard_for(area=area, excepted=[person]),
+                heard=tools.default_heard_for(area=area, excepted=[person]),
                 items=[item],
             )
         )

@@ -1,14 +1,10 @@
-import copy
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Type
 
-import grammars
-import transformers
+import grammars, transformers
 from loggers import get_logger
 from model import *
 from finders import *
-from tools import *
-from domains import Session
 import scopes
 from plugins.actions import PersonAction
 
