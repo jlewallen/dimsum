@@ -15,7 +15,7 @@ log = get_logger("dimsum")
 
 @hooks.all.enter.target()
 async def can_enter(person: Entity, area: Entity) -> bool:
-    return True
+    return area.has(occupyable.Occupyable)
 
 
 class Home(PersonAction):

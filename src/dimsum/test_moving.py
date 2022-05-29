@@ -31,6 +31,30 @@ async def test_go_unknown():
 
 
 @pytest.mark.asyncio
+async def test_go_non_carryable():
+    tw = test.TestWorld()
+    await tw.initialize()
+
+    area_before: Optional[Entity] = None
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_before = (await find_entity_area(jacob)).key
+
+    items_made = await tw.success("make Door")
+    item = items_made.items[0]
+    await tw.failure(f"go #{item.props.gid}")
+
+    with tw.domain.session() as session:
+        world = await session.prepare()
+        jacob = await session.materialize(key=tw.jacob_key)
+        area_after = (await find_entity_area(jacob)).key
+        assert area_before == area_after
+
+    await tw.close()
+
+
+@pytest.mark.asyncio
 async def test_go_non_exit():
     tw = test.TestWorld()
     await tw.initialize()
@@ -200,12 +224,12 @@ class Bidirectional:
         goes_there = scopes.exit(
             props=Common(name="Exit to {0}".format(there.props.name)),
             initialize={movement.Exit: dict(area=there)},
-            **kwargs
+            **kwargs,
         )
         comes_back = scopes.exit(
             props=Common(name="Exit to {0}".format(back.props.name)),
             initialize={movement.Exit: dict(area=back)},
-            **kwargs
+            **kwargs,
         )
         with back.make(carryable.Containing) as contain:
             contain.add_item(goes_there)
