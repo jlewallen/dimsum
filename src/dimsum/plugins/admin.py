@@ -91,13 +91,19 @@ class Unfreeze(PersonAction):
 
 
 class SystemBackup(PersonAction):
+    def __init__(self, note: Optional[str] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.note = note
+
     async def perform(
         self, world: World, area: Entity, person: Entity, ctx: Ctx, **kwargs
     ):
         # Easier to just violate norms and ask for forgiveness than come up with
         # an over-engineered solution to this one.
         now = datetime.now()
-        info = tools.flatten(await ctx.session.store.backup(now))  # type:ignore
+        info = tools.flatten(
+            await ctx.session.store.backup(now, note=self.note)  # type:ignore
+        )
         return Success(f"Done: {info}")
 
 
@@ -115,7 +121,7 @@ class Transformer(transformers.Base):
         return Unfreeze(item=args[0])
 
     def system_backup(self, args):
-        return SystemBackup()
+        return SystemBackup(args[0] if args else None)
 
 
 @grammars.grammar()
@@ -133,5 +139,5 @@ class AdminGrammar(grammars.Grammar):
         invite:            "invite" TEXT
         freeze:            "freeze" held                           -> freeze
         unfreeze:          "unfreeze" held                         -> unfreeze
-        sys_backup:        "sys" "backup"                          -> system_backup
+        sys_backup:        "sys" "backup" USEFUL_WORD?             -> system_backup
 """

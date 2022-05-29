@@ -42,10 +42,14 @@ class StorageFields:
             raise Exception("malformed entity: {0}".format(cj.text))
 
 
-def backup(now: datetime.datetime, path: str) -> Optional[str]:
+def backup(
+    now: datetime.datetime, path: str, note: Optional[str] = None
+) -> Optional[str]:
     if not os.path.isfile(path):
         return None
     suffix = now.strftime("%Y%m%d_%H%M%S")
+    if note:
+        suffix += "_" + note
     inside_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
     backups_dir = os.path.join(inside_dir, ".backups")
@@ -277,9 +281,9 @@ class SqliteStorage(EntityStorage):
             await self.db.close()
             self.db = None
 
-    async def backup(self, now: datetime.datetime) -> Optional[List[str]]:
+    async def backup(self, now: datetime.datetime, **kwargs) -> Optional[List[str]]:
         if not self.read_only:
-            file = backup(now, self.path)
+            file = backup(now, self.path, **kwargs)
             if file:
                 return [file]
         return []

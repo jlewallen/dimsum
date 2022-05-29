@@ -82,7 +82,7 @@ class HttpStorage(EntityStorage):
     async def close(self):
         pass
 
-    async def backup(self, now: datetime) -> Optional[List[str]]:
+    async def backup(self, now: datetime, **kwargs) -> Optional[List[str]]:
         pass
 
     def __repr__(self):

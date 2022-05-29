@@ -23,7 +23,7 @@ class EntityStorage:
     async def close(self):
         raise NotImplementedError
 
-    async def backup(self, now: datetime) -> Optional[List[str]]:
+    async def backup(self, now: datetime, **kwargs) -> Optional[List[str]]:
         raise NotImplementedError
 
 
@@ -60,8 +60,8 @@ class AllStorageChain(EntityStorage):
     async def close(self):
         return [await c.close() for c in self.children]
 
-    async def backup(self, now: datetime):
-        return [await c.backup(now) for c in self.children]
+    async def backup(self, now: datetime, **kwargs):
+        return [await c.backup(now, **kwargs) for c in self.children]
 
     def __str__(self):
         return "All<{0}>".format(self.children)
@@ -105,8 +105,8 @@ class PrioritizedStorageChain(EntityStorage):
     async def close(self):
         return [await c.close() for c in self.children]
 
-    async def backup(self, now: datetime):
-        return [await c.backup(now) for c in self.children]
+    async def backup(self, now: datetime, **kwargs):
+        return [await c.backup(now, **kwargs) for c in self.children]
 
     def __str__(self):
         return "Prioritized<{0}>".format(self.children)
@@ -136,8 +136,11 @@ class SeparatedStorageChain(EntityStorage):
     async def close(self):
         return [await self.read.close(), await self.write.close()]
 
-    async def backup(self, now: datetime):
-        return [await self.read.backup(now), await self.write.backup(now)]
+    async def backup(self, now: datetime, **kwargs):
+        return [
+            await self.read.backup(now, **kwargs),
+            await self.write.backup(now, **kwargs),
+        ]
 
     def __str__(self):
         return "Separated<read={0}, write={1}>".format(self.read, self.write)
