@@ -24,23 +24,23 @@ pub fn parse<T: Scope + DeserializeOwned + 'static>(
 
 pub fn new_from_kv(key: &String, value: &serde_json::Value) -> Result<Box<dyn Scope>, Error> {
     match key.as_str() {
-        "exit" => parse::<Exit>(value),
         "carryable" => parse::<Carryable>(value),
-        "post" => parse::<Post>(value),
+        "containing" => parse::<Containing>(value),
         "location" => parse::<Location>(value),
+        "ownership" => parse::<Ownership>(value),
         "occupyable" => parse::<Occupyable>(value),
         "occupying" => parse::<Occupying>(value),
-        "ownership" => parse::<Ownership>(value),
-        "containing" => parse::<Containing>(value),
+        "exit" => parse::<Exit>(value),
         "behaviors" => parse::<Behaviors>(value),
         "behaviorCollection" => parse::<BehaviorCollection>(value),
-        "encyclopedia" => parse::<Encyclopedia>(value),
+        "movement" => parse::<Movement>(value),
+        "apparel" => parse::<Apparel>(value),
         "memory" => parse::<Memory>(value),
         "health" => parse::<Health>(value),
-        "apparel" => parse::<Apparel>(value),
-        "wellKnown" => parse::<WellKnown>(value),
-        "movement" => parse::<Movement>(value),
+        "encyclopedia" => parse::<Encyclopedia>(value),
         "weather" => parse::<Weather>(value),
+        "post" => parse::<Post>(value),
+        "wellKnown" => parse::<WellKnown>(value),
         "auth" => parse::<Auth>(value),
         "usernames" => parse::<Usernames>(value),
         "identifiers" => parse::<Identifiers>(value),
@@ -48,15 +48,13 @@ pub fn new_from_kv(key: &String, value: &serde_json::Value) -> Result<Box<dyn Sc
     }
 }
 
-// TODO Can this be simplified? Is there a collect_map?
 pub fn from_map(
     map: &HashMap<String, serde_json::Value>,
 ) -> Result<HashMap<&String, Box<dyn Scope>>, Error> {
-    let mut how_to_remove = HashMap::<&String, Box<dyn Scope>>::new();
-    for (key, value) in map {
-        how_to_remove.insert(key, new_from_kv(key, value)?);
-    }
-    Ok(how_to_remove)
+    let m: HashMap<_, _> = map.iter().map(|(k, v)| {
+        (k, new_from_kv(k, v).unwrap())
+    }).collect();
+    Ok(m)
 }
 
 // scope
