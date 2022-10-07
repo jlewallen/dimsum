@@ -51,10 +51,9 @@ pub fn new_from_kv(key: &String, value: &serde_json::Value) -> Result<Box<dyn Sc
 pub fn from_map(
     map: &HashMap<String, serde_json::Value>,
 ) -> Result<HashMap<&String, Box<dyn Scope>>, Error> {
-    let m: HashMap<_, _> = map.iter().map(|(k, v)| {
-        (k, new_from_kv(k, v).unwrap())
-    }).collect();
-    Ok(m)
+    map.iter()
+        .map(|(k, v)| Ok((k, new_from_kv(k, v)?)))
+        .collect()
 }
 
 // scope
@@ -176,21 +175,21 @@ impl Scope for Memory {}
 // scope
 #[derive(Debug, Serialize, Deserialize)]
 struct Health {
-medical: Medical,
+    medical: Medical,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Medical {
     #[serde(alias = "py/object")]
     py_object: String,
-nutrition: Nutrition,
+    nutrition: Nutrition,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Nutrition {
     #[serde(alias = "py/object")]
     py_object: String,
-properties: HashMap<String, serde_json::Value>,
+    properties: HashMap<String, serde_json::Value>,
 }
 
 impl Scope for Health {}
