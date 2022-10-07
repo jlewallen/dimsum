@@ -7,56 +7,18 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 use tracing_tree::HierarchicalLayer;
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+// use serde_json::Value;
 
 use rusqlite::Connection;
+
+pub mod model;
+pub mod scopes;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Version {
     #[serde(alias = "py/object")]
     py_object: String,
     i: u32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct EntityRef {
-    #[serde(alias = "py/object")]
-    py_object: String,
-    #[serde(alias = "py/ref")]
-    py_ref: String,
-    key: String,
-    klass: String,
-    name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Identity {
-    #[serde(alias = "py/object")]
-    py_object: String,
-    private: String,
-    public: String,
-    signature: Option<String>, // TODO Why does this happen?
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct EntityClass {
-    #[serde(alias = "py/type")]
-    py_type: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct AclRule {
-    #[serde(alias = "py/object")]
-    py_object: String,
-    keys: Vec<String>,
-    perm: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Acls {
-    #[serde(alias = "py/object")]
-    py_object: String,
-    rules: Vec<AclRule>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,14 +37,20 @@ struct Entity {
     py_object: String,
     key: String,
     version: Version,
-    parent: Option<EntityRef>,
-    creator: Option<EntityRef>,
-    identity: Identity,
+    parent: Option<model::core::EntityRef>,
+    creator: Option<model::core::EntityRef>,
+    identity: model::core::Identity,
     #[serde(alias = "klass")]
-    class: EntityClass,
-    acls: Acls,
+    class: model::core::EntityClass,
+    acls: model::core::Acls,
     props: Props,
     scopes: HashMap<String, serde_json::Value>,
+}
+
+impl Entity {
+    fn to_scopes(&self) -> Result<HashMap<&String, Box<dyn scopes::Scope>>, Error> {
+        scopes::from_map(&self.scopes)
+    }
 }
 
 #[derive(Debug)]
@@ -138,12 +106,20 @@ fn main() -> Result<()> {
 
         debug!(%persisted.key, %persisted.gid, %persisted.version, "loading");
 
-        // let opaque: Value = serde_json::from_str(&persisted.serialized)?;
+        // let opaque: serde_json::Value = serde_json::from_str(&persisted.serialized)?;
         // debug!("{}", serde_json::to_string_pretty(&opaque).unwrap());
 
         let entity = persisted.to_entity()?;
 
-        info!(%entity.key, "parsed");
+        let scopes = entity.to_scopes()?;
+
+        info!(%entity.key, "scopes {:?}", scopes);
+
+        for (scope_key, scope) in scopes {
+            debug!(%scope_key, "scope");
+
+            debug!(%scope_key, "scope: {:?}", scope);
+        }
     }
 
     Ok(())
