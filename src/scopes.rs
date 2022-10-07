@@ -5,7 +5,7 @@ use anyhow::{Error, Result};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::model::core::{Acls, EntityRef, Kind};
+use crate::model::core::{Acls, EntityKey, EntityRef, Kind};
 
 pub trait Scope: std::fmt::Debug {}
 
@@ -56,6 +56,9 @@ pub fn from_map(
         .collect()
 }
 
+// #[serde(alias = "py/object")]
+// type PyObject = String;
+
 // scope
 #[derive(Debug, Serialize, Deserialize)]
 struct Unknown {}
@@ -101,7 +104,27 @@ struct BehaviorCollection {
 struct BehaviorsInner {
     #[serde(alias = "py/object")]
     py_object: String,
-    map: HashMap<String, serde_json::Value>,
+    map: HashMap<String, Behavior>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Behavior {
+    #[serde(alias = "py/object")]
+    py_object: String,
+    acls: Acls,
+    python: Option<String>,
+    executable: bool,
+    logs: Vec<BehaviorLog>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct BehaviorLog {
+    context: HashMap<String, serde_json::Value>,
+    logs: Vec<String>,
+    exceptions: Option<serde_json::Value>,
+    success: bool,
+    time: f32,
+    elapsed: f32,
 }
 
 impl Scope for Behaviors {}
@@ -206,7 +229,7 @@ impl Scope for Auth {}
 // scope
 #[derive(Debug, Serialize, Deserialize)]
 struct WellKnown {
-    entities: HashMap<String, String>, // String to Key
+    entities: HashMap<String, EntityKey>,
 }
 
 impl Scope for WellKnown {}
@@ -284,7 +307,7 @@ impl Scope for Identifiers {}
 #[derive(Debug, Serialize, Deserialize)]
 struct Usernames {
     acls: Acls,
-    users: HashMap<String, String>, // String to Key
+    users: HashMap<String, EntityKey>,
 }
 
 impl Scope for Usernames {}

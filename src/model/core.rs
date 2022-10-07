@@ -1,12 +1,14 @@
 use serde::{Deserialize, Serialize};
 
+pub type EntityKey = String;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EntityRef {
     #[serde(alias = "py/object")]
     py_object: String,
     #[serde(alias = "py/ref")]
     py_ref: String,
-    key: String,
+    key: EntityKey,
     klass: String,
     name: String,
 }

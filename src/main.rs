@@ -7,7 +7,6 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 use tracing_tree::HierarchicalLayer;
 
 use serde::{Deserialize, Serialize};
-// use serde_json::Value;
 
 use rusqlite::Connection;
 
