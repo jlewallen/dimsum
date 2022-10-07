@@ -19,3 +19,8 @@ web/node_modules
 web/src/config.ts
 static
 _build
+
+
+# Added by cargo
+
+/target
