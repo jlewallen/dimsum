@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 
 use rusqlite::Connection;
 
+// use rustpython::vm;
+
 pub mod model;
 pub mod scopes;
 
@@ -120,6 +122,23 @@ fn main() -> Result<()> {
             debug!(%scope_key, "scope: {:?}", scope);
         }
     }
+
+    /* 
+    vm::Interpreter::without_stdlib(Default::default()).enter(|vm| -> vm::PyResult<()> {
+        let scope = vm.new_scope_with_builtins();
+        let code_obj = vm
+            .compile(
+                r#""Hello World!""#,
+                vm::compiler::Mode::Exec,
+                "<embedded>".to_owned(),
+            )
+            .map_err(|err| vm.new_syntax_error(&err))?;
+
+        vm.run_code_obj(code_obj, scope)?;
+
+        Ok(())
+    }).unwrap();
+   */
 
     Ok(())
 }
